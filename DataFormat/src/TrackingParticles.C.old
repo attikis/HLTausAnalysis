@@ -1,0 +1,245 @@
+#ifndef TrackingParticles_cxx
+#define TrackingParticles_cxx
+
+// System
+#include <iostream>
+#include <algorithm>
+#include <cmath>
+
+// User
+#include "../../Auxiliary/interface/constants.h"
+#include "../interface/TrackingParticles.h"
+
+#ifdef USING_MC
+#include "../../Framework/interface/TreeDefinitionGenP.h"
+#endif
+
+// ROOT
+#include <TLorentzVector.h>
+
+//#define DEBUG
+
+
+//****************************************************************************
+double TrackingParticles::GetD0(const int iTP)
+//****************************************************************************
+{
+  
+  double tp_Phi   = 0;
+  double tp_POCAx = t->TP_POCAx->at(iTP);
+  double tp_POCAy = t->TP_POCAy->at(iTP);
+  double tp_d0    = -tp_POCAx * sin(tp_Phi) + tp_POCAy * cos(tp_Phi);
+  return tp_d0;
+  
+}
+
+
+//****************************************************************************
+double TrackingParticles::GetD0Sign(const int iTP)
+//****************************************************************************
+{
+
+  // The track d0 sign has the same sign as the curvature (rho)
+  // [and hence charge (Q) since Sgn(Q) = Sgn(rho)] if the z-axis is OUTSIDE
+  // the circle in the x-y plane formed by the track helix projection.
+  // In other words, if the track is going clockwise in the x-y plane it has a
+  // positive d0 sign, otherwise negative. The latter is irrespective of charge.
+  // One way to determine the track direction (clockwise or anticlockwise) is to
+  // first take the cross product of the POCA vector with the instantaneous
+  // momentum at the POCA and then project along the unit vector of the viewing direction.
+  // If you are looking AT the x-y plane the we are looking along the negative z-axis.
+  // Therefore we need to project along (0, 0, -1)
+  // double tp_RInv = t->TP_RInv->at(iTP);
+
+  // Q. How to determine if a vector is moving clockwise or anti-clockwise to another
+  // A. The question only makes sense in 3-D since the notion only makes sense
+  // once you have established a viewing direction. If V is the viewing direction vector
+  // and A and B are the individual vectors, then what you look at is the sign of
+  // (A x B) o V 
+  // where A x B is the vector cross product and "o" is the dot product.
+  // If your direction vector is looking down on the Cartesian plane then V = (0, 0, -1) and
+  // then a positive sign indicates a clockwise move. 
+  // To show this, let A = (1, 0, 0) and let B = (0, 1, 0); that is, A is along the x-axis and
+  // vector B is along the y-axis. Then A x B = (0, 0, 1) and it is pointing up along the Z axis.
+  // The dot product (0, 0, 1) o (0, 0, -1) = -1 and, indeed, from the X axis to the Y axis is
+  // counter-clockwise when viewed from the +Z side of the plane.
+    
+
+  // Get the POCA vector
+  double tp_POCAx = t->TP_POCAx->at(iTP);
+  double tp_POCAy = t->TP_POCAy->at(iTP);
+  double tp_POCAz = t->TP_POCAz->at(iTP);
+  TVector3 v_POCA(tp_POCAx, tp_POCAy, tp_POCAz);
+  
+  // Get the track momentum vector at the POCA
+  double tp_px = t->TP_Px->at(iTP);
+  double tp_py = t->TP_Py->at(iTP);
+  double tp_pz = t->TP_Pz->at(iTP);
+  TVector3 v_p0(tp_px, tp_py, tp_pz);
+  TVector3 v_p0_unit = v_p0.Unit();
+  
+  // Check the dot product sign: vec{a} dot vec{b}  = ax*bx + ay*by + az*bz
+  // double dot_product = v_POCA.Dot(v_p0_unit);
+  TVector3 cross_product = v_POCA.Cross(v_p0_unit);
+
+  // For looking down on the Cartesian plane the viewing direction vector (0, 0, -1) is (0, 0, -1)
+  TVector3 v_z(0, 0, -1);
+  double dot_product = cross_product.Dot(v_z);  
+  
+  // If dot product is positive then track is clockwise. Otherwise anticlockwise
+  if (dot_product >= 0.0) return +1.0;
+  else return -1.0;
+      
+}
+
+
+//****************************************************************************
+double TrackingParticles::GetD0Mag(const int iTP)
+//****************************************************************************
+{
+
+  double tp_POCAx   = t->TP_POCAx->at(iTP);
+  double tp_POCAy   = t->TP_POCAy->at(iTP);
+  double tp_d0_mag  = sqrt(tp_POCAx * tp_POCAx + tp_POCAy * tp_POCAy);
+
+  return tp_d0_mag;
+  
+}
+
+
+//****************************************************************************
+double TrackingParticles::GetD0Phi(const int iTP)
+//****************************************************************************
+{
+
+  double tp_POCAx    = t->TP_POCAx->at(iTP);
+  double tp_POCAy    = t->TP_POCAy->at(iTP);
+  double d0_phi      = atan2(tp_POCAy, tp_POCAx); // range(-pi, +pi)
+  // double d0_phi      = atan(tp_POCAy/tp_POCAx);   // range(-pi/2, +pi/2)
+  return d0_phi;
+}
+
+
+//****************************************************************************
+void TrackingParticles::PrintTPProperties(const int iTP)
+//****************************************************************************
+{
+
+  // Sanity check
+  const int nTPs = t->TP_Pt->size();
+  if ( iTP >= nTPs ){
+    cout << "E R R O R ! TrackingParticles::PrintProperties(...) - "
+	 << "the selected track index \"" << iTP << "\" is invalid. The total number of tracks is \"" << nTPs << "\". EXIT";
+    exit(1);
+  }
+ 
+  // Inform user of settings
+  Table tkProperties("Evt | iTP | Pt | Eta | Phi | z0 | d0 | Q | PdgId | NMatch | TTTracks | TTClusters | TTStubs | TTTrackIndex | TTPixelTrackIndex", "Text");
+  if (iTP < 0) 
+    {
+#ifdef DEBUG      
+      tkProperties.Print(); 
+#endif      
+      return;
+    }
+
+  // Get track variables
+  int EvtNumber            = t->EvtNumber;
+  int tp_TTTrackIndex      = t->TP_TTTrackIndex->at(iTP);
+  int tp_TTPixelTrackIndex = GetPixelIndexOfTrack(tp_TTTrackIndex);
+  double tp_Pt             = t->TP_Pt->at(iTP);
+  double tp_Eta            = t->TP_Eta->at(iTP);
+  double tp_Phi            = t->TP_Phi->at(iTP);
+  int    tp_Charge         = t->TP_Charge->at(iTP); 
+  double tp_d0             = GetD0(iTP);
+  double tp_POCAz          = t->TP_POCAz->at(iTP);
+  int    tp_PdgId          = t->TP_PdgId->at(iTP);
+  int    tp_NMatch         = t->TP_NMatch->at(iTP);
+  int    tp_TTTracks       = t->TP_TTTracks->at(iTP); 
+  int    tp_TTClusters     = t->TP_TTClusters->at(iTP);
+  int    tp_TTStubs        = t->TP_TTStubs->at(iTP);
+
+  string tp_Q = "-";
+  if(tp_Charge > 0) tp_Q = "+";
+  
+  // Add table rows
+  tkProperties.AddRowColumn(0, auxTools.ToString(EvtNumber)       );
+  tkProperties.AddRowColumn(0, auxTools.ToString(iTP)  + " (" + auxTools.ToString(nTPs) + ")" );
+  tkProperties.AddRowColumn(0, auxTools.ToString(tp_Pt   , 4)     );
+  tkProperties.AddRowColumn(0, auxTools.ToString(tp_Eta  , 4)     );
+  tkProperties.AddRowColumn(0, auxTools.ToString(tp_Phi  , 4)     );
+  tkProperties.AddRowColumn(0, auxTools.ToString(tp_POCAz, 4)     );
+  tkProperties.AddRowColumn(0, auxTools.ToString(tp_d0   , 4)     );
+  tkProperties.AddRowColumn(0, tp_Q                               );
+  tkProperties.AddRowColumn(0, auxTools.ToString(tp_PdgId)        );
+  tkProperties.AddRowColumn(0, auxTools.ToString(tp_NMatch)       );
+  tkProperties.AddRowColumn(0, auxTools.ToString(tp_TTTracks)     );
+  tkProperties.AddRowColumn(0, auxTools.ToString(tp_TTClusters)   );
+  tkProperties.AddRowColumn(0, auxTools.ToString(tp_TTStubs)      );
+  tkProperties.AddRowColumn(0, auxTools.ToString(tp_TTTrackIndex) );
+  tkProperties.AddRowColumn(0, auxTools.ToString(tp_TTPixelTrackIndex) );
+  tkProperties.Print();
+
+  return;
+}
+
+
+//****************************************************************************
+unsigned int TrackingParticles::GetNumOfStubs(const int iTP)
+//****************************************************************************
+{
+
+  unsigned int tp_nStubs = t->TP_TTStubs->at(iTP);
+
+  return tp_nStubs;
+}
+
+
+//****************************************************************************
+TLorentzVector TrackingParticles::GetP4(const vector<int> tks_Index)
+//****************************************************************************
+{
+  
+  TLorentzVector p4;
+  if (tks_Index.size() < 1) return p4;
+
+  // For-loop: Tks
+  for (int i = 0; i < (int) tks_Index.size(); i++){
+
+    const int index = tks_Index.at(i);
+    double pt       = t->TP_Pt  ->at(index);
+    double eta      = t->TP_Eta ->at(index);
+    double phi      = t->TP_Phi ->at(index);
+    double mass     = pionMass; //assume charged pion mass
+
+    TLorentzVector tmp;
+    tmp.SetPtEtaPhiM(pt, eta, phi, mass);
+    p4 += tmp;
+    
+  } // For-loop: Tks
+
+  return p4;
+}
+
+//****************************************************************************
+int TrackingParticles::GetPixelIndexOfTrack(const int tk_Index)
+//****************************************************************************
+{
+  
+  int pixTk_Index = -1;
+  
+  // For-loop: L1PixTks
+  for (int i = 0; i < (int) t->L1PixTks_Pt->size(); i++) {
+    
+    int iTTTrack = t->L1PixTks_TTTrackIndex->at(i);
+    if (iTTTrack == tk_Index) {
+      pixTk_Index = i;
+      break;
+    }
+  }
+  
+  return pixTk_Index;
+}
+
+#endif
+
