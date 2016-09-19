@@ -1,13 +1,12 @@
 #================================================================================================
-# Script for setting up environment  for HLTausAnalysis,
-# for accessing the python libraries and scripts.
+# Script for setting up standalone environment for accessing the python libraries and scripts.
 #
 # Usage:
 # cd HLTausAnalysis
 # source setup.csh
 #
 # Note:
-# tested so far LOCATION="" and LOCATION="Mac"
+# tested so far LOCATION="" and LOCATION="jade"
 #================================================================================================
 if ( $?HLTAUSANALYSIS_BASE ) then
     echo "Standalone environment already loaded"
@@ -78,6 +77,7 @@ if ( $LOCATION == "lxplus" || $LOCATION == "lxbatch" ) then
     endif
 endif
 
+
 if ( $LOCATION == "mac" ) then
     echo "=== Setting ROOT version 5-34-00-patches"
     source /Users/attikis/ROOT/v5-34-00-patches/bin/thisroot.csh
@@ -90,7 +90,7 @@ if ( $LOCATION == "mac" ) then
 endif
 
 
-# echo "=== Appending to LD_LIBRARY_PATH"
+echo "=== Appending to LD_LIBRARY_PATH"
 set LD_LIBRARY_PATH_APPEND="$HLTAUSANALYSIS_BASE/NtupleAnalysis/lib:${LD_LIBRARY_PATH_APPEND}"
 if ( ! $?LD_LIBRARY_PATH ) then
     setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH_APPEND}"
@@ -98,7 +98,7 @@ else
     setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH_APPEND}:${LD_LIBRARY_PATH}"
 endif
 
-# echo "=== Creating symbolic links and hidden directories for $LOCATION"
+echo "=== Creating symbolic links and hidden directories for $LOCATION"
 set PATHPREFIX=.python
 
 if ( $LOCATION == "CMSSW" ) then    
@@ -108,35 +108,31 @@ if ( $LOCATION == "CMSSW" ) then
 
 else
     if ( ! -e $PATHPREFIX/HLTausAnalysis ) then
-	echo "=== Creating $PATHPREFIX directory under `pwd`."
+	echo "=== Creating $PATHPREFIX directory under `pwd`. Creating __init__.py"
         mkdir -p $PATHPREFIX/HLTausAnalysis
-	echo "=== Creating $PATHPREFIX/HLTausAnalysis/__init__.py"
         touch $PATHPREFIX/HLTausAnalysis/__init__.py
     endif
 
-    # echo "=== Loop over directories under HLTauAnalysis
-    foreach DIR ( HLTausAnalysis )
+    echo "=== Loop over directories under NtupleAnalysis/ and HeavyChHLTausToTauNu/"
+    foreach DIR ( NtupleAnalysis )
 	# echo "DIR=$DIR"
 
-	#set LINK_NAME=$PATHPREFIX/HLTausAnalysis/$DIR
-	#set TARGET=$HLTAUSANALYSIS_BASE/$DIR/python
-	set LINK_NAME=$PATHPREFIX/$DIR
-	set TARGET=$DIR/python
+	set LINK_NAME=$PATHPREFIX/HLTausAnalysis/$DIR
+	set TARGET=$HLTAUSANALYSIS_BASE/$DIR/python
 	set PYINIT=$LINK_NAME/__init__.py
 
 	# If $PATHPREFIX/HLTausAnalysis/$DIR does not exist
         if ( ! -e $PATHPREFIX/HLTausAnalysis/$DIR ) then
 
-            #echo "Linking $TARGET with $LINK_NAME"
+            echo "Linking $TARGET with $LINK_NAME"
 	    ln -s $TARGET $LINK_NAME
 
-	    # echo "Creating $PYINIT"
+	    echo "Creating $PYINIT"
             touch $PYINIT
 	    
-            #foreach d ( $PATHPREFIX/HLTausAnalysis/$DIR/* )
-	     foreach d ( $PATHPREFIX/$DIR/* )
+            foreach d ( $PATHPREFIX/HLTausAnalysis/$DIR/* )
                 if ( -d $d ) then
-		    #echo "Creating $d/__init__.py"
+		    echo "Creating $d/__init__.py"
                     touch $d/__init__.py
                 endif
             end
@@ -144,24 +140,23 @@ else
     end
 
 
-    echo "=== Loop over directories under HLTausAnalysis"
-    foreach DIR ( `ls HLTausAnalysis` )
-	echo "DIR=$DIR"
+    echo "=== Loop over directories under NtupleAnalysis/src"
+    foreach DIR ( `ls NtupleAnalysis/src` )
+	# echo "DIR=$DIR"
 
 	# NOTE: Remove last "/" from directory name. The "/" at the end causes the linking to FAIL for some shells
 	set DIR=`echo $DIR | sed 's/\(.*\)\//\1 /'`
 	set LINK_NAME=$PATHPREFIX/HLTausAnalysis/$DIR
-	set TARGET=$HLTAUSANALYSIS_BASE/$DIR/python
+	set TARGET=$HLTAUSANALYSIS_BASE/NtupleAnalysis/src/$DIR/python
 	set PYINIT=$LINK_NAME/__init__.py
 
-	echo "LINK_NAME = $LINK_NAME , $HLTAUSANALYSIS_BASE/HLTausAnalysis/$DIR/python"
 	# If $LINK_NAME does not exist and $TARGET exists
-        if ( ! -e $LINK_NAME && -e $HLTAUSANALYSIS_BASE/HLTausAnalysis/$DIR/python ) then
+        if ( ! -e $LINK_NAME && -e $HLTAUSANALYSIS_BASE/NtupleAnalysis/src/$DIR/python ) then
 
             echo "Linking $TARGET with $LINK_NAME"
             ln -s $TARGET $LINK_NAME
 
-            echo "Creating $PYINIT"
+            # echo "Creating $PYINIT"
             touch $PYINIT
 
             foreach d ( $PATHPREFIX/HLTausAnalysis/$DIR/* )
