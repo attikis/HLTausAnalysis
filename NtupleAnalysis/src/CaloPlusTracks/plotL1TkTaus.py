@@ -32,6 +32,7 @@ import ROOT
 #================================================================================================
 # Options here
 #================================================================================================
+analysis         = "CaloPlusTracks"
 bDoL1TkTau       = True
 bDoL1TkTauExtra  = False
 bDoMatchTk       = False
@@ -45,14 +46,13 @@ savePath         = "plots/"
 #================================================================================================
 # Function Definition
 #================================================================================================
-def CreateDatasetDict(inputPath, outputExt):
+def CreateDatasetDict(inputPath, analysis, outputExt):
     '''
     '''
     datasetPaths= {}
     for dataset in GetDatasetsList():
-        datasetPaths[dataset] = inputPath + dataset + outputExt + ".root"
+        datasetPaths[dataset] = inputPath + analysis + "_Histograms_" + dataset + outputExt + ".root"
     return datasetPaths
-
 
 def GetDatasetsList():
     '''
@@ -64,12 +64,11 @@ def GetDatasetsList():
                 "SingleMuPlus_NoPU"]    
     return datasets
 
-def PrintTreeCreationParameters():
+def PrintPSet(datasetPath, dataset):
     '''
     '''
-    inputPath = "/Users/attikis/hltaus/rootFiles/TTrees/CMSSW_6_2_0_SLHC12_patch1/TkTauFromCaloAnalyzer_v3/TTracks_TTPixelTracks_CaloTausCorr_FitParam5_PtMin2_TTI2023Upg14D_TestVersionWithPixelBugs_28Jan2015_144735/"
     p = m_plotter.Plotter( Verbose=False, BatchMode=parseOpts.batchMode )
-    p.GetDatasets("TTI2023Upg14D", inputPath, ["minbias"])
+    p.GetDatasets("TTI2023Upg14D", datasetPath, [dataset])
     p.PrintPSet("TkTauFromCaloNTupleMaker/configInfo/parameterSet")    
     return
 
@@ -106,10 +105,12 @@ def DoEfficiency(hList, datasetPaths, datasetList, cutDirList, saveExt=""):
 
 def main(opts):
 
-    #inputPath    = "/Users/attikis/hltaus/HLTausAnalysis/CaloPlusTracks/results/test/"
-    datasetPaths = CreateDatasetDict(opts.mcrab + "CaloPlusTracks_Histograms_", "")
-    
-    #PrintTreeCreationParameters()
+    datasetPaths = CreateDatasetDict(opts.mcrab, analysis, "")
+
+    if opts.verbose:
+        PrintPSet("/Users/attikis/disk/hltaus/rootFiles/TTrees/CMSSW_6_2_0_SLHC12_patch1/TkTauFromCaloAnalyzer_v7/test/", "VBF")
+
+        
     if bDoL1TkTau:
         if opts.verbose:
             print "=== Doing L1TkTau"        
@@ -124,6 +125,7 @@ def main(opts):
         # DoPlots( hL1TkTau_VtxIsoAbs  , datasetPaths, datasetList) 
         # DoPlots( hL1TkTau_InvMassIncl, datasetPaths, datasetList) 
 
+        
     if bDoL1TkTauExtra:
         if opts.verbose:
             print "=== Doing L1TkTauExtra"
@@ -134,6 +136,7 @@ def main(opts):
         DoPlots( hL1TkTau_DeltaRGenP , datasetPaths, datasetList) 
         DoPlots( hL1TkTau_Charge     , datasetPaths, datasetList) 
 
+        
     if bDoEfficiencies:
         if opts.verbose:
             print "=== Doing Efficiencies"
@@ -145,6 +148,7 @@ def main(opts):
         # DoEfficiency( hL1TkTau_RelIso               , datasetPaths, datasetList, ["<"] )
         # DoEfficiency( hL1TkTau_VtxIsoAbs            , datasetPaths, datasetList, [">"] )
 
+        
     if bDoMatchTk:
         if opts.verbose:
             print "=== Doing MatchTks"
@@ -165,6 +169,7 @@ def main(opts):
         ### DoPlots( hL1TkTau_MatchTk_IsUnknown     , datasetPaths, datasetList)
         ### DoPlots( hL1TkTau_MatchTk_IsCombinatoric, datasetPaths, datasetList)
 
+        
     if bDoSigTks:
         if opts.verbose:
             print "=== Doing SigTks"
@@ -179,7 +184,7 @@ def main(opts):
         # DoPlots( hL1TkTau_SigTks_POCAz     , datasetPaths, datasetList)
         DoPlots( hL1TkTau_SigTks_DeltaPOCAz, datasetPaths, datasetList)
         DoPlots( hL1TkTau_SigTks_StubPtCons, datasetPaths, datasetList)
-
+        
         
     if bDoIsoTks:
         if opts.verbose:
