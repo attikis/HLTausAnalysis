@@ -43,6 +43,7 @@ class TTTrack{
   
   unsigned short index(void) const {return theIndex;}
   TVector3 p3(void) const {return theMomentum;}
+  TLorentzVector p4(double mass=pionMass);
   TVector3 getMomentum(void) const {return theMomentum;}
   ROOT::Math::XYZVector getPOCA(void) const {return thePOCA;} //https://root.cern.ch/doc/master/namespaceROOT_1_1Math.html#a676e5bc512b53b6999fd0200df1e81ab
   double getPt(void) const {return theMomentum.Perp(); }

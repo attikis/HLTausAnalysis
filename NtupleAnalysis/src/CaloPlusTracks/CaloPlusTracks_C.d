@@ -111,6 +111,7 @@ CaloPlusTracks_C.so: ../Framework/interface/TreeDefinitionReco.h
 CaloPlusTracks_C.so: ../DataFormat/src/TTPixelTrack.C
 CaloPlusTracks_C.so: ../DataFormat/interface/TTPixelTrack.h
 CaloPlusTracks_C.so: ../Auxiliary/src/AuxTools.C ../Auxiliary/src/Table.C
+CaloPlusTracks_C.so: ../Auxiliary/interface/constants.h
 CaloPlusTracks_C.so: ../DataFormat/src/TTTrack.C
 CaloPlusTracks_C.so: ../DataFormat/interface/TTTrack.h
 CaloPlusTracks_C.so: /usr/local/include/Math/GenVector/VectorUtil.h
@@ -166,7 +167,6 @@ CaloPlusTracks_C.so: /usr/local/include/TBits.h
 CaloPlusTracks_C.so: /usr/local/include/Math/ParamFunctor.h
 CaloPlusTracks_C.so: ../Auxiliary/src/L1Tracks.C ../Auxiliary/src/Datasets.C
 CaloPlusTracks_C.so: ../DataFormat/src/L1TkTauParticle.C
-CaloPlusTracks_C.so: ../Auxiliary/interface/constants.h
 CaloPlusTracks_C.so: ../DataFormat/interface/L1TkTauParticle.h
 CaloPlusTracks_C.so: ../DataFormat/src/L1JetParticle.C
 CaloPlusTracks_C.so: ../DataFormat/interface/L1JetParticle.h
@@ -175,6 +175,8 @@ CaloPlusTracks_C.so: ../DataFormat/interface/TTPixelTrack.h
 CaloPlusTracks_C.so: ../DataFormat/interface/GenParticle.h
 CaloPlusTracks_C.so: ../DataFormat/src/GenParticle.C
 CaloPlusTracks_C.so: ../DataFormat/interface/GenParticle.h
+CaloPlusTracks_C.so: ../DataFormat/src/TrackingParticle.C
+CaloPlusTracks_C.so: ../DataFormat/interface/TrackingParticle.h
 CaloPlusTracks_C.so: ../DataFormat/interface/TTTrack.h
 CaloPlusTracks_C.so: ../DataFormat/interface/TTPixelTrack.h
 CaloPlusTracks_C.so: ../DataFormat/src/L1JetParticle.C

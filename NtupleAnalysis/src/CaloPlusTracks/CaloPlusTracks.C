@@ -192,10 +192,12 @@ void CaloPlusTracks::Loop()
 
     
     // Track Collections
+    vector<TrackingParticle> TPs = GetTrackingParticles();
     vector<TTTrack> TTTracks = GetTTTracks();
     vector<TTPixelTrack> TTPixelTracks = GetTTPixelTracks();
     vector<TTTrack> pvTTTracks;
     double pv_z = GetPVTTTracks(pvTTTracks);
+    if (0) for (vector<TrackingParticle>::iterator p = TPs.begin(); p != TPs.end(); p++) p->PrintProperties();
     if (0) for (vector<TTTrack>::iterator t = TTTracks.begin(); t != TTTracks.end(); t++) t->PrintProperties();
     if (0) for (vector<TTTrack>::iterator t = pvTTTracks.begin(); t != pvTTTracks.end(); t++) t->PrintProperties();
     if (0) for (vector<TTPixelTrack>::iterator t = TTPixelTracks.begin(); t != TTPixelTracks.end(); t++) t->PrintProperties();
@@ -212,6 +214,7 @@ void CaloPlusTracks::Loop()
 
     // Sanity checks
     auxTools_.EnsureVectorIsSorted(*L1CaloTau_Et, true);
+    // auxTools_.EnsureVectorIsSorted(*TP_Pt, true); // not true
     auxTools_.EnsureVectorIsSorted(*L1Tks_Pt    , true);
     auxTools_.EnsureVectorIsSorted(*L1PixTks_Pt , true);
 
@@ -224,7 +227,6 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     // For-loop: L1CaloTaus
     ////////////////////////////////////////////////
-    if (DEBUG) cout << "HERE-1" << endl;
     for (vector<L1JetParticle>::iterator calo = L1CaloTaus.begin(); calo != L1CaloTaus.end(); calo++)
       {
 
@@ -264,8 +266,6 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     /// Create L1TkTaus Collections
     ////////////////////////////////////////////////
-    if (DEBUG) cout << "HERE-2" << endl;
-
     // For-loop: Al L1TkTauCandidates
     for (size_t i = 0; i < L1TkTauCandidates.size(); i++)
       {
@@ -305,7 +305,6 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     /// L1Tktau Properties 
     ////////////////////////////////////////////////
-    if (DEBUG) cout << "HERE-3" << endl;
     hL1TkTau_Multiplicity ->Fill( L1TkTaus_VtxIso.size() );
     
     // For-loop: L1TkTaus_VtxIso
@@ -342,7 +341,6 @@ void CaloPlusTracks::Loop()
 
 	// Matching TTTrack
 	TTTrack match_tk = tau->GetMatchingTk();
-	if (DEBUG) cout << "HERE-4" << endl;
 
 	// // For-loop: SigCone TTTracks
 	// for (vector<TTTrack>::iterator sigTk = tau->GetSigConeTTTracks().begin(); sigTk != tau->GetSigConeTTTracks().end(); sigTk++)
@@ -412,7 +410,6 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     // Fill Turn-On histograms
     ////////////////////////////////////////////////
-    if (DEBUG) cout << "HERE-6" << endl;
     FillTurnOn_Denominator_(GenTausHadronic, hMcHadronicTau_VisEt);
     FillTurnOn_Numerator_(L1TkTaus_Calo   , 25.0, hCalo_TurnOn25  );
     FillTurnOn_Numerator_(L1TkTaus_Tk     , 25.0, hTk_TurnOn25    );
@@ -431,7 +428,6 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     // SingleTau
     ////////////////////////////////////////////////
-    if (DEBUG) cout << "HERE-7" << endl;
     FillSingleTau_(L1TkTaus_Calo  , hCalo_Rate  , hCalo_Eff  );
     FillSingleTau_(L1TkTaus_Tk    , hTk_Rate    , hTk_Eff    );
     FillSingleTau_(L1TkTaus_VtxIso, hVtxIso_Rate, hVtxIso_Eff);
@@ -440,7 +436,6 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     // DiTau
     ////////////////////////////////////////////////
-    if (DEBUG) cout << "HERE-8" << endl;
     // FillDiTau_(L1TkTaus_Calo  , L1TkTaus_Tk       , hDiTau_Rate_Calo_Tk    , hDiTau_Eff_Calo_Tk    );
     // FillDiTau_(L1TkTaus_Calo  , L1TkTaus_VtxIso   , hDiTau_Rate_Calo_VtxIso, hDiTau_Eff_Calo_VtxIso);
     // FillDiTau_(L1TkTaus_Tk    , L1TkTaus_VtxIso   , hDiTau_Rate_Tk_VtxIso  , hDiTau_Eff_Tk_VtxIso  ); // FIXME
@@ -449,7 +444,6 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     // WARNING: Removal of non Z-matching should be just before I need it!
     ////////////////////////////////////////////////
-    if (DEBUG) cout << "HERE-9" << endl;
     ApplyDiTauZMatching(tk_CollectionType, L1TkTaus_Tk);      // fixme - erases L1TkTaus from vector!
     ApplyDiTauZMatching(tk_CollectionType, L1TkTaus_VtxIso);  // fixme - erases L1TkTaus from vector!
     FillDiTau_(L1TkTaus_Calo  , hDiTau_Rate_Calo  , hDiTau_Eff_Calo  );
@@ -1216,16 +1210,6 @@ GenParticle CaloPlusTracks::GetGenParticle(unsigned int Index)
 
 
 //****************************************************************************
-vector<TTTrack> CaloPlusTracks::GetTTTracks(void)
-//****************************************************************************
-{
-  vector<TTTrack> theTTTracks; 
-  for (Size_t iTk = 0; iTk < L1Tks_Pt->size(); iTk++) theTTTracks.push_back( GetTTTrack(iTk) );
-  return theTTTracks;
-}
-
-
-//****************************************************************************
 double CaloPlusTracks::GetPVTTTracks(vector<TTTrack> &pvTTTracks)
 //****************************************************************************
 {
@@ -1239,6 +1223,15 @@ double CaloPlusTracks::GetPVTTTracks(vector<TTTrack> &pvTTTracks)
   return pv_z;
 }
 
+
+//****************************************************************************
+vector<TTTrack> CaloPlusTracks::GetTTTracks(void)
+//****************************************************************************
+{
+  vector<TTTrack> theTTTracks; 
+  for (Size_t iTk = 0; iTk < L1Tks_Pt->size(); iTk++) theTTTracks.push_back( GetTTTrack(iTk) );
+  return theTTTracks;
+}
 
 
 //****************************************************************************
@@ -1279,6 +1272,49 @@ TTTrack CaloPlusTracks::GetTTTrack(unsigned int Index,
   TTTrack theTTTrack(Index, p, aPOCA,  aRInv, aChi2, aStubPtCons, aSector, aWedge, isGenuine, isUnknown, isCombinatoric, stubs_isPS, stubs_iDisk, stubs_iLayer, stubs_iPhi, stubs_iRing, stubs_iSide, stubs_iZ, nFitParams);
 
   return theTTTrack;
+}
+
+
+
+//****************************************************************************
+vector<TrackingParticle> CaloPlusTracks::GetTrackingParticles(void)
+//****************************************************************************
+{
+  vector<TrackingParticle> theTrackingParticles; 
+  for (Size_t iTP = 0; iTP < TP_Pt->size(); iTP++) theTrackingParticles.push_back( GetTrackingParticle(iTP) );
+  return theTrackingParticles;
+}
+
+
+//****************************************************************************
+TrackingParticle CaloPlusTracks::GetTrackingParticle(unsigned int Index)
+//****************************************************************************
+{
+
+  // Initialise variables
+  TVector3 p;  
+
+  // Get the track properties
+  double pt  = TP_Pt->at(Index);
+  double eta = TP_Eta->at(Index);
+  double phi = TP_Phi->at(Index);
+  double x0  = TP_POCAx->at(Index);
+  double y0  = TP_POCAy->at(Index);
+  double z0  = TP_POCAz->at(Index);
+  int pdgId  = TP_PdgId->at(Index);
+  int charge = TP_Charge->at(Index);
+  p.SetPtEtaPhi(pt, eta, phi);
+  ROOT::Math::XYZVector poca(x0, y0, z0);
+  unsigned short nMatch       = TP_NMatch->at(Index);
+  unsigned short ttTrackIndex = TP_TTTrackIndex->at(Index);
+  unsigned short ttClusters   = TP_TTClusters->at(Index);
+  unsigned short ttStubs      = TP_TTStubs->at(Index);
+  unsigned short ttTracks     = TP_TTTracks->at(Index);
+
+  // Construct the TTTrack
+  TrackingParticle theTrackingParticle(Index, p, poca,  charge, pdgId, nMatch, ttTrackIndex, ttClusters, ttStubs, ttTracks);
+
+  return theTrackingParticle;
 }
 
 

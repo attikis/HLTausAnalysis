@@ -252,4 +252,13 @@ void TTTrack::PrintAllProperties(void)
 }
 
 
+//****************************************************************************
+TLorentzVector TTTrack::p4(double mass)
+//****************************************************************************
+{
+  TLorentzVector p4;
+  p4.SetPtEtaPhiM(getPt(), getEta(), getPhi(), mass);
+  return p4;
+}
+
 #endif

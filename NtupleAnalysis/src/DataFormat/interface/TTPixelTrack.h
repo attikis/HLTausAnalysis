@@ -7,6 +7,7 @@
 // User
 #include "../../Auxiliary/src/AuxTools.C"
 #include "../../Auxiliary/src/Table.C"
+#include "../../Auxiliary/interface/constants.h"
 #include "../src/TTTrack.C"
 
 // ROOT
@@ -51,6 +52,8 @@ class TTPixelTrack{
 	    vector<ROOT::Math::XYZVector> candidatePixHits); // Ported from CMSSW. For Pixel Re-fitting  
 
   unsigned short index() const {return theIndex;}
+  TLorentzVector p4(double mass=pionMass);
+  TVector3 p3() const {return theMomentum;}
   TVector3 getMomentum() const {return theMomentum;}
   double getPt() const {return theMomentum.Perp();}
   double getEta() const {return theMomentum.Eta();}

@@ -12,11 +12,12 @@
 #include "../Auxiliary/src/Table.C"
 #include "../Auxiliary/src/MCTools.C"
 #include "../Auxiliary/src/HistoTools.C"
-#include "../Auxiliary/src/L1Tracks.C"
-#include "../Auxiliary/src/Datasets.C"
+#include "../Auxiliary/src/L1Tracks.C" // needed?
+#include "../Auxiliary/src/Datasets.C" 
 
 #include "../DataFormat/src/L1TkTauParticle.C"
 #include "../DataFormat/src/GenParticle.C"
+#include "../DataFormat/src/TrackingParticle.C"
 #include "../DataFormat/interface/TTTrack.h"
 #include "../DataFormat/interface/TTPixelTrack.h"
 #include "../DataFormat/src/L1JetParticle.C"
@@ -166,6 +167,9 @@ class CaloPlusTracks : public TreeAnalyserMC{
 		  vector<L1TkTauParticle> L1TkTaus2,
 		  TH2D *hRate,
 		  TH2D *hEfficiency);
+
+  TrackingParticle GetTrackingParticle(unsigned int Index);
+  vector<TrackingParticle> GetTrackingParticles(void);
 
   TTTrack GetTTTrack(unsigned int Index,
 		     unsigned int nFitParams=5);
