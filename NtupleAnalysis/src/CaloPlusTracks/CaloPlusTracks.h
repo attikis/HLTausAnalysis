@@ -94,31 +94,39 @@ class CaloPlusTracks : public TreeAnalyserMC{
   bool DEBUG;
   bool mcMatching_unique;
   double diTau_deltaPOCAz;
-  double isoCone_Constant;
-  double isoCone_VtxIsoWP;
-  double isoCone_dRMax;
-  double isoCone_dRMin;
   double matchTk_caloDeltaR_;
   double matchTk_minPt_;
   double mcMatching_dRMax;
   double pv_deltaZMax;
   double pv_z;
+  //
+  string selTks_Collection;
+  double selTks_minPt;
+  double selTks_maxEta;
+  double selTks_maxChiSq;
+  unsigned int selTks_minStubs;
+  unsigned int selTks_minStubsPS;
+  unsigned int selTks_nFitParams;
+  int selTksPix_minHits;
+  //
   double sigCone_Constant;
   double sigCone_cutoffDeltaR;
   double sigCone_dRMax;
   double sigCone_maxTkDeltaPOCAz;
   double sigCone_maxTkInvMass;
   double sigCone_dRMin;
+  //
+  double isoCone_Constant;
+  double isoCone_VtxIsoWP;
+  double isoCone_dRMax;
+  double isoCone_dRMin;
+  //
   int nMaxNumOfHTausPossible;
   int realTauMom;
   string caloCorrectionType;
-  string isoCone_tkCollectionWP;
   string mcSample;
   string pv_producer;
-  string sigCone_tkCollectionWP;
-  string tauAlgorithmMode;
   string tauDecayMode;
-  string tk_CollectionType;
   struct SortAscendingAbs{ bool operator() (double a, double b) const { return abs(a) > abs(b); } }; 
   struct SortDescendingAbs{ bool operator() (double a, double b) const { return abs(a) < abs(b); } }; 
   
@@ -172,15 +180,23 @@ class CaloPlusTracks : public TreeAnalyserMC{
   vector<TrackingParticle> GetTrackingParticles(void);
 
   TTTrack GetTTTrack(unsigned int Index,
-		     unsigned int nFitParams=5);
+		     const unsigned int nFitParams = 5);
   
-  vector<TTTrack> GetTTTracks(void);
+  vector<TTTrack> GetTTTracks(const double minPt = 0.0,
+			      const double maxEta = 9999.9,
+			      const double maxChiSq = 9999.9,
+			      const unsigned int minStubs = 0,
+			      const unsigned int minStubsPS = 0,
+			      const unsigned nFitParams = 5);
 
   double GetPVTTTracks(vector<TTTrack> &pvTTTracks);
 
   TTPixelTrack GetTTPixelTrack(unsigned int Index);
 
-  vector<TTPixelTrack> GetTTPixelTracks(void);  
+  vector<TTPixelTrack> GetTTPixelTracks(const double minPt = 0.0,
+					const double maxEta = 9999.9,
+					const double maxChiSq = 9999.9,
+					const int minHits = 0.0);
 
   L1JetParticle GetL1CaloTau(unsigned int Index);
   

@@ -72,7 +72,7 @@ class TTPixelTrack{
   int getCandidatePixelHitsPattern(void);
   int getCharge();
   string getQ();
-  int getL1Track() const {return 0; }
+  int getL1Track() const {return 0;}
   int getNcandidatehit() const {return thencandidatehit;}
   int getNhit() const {return thenhit;}  
   int getPixelHitType(ROOT::Math::XYZVector pixHit);   

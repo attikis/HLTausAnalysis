@@ -40,6 +40,7 @@ void TTTrack::_InitVars(void)
   theStubs_isPS.clear();
   theWedge = 0.0;
   theZ0 = 0.0;
+  theCharge = -9999;
   
   return;
 }
@@ -135,7 +136,6 @@ int TTTrack::getDOF(void)
 unsigned int TTTrack::getNumOfStubs(void)
 //****************************************************************************
 {
-
   return theStubs_isPS.size();
 }
 
@@ -145,7 +145,10 @@ unsigned int TTTrack::getNumOfStubsPS(void)
 //****************************************************************************
 {
   unsigned int nStubsPS = 0;
-  for (size_t i = 0; i < theStubs_isPS.size(); i++) nStubsPS += theStubs_isPS.at(i);
+  for (size_t i = 0; i < theStubs_isPS.size(); i++)
+    {
+      nStubsPS += theStubs_isPS.at(i);
+    }
   return nStubsPS;
 }
 
@@ -191,7 +194,7 @@ void TTTrack::PrintProperties(void)
   Table info("Index | Pt | Eta | Phi | x0 | y0 | z0 | d0 | Q | Chi2 | DOF | Chi2Red | Stubs (PS) | StubPtCons. | Genuine | Unknown | Combinatoric", "Text");
   info.AddRowColumn(0, auxTools.ToString( theIndex) );
   info.AddRowColumn(0, auxTools.ToString( theMomentum.Perp(), 3) );
-  info.AddRowColumn(0, auxTools.ToString( theMomentum.Eta() , 3) );
+  info.AddRowColumn(0, auxTools.ToString( theMomentum.Eta() , 3) );  
   info.AddRowColumn(0, auxTools.ToString( theMomentum.Phi() , 3) );
   info.AddRowColumn(0, auxTools.ToString( getX0(), 3) );
   info.AddRowColumn(0, auxTools.ToString( getY0(), 3) );
@@ -259,6 +262,35 @@ TLorentzVector TTTrack::p4(double mass)
   TLorentzVector p4;
   p4.SetPtEtaPhiM(getPt(), getEta(), getPhi(), mass);
   return p4;
+}
+
+//****************************************************************************
+unsigned int TTTrack::getNumOfBarrelStubs(void)
+//****************************************************************************
+{
+
+  unsigned int theBarrelStubs = 0;
+  for(int i=0; i < (int) theStubs_iLayer.size(); i++)
+    {
+      if(theStubs_iLayer.at(i) != 999999) theBarrelStubs++;
+    }
+
+  return theBarrelStubs;
+}
+
+
+//****************************************************************************
+unsigned int TTTrack::getNumOfEndcapStubs(void)
+//****************************************************************************
+{
+
+  unsigned int theEndcapStubs = 0;
+  for(int i=0; i < (int) theStubs_iDisk.size(); i++)
+    {
+      if(theStubs_iDisk.at(i) != 999999) theEndcapStubs++;
+    }
+  
+  return theEndcapStubs;
 }
 
 #endif

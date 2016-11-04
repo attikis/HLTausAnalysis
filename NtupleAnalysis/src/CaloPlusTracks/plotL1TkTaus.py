@@ -34,11 +34,11 @@ import ROOT
 #================================================================================================
 analysis         = "CaloPlusTracks"
 bDoL1TkTau       = True
-bDoL1TkTauExtra  = False
-bDoMatchTk       = False
-bDoSigTks        = False
-bDoIsoTks        = False
-bDoEfficiencies  = False
+bDoL1TkTauExtra  = True
+bDoMatchTk       = True
+bDoSigTks        = True
+bDoIsoTks        = True
+bDoEfficiencies  = False # Seg-Faults
 datasetList      = ["VBF"] #["MinBias", "VBF", "HPlus160"]
 saveFormats      = ["png"]
 savePath         = "plots/"
@@ -120,10 +120,10 @@ def main(opts):
         DoPlots( hL1TkTau_NHFAbs     , datasetPaths, datasetList) 
         DoPlots( hL1TkTau_InvMass    , datasetPaths, datasetList) 
         DoPlots( hL1TkTau_Rtau       , datasetPaths, datasetList) 
-        # DoPlots( hL1TkTau_RelIso     , datasetPaths, datasetList) 
-        # DoPlots( hL1TkTau_VtxIso     , datasetPaths, datasetList) 
-        # DoPlots( hL1TkTau_VtxIsoAbs  , datasetPaths, datasetList) 
-        # DoPlots( hL1TkTau_InvMassIncl, datasetPaths, datasetList) 
+        DoPlots( hL1TkTau_RelIso     , datasetPaths, datasetList) 
+        DoPlots( hL1TkTau_VtxIso     , datasetPaths, datasetList) 
+        DoPlots( hL1TkTau_VtxIsoAbs  , datasetPaths, datasetList) 
+        DoPlots( hL1TkTau_InvMassIncl, datasetPaths, datasetList) 
 
         
     if bDoL1TkTauExtra:
@@ -143,10 +143,10 @@ def main(opts):
         DoEfficiency( hL1TkTau_CHF                  , datasetPaths, datasetList, ["<"] )
         DoEfficiency( hL1TkTau_NHF                  , datasetPaths, datasetList, ["<", ">"] )
         DoEfficiency( hL1TkTau_NHFAbs               , datasetPaths, datasetList, ["<", ">"] )
-        # DoEfficiency( hL1TkTau_InvMass              , datasetPaths, datasetList, ["<"] )
-        # DoEfficiency( hL1TkTau_Rtau                 , datasetPaths, datasetList, [">", "<"] )
-        # DoEfficiency( hL1TkTau_RelIso               , datasetPaths, datasetList, ["<"] )
-        # DoEfficiency( hL1TkTau_VtxIsoAbs            , datasetPaths, datasetList, [">"] )
+        DoEfficiency( hL1TkTau_InvMass              , datasetPaths, datasetList, ["<"] )
+        DoEfficiency( hL1TkTau_Rtau                 , datasetPaths, datasetList, [">", "<"] )
+        DoEfficiency( hL1TkTau_RelIso               , datasetPaths, datasetList, ["<"] )
+        DoEfficiency( hL1TkTau_VtxIsoAbs            , datasetPaths, datasetList, [">"] )
 
         
     if bDoMatchTk:
@@ -159,29 +159,29 @@ def main(opts):
         DoPlots( hL1TkTau_MatchTk_ChiSquared    , datasetPaths, datasetList)
         DoPlots( hL1TkTau_MatchTk_RedChiSquared , datasetPaths, datasetList)
         DoPlots( hL1TkTau_MatchTk_NStubs        , datasetPaths, datasetList)
-        ### DoPlots( hL1TkTau_MatchTk_NPsStubs      , datasetPaths, datasetList)
-        ### DoPlots( hL1TkTau_MatchTk_NBarrelStubs  , datasetPaths, datasetList)
-        ### DoPlots( hL1TkTau_MatchTk_NEndcapStubs  , datasetPaths, datasetList)
-        ### DoPlots( hL1TkTau_MatchTk_Eta           , datasetPaths, datasetList)
-        ### DoPlots( hL1TkTau_MatchTk_POCAz         , datasetPaths, datasetList)
-        ### DoPlots( hL1TkTau_MatchTk_d0            , datasetPaths, datasetList)
-        ### DoPlots( hL1TkTau_MatchTk_IsGenuine     , datasetPaths, datasetList)
-        ### DoPlots( hL1TkTau_MatchTk_IsUnknown     , datasetPaths, datasetList)
-        ### DoPlots( hL1TkTau_MatchTk_IsCombinatoric, datasetPaths, datasetList)
+        DoPlots( hL1TkTau_MatchTk_NPsStubs      , datasetPaths, datasetList)
+        DoPlots( hL1TkTau_MatchTk_NBarrelStubs  , datasetPaths, datasetList)
+        DoPlots( hL1TkTau_MatchTk_NEndcapStubs  , datasetPaths, datasetList)
+        DoPlots( hL1TkTau_MatchTk_Eta           , datasetPaths, datasetList)
+        DoPlots( hL1TkTau_MatchTk_POCAz         , datasetPaths, datasetList)
+        DoPlots( hL1TkTau_MatchTk_d0            , datasetPaths, datasetList)
+        DoPlots( hL1TkTau_MatchTk_IsGenuine     , datasetPaths, datasetList)
+        DoPlots( hL1TkTau_MatchTk_IsUnknown     , datasetPaths, datasetList)
+        DoPlots( hL1TkTau_MatchTk_IsCombinatoric, datasetPaths, datasetList)
 
         
     if bDoSigTks:
         if opts.verbose:
             print "=== Doing SigTks"
         DoPlots( hL1TkTau_NSigTks          , datasetPaths, datasetList)
-        # DoPlots( hL1TkTau_SigTks_Pt        , datasetPaths, datasetList)
-        # DoPlots( hL1TkTau_SigTks_Eta       , datasetPaths, datasetList)
+        DoPlots( hL1TkTau_SigTks_Pt        , datasetPaths, datasetList)
+        DoPlots( hL1TkTau_SigTks_Eta       , datasetPaths, datasetList)
         DoPlots( hL1TkTau_SigTks_d0        , datasetPaths, datasetList)
         DoPlots( hL1TkTau_SigTks_d0Abs     , datasetPaths, datasetList)
         DoPlots( hL1TkTau_SigTks_d0Sig     , datasetPaths, datasetList)
         DoPlots( hL1TkTau_SigTks_d0SigAbs  , datasetPaths, datasetList)
         DoPlots( hL1TkTau_SigTks_PtRel     , datasetPaths, datasetList)
-        # DoPlots( hL1TkTau_SigTks_POCAz     , datasetPaths, datasetList)
+        DoPlots( hL1TkTau_SigTks_POCAz     , datasetPaths, datasetList)
         DoPlots( hL1TkTau_SigTks_DeltaPOCAz, datasetPaths, datasetList)
         DoPlots( hL1TkTau_SigTks_StubPtCons, datasetPaths, datasetList)
         
@@ -190,14 +190,14 @@ def main(opts):
         if opts.verbose:
             print "=== Doing IsoTks"
         DoPlots( hL1TkTau_NIsoTks          , datasetPaths, datasetList)
-        # DoPlots( hL1TkTau_IsoTks_Pt        , datasetPaths, datasetList)
-        # DoPlots( hL1TkTau_IsoTks_Eta       , datasetPaths, datasetList)
+        DoPlots( hL1TkTau_IsoTks_Pt        , datasetPaths, datasetList)
+        DoPlots( hL1TkTau_IsoTks_Eta       , datasetPaths, datasetList)
         DoPlots( hL1TkTau_IsoTks_d0        , datasetPaths, datasetList)
         DoPlots( hL1TkTau_IsoTks_d0Abs     , datasetPaths, datasetList)
         DoPlots( hL1TkTau_IsoTks_d0Sig     , datasetPaths, datasetList)
         DoPlots( hL1TkTau_IsoTks_d0SigAbs  , datasetPaths, datasetList)
         DoPlots( hL1TkTau_IsoTks_PtRel     , datasetPaths, datasetList)
-        # DoPlots( hL1TkTau_IsoTks_POCAz     , datasetPaths, datasetList)
+        DoPlots( hL1TkTau_IsoTks_POCAz     , datasetPaths, datasetList)
         DoPlots( hL1TkTau_IsoTks_DeltaPOCAz, datasetPaths, datasetList)
         DoPlots( hL1TkTau_IsoTks_StubPtCons, datasetPaths, datasetList)
 

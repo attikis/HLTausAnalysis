@@ -182,7 +182,6 @@ void Table::AddRowColumn(int iRow,
 }
 
 
-
 //****************************************************************************
 void Table::_BeginTabular_(void)
 //****************************************************************************
@@ -254,7 +253,7 @@ void Table::_EndTabular_(void)
     }
   else if (format_.compare("Text") == 0) 
     {
-      // AddBottomRow( hLine_ );
+      AddBottomRow( hLine_ );
     }
   AddBottomRow("");
   

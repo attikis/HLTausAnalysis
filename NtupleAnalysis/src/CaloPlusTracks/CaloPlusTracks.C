@@ -28,37 +28,41 @@ void CaloPlusTracks::InitVars_()
   
   DEBUG = false;
 
-  // MC matching
-  mcMatching_dRMax  = +0.05;
-  mcMatching_unique = true;
-
-  // L1TkTau 
-  tk_CollectionType        = "TTTracks"; // "TTTracks"; // "TTPixelTracks"; // FIXME
-  tauAlgorithmMode         = "ShrinkingCone";
-  matchTk_minPt_           = +5.00;
-
   // Dataset-related
   datasets_  = datasets_.GetDataset(mcSample);
   realTauMom = datasets_.McTauMomPdgId_;
   nMaxNumOfHTausPossible = datasets_.nMcTaus_;
 
-  // Signal cone 
-  sigCone_tkCollectionWP   = "vLooseWP"; // TP: vLooseWP
-  matchTk_caloDeltaR_      = +0.12;      // TP: 0.10
-  sigCone_Constant         = +0.00;      // TP: 0.00
-  sigCone_dRMin            = +0.00;      // WARNING! If > 0 the matching Track will NOT be added in sigCone_TTTracks.
-  sigCone_dRMax            = +0.15;      // TP: 0.15
-  sigCone_cutoffDeltaR     = +0.15;      // TP: 0.15
-  sigCone_maxTkInvMass     = +1.77;      // TP: Unused (3-pr)
-  sigCone_maxTkDeltaPOCAz  = +0.20;      // TPL Unused (3-pr)
+  // Tracks
+  selTks_Collection = "TTTracks"; // "TTTracks"; // "TTPixelTracks";
+  selTks_nFitParams =   5;   // TP:   5
+  selTks_minPt      =   2.0; // TP:   2.0
+  selTks_maxEta     = 999.9; // TP: 999.9
+  selTks_maxChiSq   = 200.0; // TP: 200.0
+  selTks_minStubs   =   0;   // TP:   0
+  selTks_minStubsPS =   0;   // TP:   0
+  selTksPix_minHits =   0;   // TP:   N/A
+  
+  // L1TkTau - Signal cone
+  matchTk_minPt_          = +5.00; // TP: 5.00
+  matchTk_caloDeltaR_     = +0.12; // TP: 0.10
+  sigCone_Constant        = +0.00; // TP: 0.00
+  sigCone_dRMin           = +0.00; // WARNING! If > 0 the matching Track will NOT be added in sigCone_TTTracks.
+  sigCone_dRMax           = +0.15; // TP: 0.15
+  sigCone_cutoffDeltaR    = +0.15; // TP: 0.15
+  sigCone_maxTkInvMass    = +1.77; // TP: Unused (3-pr)
+  sigCone_maxTkDeltaPOCAz = +0.20; // TP: Unused (3-pr)
 
   // Isolation cone
-  isoCone_tkCollectionWP   = "vLooseWP";         // TP: vLooseWP
-  isoCone_Constant         = +3.50;              // TP: 3.50 GeV
-  isoCone_VtxIsoWP         = +0.40;              // TP: 1.0cm
-  isoCone_dRMin            = sigCone_dRMax;      // TP: 0.4cm
-  isoCone_dRMax            = +0.30;              // TP: 0.4cm
-  diTau_deltaPOCAz         = +0.50;              // TP: 1.0cm
+  isoCone_Constant       = +3.50;         // TP: 3.50 GeV
+  isoCone_VtxIsoWP       = +0.40;         // TP: 1.0cm
+  isoCone_dRMin          = sigCone_dRMax; // TP: 0.4cm
+  isoCone_dRMax          = +0.30;         // TP: 0.4cm
+  diTau_deltaPOCAz       = +0.50;         // TP: 1.0cm
+
+  // MC matching
+  mcMatching_dRMax  = +0.05;
+  mcMatching_unique = true;
 
   PrintSettings();
 
@@ -72,76 +76,118 @@ void CaloPlusTracks::PrintSettings(void)
 {
 
   // Inform user of settings
-  Table settings("Variable | Value | Units", "Text");  // Table settingsTable("Variable & Value & Units", "LaTeX", "l l l");
-  settings.AddRowColumn(0, "MC Sample");
-  settings.AddRowColumn(0, mcSample );
+  Table settings("Variable | Value | TP 2015 | Units", "Text");  // Table settingsTable("Variable & Value & Units", "LaTeX", "l l l");
+  // settings.AddRowColumn(0, "MC Sample");
+  // settings.AddRowColumn(0, mcSample );
 
-  settings.AddRowColumn(1, "Tau Algorithm");
-  settings.AddRowColumn(1, tauAlgorithmMode);
+  settings.AddRowColumn(0, "Tracks Collection");
+  settings.AddRowColumn(0, selTks_Collection);
+  settings.AddRowColumn(0, "TTTracks");
 
-  settings.AddRowColumn(2, "Track Collection");
-  settings.AddRowColumn(2, tk_CollectionType);
+  settings.AddRowColumn(1, "Tracks Fit-Params");
+  settings.AddRowColumn(1, auxTools_.ToString( selTks_nFitParams) );
+  settings.AddRowColumn(1, "5");
 
-  settings.AddRowColumn(3, "SigTks WP");
-  settings.AddRowColumn(3, sigCone_tkCollectionWP);
+  settings.AddRowColumn(2, "Tracks Pt (min)");
+  settings.AddRowColumn(2, auxTools_.ToString( selTks_minPt) );
+  settings.AddRowColumn(2, "2" );
+  settings.AddRowColumn(2, "GeV/c" );
+  
+  settings.AddRowColumn(3, "Tracks Eta (max)");
+  settings.AddRowColumn(3, auxTools_.ToString( selTks_maxEta) );
+  settings.AddRowColumn(3, "1e+03" );
+  
+  settings.AddRowColumn(4, "Tracks ChiSq (max)");
+  settings.AddRowColumn(4, auxTools_.ToString( selTks_maxChiSq) );
+  settings.AddRowColumn(4, "10 (8) (chi2/DOF)");
 
-  settings.AddRowColumn(4, "Calo-Matching Tk Pt (min)");
-  settings.AddRowColumn(4, auxTools_.ToString(matchTk_minPt_) );
-  settings.AddRowColumn(4, "GeVc^{-1}");
+  settings.AddRowColumn(5, "Tracks Stubs (min)");
+  settings.AddRowColumn(5, auxTools_.ToString( selTks_minStubs) );
+  settings.AddRowColumn(5, "4" );
+  
+  settings.AddRowColumn(6, "Tracks PS-Stubs (min)");
+  settings.AddRowColumn(6, auxTools_.ToString( selTks_minStubsPS) );
+  settings.AddRowColumn(6, "0" );
 
-  settings.AddRowColumn(5, "Calo-Matching Tk DeltaR (max)");
-  settings.AddRowColumn(5, auxTools_.ToString(matchTk_caloDeltaR_) );
+  settings.AddRowColumn(7, "Tracks-Pixel Hits");
+  settings.AddRowColumn(7, auxTools_.ToString( selTksPix_minHits) );
+  settings.AddRowColumn(7, "N/A" );
+  			
+  settings.AddRowColumn(8, "CaloTau Matching-Tk Pt (min)");
+  settings.AddRowColumn(8, auxTools_.ToString(matchTk_minPt_) );
+  settings.AddRowColumn(8, "15" );
+  settings.AddRowColumn(8, "GeV/c");
 
-  settings.AddRowColumn(6, "SigCone Shrink Constant");
-  settings.AddRowColumn(6, auxTools_.ToString(sigCone_Constant) );
-  settings.AddRowColumn(6, "GeV");
+  settings.AddRowColumn(9, "CaloTau Matching-Tk DeltaR (max)");
+  settings.AddRowColumn(9, auxTools_.ToString(matchTk_caloDeltaR_) );
+  settings.AddRowColumn(9, "0.1" );  
+  settings.AddRowColumn(10, "");
 
-  settings.AddRowColumn(7, "SigCone DeltaR (min)");
-  settings.AddRowColumn(7, auxTools_.ToString(sigCone_dRMin) );
+  settings.AddRowColumn(11, "SigCone Shrink Constant");
+  settings.AddRowColumn(11, auxTools_.ToString(sigCone_Constant) );
+  settings.AddRowColumn(11, "0" );
+  settings.AddRowColumn(11, "GeV");
 
-  settings.AddRowColumn(8, "SigCone DeltaR (max)");
-  settings.AddRowColumn(8, auxTools_.ToString(sigCone_dRMax) );
+  settings.AddRowColumn(12, "SigCone DeltaR (min)");
+  settings.AddRowColumn(12, auxTools_.ToString(sigCone_dRMin) );
+  settings.AddRowColumn(12, "0.0" );
 
-  settings.AddRowColumn(9, "SigCone InvMass (max)");
-  settings.AddRowColumn(9, auxTools_.ToString(sigCone_maxTkInvMass) );
-  settings.AddRowColumn(9, "GeVc^{-2}");
+  settings.AddRowColumn(13, "SigCone DeltaR (max)");
+  settings.AddRowColumn(13, auxTools_.ToString(sigCone_dRMax) );
+  settings.AddRowColumn(13, "0.15" );
+  
+  settings.AddRowColumn(14, "SigCone-3pr InvMass (max)");
+  settings.AddRowColumn(14, auxTools_.ToString(sigCone_maxTkInvMass) );
+  settings.AddRowColumn(14, "N/A" );
+  settings.AddRowColumn(14, "GeV/c^{-2}");
 
-  settings.AddRowColumn(10, "SigCone TkDeltaPOCAz (max)");
-  settings.AddRowColumn(10, auxTools_.ToString(sigCone_maxTkDeltaPOCAz) );
-  settings.AddRowColumn(10, "cm");
-
-  settings.AddRowColumn(11, "IsoTks WP");
-  settings.AddRowColumn(11, isoCone_tkCollectionWP);
-
-  settings.AddRowColumn(12, "IsoCone Shrink Constant");
-  settings.AddRowColumn(12, auxTools_.ToString(isoCone_Constant) );
-  settings.AddRowColumn(12, "GeV");
-
-  settings.AddRowColumn(13, "IsoCone DeltaR (min)");
-  settings.AddRowColumn(13, auxTools_.ToString(isoCone_dRMin) );
-
-  settings.AddRowColumn(14, "IsoCone DeltaR (max)");
-  settings.AddRowColumn(14, auxTools_.ToString(isoCone_dRMax) );
-
-  settings.AddRowColumn(15, "VtxIso WP" );
-  settings.AddRowColumn(15, auxTools_.ToString(isoCone_VtxIsoWP) );
+  settings.AddRowColumn(15, "SigCone-3pr maxTkDeltaPOCAz (max)");
+  settings.AddRowColumn(15, auxTools_.ToString(sigCone_maxTkDeltaPOCAz) );
+  settings.AddRowColumn(15, "N/A" );
   settings.AddRowColumn(15, "cm");
 
-  settings.AddRowColumn(16, "MC-Matching DeltaR (max)");
-  settings.AddRowColumn(16, auxTools_.ToString(mcMatching_dRMax) );
+  settings.AddRowColumn(16, "");
 
-  settings.AddRowColumn(17, "Unique MC-Matching");
-  settings.AddRowColumn(17, auxTools_.ToString(mcMatching_unique) );
+  settings.AddRowColumn(17, "IsoCone Shrink Constant");
+  settings.AddRowColumn(17, auxTools_.ToString(isoCone_Constant) );
+  settings.AddRowColumn(17, "3.5");
+  settings.AddRowColumn(17, "GeV");
 
-  settings.AddRowColumn(18, "MC-Tau Mom (PdgId)");
-  settings.AddRowColumn(18, auxTools_.ToString(realTauMom));
+  settings.AddRowColumn(18, "IsoCone DeltaR (min)");
+  settings.AddRowColumn(18, auxTools_.ToString(isoCone_dRMin) );
+  settings.AddRowColumn(18, "0.15" );
 
-  settings.AddRowColumn(19, "Num of MC-Taus");
-  settings.AddRowColumn(19, auxTools_.ToString(nMaxNumOfHTausPossible));
+  settings.AddRowColumn(19, "IsoCone DeltaR (max)");
+  settings.AddRowColumn(19, auxTools_.ToString(isoCone_dRMax) );
+  settings.AddRowColumn(19, "0.30");
 
-  settings.AddRowColumn(20, "Di-TAu Delta POCA-z");
-  settings.AddRowColumn(20, auxTools_.ToString(diTau_deltaPOCAz));
+  settings.AddRowColumn(20, "IsoCone VtxIso (max)" );
+  settings.AddRowColumn(20, auxTools_.ToString(isoCone_VtxIsoWP) );
+  settings.AddRowColumn(20, "1.0");
   settings.AddRowColumn(20, "cm");
+
+  settings.AddRowColumn(21, "Di-Tau Delta POCA-z");
+  settings.AddRowColumn(21, auxTools_.ToString(diTau_deltaPOCAz) );
+  settings.AddRowColumn(21, "1.0" );
+  settings.AddRowColumn(21, "cm");
+
+  settings.AddRowColumn(22, "");
+
+  settings.AddRowColumn(23, "MC-Matching DeltaR (max)");
+  settings.AddRowColumn(23, auxTools_.ToString(mcMatching_dRMax) );
+  settings.AddRowColumn(23, "0.05" );
+
+  settings.AddRowColumn(24, "MC-Matching Unique (True/False)");
+  settings.AddRowColumn(24, auxTools_.ToString(mcMatching_unique) );
+  settings.AddRowColumn(24, "1" );
+  
+  settings.AddRowColumn(25, "MC-Tau Mom (PdgId)");
+  settings.AddRowColumn(25, auxTools_.ToString(realTauMom));
+  settings.AddRowColumn(25, "N/A" );
+
+  settings.AddRowColumn(26, "MC-Taus (Min Number Expected)");
+  settings.AddRowColumn(26, auxTools_.ToString(nMaxNumOfHTausPossible));
+  settings.AddRowColumn(26, "N/A" );
 
   settings.Print();
   
@@ -170,7 +216,7 @@ void CaloPlusTracks::Loop()
   ////////////////////////////////////////////////
   // For-loop: Entries
   ////////////////////////////////////////////////
-  for (int jentry=0; jentry < nEntries; jentry++){
+  for (int jentry = 0; jentry < nEntries; jentry++){
   
     if(DEBUG) cout << "Entry = " << jentry << endl;
     
@@ -185,6 +231,7 @@ void CaloPlusTracks::Loop()
     vector<GenParticle> GenTaus         = GetGenParticles(15, true);
     vector<GenParticle> GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
     vector<GenParticle> GenTausTrigger  = GetHadronicGenTaus(GenTaus, 20.0, 2.3);
+    // Print Collections?
     if (0) for (vector<GenParticle>::iterator p = GenParticles.begin(); p != GenParticles.end(); p++) p->PrintProperties();
     if (0) for (vector<GenParticle>::iterator p = GenTaus.begin(); p != GenTaus.end(); p++) p->PrintProperties();
     if (0) for (vector<GenParticle>::iterator p = GenTausHadronic.begin(); p != GenTausHadronic.end(); p++) p->PrintProperties();
@@ -192,13 +239,16 @@ void CaloPlusTracks::Loop()
 
     
     // Track Collections
-    vector<TrackingParticle> TPs = GetTrackingParticles();
-    vector<TTTrack> TTTracks = GetTTTracks();
-    vector<TTPixelTrack> TTPixelTracks = GetTTPixelTracks();
+    vector<TrackingParticle> TPs       = GetTrackingParticles();
+    vector<TTTrack> matchTTTracks      = GetTTTracks(matchTk_minPt_, selTks_maxEta, selTks_maxChiSq, selTks_minStubs, selTks_minStubsPS, selTks_nFitParams);
+    vector<TTTrack> selTTTracks        = GetTTTracks(selTks_minPt  , selTks_maxEta, selTks_maxChiSq, selTks_minStubs, selTks_minStubsPS, selTks_nFitParams);
+    vector<TTPixelTrack> TTPixelTracks = GetTTPixelTracks(selTks_minPt, selTks_maxEta, selTks_maxChiSq, selTksPix_minHits);
     vector<TTTrack> pvTTTracks;
     double pv_z = GetPVTTTracks(pvTTTracks);
+    // Print Collections?
     if (0) for (vector<TrackingParticle>::iterator p = TPs.begin(); p != TPs.end(); p++) p->PrintProperties();
-    if (0) for (vector<TTTrack>::iterator t = TTTracks.begin(); t != TTTracks.end(); t++) t->PrintProperties();
+    if (0) for (vector<TTTrack>::iterator t = selTTTracks.begin(); t != selTTTracks.end(); t++) t->PrintProperties();
+    if (0) for (vector<TTTrack>::iterator t = matchTTTracks.begin(); t != matchTTTracks.end(); t++) t->PrintProperties();
     if (0) for (vector<TTTrack>::iterator t = pvTTTracks.begin(); t != pvTTTracks.end(); t++) t->PrintProperties();
     if (0) for (vector<TTPixelTrack>::iterator t = TTPixelTracks.begin(); t != TTPixelTracks.end(); t++) t->PrintProperties();
 
@@ -209,12 +259,13 @@ void CaloPlusTracks::Loop()
     vector<L1TkTauParticle> L1TkTaus_Calo;
     vector<L1TkTauParticle> L1TkTaus_Tk;
     vector<L1TkTauParticle> L1TkTaus_VtxIso;
+    // Print Collections?
     if (0) for (vector<L1JetParticle>::iterator j = L1CaloTaus.begin(); j != L1CaloTaus.end(); j++) j->PrintProperties();
 
 
     // Sanity checks
     auxTools_.EnsureVectorIsSorted(*L1CaloTau_Et, true);
-    // auxTools_.EnsureVectorIsSorted(*TP_Pt, true); // not true
+    // auxTools_.EnsureVectorIsSorted(*TP_Pt, true); // is not sorted. does not have to be either
     auxTools_.EnsureVectorIsSorted(*L1Tks_Pt    , true);
     auxTools_.EnsureVectorIsSorted(*L1PixTks_Pt , true);
 
@@ -231,33 +282,33 @@ void CaloPlusTracks::Loop()
       {
 
 	// Calculate the Et-dependent signal & isolation cone sizes
-	GetShrinkingConeSizes(calo->et(), sigCone_Constant, isoCone_Constant, sigCone_cutoffDeltaR, sigCone_dRMin, sigCone_dRMax, isoCone_dRMin, isoCone_dRMax);
+	GetShrinkingConeSizes(calo->et(), sigCone_Constant, isoCone_Constant, sigCone_cutoffDeltaR,
+			      sigCone_dRMin, sigCone_dRMax, isoCone_dRMin, isoCone_dRMax);
 
 	// Construct the CaloPlusTracks candidate
 	L1TkTauParticle	L1TkTauCandidate(0.0, matchTk_caloDeltaR_, sigCone_dRMin, sigCone_dRMax, isoCone_dRMin, isoCone_dRMax);
 
-
 	//
-	if ( tk_CollectionType.compare("TTPixelTracks") == 0 )
+	if ( selTks_Collection.compare("TTPixelTracks") == 0 )
 	  {
 	    // FIXME 
 	  }      
-	else if ( tk_CollectionType.compare("TTTracks") == 0 )
+	else if ( selTks_Collection.compare("TTTracks") == 0 )
 	  {
 	    
-	    GetMatchingTrack(L1TkTauCandidate, *calo, TTTracks);
-	    GetSigConeTracks(L1TkTauCandidate, TTTracks); // fixme: filter tracks
-	    GetIsoConeTracks(L1TkTauCandidate, TTTracks); // fixme: filter tracks
+	    GetMatchingTrack(L1TkTauCandidate, *calo, matchTTTracks);
+	    GetSigConeTracks(L1TkTauCandidate, selTTTracks);
+	    GetIsoConeTracks(L1TkTauCandidate, selTTTracks);
 	    GetIsolationValues(L1TkTauCandidate);
 	    GetMatchingGenParticle(L1TkTauCandidate, GenTaus);
-	    // L1TkTauCandidate.PrintProperties(false, false, true, true);
-	}
-      else
-	{
-	 cout << "E R R O R ! CaloPlusTracks::Loop(...) - Invalid Track Collection Type \"" << tk_CollectionType << "\". EXIT" << endl;
-	  exit(1);
-	}
-
+	    if (0) L1TkTauCandidate.PrintProperties(false, false, true, true);
+	  }
+	else
+	  {
+	    cout << "E R R O R ! CaloPlusTracks::Loop(...) - Invalid Track Collection Type \"" << selTks_Collection << "\". EXIT" << endl;
+	    exit(1);
+	  }
+	
 	// Save L1TkTau Candidate
 	L1TkTauCandidates.push_back(L1TkTauCandidate);
       }
@@ -266,7 +317,6 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     /// Create L1TkTaus Collections
     ////////////////////////////////////////////////
-    // For-loop: Al L1TkTauCandidates
     for (size_t i = 0; i < L1TkTauCandidates.size(); i++)
       {
 	
@@ -316,7 +366,6 @@ void CaloPlusTracks::Loop()
 	// Variables
 	TLorentzVector sigTks_p4 = tau->GetSigConeTTTracksP4();
 	TLorentzVector isoTks_p4 = tau->GetIsoConeTTTracksP4();
-
 	// Do not Skip if using MinBias sample as no real taus exist!
 	if (!tau->HasMatchingGenParticle() && ( mcSample.compare("MinBias") !=0 ) ) continue;
 	
@@ -324,85 +373,111 @@ void CaloPlusTracks::Loop()
 	hL1TkTau_Rtau        ->Fill( tau->GetSigConeLdgTk().getPt() / tau->GetCaloTau().et() );
 	hL1TkTau_CHF         ->Fill( tau->GetCaloTau().et()/sigTks_p4.Et() );
 	hL1TkTau_NHF         ->Fill( (tau->GetCaloTau().et() - sigTks_p4.Et())/tau->GetCaloTau().et() );
-	hL1TkTau_NHFAbs      ->Fill( fabs(tau->GetCaloTau().et() - sigTks_p4.Et()/tau->GetCaloTau().et()) );
+	hL1TkTau_NHFAbs      ->Fill( std::abs(tau->GetCaloTau().et() - sigTks_p4.Et()/tau->GetCaloTau().et()) );
 	hL1TkTau_NSigTks     ->Fill( tau->GetSigConeTTTracks().size() );
 	hL1TkTau_NIsoTks     ->Fill( tau->GetIsoConeTTTracks().size() );
 	hL1TkTau_InvMass     ->Fill( sigTks_p4.M() ); 
 	hL1TkTau_InvMassIncl ->Fill( sigTks_p4.M() + isoTks_p4.M() );
 	hL1TkTau_SigConeRMin ->Fill( tau->GetSigConeMin() );
-	hL1TkTau_SigConeRMax ->Fill( tau->GetSigConeMax() );
 	hL1TkTau_IsoConeRMin ->Fill( tau->GetIsoConeMin() );
+	hL1TkTau_SigConeRMax ->Fill( tau->GetSigConeMax() );
 	hL1TkTau_IsoConeRMax ->Fill( tau->GetIsoConeMax() );
 	hL1TkTau_DeltaRGenP  ->Fill( tau->GetMatchingGenParticleDeltaR() );
 	hL1TkTau_RelIso      ->Fill( tau->GetRelIsolation() );
 	hL1TkTau_VtxIso      ->Fill( tau->GetVtxIsolation() );
 	hL1TkTau_VtxIsoAbs   ->Fill( abs(tau->GetVtxIsolation()) );
 
+	TTTrack matchTk   = tau->GetMatchingTk();
+	double matchTk_dR = auxTools_.DeltaR(matchTk.getEta(), matchTk.getPhi(), tau->GetCaloTau().eta(), tau->GetCaloTau().phi() );
+	TLorentzVector caloTau_p4;
+	caloTau_p4.SetPtEtaPhiE(tau->GetCaloTau().et(), tau->GetCaloTau().eta(), tau->GetCaloTau().phi(), tau->GetCaloTau().energy() );
+	hL1TkTau_MatchTk_DeltaR        ->Fill( matchTk_dR );
+	hL1TkTau_MatchTk_PtRel         ->Fill( matchTk.p3().Perp(caloTau_p4.Vect()) );
+	hL1TkTau_MatchTk_Pt            ->Fill( matchTk.getPt() );
+	hL1TkTau_MatchTk_Eta           ->Fill( matchTk.getEta() );
+	hL1TkTau_MatchTk_POCAz         ->Fill( matchTk.getZ0() );
+	hL1TkTau_MatchTk_d0            ->Fill( matchTk.getD0() );
+	hL1TkTau_MatchTk_d0Abs         ->Fill( std::abs(matchTk.getD0()) );
+	hL1TkTau_MatchTk_NStubs        ->Fill( matchTk.getNumOfStubs() );
+	hL1TkTau_MatchTk_NPsStubs      ->Fill( matchTk.getNumOfStubsPS() );
+	hL1TkTau_MatchTk_NBarrelStubs  ->Fill( matchTk.getNumOfBarrelStubs() );
+	hL1TkTau_MatchTk_NEndcapStubs  ->Fill( matchTk.getNumOfEndcapStubs() );
+	hL1TkTau_MatchTk_StubPtCons    ->Fill( matchTk.getStubPtConsistency() );
+	hL1TkTau_MatchTk_ChiSquared    ->Fill( matchTk.getChi2() );
+	hL1TkTau_MatchTk_RedChiSquared ->Fill( matchTk.getChi2Red() );
+	hL1TkTau_MatchTk_IsGenuine     ->Fill( matchTk.getIsGenuine() );
+	hL1TkTau_MatchTk_IsUnknown     ->Fill( matchTk.getIsUnknown() );
+	hL1TkTau_MatchTk_IsCombinatoric->Fill( matchTk.getIsCombinatoric() );
+	
 
 	// Matching TTTrack
 	TTTrack match_tk = tau->GetMatchingTk();
-
-	// // For-loop: SigCone TTTracks
-	// for (vector<TTTrack>::iterator sigTk = tau->GetSigConeTTTracks().begin(); sigTk != tau->GetSigConeTTTracks().end(); sigTk++)
-	//   {
-
-	    // cout << "sigTk->getCharge() = " << sigTk->getCharge() << endl;
-	    // cout << "sigTk->getQ() = " << sigTk->getQ() << endl;
-	    // FIXME - SEG FAULTS
-	// if (1) sigTk->PrintProperties();
+	int sigTks_sumCharge = 0;
+	  
+	// For-loop: SigCone TTTracks
+	vector<TTTrack> sigTks = tau->GetSigConeTTTracks();
+	for (vector<TTTrack>::iterator sigTk = sigTks.begin(); sigTk != sigTks.end(); sigTk++)
+	  {
+	    if (0) sigTk->PrintProperties();
 
 	    // Skip if tk is matching track
-	//  if ( sigTk->index() == match_tk.index() ) continue;
+	    if ( sigTk->index() == match_tk.index() ) continue;
 	    
-	    // // Get the transverse component of this track with respect to the matching track
-	    // TVector3 sigTk_p3  = sigTk->getMomentum();
-	    // double sigTk_PtRel = sigTk_p3.Perp( match_tk.getMomentum() );
+	    // Get the transverse component of this track with respect to the matching track
+	    TVector3 sigTk_p3  = sigTk->getMomentum();
+	    double sigTk_PtRel = sigTk_p3.Perp( match_tk.getMomentum() );
 	 
-	    // // Fill Histograms
-	    // if (DEBUG) cout << "HERE-4a" << endl;
-	    // hL1TkTau_SigTks_Pt        ->Fill( sigTk->getPt()  );
-	    // // hL1TkTau_SigTks_Eta       ->Fill( sigTk->getEta() );	    
-	    // hL1TkTau_SigTks_POCAz     ->Fill( sigTk->getZ0()  );
-	    // hL1TkTau_SigTks_DeltaPOCAz->Fill( fabs( sigTk->getZ0() - match_tk.getZ0() ) );
-	    // if (DEBUG) cout << "HERE-4b" << endl;
-	    // hL1TkTau_SigTks_d0        ->Fill( sigTk->getD0() );
-	    // hL1TkTau_SigTks_d0Abs     ->Fill( abs( sigTk->getD0()) );
-	    // hL1TkTau_SigTks_d0Sig     ->Fill( -1.0 ); // only possiblefor TTPixelTracks
-	    // if (DEBUG) cout << "HERE-4c" << endl;
-	    // hL1TkTau_SigTks_d0SigAbs  ->Fill( -1.0 ); // only possiblefor TTPixelTracks
-	    // hL1TkTau_SigTks_PtRel     ->Fill( sigTk_PtRel );
-	    // hL1TkTau_SigTks_StubPtCons->Fill( sigTk->getStubPtConsistency() );
-	 
-	//	  }// SigCone_TTTracks
-       
-	// For-loop: IsoCone TTTracks
-	// if (DEBUG) cout << "HERE-5" << endl;	
-	// for (vector<TTTrack>::iterator isoTk = tau->GetIsoConeTTTracks().begin(); isoTk != tau->GetIsoConeTTTracks().end(); isoTk++)
-	//   {
-	    
-	//     // Skip if tk is matching track
-	//     if ( isoTk->index() == match_tk.index() ) continue;
-	  
-	//     // Get the transverse component of this track with respect to the matching track
-	//     TVector3 isoTk_p3  = isoTk->getMomentum();
-	//     double isoTk_PtRel = isoTk_p3.Perp( match_tk.getMomentum() );
-	  
-	//     // Fill Histograms
-	//     if (DEBUG) cout << "HERE-5a" << endl;	
-	//     hL1TkTau_IsoTks_Pt        ->Fill( isoTk->getPt()  );
-	//     // hL1TkTau_IsoTks_Eta       ->Fill( isoTk->getEta() );	    
-	//     hL1TkTau_IsoTks_POCAz     ->Fill( isoTk->getZ0()  );
-	//     hL1TkTau_IsoTks_DeltaPOCAz->Fill( fabs( isoTk->getZ0() - match_tk.getZ0() ) );
-	//     if (DEBUG) cout << "HERE-5b" << endl;
-	//     hL1TkTau_IsoTks_d0        ->Fill( isoTk->getD0() );							     
-	//     hL1TkTau_IsoTks_d0Abs     ->Fill( abs( isoTk->getD0()) );
-	//     hL1TkTau_IsoTks_d0Sig     ->Fill( -1.0 ); // only possiblefor TTPixelTracks
-	//     if (DEBUG) cout << "HERE-5c" << endl;	
-	//     hL1TkTau_IsoTks_d0SigAbs  ->Fill( -1.0 ); // only possiblefor TTPixelTracks
-	//     hL1TkTau_IsoTks_PtRel     ->Fill( isoTk_PtRel );
-	//     hL1TkTau_IsoTks_StubPtCons->Fill( isoTk->getStubPtConsistency() );
+	    // Fill Histograms
+	    hL1TkTau_SigTks_Pt        ->Fill( sigTk->getPt()  );
+	    hL1TkTau_SigTks_Eta       ->Fill( sigTk->getEta() );
+	    hL1TkTau_SigTks_POCAz     ->Fill( sigTk->getZ0()  );
+	    hL1TkTau_SigTks_DeltaPOCAz->Fill( std::abs( sigTk->getZ0() - match_tk.getZ0() ) );
+	    hL1TkTau_SigTks_d0        ->Fill( sigTk->getD0() );
+	    hL1TkTau_SigTks_d0Abs     ->Fill( abs( sigTk->getD0()) );
+	    // hL1TkTau_SigTks_d0Sig     ->Fill( sigTk->getD0()/sigTk->getSigmaD0() );             // TTPixelTracks
+	    // hL1TkTau_SigTks_d0SigAbs  ->Fill( std::abs(sigTk->getD0()/sigTk->getSigmaD0() ) );  // TTPixelTracks
+	    hL1TkTau_SigTks_d0Sig     ->Fill( -1.0 );
+	    hL1TkTau_SigTks_d0SigAbs  ->Fill( -1.0 );
+	    hL1TkTau_SigTks_PtRel     ->Fill( sigTk_PtRel );
+	    hL1TkTau_SigTks_StubPtCons->Fill( sigTk->getStubPtConsistency() );
 
-	//   }// IsoCone_TTTracks
+	    // Other variables
+	    sigTks_sumCharge += sigTk->getCharge();
+	    
+	  }// SigCone_TTTracks
+
+	// Fill histos for other variables
+	hL1TkTau_Charge->Fill( sigTks_sumCharge);
+
+	
+	// For-loop: IsoCone TTTracks
+	vector<TTTrack> isoTks = tau->GetIsoConeTTTracks();
+	for (vector<TTTrack>::iterator isoTk = isoTks.begin(); isoTk != isoTks.end(); isoTk++)
+	  {
+
+	    if (0) isoTk->PrintProperties();
+	    
+	    // Skip if tk is matching track
+	    if ( isoTk->index() == match_tk.index() ) continue;
+	
+	    // Get the transverse component of this track with respect to the matching track
+	    TVector3 isoTk_p3  = isoTk->getMomentum();
+	    double isoTk_PtRel = isoTk_p3.Perp( match_tk.getMomentum() );
+	
+	    // Fill Histograms
+	    hL1TkTau_IsoTks_Pt        ->Fill( isoTk->getPt()  );
+	    hL1TkTau_IsoTks_Eta       ->Fill( isoTk->getEta() );
+	    hL1TkTau_IsoTks_POCAz     ->Fill( isoTk->getZ0()  );
+	    hL1TkTau_IsoTks_DeltaPOCAz->Fill( std::abs( isoTk->getZ0() - match_tk.getZ0() ) );
+	    hL1TkTau_IsoTks_d0        ->Fill( isoTk->getD0() );							     
+	    hL1TkTau_IsoTks_d0Abs     ->Fill( abs( isoTk->getD0()) );
+	    // hL1TkTau_IsoTks_d0Sig     ->Fill( isoTk->getD0()/isoTk->getSigmaD0() );             // TTPixelTracks
+	    // hL1TkTau_IsoTks_d0SigAbs  ->Fill( std::abs(isoTk->getD0()/isoTk->getSigmaD0() ) );  // TTPixelTracks
+	    hL1TkTau_IsoTks_d0Sig     ->Fill( -1.0 );
+	    hL1TkTau_IsoTks_d0SigAbs  ->Fill( -1.0 );
+	    hL1TkTau_IsoTks_PtRel     ->Fill( isoTk_PtRel );
+	    hL1TkTau_IsoTks_StubPtCons->Fill( isoTk->getStubPtConsistency() );
+	  }// IsoCone_TTTracks
 
       } // L1TkTaus_VtxIso
   
@@ -444,8 +519,8 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     // WARNING: Removal of non Z-matching should be just before I need it!
     ////////////////////////////////////////////////
-    ApplyDiTauZMatching(tk_CollectionType, L1TkTaus_Tk);      // fixme - erases L1TkTaus from vector!
-    ApplyDiTauZMatching(tk_CollectionType, L1TkTaus_VtxIso);  // fixme - erases L1TkTaus from vector!
+    ApplyDiTauZMatching(selTks_Collection, L1TkTaus_Tk);      // fixme - erases L1TkTaus from vector!
+    ApplyDiTauZMatching(selTks_Collection, L1TkTaus_VtxIso);  // fixme - erases L1TkTaus from vector!
     FillDiTau_(L1TkTaus_Calo  , hDiTau_Rate_Calo  , hDiTau_Eff_Calo  );
     FillDiTau_(L1TkTaus_Tk    , hDiTau_Rate_Tk    , hDiTau_Eff_Tk    );
     FillDiTau_(L1TkTaus_VtxIso, hDiTau_Rate_VtxIso, hDiTau_Eff_VtxIso);
@@ -569,7 +644,7 @@ void CaloPlusTracks::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1TkTau_IsoTks_PtRel            , "L1TkTau_IsoTks_PtRel"        , 2000,    +0.0,   +20.0  );
   histoTools_.BookHisto_1D(hL1TkTau_IsoTks_StubPtCons       , "L1TkTau_IsoTks_StubPtCons"   ,  200,    +0.0,  +200.0  );
 
-  // VtxIsolated L1TkTaus, Signal TTPixelTracks
+  // VtxIsolated L1TkTaus, Signal TTTracks
   histoTools_.BookHisto_1D(hL1TkTau_MatchTk_DeltaR          , "L1TkTau_MatchTk_DeltaR"        , 2000,  +0.0,   +2.0);
   histoTools_.BookHisto_1D(hL1TkTau_MatchTk_PtRel           , "L1TkTau_MatchTk_PtRel"         , 2000,  +0.0,  +20.0);
   histoTools_.BookHisto_1D(hL1TkTau_MatchTk_Pt              , "L1TkTau_MatchTk_Pt"            ,  300,  +0.0, +300.0);
@@ -927,14 +1002,14 @@ void CaloPlusTracks::FillEfficiency_(TH1D *hEfficiency,
 
 //****************************************************************************
 vector<GenParticle> CaloPlusTracks::GetHadronicGenTaus(vector<GenParticle> GenTaus,
-							double visEt,
-							double visEta)
+						       double visEt,
+						       double visEta)
 //****************************************************************************
 {
 
   // Sanity check
-  vector<GenParticle> triggerGenTaus;
-  if (GenTaus.size() < 1 ) return triggerGenTaus;
+  vector<GenParticle> hadGenTaus;
+  if (GenTaus.size() < 1 ) return hadGenTaus;
 
   
   // For-loop: GenTaus
@@ -952,15 +1027,16 @@ vector<GenParticle> CaloPlusTracks::GetHadronicGenTaus(vector<GenParticle> GenTa
 
       // Acceptance cuts using visible 4-momenta
       TLorentzVector tau_visP4 = GetVisibleP4(hadronicDaughters);
-      bool bPassVisEt  = (tau_visP4.Et() >= visEt);
-      bool bPassVisEta = (fabs(tau_visP4.Eta()) <= visEta );
+      bool bPassVisEt  = ( tau_visP4.Et() >= visEt );
+      bool bPassVisEta = ( std::abs(tau_visP4.Eta()) <= visEta );
       if (!(bPassVisEt * bPassVisEta)) continue;
 
-      // Save this trigger tau
-      triggerGenTaus.push_back(*tau);
+      // Save this hadronic generator tau
+      if (0) tau->PrintProperties();
+      hadGenTaus.push_back(*tau);
     }
   
-  return triggerGenTaus;
+  return hadGenTaus;
 }      
 
 
@@ -1225,21 +1301,38 @@ double CaloPlusTracks::GetPVTTTracks(vector<TTTrack> &pvTTTracks)
 
 
 //****************************************************************************
-vector<TTTrack> CaloPlusTracks::GetTTTracks(void)
+vector<TTTrack> CaloPlusTracks::GetTTTracks(const double minPt,
+					    const double maxEta,
+					    const double maxChiSq,
+					    const unsigned int minStubs,
+					    const unsigned int minStubsPS,
+					    const unsigned nFitParams)
 //****************************************************************************
 {
   vector<TTTrack> theTTTracks; 
-  for (Size_t iTk = 0; iTk < L1Tks_Pt->size(); iTk++) theTTTracks.push_back( GetTTTrack(iTk) );
+  for (Size_t iTk = 0; iTk < L1Tks_Pt->size(); iTk++)
+    {
+      TTTrack tk = GetTTTrack(iTk, nFitParams);
+      // double z0 = tk.getZ0();
+      // double d0 = tk.getD0();
+      
+      if (tk.getPt() < minPt) continue;
+      if (std::abs(tk.getEta()) > maxEta) continue;
+      if (tk.getChi2() > maxChiSq) continue;
+      if (tk.getNumOfStubs() < minStubs) continue;
+      if (tk.getNumOfStubsPS() < minStubsPS) continue;
+      theTTTracks.push_back( tk );
+    }
   return theTTTracks;
 }
 
 
 //****************************************************************************
 TTTrack CaloPlusTracks::GetTTTrack(unsigned int Index,
-				   unsigned int nFitParams)
+				   const unsigned int nFitParams)
 //****************************************************************************
 {
-
+  
   // Initialise variables
   TVector3 p;  
 
@@ -1267,9 +1360,12 @@ TTTrack CaloPlusTracks::GetTTTrack(unsigned int Index,
   vector<unsigned int> stubs_iRing  = L1Tks_Stubs_iRing->at(Index);
   vector<unsigned int> stubs_iSide  = L1Tks_Stubs_iSide->at(Index);
   vector<unsigned int> stubs_iZ     = L1Tks_Stubs_iZ->at(Index);
-
+  // auxTools_.PrintVector(stubs_isPS);
+  
   // Construct the TTTrack
-  TTTrack theTTTrack(Index, p, aPOCA,  aRInv, aChi2, aStubPtCons, aSector, aWedge, isGenuine, isUnknown, isCombinatoric, stubs_isPS, stubs_iDisk, stubs_iLayer, stubs_iPhi, stubs_iRing, stubs_iSide, stubs_iZ, nFitParams);
+  TTTrack theTTTrack(Index, p, aPOCA,  aRInv, aChi2, aStubPtCons,
+		     aSector, aWedge, isGenuine, isUnknown, isCombinatoric,
+		     stubs_isPS, stubs_iDisk, stubs_iLayer, stubs_iPhi, stubs_iRing, stubs_iSide, stubs_iZ, nFitParams);
 
   return theTTTrack;
 }
@@ -1320,11 +1416,25 @@ TrackingParticle CaloPlusTracks::GetTrackingParticle(unsigned int Index)
 
 
 //****************************************************************************
-vector<TTPixelTrack> CaloPlusTracks::GetTTPixelTracks(void) //fime, add filtering option
+vector<TTPixelTrack> CaloPlusTracks::GetTTPixelTracks(const double minPt,
+						      const double maxEta,
+						      const double maxChiSq,
+						      const int minHits)
 //****************************************************************************
 {
   vector<TTPixelTrack> theTTPixelTracks; 
-  for (Size_t iTk = 0; iTk < L1PixTks_Pt->size(); iTk++) theTTPixelTracks.push_back( GetTTPixelTrack(iTk) );
+  for (Size_t iTk = 0; iTk < L1PixTks_Pt->size(); iTk++)
+    {
+      TTPixelTrack pixTk = GetTTPixelTrack(iTk);
+      // double z0 = tk.getZ0();
+      // double d0 = tk.getD0();
+      if (pixTk.getPt() < minPt) continue;
+      if (std::abs(pixTk.getEta()) > maxEta) continue;
+      if (pixTk.getChi2() > maxChiSq) continue;
+      if (pixTk.getNcandidatehit() < minHits) continue;
+
+      theTTPixelTracks.push_back( pixTk );
+    }
   return theTTPixelTracks;
 }
 
@@ -1480,7 +1590,7 @@ void CaloPlusTracks::GetIsolationValues(L1TkTauParticle &L1TkTau)
       isoTks_scalarSumPt += isoConeTk.getPt();
       
       // Find the track closest in Z0
-      deltaZ0 = fabs(matchTk.getZ0() - isoConeTk.getZ0());
+      deltaZ0 = std::abs(matchTk.getZ0() - isoConeTk.getZ0());
       if (deltaZ0 < L1TkTau.GetVtxIsolation())
 	{
 	  L1TkTau.SetVtxIsolation(deltaZ0);

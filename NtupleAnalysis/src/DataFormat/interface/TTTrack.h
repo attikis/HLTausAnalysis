@@ -74,6 +74,9 @@ class TTTrack{
   int getDOF(void);
   unsigned int getNumOfStubs(void);
   unsigned int getNumOfStubsPS(void);
+  unsigned int getNumOfBarrelStubs(void);
+  unsigned int getNumOfEndcapStubs(void);
+
 
   void PrintProperties(void);
   void PrintAllProperties(void);

@@ -29,7 +29,8 @@ void runCaloPlusTracks(const std::string MulticrabDir = "",
 
   const std::string absolutePath = "/Users/attikis/my_work/cms/lxplus/hltaus/rootFiles/TTrees/CMSSW_6_2_0_SLHC12_patch1/TkTauFromCaloAnalyzer_v7";
   // const std::string absolutePath = "/Users/attikis/disk/hltaus/rootFiles/TTrees/CMSSW_6_2_0_SLHC12_patch1/TkTauFromCaloAnalyzer_v7";
-  
+  // const std::string absolutePath = "/Users/attikis/my_work/cms/lxplus/hltaus/rootFiles/TTrees/CMSSW_6_2_0_SLHC12_patch1/TkTauFromCaloAnalyzer_v3/";
+   
   CaloPlusTracks macro(absolutePath + "/" + MulticrabDir, SampleName, text, maxEvents);
   macro.Loop();
 }
