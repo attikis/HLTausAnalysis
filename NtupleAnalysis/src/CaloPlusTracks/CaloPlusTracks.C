@@ -54,11 +54,11 @@ void CaloPlusTracks::InitVars_()
   sigCone_maxTkDeltaPOCAz = +0.20; // TP: Unused (3-pr)
 
   // Isolation cone
-  isoCone_Constant       = +3.50;         // TP: 3.50 GeV
-  isoCone_VtxIsoWP       = +0.40;         // TP: 1.0cm
-  isoCone_dRMin          = sigCone_dRMax; // TP: 0.4cm
-  isoCone_dRMax          = +0.30;         // TP: 0.4cm
-  diTau_deltaPOCAz       = +0.50;         // TP: 1.0cm
+  isoCone_Constant = +3.50;         // TP: 3.50 GeV
+  isoCone_VtxIsoWP = +0.40;         // TP: 1.0cm
+  isoCone_dRMin    = sigCone_dRMax; // TP: 0.4cm
+  isoCone_dRMax    = +0.30;         // TP: 0.4cm
+  diTau_deltaPOCAz = +0.50;         // TP: 1.0cm
 
   // MC matching
   mcMatching_dRMax  = +0.05;
@@ -76,118 +76,165 @@ void CaloPlusTracks::PrintSettings(void)
 {
 
   // Inform user of settings
-  Table settings("Variable | Value | TP 2015 | Units", "Text");  // Table settingsTable("Variable & Value & Units", "LaTeX", "l l l");
-  // settings.AddRowColumn(0, "MC Sample");
-  // settings.AddRowColumn(0, mcSample );
+  Table settings("Variable | Cut | Value | TP 2015 | Units", "Text");  // Table settingsTable("Variable & Value & Units", "LaTeX", "l l l");
+  settings.AddRowColumn(0, "MC Sample");
+  settings.AddRowColumn(0, "==" );
+  settings.AddRowColumn(0, mcSample );
 
-  settings.AddRowColumn(0, "Tracks Collection");
-  settings.AddRowColumn(0, selTks_Collection);
-  settings.AddRowColumn(0, "TTTracks");
-
-  settings.AddRowColumn(1, "Tracks Fit-Params");
-  settings.AddRowColumn(1, auxTools_.ToString( selTks_nFitParams) );
-  settings.AddRowColumn(1, "5");
-
-  settings.AddRowColumn(2, "Tracks Pt (min)");
-  settings.AddRowColumn(2, auxTools_.ToString( selTks_minPt) );
-  settings.AddRowColumn(2, "2" );
-  settings.AddRowColumn(2, "GeV/c" );
+  settings.AddRowColumn(1, "");
   
-  settings.AddRowColumn(3, "Tracks Eta (max)");
-  settings.AddRowColumn(3, auxTools_.ToString( selTks_maxEta) );
-  settings.AddRowColumn(3, "1e+03" );
+  settings.AddRowColumn(2, "Tracks: Collection");
+  settings.AddRowColumn(2, "==");
+  settings.AddRowColumn(2, selTks_Collection);
+  settings.AddRowColumn(2, "TTTracks");
+  settings.AddRowColumn(2, "");
   
-  settings.AddRowColumn(4, "Tracks ChiSq (max)");
-  settings.AddRowColumn(4, auxTools_.ToString( selTks_maxChiSq) );
-  settings.AddRowColumn(4, "10 (8) (chi2/DOF)");
+  settings.AddRowColumn(3, "Tracks: Fit Parameters");
+  settings.AddRowColumn(3, "==");
+  settings.AddRowColumn(3, auxTools_.ToString( selTks_nFitParams) );
+  settings.AddRowColumn(3, "5");
+  settings.AddRowColumn(3, "");
 
-  settings.AddRowColumn(5, "Tracks Stubs (min)");
-  settings.AddRowColumn(5, auxTools_.ToString( selTks_minStubs) );
-  settings.AddRowColumn(5, "4" );
+  settings.AddRowColumn(4, "Tracks: Pt");
+  settings.AddRowColumn(4, ">=");
+  settings.AddRowColumn(4, auxTools_.ToString( selTks_minPt) );
+  settings.AddRowColumn(4, "2" );
+  settings.AddRowColumn(4, "GeV/c" );
   
-  settings.AddRowColumn(6, "Tracks PS-Stubs (min)");
-  settings.AddRowColumn(6, auxTools_.ToString( selTks_minStubsPS) );
-  settings.AddRowColumn(6, "0" );
+  settings.AddRowColumn(5, "Tracks: |Eta|");
+  settings.AddRowColumn(5, "<=");
+  settings.AddRowColumn(5, auxTools_.ToString( selTks_maxEta) );
+  settings.AddRowColumn(5, "1e+03" );
+  settings.AddRowColumn(5, "" );
+  
+  settings.AddRowColumn(6, "Tracks: ChiSq");
+  settings.AddRowColumn(6, "<=");
+  settings.AddRowColumn(6, auxTools_.ToString( selTks_maxChiSq) );
+  settings.AddRowColumn(6, "10 (8) (chi2/DOF)");
+  settings.AddRowColumn(6, "");
 
-  settings.AddRowColumn(7, "Tracks-Pixel Hits");
-  settings.AddRowColumn(7, auxTools_.ToString( selTksPix_minHits) );
-  settings.AddRowColumn(7, "N/A" );
+  settings.AddRowColumn(7, "Tracks: Stubs");
+  settings.AddRowColumn(7, ">=");
+  settings.AddRowColumn(7, auxTools_.ToString( selTks_minStubs) );
+  settings.AddRowColumn(7, "4" );
+  settings.AddRowColumn(7, "" );
+  
+  settings.AddRowColumn(8, "Tracks: PS-Stubs");
+  settings.AddRowColumn(8, ">=");
+  settings.AddRowColumn(8, auxTools_.ToString( selTks_minStubsPS) );
+  settings.AddRowColumn(8, "0" );
+  settings.AddRowColumn(8, "" );
+
+  settings.AddRowColumn(9, "Tracks: Pixel Hits");
+  settings.AddRowColumn(9, ">=");
+  settings.AddRowColumn(9, auxTools_.ToString( selTksPix_minHits) );
+  settings.AddRowColumn(9, "N/A" );
+  settings.AddRowColumn(9, "" );
   			
-  settings.AddRowColumn(8, "CaloTau Matching-Tk Pt (min)");
-  settings.AddRowColumn(8, auxTools_.ToString(matchTk_minPt_) );
-  settings.AddRowColumn(8, "15" );
-  settings.AddRowColumn(8, "GeV/c");
-
-  settings.AddRowColumn(9, "CaloTau Matching-Tk DeltaR (max)");
-  settings.AddRowColumn(9, auxTools_.ToString(matchTk_caloDeltaR_) );
-  settings.AddRowColumn(9, "0.1" );  
   settings.AddRowColumn(10, "");
 
-  settings.AddRowColumn(11, "SigCone Shrink Constant");
-  settings.AddRowColumn(11, auxTools_.ToString(sigCone_Constant) );
-  settings.AddRowColumn(11, "0" );
-  settings.AddRowColumn(11, "GeV");
+  settings.AddRowColumn(11, "Matching Track: Pt");
+  settings.AddRowColumn(11, ">=");
+  settings.AddRowColumn(11, auxTools_.ToString(matchTk_minPt_) );
+  settings.AddRowColumn(11, "15" );
+  settings.AddRowColumn(11, "GeV/c");
 
-  settings.AddRowColumn(12, "SigCone DeltaR (min)");
-  settings.AddRowColumn(12, auxTools_.ToString(sigCone_dRMin) );
-  settings.AddRowColumn(12, "0.0" );
+  settings.AddRowColumn(12, "Matching Track: DeltaR");
+  settings.AddRowColumn(12, "<=");
+  settings.AddRowColumn(12, auxTools_.ToString(matchTk_caloDeltaR_) );
+  settings.AddRowColumn(12, "0.10" );
+  settings.AddRowColumn(12, "");
 
-  settings.AddRowColumn(13, "SigCone DeltaR (max)");
-  settings.AddRowColumn(13, auxTools_.ToString(sigCone_dRMax) );
-  settings.AddRowColumn(13, "0.15" );
+  settings.AddRowColumn(13, "");
+
+  settings.AddRowColumn(14, "Signal Cone: Shrink Constant");
+  settings.AddRowColumn(14, "==");
+  settings.AddRowColumn(14, auxTools_.ToString(sigCone_Constant) );
+  settings.AddRowColumn(14, "0" );
+  settings.AddRowColumn(14, "GeV");
+
+  settings.AddRowColumn(15, "Signal Cone: DeltaR");
+  settings.AddRowColumn(15, ">=");
+  settings.AddRowColumn(15, auxTools_.ToString(sigCone_dRMin) );
+  settings.AddRowColumn(15, "0.0" );
+  settings.AddRowColumn(15, "" );
+
+  settings.AddRowColumn(16, "Signal Cone: DeltaR");
+  settings.AddRowColumn(16, "<=");
+  settings.AddRowColumn(16, auxTools_.ToString(sigCone_dRMax) );
+  settings.AddRowColumn(16, "0.15" );
+  settings.AddRowColumn(16, "" );
   
-  settings.AddRowColumn(14, "SigCone-3pr InvMass (max)");
-  settings.AddRowColumn(14, auxTools_.ToString(sigCone_maxTkInvMass) );
-  settings.AddRowColumn(14, "N/A" );
-  settings.AddRowColumn(14, "GeV/c^{-2}");
+  settings.AddRowColumn(17, "Signal Cone:-3pr InvMass");
+  settings.AddRowColumn(17, "<=");
+  settings.AddRowColumn(17, auxTools_.ToString(sigCone_maxTkInvMass) );
+  settings.AddRowColumn(17, "N/A" );
+  settings.AddRowColumn(17, "GeV/c^{-2}");
 
-  settings.AddRowColumn(15, "SigCone-3pr maxTkDeltaPOCAz (max)");
-  settings.AddRowColumn(15, auxTools_.ToString(sigCone_maxTkDeltaPOCAz) );
-  settings.AddRowColumn(15, "N/A" );
-  settings.AddRowColumn(15, "cm");
+  settings.AddRowColumn(18, "Signal Cone:-3pr maxTkDeltaPOCAz");
+  settings.AddRowColumn(18, "<=");
+  settings.AddRowColumn(18, auxTools_.ToString(sigCone_maxTkDeltaPOCAz) );
+  settings.AddRowColumn(18, "N/A" );
+  settings.AddRowColumn(18, "cm");
 
-  settings.AddRowColumn(16, "");
+  settings.AddRowColumn(19, "");
 
-  settings.AddRowColumn(17, "IsoCone Shrink Constant");
-  settings.AddRowColumn(17, auxTools_.ToString(isoCone_Constant) );
-  settings.AddRowColumn(17, "3.5");
-  settings.AddRowColumn(17, "GeV");
+  settings.AddRowColumn(20, "Isolation Cone: Shrink Constant");
+  settings.AddRowColumn(20, "==");
+  settings.AddRowColumn(20, auxTools_.ToString(isoCone_Constant) );
+  settings.AddRowColumn(20, "3.5");
+  settings.AddRowColumn(20, "GeV");
 
-  settings.AddRowColumn(18, "IsoCone DeltaR (min)");
-  settings.AddRowColumn(18, auxTools_.ToString(isoCone_dRMin) );
-  settings.AddRowColumn(18, "0.15" );
+  settings.AddRowColumn(21, "Isolation Cone: DeltaR");
+  settings.AddRowColumn(21, ">=");
+  settings.AddRowColumn(21, auxTools_.ToString(isoCone_dRMin) );
+  settings.AddRowColumn(21, "0.15" );
+  settings.AddRowColumn(21, "" );
 
-  settings.AddRowColumn(19, "IsoCone DeltaR (max)");
-  settings.AddRowColumn(19, auxTools_.ToString(isoCone_dRMax) );
-  settings.AddRowColumn(19, "0.30");
-
-  settings.AddRowColumn(20, "IsoCone VtxIso (max)" );
-  settings.AddRowColumn(20, auxTools_.ToString(isoCone_VtxIsoWP) );
-  settings.AddRowColumn(20, "1.0");
-  settings.AddRowColumn(20, "cm");
-
-  settings.AddRowColumn(21, "Di-Tau Delta POCA-z");
-  settings.AddRowColumn(21, auxTools_.ToString(diTau_deltaPOCAz) );
-  settings.AddRowColumn(21, "1.0" );
-  settings.AddRowColumn(21, "cm");
-
+  settings.AddRowColumn(22, "Isolation Cone: DeltaR");
+  settings.AddRowColumn(22, "=<");
+  settings.AddRowColumn(22, auxTools_.ToString(isoCone_dRMax) );
+  settings.AddRowColumn(22, "0.30");
   settings.AddRowColumn(22, "");
 
-  settings.AddRowColumn(23, "MC-Matching DeltaR (max)");
-  settings.AddRowColumn(23, auxTools_.ToString(mcMatching_dRMax) );
-  settings.AddRowColumn(23, "0.05" );
+  settings.AddRowColumn(23, "Isolation Cone: VtxIso" );
+  settings.AddRowColumn(23, "<=" );
+  settings.AddRowColumn(23, auxTools_.ToString(isoCone_VtxIsoWP) );
+  settings.AddRowColumn(23, "1.0");
+  settings.AddRowColumn(23, "cm");
+  settings.AddRowColumn(23, "");
 
-  settings.AddRowColumn(24, "MC-Matching Unique (True/False)");
-  settings.AddRowColumn(24, auxTools_.ToString(mcMatching_unique) );
-  settings.AddRowColumn(24, "1" );
+  settings.AddRowColumn(24, "Di-Tau |Delta z0|");
+  settings.AddRowColumn(24, "<");
+  settings.AddRowColumn(24, auxTools_.ToString(diTau_deltaPOCAz) );
+  settings.AddRowColumn(24, "1.0" );
+  settings.AddRowColumn(24, "cm");
+
+  settings.AddRowColumn(25, "");
+
+  settings.AddRowColumn(26, "MC-Matching DeltaR");
+  settings.AddRowColumn(26, "<=");
+  settings.AddRowColumn(26, auxTools_.ToString(mcMatching_dRMax) );
+  settings.AddRowColumn(26, "0.05" );
+  settings.AddRowColumn(26, "" );
+
+  settings.AddRowColumn(27, "MC-Matching IsUnique");
+  settings.AddRowColumn(27, "==");
+  settings.AddRowColumn(27, auxTools_.ToString(mcMatching_unique) );
+  settings.AddRowColumn(27, "1" );
+  settings.AddRowColumn(27, "" );
   
-  settings.AddRowColumn(25, "MC-Tau Mom (PdgId)");
-  settings.AddRowColumn(25, auxTools_.ToString(realTauMom));
-  settings.AddRowColumn(25, "N/A" );
+  settings.AddRowColumn(28, "MC-Taus: Mom PdgId");
+  settings.AddRowColumn(28, "==");
+  settings.AddRowColumn(28, auxTools_.ToString(realTauMom));
+  settings.AddRowColumn(28, "N/A" );
+  settings.AddRowColumn(28, "" );
 
-  settings.AddRowColumn(26, "MC-Taus (Min Number Expected)");
-  settings.AddRowColumn(26, auxTools_.ToString(nMaxNumOfHTausPossible));
-  settings.AddRowColumn(26, "N/A" );
+  settings.AddRowColumn(29, "MC-Taus: Number Expected");
+  settings.AddRowColumn(29, ">=");
+  settings.AddRowColumn(29, auxTools_.ToString(nMaxNumOfHTausPossible));
+  settings.AddRowColumn(29, "N/A" );
+  settings.AddRowColumn(29, "" );
 
   settings.Print();
   
@@ -330,7 +377,7 @@ void CaloPlusTracks::Loop()
 	    L1TkTaus_Tk.push_back(L1TkTau);
 	    
 	    // +VtxIso
-	    if ( L1TkTau.GetVtxIsolation() >= isoCone_VtxIsoWP) L1TkTaus_VtxIso.push_back(L1TkTau);
+	    if ( L1TkTau.GetVtxIsolation() > isoCone_VtxIsoWP) L1TkTaus_VtxIso.push_back(L1TkTau);
 	  }
 	
       }// L1TkTauCandidates
@@ -373,7 +420,7 @@ void CaloPlusTracks::Loop()
 	hL1TkTau_Rtau        ->Fill( tau->GetSigConeLdgTk().getPt() / tau->GetCaloTau().et() );
 	hL1TkTau_CHF         ->Fill( tau->GetCaloTau().et()/sigTks_p4.Et() );
 	hL1TkTau_NHF         ->Fill( (tau->GetCaloTau().et() - sigTks_p4.Et())/tau->GetCaloTau().et() );
-	hL1TkTau_NHFAbs      ->Fill( std::abs(tau->GetCaloTau().et() - sigTks_p4.Et()/tau->GetCaloTau().et()) );
+	hL1TkTau_NHFAbs      ->Fill( std::abs( (tau->GetCaloTau().et() - sigTks_p4.Et())/tau->GetCaloTau().et() ) );
 	hL1TkTau_NSigTks     ->Fill( tau->GetSigConeTTTracks().size() );
 	hL1TkTau_NIsoTks     ->Fill( tau->GetIsoConeTTTracks().size() );
 	hL1TkTau_InvMass     ->Fill( sigTks_p4.M() ); 
@@ -1020,7 +1067,11 @@ vector<GenParticle> CaloPlusTracks::GetHadronicGenTaus(vector<GenParticle> GenTa
 
       // Get hadronic decay products (pi+/-,pi0, K+/-, K0, K0L, KOS, eta, omegas, gammas from tau->tau+gamma transition)
       std::vector<unsigned short> hadronicDaughters;
-      GetHadronicTauFinalDaughters(tau->index(), hadronicDaughters);
+      std::cout << "1 ================================================" << std::endl;
+      vector<unsigned short> test = tau->daughtersIndex();
+      auxTools_.PrintVector(test);
+      std::cout << "1 ================================================" << std::endl;
+      mcTools_.GetHadronicTauFinalDaughters(tau->index(), hadronicDaughters); //fixme: iro
 
       // Sanity check
       if (hadronicDaughters.size() < 1) continue;
@@ -1056,7 +1107,7 @@ void CaloPlusTracks::FillTurnOn_Numerator_(const vector<L1TkTauParticle> L1TkTau
 
     // Skip if trigger object is not MC matched
     L1TkTauParticle L1TkTau = L1TkTaus.at(iTau);
-    if (!L1TkTau.HasMatchingGenParticle()) continue;
+    if (!L1TkTau.HasMatchingGenParticle()) continue;    
 
     // Skip if trigger object has eT < minEt
     double calo_et = L1TkTau.GetCaloTau().et();
@@ -1065,8 +1116,15 @@ void CaloPlusTracks::FillTurnOn_Numerator_(const vector<L1TkTauParticle> L1TkTau
     // Fill histo with visible eT of mathing MC Tau
     GenParticle match_GenP = L1TkTau.GetMatchingGenParticle();
     vector<unsigned short> tau_daughters;
-    GetHadronicTauFinalDaughters(match_GenP.index(), tau_daughters);
+    std::cout << "2 ================================================" << std::endl;
+    vector<unsigned short> test = match_GenP.daughtersIndex();
+    auxTools_.PrintVector(test);
+    std::cout << "2 ================================================" << std::endl;
+    mcTools_.GetHadronicTauFinalDaughters(match_GenP.index(), tau_daughters); //fixme: iro
     TLorentzVector tau_visP4 = GetVisibleP4(tau_daughters);
+    auxTools_.PrintVector(tau_daughters);
+    
+    std::cout << "Filling Turn-On Histo with Et = " << tau_visP4.Et() << std::endl;
     hTurnOn->Fill( tau_visP4.Et() );
     
   } // For-loop: L1TkTaus
@@ -1091,7 +1149,11 @@ void CaloPlusTracks::FillTurnOn_Denominator_(vector<GenParticle> GenTausHadronic
 
       // Get hadronic decay products (pi+/-,pi0, K+/-, K0, K0L, KOS, eta, omegas, gammas from tau->tau+gamma transition)
       std::vector<unsigned short> hadronicDaughters;
-      GetHadronicTauFinalDaughters(tau->index(), hadronicDaughters);
+      std::cout << "3 ================================================" << std::endl;
+      vector<unsigned short> test = tau->daughtersIndex();
+      auxTools_.PrintVector(test);
+      std::cout << "3 ================================================" << std::endl;
+      mcTools_.GetHadronicTauFinalDaughters(tau->index(), hadronicDaughters); //fixme: iro
 
       // Sanity check
       if (hadronicDaughters.size() < 1) cout << "E R R O R ! CaloPlusTracks::FillTurnOn_Denominator_() - This should never be reached. EXIT" << endl;
@@ -1231,7 +1293,7 @@ vector<GenParticle> CaloPlusTracks::GetGenParticles(int pdgId, bool isLastCopy)
 
 	  // Determine if it's a last copy
 	  bool save = true;
-	  vector<unsigned short>  genP_Daughters = p->daughtersIndex();
+	  vector<unsigned short> genP_Daughters = p->daughtersIndex();
 	  
 	  // For-loop: Daughters
 	  for (size_t i = 0; i < genP_Daughters.size(); i++)
@@ -1313,14 +1375,15 @@ vector<TTTrack> CaloPlusTracks::GetTTTracks(const double minPt,
   for (Size_t iTk = 0; iTk < L1Tks_Pt->size(); iTk++)
     {
       TTTrack tk = GetTTTrack(iTk, nFitParams);
-      // double z0 = tk.getZ0();
-      // double d0 = tk.getD0();
       
       if (tk.getPt() < minPt) continue;
       if (std::abs(tk.getEta()) > maxEta) continue;
       if (tk.getChi2() > maxChiSq) continue;
       if (tk.getNumOfStubs() < minStubs) continue;
       if (tk.getNumOfStubsPS() < minStubsPS) continue;
+      // double z0 = tk.getZ0();
+      // double d0 = tk.getD0();
+
       theTTTracks.push_back( tk );
     }
   return theTTTracks;
@@ -1548,7 +1611,7 @@ void CaloPlusTracks::GetShrinkingConeSizes(double calo_et,
   if (signalCone_max > sigCone_dRCutoff) signalCone_max = sigCone_dRCutoff;
   else{}
   double isoCone_min    = signalCone_max;
-  double isoCone_max    = (isoCone_dRMax/1.0); // no change
+  double isoCone_max    = (isoCone_dRMax/1.0);
       
   // Assign signal and isolation cone sizes
   sigCone_dRMin = signalCone_min;
@@ -1630,7 +1693,11 @@ void CaloPlusTracks::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
 
       // Get hadronic decay products (pi+/-,pi0, K+/-, K0, K0L, KOS, eta, omegas, gammas from tau->tau+gamma transition)
       std::vector<unsigned short> hadronicDaughters;
-      GetHadronicTauFinalDaughters(tau->index(), hadronicDaughters);
+      std::cout << "4 ================================================" << std::endl;
+      vector<unsigned short> test = tau->daughtersIndex();
+      auxTools_.PrintVector(test);
+      std::cout << "4 ================================================" << std::endl;
+      mcTools_.GetHadronicTauFinalDaughters(tau->index(), hadronicDaughters); //fixme: iro
 
       // Sanity check
       if (hadronicDaughters.size() < 1) continue;

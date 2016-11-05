@@ -311,8 +311,14 @@ void MCTools::GetHadronicTauFinalDaughters(Int_t Indx,
 					   std::vector<unsigned short>& Daug)
 //****************************************************************************
 {
+
+  std::cout << "GenP_PdgId->at("<<Indx<<") = " << GenP_PdgId->at(Indx) << std::endl;
+  std::cout << "GenP_Daughters->at(0).size() = " << GenP_Daughters->at(0).size() << std::endl;
+  
   if (GenP_Daughters->at(Indx).size() == 0) return;
-  for (unsigned short i = 0; i< GenP_Daughters->at(Indx).size(); i++){
+  for (unsigned short i = 0; i< GenP_Daughters->at(Indx).size(); i++)
+    {
+
     Int_t IndxDau = GenP_Daughters->at(Indx).at(i);
     Int_t IdDau = fabs(GenP_PdgId->at(IndxDau));
     Int_t IdMo  = fabs(GenP_PdgId->at(Indx));
@@ -326,7 +332,8 @@ void MCTools::GetHadronicTauFinalDaughters(Int_t Indx,
       // in the list check if the particle has a parent already in the list
       // If it does then it comes from a hadronic Int_teraction with the
       // detector material and it is not part of the tau decay
-      Int_t ifound = 0;
+
+    Int_t ifound = 0;      
       for (unsigned short j=0; j< Daug.size(); j++){
 	if (RecursivelyLookForMotherId(IndxDau, GenP_PdgId->at(Daug[j]),true)) {
 	  ifound += 1;
@@ -334,6 +341,7 @@ void MCTools::GetHadronicTauFinalDaughters(Int_t Indx,
       }
       if (ifound == 0) Daug.push_back(IndxDau);
     }
+
     GetHadronicTauFinalDaughters(IndxDau,Daug);
   }
   return;

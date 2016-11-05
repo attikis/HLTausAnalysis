@@ -4,6 +4,7 @@
 Usage:
 cd HLTausAnalysis
 source setup.csh
+source /Users/attikis/ROOT/v5-34-00-patches/bin/thisroot.csh
 ./plotL1TkTaus.py -m results/test/
 
 Comments:
@@ -39,7 +40,7 @@ bDoMatchTk       = True
 bDoSigTks        = True
 bDoIsoTks        = True
 bDoEfficiencies  = False # Seg-Faults
-datasetList      = ["VBF"] #["MinBias", "VBF", "HPlus160"]
+datasetList      = ["VBF", "MinBias"] #["MinBias", "VBF", "HPlus160"]
 saveFormats      = ["png"]
 savePath         = "plots/"
 
@@ -54,6 +55,7 @@ def CreateDatasetDict(inputPath, analysis, outputExt):
         datasetPaths[dataset] = inputPath + analysis + "_Histograms_" + dataset + outputExt + ".root"
     return datasetPaths
 
+
 def GetDatasetsList():
     '''
     '''
@@ -64,6 +66,7 @@ def GetDatasetsList():
                 "SingleMuPlus_NoPU"]    
     return datasets
 
+
 def PrintPSet(datasetPath, dataset):
     '''
     '''
@@ -71,6 +74,7 @@ def PrintPSet(datasetPath, dataset):
     p.GetDatasets("TTI2023Upg14D", datasetPath, [dataset])
     p.PrintPSet("TkTauFromCaloNTupleMaker/configInfo/parameterSet")    
     return
+
 
 def DoPlots(hList, datasetPaths, datasetList, saveExt=""):
     '''
@@ -86,6 +90,7 @@ def DoPlots(hList, datasetPaths, datasetList, saveExt=""):
     p.SaveHistos(True, savePath, saveFormats, saveExt)
     return
 
+
 def DoEfficiency(hList, datasetPaths, datasetList, cutDirList, saveExt=""):
     '''
     '''
@@ -99,9 +104,9 @@ def DoEfficiency(hList, datasetPaths, datasetList, cutDirList, saveExt=""):
         p.EnableColourPalette(False)
         p.DrawEfficiency(cutDir, "binomial")
         p.GetTLegend().SetHeader( "L1TkTau" )
-        p.SaveHistos(True, savePath, saveFormats, saveExt)
-        
+        p.SaveHistos(True, savePath, saveFormats, saveExt)        
     return
+
 
 def main(opts):
 
@@ -200,6 +205,7 @@ def main(opts):
         DoPlots( hL1TkTau_IsoTks_POCAz     , datasetPaths, datasetList)
         DoPlots( hL1TkTau_IsoTks_DeltaPOCAz, datasetPaths, datasetList)
         DoPlots( hL1TkTau_IsoTks_StubPtCons, datasetPaths, datasetList)
+    return
 
         
 #================================================================================================

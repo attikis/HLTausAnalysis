@@ -215,6 +215,7 @@ class CaloPlusTracks : public TreeAnalyserMC{
   // Variable declaration
   L1TkPrimaryVertex *pvProducer;
   AuxTools auxTools_;
+  MCTools mcTools_;
   Datasets datasets_;
   HistoTools histoTools_;
   bool bFoundAllTaus_;
