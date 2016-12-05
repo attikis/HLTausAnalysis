@@ -10,6 +10,9 @@
 #include "TF1.h"
 #include "Math/VectorUtil.h"
 
+// C++
+#include <stdexcept>
+
 //****************************************************************************
 void CaloPlusTracks::InitObjects(void)
 //****************************************************************************
@@ -25,7 +28,7 @@ void CaloPlusTracks::InitObjects(void)
 void CaloPlusTracks::InitVars_()
 //****************************************************************************
 {
-  
+
   DEBUG = false;
 
   // Dataset-related
@@ -34,14 +37,14 @@ void CaloPlusTracks::InitVars_()
   nMaxNumOfHTausPossible = datasets_.nMcTaus_;
 
   // Tracks
-  selTks_Collection = "TTTracks"; // "TTTracks"; // "TTPixelTracks";
-  selTks_nFitParams =   5;   // TP:   5
-  selTks_minPt      =   2.0; // TP:   2.0
-  selTks_maxEta     = 999.9; // TP: 999.9
-  selTks_maxChiSq   = 200.0; // TP: 200.0
-  selTks_minStubs   =   0;   // TP:   0
-  selTks_minStubsPS =   0;   // TP:   0
-  selTksPix_minHits =   0;   // TP:   N/A
+  selTks_Collection = "TTTracks"; // TP: "TTTracks" (not "TTPixelTracks")
+  selTks_nFitParams =   5;        // TP:   5
+  selTks_minPt      =   2.0;      // TP:   2.0
+  selTks_maxEta     = 999.9;      // TP: 999.9
+  selTks_maxChiSq   = 200.0;      // TP: 200.0
+  selTks_minStubs   =   0;        // TP:   0
+  selTks_minStubsPS =   0;        // TP:   0
+  selTksPix_minHits =   0;        // TP:   N/A
   
   // L1TkTau - Signal cone
   matchTk_minPt_          = +5.00; // TP: 5.00
@@ -61,7 +64,7 @@ void CaloPlusTracks::InitVars_()
   diTau_deltaPOCAz = +0.50;         // TP: 1.0cm
 
   // MC matching
-  mcMatching_dRMax  = +0.05;
+  mcMatching_dRMax  = +0.10;        // TP: 0.05
   mcMatching_unique = true;
 
   PrintSettings();
@@ -246,11 +249,14 @@ void CaloPlusTracks::PrintSettings(void)
 void CaloPlusTracks::Loop()
 //****************************************************************************
 {
-  
+
+
   InitVars_(); 
   if (fChain == 0) return;  
   const Long64_t nEntries = (MaxEvents == -1) ? fChain->GetEntries() : min((int)fChain->GetEntries(), MaxEvents);
-  cout << "Analyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
+  if(DEBUG) cout << "=== CaloPlusTracks::Loop()" << endl;
+  if(DEBUG) cout << "\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
+
 
   // Initialisations
   BookHistos_();
@@ -265,7 +271,7 @@ void CaloPlusTracks::Loop()
   ////////////////////////////////////////////////
   for (int jentry = 0; jentry < nEntries; jentry++){
   
-    if(DEBUG) cout << "Entry = " << jentry << endl;
+    if(DEBUG) cout << "\tEntry = " << jentry << endl;
     
     // Init variables
     Long64_t ientry = LoadTree(jentry);
@@ -278,11 +284,12 @@ void CaloPlusTracks::Loop()
     vector<GenParticle> GenTaus         = GetGenParticles(15, true);
     vector<GenParticle> GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
     vector<GenParticle> GenTausTrigger  = GetHadronicGenTaus(GenTaus, 20.0, 2.3);
-    // Print Collections?
     if (0) for (vector<GenParticle>::iterator p = GenParticles.begin(); p != GenParticles.end(); p++) p->PrintProperties();
     if (0) for (vector<GenParticle>::iterator p = GenTaus.begin(); p != GenTaus.end(); p++) p->PrintProperties();
     if (0) for (vector<GenParticle>::iterator p = GenTausHadronic.begin(); p != GenTausHadronic.end(); p++) p->PrintProperties();
-    if (0) for (vector<GenParticle>::iterator p = GenTausTrigger.begin(); p != GenTausTrigger.end(); p++) p->PrintProperties();
+    if (0) for (vector<GenParticle>::iterator p = GenTausTrigger.begin(); p != GenTausTrigger.end(); p++) p->PrintProperties();   
+    if (DEBUG) cout << "\tFound " << GenTaus.size() << "/" << nMaxNumOfHTausPossible << " taus." << endl;
+    if (DEBUG) cout << "\tFound " << GenTausHadronic.size() << " hadronic taus (max " << nMaxNumOfHTausPossible << ")." << endl;
 
     
     // Track Collections
@@ -292,7 +299,6 @@ void CaloPlusTracks::Loop()
     vector<TTPixelTrack> TTPixelTracks = GetTTPixelTracks(selTks_minPt, selTks_maxEta, selTks_maxChiSq, selTksPix_minHits);
     vector<TTTrack> pvTTTracks;
     double pv_z = GetPVTTTracks(pvTTTracks);
-    // Print Collections?
     if (0) for (vector<TrackingParticle>::iterator p = TPs.begin(); p != TPs.end(); p++) p->PrintProperties();
     if (0) for (vector<TTTrack>::iterator t = selTTTracks.begin(); t != selTTTracks.end(); t++) t->PrintProperties();
     if (0) for (vector<TTTrack>::iterator t = matchTTTracks.begin(); t != matchTTTracks.end(); t++) t->PrintProperties();
@@ -335,10 +341,12 @@ void CaloPlusTracks::Loop()
 	// Construct the CaloPlusTracks candidate
 	L1TkTauParticle	L1TkTauCandidate(0.0, matchTk_caloDeltaR_, sigCone_dRMin, sigCone_dRMax, isoCone_dRMin, isoCone_dRMax);
 
-	//
+
+	// Proceed according to track collection type 
 	if ( selTks_Collection.compare("TTPixelTracks") == 0 )
 	  {
-	    // FIXME 
+	    cout << "\tTrack Collection Type \"" << selTks_Collection << "\" is unsupported yet. EXIT" << endl;
+	    exit(1);
 	  }      
 	else if ( selTks_Collection.compare("TTTracks") == 0 )
 	  {
@@ -352,7 +360,7 @@ void CaloPlusTracks::Loop()
 	  }
 	else
 	  {
-	    cout << "E R R O R ! CaloPlusTracks::Loop(...) - Invalid Track Collection Type \"" << selTks_Collection << "\". EXIT" << endl;
+	    cout << "\tInvalid Track Collection Type \"" << selTks_Collection << "\". EXIT" << endl;
 	    exit(1);
 	  }
 	
@@ -392,10 +400,10 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     // Event-Type Histograms
     ////////////////////////////////////////////////
-    hHepMCEvt_VtxX_VtxY     ->Fill(HepMCEvt_VtxX, HepMCEvt_VtxY);
-    hHepMCEvt_VtxZ          ->Fill(HepMCEvt_VtxZ);
-    hL1TkPV_VtxZ            ->Fill(pv_z);
-    hPrimaryVertex_DeltaZ   ->Fill(pv_z - HepMCEvt_VtxZ);
+    hHepMCEvt_VtxX_VtxY->Fill(HepMCEvt_VtxX, HepMCEvt_VtxY);
+    hHepMCEvt_VtxZ->Fill(HepMCEvt_VtxZ);
+    hL1TkPV_VtxZ->Fill(pv_z);
+    hPrimaryVertex_DeltaZ->Fill(pv_z - HepMCEvt_VtxZ);
     hPrimaryVertex_AbsDeltaZ->Fill( abs(pv_z - HepMCEvt_VtxZ) );
 
     
@@ -413,6 +421,7 @@ void CaloPlusTracks::Loop()
 	// Variables
 	TLorentzVector sigTks_p4 = tau->GetSigConeTTTracksP4();
 	TLorentzVector isoTks_p4 = tau->GetIsoConeTTTracksP4();
+
 	// Do not Skip if using MinBias sample as no real taus exist!
 	if (!tau->HasMatchingGenParticle() && ( mcSample.compare("MinBias") !=0 ) ) continue;
 	
@@ -420,7 +429,7 @@ void CaloPlusTracks::Loop()
 	hL1TkTau_Rtau        ->Fill( tau->GetSigConeLdgTk().getPt() / tau->GetCaloTau().et() );
 	hL1TkTau_CHF         ->Fill( tau->GetCaloTau().et()/sigTks_p4.Et() );
 	hL1TkTau_NHF         ->Fill( (tau->GetCaloTau().et() - sigTks_p4.Et())/tau->GetCaloTau().et() );
-	hL1TkTau_NHFAbs      ->Fill( std::abs( (tau->GetCaloTau().et() - sigTks_p4.Et())/tau->GetCaloTau().et() ) );
+	hL1TkTau_NHFAbs      ->Fill( abs( (tau->GetCaloTau().et() - sigTks_p4.Et())/tau->GetCaloTau().et() ) );
 	hL1TkTau_NSigTks     ->Fill( tau->GetSigConeTTTracks().size() );
 	hL1TkTau_NIsoTks     ->Fill( tau->GetIsoConeTTTracks().size() );
 	hL1TkTau_InvMass     ->Fill( sigTks_p4.M() ); 
@@ -444,7 +453,7 @@ void CaloPlusTracks::Loop()
 	hL1TkTau_MatchTk_Eta           ->Fill( matchTk.getEta() );
 	hL1TkTau_MatchTk_POCAz         ->Fill( matchTk.getZ0() );
 	hL1TkTau_MatchTk_d0            ->Fill( matchTk.getD0() );
-	hL1TkTau_MatchTk_d0Abs         ->Fill( std::abs(matchTk.getD0()) );
+	hL1TkTau_MatchTk_d0Abs         ->Fill( abs(matchTk.getD0()) );
 	hL1TkTau_MatchTk_NStubs        ->Fill( matchTk.getNumOfStubs() );
 	hL1TkTau_MatchTk_NPsStubs      ->Fill( matchTk.getNumOfStubsPS() );
 	hL1TkTau_MatchTk_NBarrelStubs  ->Fill( matchTk.getNumOfBarrelStubs() );
@@ -478,11 +487,11 @@ void CaloPlusTracks::Loop()
 	    hL1TkTau_SigTks_Pt        ->Fill( sigTk->getPt()  );
 	    hL1TkTau_SigTks_Eta       ->Fill( sigTk->getEta() );
 	    hL1TkTau_SigTks_POCAz     ->Fill( sigTk->getZ0()  );
-	    hL1TkTau_SigTks_DeltaPOCAz->Fill( std::abs( sigTk->getZ0() - match_tk.getZ0() ) );
+	    hL1TkTau_SigTks_DeltaPOCAz->Fill( abs( sigTk->getZ0() - match_tk.getZ0() ) );
 	    hL1TkTau_SigTks_d0        ->Fill( sigTk->getD0() );
 	    hL1TkTau_SigTks_d0Abs     ->Fill( abs( sigTk->getD0()) );
 	    // hL1TkTau_SigTks_d0Sig     ->Fill( sigTk->getD0()/sigTk->getSigmaD0() );             // TTPixelTracks
-	    // hL1TkTau_SigTks_d0SigAbs  ->Fill( std::abs(sigTk->getD0()/sigTk->getSigmaD0() ) );  // TTPixelTracks
+	    // hL1TkTau_SigTks_d0SigAbs  ->Fill( abs(sigTk->getD0()/sigTk->getSigmaD0() ) );  // TTPixelTracks
 	    hL1TkTau_SigTks_d0Sig     ->Fill( -1.0 );
 	    hL1TkTau_SigTks_d0SigAbs  ->Fill( -1.0 );
 	    hL1TkTau_SigTks_PtRel     ->Fill( sigTk_PtRel );
@@ -515,11 +524,11 @@ void CaloPlusTracks::Loop()
 	    hL1TkTau_IsoTks_Pt        ->Fill( isoTk->getPt()  );
 	    hL1TkTau_IsoTks_Eta       ->Fill( isoTk->getEta() );
 	    hL1TkTau_IsoTks_POCAz     ->Fill( isoTk->getZ0()  );
-	    hL1TkTau_IsoTks_DeltaPOCAz->Fill( std::abs( isoTk->getZ0() - match_tk.getZ0() ) );
+	    hL1TkTau_IsoTks_DeltaPOCAz->Fill( abs( isoTk->getZ0() - match_tk.getZ0() ) );
 	    hL1TkTau_IsoTks_d0        ->Fill( isoTk->getD0() );							     
 	    hL1TkTau_IsoTks_d0Abs     ->Fill( abs( isoTk->getD0()) );
 	    // hL1TkTau_IsoTks_d0Sig     ->Fill( isoTk->getD0()/isoTk->getSigmaD0() );             // TTPixelTracks
-	    // hL1TkTau_IsoTks_d0SigAbs  ->Fill( std::abs(isoTk->getD0()/isoTk->getSigmaD0() ) );  // TTPixelTracks
+	    // hL1TkTau_IsoTks_d0SigAbs  ->Fill( abs(isoTk->getD0()/isoTk->getSigmaD0() ) );  // TTPixelTracks
 	    hL1TkTau_IsoTks_d0Sig     ->Fill( -1.0 );
 	    hL1TkTau_IsoTks_d0SigAbs  ->Fill( -1.0 );
 	    hL1TkTau_IsoTks_PtRel     ->Fill( isoTk_PtRel );
@@ -532,20 +541,22 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     // Fill Turn-On histograms
     ////////////////////////////////////////////////
-    FillTurnOn_Denominator_(GenTausHadronic, hMcHadronicTau_VisEt);
-    FillTurnOn_Numerator_(L1TkTaus_Calo   , 25.0, hCalo_TurnOn25  );
-    FillTurnOn_Numerator_(L1TkTaus_Tk     , 25.0, hTk_TurnOn25    );
-    FillTurnOn_Numerator_(L1TkTaus_VtxIso , 25.0, hVtxIso_TurnOn25);
-    FillTurnOn_Numerator_(L1TkTaus_Calo   , 50.0, hCalo_TurnOn50  );
-    FillTurnOn_Numerator_(L1TkTaus_Tk     , 50.0, hTk_TurnOn50    );
-    FillTurnOn_Numerator_(L1TkTaus_VtxIso , 50.0, hVtxIso_TurnOn50);
-    FillTurnOn_Numerator_(L1TkTaus_Calo   , 66.0, hCalo_TurnOn_SingleTau50KHz  );
-    FillTurnOn_Numerator_(L1TkTaus_Tk     , 65.0, hTk_TurnOn_SingleTau50KHz    );
-    FillTurnOn_Numerator_(L1TkTaus_VtxIso , 50.0, hVtxIso_TurnOn_SingleTau50KHz);
-    FillTurnOn_Numerator_(L1TkTaus_Calo   , 42.0, hCalo_TurnOn_DiTau50KHz  );
-    FillTurnOn_Numerator_(L1TkTaus_Tk     , 40.0, hTk_TurnOn_DiTau50KHz    );
-    FillTurnOn_Numerator_(L1TkTaus_VtxIso , 25.0, hVtxIso_TurnOn_DiTau50KHz);
-
+    if (GenTausHadronic.size() > 0)
+      {
+	FillTurnOn_Denominator_(GenTausHadronic, hMcHadronicTau_VisEt);
+	FillTurnOn_Numerator_(L1TkTaus_Calo   , 25.0, hCalo_TurnOn25  );
+	FillTurnOn_Numerator_(L1TkTaus_Tk     , 25.0, hTk_TurnOn25    );
+	FillTurnOn_Numerator_(L1TkTaus_VtxIso , 25.0, hVtxIso_TurnOn25);
+	FillTurnOn_Numerator_(L1TkTaus_Calo   , 50.0, hCalo_TurnOn50  );
+	FillTurnOn_Numerator_(L1TkTaus_Tk     , 50.0, hTk_TurnOn50    );
+	FillTurnOn_Numerator_(L1TkTaus_VtxIso , 50.0, hVtxIso_TurnOn50);
+	FillTurnOn_Numerator_(L1TkTaus_Calo   , 66.0, hCalo_TurnOn_SingleTau50KHz  );
+	FillTurnOn_Numerator_(L1TkTaus_Tk     , 65.0, hTk_TurnOn_SingleTau50KHz    );
+	FillTurnOn_Numerator_(L1TkTaus_VtxIso , 50.0, hVtxIso_TurnOn_SingleTau50KHz);
+	FillTurnOn_Numerator_(L1TkTaus_Calo   , 42.0, hCalo_TurnOn_DiTau50KHz  );
+	FillTurnOn_Numerator_(L1TkTaus_Tk     , 40.0, hTk_TurnOn_DiTau50KHz    );
+	FillTurnOn_Numerator_(L1TkTaus_VtxIso , 25.0, hVtxIso_TurnOn_DiTau50KHz);
+      }
     
     ////////////////////////////////////////////////
     // SingleTau
@@ -558,16 +569,16 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     // DiTau
     ////////////////////////////////////////////////
-    // FillDiTau_(L1TkTaus_Calo  , L1TkTaus_Tk       , hDiTau_Rate_Calo_Tk    , hDiTau_Eff_Calo_Tk    );
-    // FillDiTau_(L1TkTaus_Calo  , L1TkTaus_VtxIso   , hDiTau_Rate_Calo_VtxIso, hDiTau_Eff_Calo_VtxIso);
-    // FillDiTau_(L1TkTaus_Tk    , L1TkTaus_VtxIso   , hDiTau_Rate_Tk_VtxIso  , hDiTau_Eff_Tk_VtxIso  ); // FIXME
+    FillDiTau_(L1TkTaus_Calo  , L1TkTaus_Tk       , hDiTau_Rate_Calo_Tk    , hDiTau_Eff_Calo_Tk    );
+    FillDiTau_(L1TkTaus_Calo  , L1TkTaus_VtxIso   , hDiTau_Rate_Calo_VtxIso, hDiTau_Eff_Calo_VtxIso);
+    FillDiTau_(L1TkTaus_Tk    , L1TkTaus_VtxIso   , hDiTau_Rate_Tk_VtxIso  , hDiTau_Eff_Tk_VtxIso  );
     
 
     ////////////////////////////////////////////////
-    // WARNING: Removal of non Z-matching should be just before I need it!
+    // WARNING: Erases L1TkTaus from vector!
     ////////////////////////////////////////////////
-    ApplyDiTauZMatching(selTks_Collection, L1TkTaus_Tk);      // fixme - erases L1TkTaus from vector!
-    ApplyDiTauZMatching(selTks_Collection, L1TkTaus_VtxIso);  // fixme - erases L1TkTaus from vector!
+    ApplyDiTauZMatching(selTks_Collection, L1TkTaus_Tk);
+    ApplyDiTauZMatching(selTks_Collection, L1TkTaus_VtxIso); 
     FillDiTau_(L1TkTaus_Calo  , hDiTau_Rate_Calo  , hDiTau_Eff_Calo  );
     FillDiTau_(L1TkTaus_Tk    , hDiTau_Rate_Tk    , hDiTau_Eff_Tk    );
     FillDiTau_(L1TkTaus_VtxIso, hDiTau_Rate_VtxIso, hDiTau_Eff_VtxIso);
@@ -575,7 +586,7 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     // Progress bar
     ////////////////////////////////////////////////
-    auxTools_.ProgressBar(jentry, nEntries, 100, 100);
+    if (!DEBUG) auxTools_.ProgressBar(jentry, nEntries, 100, 100);
     
   }// For-loop: Entries
 
@@ -761,7 +772,7 @@ void CaloPlusTracks::BookHistos_(void)
 
 //****************************************************************************
 void CaloPlusTracks::FinaliseEffHisto_(TH1D *histo, 
-				   const int nEvtsTotal)
+				       const int nEvtsTotal)
 //****************************************************************************
 {
 
@@ -833,20 +844,18 @@ void CaloPlusTracks::ApplyDiTauZMatching(string tkCollectionType,
     {
 
       TTTrack match_tk = L1TkTaus.at(i).GetMatchingTk();
+
       
-
-
     if ( tkCollectionType.compare("TTPixelTracks") == 0 )
       {
-	cout << "E R R O R ! CaloPlusTracks::ApplyDiTauZMatching(...) - FIXME. EXIT" << endl;
+	cout << "=== CaloPlusTracks::ApplyDiTauZMatching() - Unsupported track collection. Exit" << endl;
 	exit(1);
-	
-    }
+      }
     else if ( tkCollectionType.compare("TTTracks") == 0 ) {
       deltaPOCAz = abs( match_tk0.getZ0() - match_tk.getZ0() );
     }
     else{
-      cout << "E R R O R ! CaloPlusTracks::ApplyDiTauZMatching(...) - Unknown sample \"" << mcSample << "\". EXIT" << endl;
+      cout << "=== CaloPlusTracks::ApplyDiTauZMatching() - Unknown sample \"" << mcSample << "\". EXIT" << endl;
       exit(1);
     }
     
@@ -930,79 +939,56 @@ void CaloPlusTracks::FillDiTau_(vector<L1TkTauParticle> L1TkTaus1,
   if( L1TkTaus1.size() < 1 ) return;
   if( L1TkTaus2.size() < 1 ) return;
   
-  vector<L1TkTauParticle> L1TkTaus1_ = L1TkTaus1;
-  
   // Get MC-Matched trigger objects
-  vector<L1TkTauParticle> L1TkTaus_mcMatched1 = GetMcMatchedL1TkTaus(L1TkTaus1);
-  vector<L1TkTauParticle> L1TkTaus_mcMatched2 = GetMcMatchedL1TkTaus(L1TkTaus1);
+  vector<L1TkTauParticle> L1TkTaus1_mcMatched = GetMcMatchedL1TkTaus(L1TkTaus1);
+  vector<L1TkTauParticle> L1TkTaus2_mcMatched = GetMcMatchedL1TkTaus(L1TkTaus2);
 
   // Fill rate 
-  // RemoveDuplicates(L1TkTaus2, L1TkTaus1_); // FIXME - OBSOLETE
-  if( L1TkTaus1_.size() < 1 ) return;
-  
   double ldgEt1 = L1TkTaus1.at(0).GetCaloTau().et();
   double ldgEt2 = L1TkTaus2.at(0).GetCaloTau().et();
 
+  // Ensure that different calo objects are used
+  unsigned int index1 = L1TkTaus1.at(0).GetCaloTau().index();
+  unsigned int index2 = L1TkTaus2.at(0).GetCaloTau().index();
+  if (index1==index2)
+    {
+      if (L1TkTaus2.size() < 2) return;
+      index2 = L1TkTaus2.at(1).GetCaloTau().index();
+    }
+
   // Make x-axis the ldgEt axis
-  if (ldgEt1 > ldgEt2)      FillRate_(hRate, ldgEt1, ldgEt2); 
-  else if (ldgEt1 < ldgEt2) FillRate_(hRate, ldgEt2, ldgEt1);
-  else{
-    if (L1TkTaus_mcMatched1.at(0).GetCaloTau().index() == L1TkTaus_mcMatched2.at(0).GetCaloTau().index() ) {
-    cout << "E R R O R ! CaloPlusTracks::FillDiTau_(...) - Leading and Sub-Leading Trigger objects have the same eT (" << ldgEt1 << " , " << ldgEt2 << ")! "
-	 << "This cannot happen. Exit." << endl;
-    // exit(1); // FIXME 
-    } 
-  }
+  if (ldgEt1 > ldgEt2) FillRate_(hRate, ldgEt1, ldgEt2); 
+  else FillRate_(hRate, ldgEt2, ldgEt1);
 
+  
   // Get MC-matched trigger objects
-  if (L1TkTaus_mcMatched1.size() < 1) return;
-  if (L1TkTaus_mcMatched2.size() < 1) return;
-  // RemoveDuplicates(L1TkTaus_mcMatched2, L1TkTaus_mcMatched1); // FIXME - OBSOLETE
-  // if (L1TkTaus_mcMatched1.size() < 1) return; // FIXME - OBSOLETE
+  if (L1TkTaus1_mcMatched.size() < 1) return;
+  if (L1TkTaus2_mcMatched.size() < 1) return;
 
-  double ldgEt_mcMatched1 = L1TkTaus_mcMatched1.at(1).GetCaloTau().et();
-  double ldgEt_mcMatched2 = L1TkTaus_mcMatched2.at(1).GetCaloTau().et();
-    
+  // Get MC-matched Et
+  double ldgEt1_mcMatched = L1TkTaus1_mcMatched.at(0).GetCaloTau().et();
+  double ldgEt2_mcMatched = L1TkTaus2_mcMatched.at(0).GetCaloTau().et();
+
+  
+  // Ensure that different calo objects are used
+  index1 = L1TkTaus1_mcMatched.at(0).GetCaloTau().index();
+  index2 = L1TkTaus2_mcMatched.at(0).GetCaloTau().index();
+  if (index1==index2)
+    {
+      if (L1TkTaus2_mcMatched.size() < 2) return;
+      index2 = L1TkTaus2_mcMatched.at(1).GetCaloTau().index();
+    }
+
   // Check that all taus were found
   if(!bFoundAllTaus_) return;
-  
-  if (ldgEt_mcMatched1 > ldgEt_mcMatched2)      histoTools_.FillAllBinsUpToValue_2D(hEfficiency, ldgEt_mcMatched1, ldgEt_mcMatched2);
-  else if (ldgEt_mcMatched1 < ldgEt_mcMatched2) histoTools_.FillAllBinsUpToValue_2D(hEfficiency, ldgEt_mcMatched2, ldgEt_mcMatched1);
-  else{
-    if (L1TkTaus_mcMatched1.at(0).GetCaloTau().index() == L1TkTaus_mcMatched2.at(0).GetCaloTau().index() ) {
-      cout << "E R R O R ! CaloPlusTracks::FillDiTau_(...) - Leading and Sub-Leading MC-Matched Trigger objects have the same eT (" << ldgEt_mcMatched1 << " , " << ldgEt_mcMatched2 << ")! "
-	   << "This cannot happen. Exit." << endl;
-      // exit(1); // FIXME 
-    }
-  }
+
+  // Make x-axis the ldgEt axis
+  if (ldgEt1_mcMatched > ldgEt2_mcMatched) histoTools_.FillAllBinsUpToValue_2D(hEfficiency, ldgEt1_mcMatched, ldgEt2_mcMatched);
+  else histoTools_.FillAllBinsUpToValue_2D(hEfficiency, ldgEt2_mcMatched, ldgEt1_mcMatched);
 
   return;
 }
 
-
-//****************************************************************************
-void CaloPlusTracks::RemoveDuplicates(vector<L1TkTauParticle> L1TkTaus2, 
-				      vector<L1TkTauParticle> &L1TkTaus1)
-//****************************************************************************
-{
-
-  // Sanity check
-  if (L1TkTaus1.size() < 1) return;
-  if (L1TkTaus2.size() < 1) return;
-
-  if ( L1TkTaus1.size() < L1TkTaus2.size() )
-    {
-      cout << "E R R O R ! CaloPlusTracks::RemoveDuplicates(...) - Size of L1TkTaus1 (" << L1TkTaus1.size() << ") is smaller than the size of L1TkTaus2 (" << L1TkTaus2.size() << "). "
-	   <<  "Perhaps you should reverse their order when passing them as arguments to this function? EXIT" << endl;
-      exit(1);
-    }
-
-  int calo_index1 = L1TkTaus1.at(0).caloTau_Index_;
-  int calo_index2 = L1TkTaus2.at(0).caloTau_Index_;
-  if( calo_index1 == calo_index2) L1TkTaus1.erase ( L1TkTaus1.begin()+0 );
-
-  return;
-}
 
 
 //****************************************************************************
@@ -1055,82 +1041,96 @@ vector<GenParticle> CaloPlusTracks::GetHadronicGenTaus(vector<GenParticle> GenTa
 {
 
   // Sanity check
-  vector<GenParticle> hadGenTaus;
-  if (GenTaus.size() < 1 ) return hadGenTaus;
-
-  
+  vector<GenParticle> genP_hadGenTaus;
+  if (GenTaus.size() < 1 ) return genP_hadGenTaus;
+    
   // For-loop: GenTaus
   for (vector<GenParticle>::iterator tau = GenTaus.begin(); tau != GenTaus.end(); tau++)
     {
-
       if (0) tau->PrintProperties();
+      if (0) tau->PrintDaughters();
+      if (0) tau->PrintMothers();
 
-      // Get hadronic decay products (pi+/-,pi0, K+/-, K0, K0L, KOS, eta, omegas, gammas from tau->tau+gamma transition)
-      std::vector<unsigned short> hadronicDaughters;
-      std::cout << "1 ================================================" << std::endl;
-      vector<unsigned short> test = tau->daughtersIndex();
-      auxTools_.PrintVector(test);
-      std::cout << "1 ================================================" << std::endl;
-      mcTools_.GetHadronicTauFinalDaughters(tau->index(), hadronicDaughters); //fixme: iro
+      // Variable declaration
+      vector<unsigned short> genP_daughtersIndex;
+      vector<GenParticle> genP_daughters;
 
-      // Sanity check
-      if (hadronicDaughters.size() < 1) continue;
+      // Get hadronic decay products (pi+/-, pi0, K+/-, K0, K0L, gammas from tau->tau+gamma transition)
+      GetHadronicTauFinalDaughters(*tau, genP_daughtersIndex);
+      for (unsigned int i = 0; i < genP_daughtersIndex.size(); i++) genP_daughters.push_back( GetGenParticle( genP_daughtersIndex.at(i)) );
 
-      // Acceptance cuts using visible 4-momenta
-      TLorentzVector tau_visP4 = GetVisibleP4(hadronicDaughters);
-      bool bPassVisEt  = ( tau_visP4.Et() >= visEt );
-      bool bPassVisEta = ( std::abs(tau_visP4.Eta()) <= visEta );
+      // Get the visible 4-momentum
+      TLorentzVector genP_visP4;
+      for (vector<GenParticle>::iterator d = genP_daughters.begin(); d != genP_daughters.end(); d++)
+	{
+	  genP_visP4 += d->p4();
+	}
+
+      // Apply acceptance cuts
+      bool bPassVisEt  = ( genP_visP4.Et() >= visEt );
+      bool bPassVisEta = ( abs(genP_visP4.Eta()) <= visEta );
       if (!(bPassVisEt * bPassVisEta)) continue;
 
       // Save this hadronic generator tau
-      if (0) tau->PrintProperties();
-      hadGenTaus.push_back(*tau);
+      genP_hadGenTaus.push_back(*tau);
     }
   
-  return hadGenTaus;
+  return genP_hadGenTaus;
 }      
 
 
-
 //****************************************************************************
-void CaloPlusTracks::FillTurnOn_Numerator_(const vector<L1TkTauParticle> L1TkTaus, 
-					   const double minEt,
-					   TH1D *hTurnOn)
+void CaloPlusTracks::GetHadronicTauFinalDaughters(GenParticle hTau,
+						  vector<unsigned short> &Daug)
 //****************************************************************************
 {
+  //
+  // Description:
+  // Keep only the pi+/-,pi0, K+/-, K0, K0L, KOS, eta, omegas and gammas
+  // from tau->tau+gamma transition. Avoid leptonic decays.
+  // Because of the mixing of Generator and Detector simulation particles
+  // in the list check if the particle has a parent already in the list.
+  // If it does then it comes from a hadronic interaction with the
+  // detector material and it is not part of the tau decay
+  //
+  // Additional info:
+  // We keep the K+/-(pdgId=321) and K0L(pdgId=130) and we don't get their decay
+  // products (pi+/-) because  typically they live long enought to reach the ECAL/HCAL
+  // c*tau (K+/-) =  3.713 m
+  // c*tau (K0L)  = 15.33  m
+  // c*tau (K0S)  =  0.026842 m
+  //
 
-  // Sanity check
-  if (L1TkTaus.size() < 1) return;
+  // If the genParticle has no daughters return
+  if (hTau.daughtersIndex().size() < 1) return;
 
-  // For-loop: L1TkTaus
-  for(int iTau = 0; iTau < (int) L1TkTaus.size(); iTau++){
+  // For-loop: All daughters
+  for (unsigned int i = 0; i < hTau.daughtersIndex().size(); i++) 
+    {
 
-    // Skip if trigger object is not MC matched
-    L1TkTauParticle L1TkTau = L1TkTaus.at(iTau);
-    if (!L1TkTau.HasMatchingGenParticle()) continue;    
-
-    // Skip if trigger object has eT < minEt
-    double calo_et = L1TkTau.GetCaloTau().et();
-    if ( calo_et < minEt) continue;
-
-    // Fill histo with visible eT of mathing MC Tau
-    GenParticle match_GenP = L1TkTau.GetMatchingGenParticle();
-    vector<unsigned short> tau_daughters;
-    std::cout << "2 ================================================" << std::endl;
-    vector<unsigned short> test = match_GenP.daughtersIndex();
-    auxTools_.PrintVector(test);
-    std::cout << "2 ================================================" << std::endl;
-    mcTools_.GetHadronicTauFinalDaughters(match_GenP.index(), tau_daughters); //fixme: iro
-    TLorentzVector tau_visP4 = GetVisibleP4(tau_daughters);
-    auxTools_.PrintVector(tau_daughters);
-    
-    std::cout << "Filling Turn-On Histo with Et = " << tau_visP4.Et() << std::endl;
-    hTurnOn->Fill( tau_visP4.Et() );
-    
-  } // For-loop: L1TkTaus
+      GenParticle d = GetGenParticle(hTau.daughtersIndex().at(i) );
+      int genD_pdgId = abs(d.pdgId());
+      
+      // Continue according to daughter
+      if (genD_pdgId ==  15) GetHadronicTauFinalDaughters(d, Daug);
+      else if ( mcTools_.IsQuark(genD_pdgId) ) continue; // impossible
+      else if ( mcTools_.IsChargedLepton(genD_pdgId) ) continue; // e, mu
+      else if ( mcTools_.IsNeutrino(genD_pdgId) ) continue; // nu
+      else if ( (genD_pdgId == 223) || (genD_pdgId ==  24) || (genD_pdgId == 221) ||  // omega, W, eta
+		(genD_pdgId == 213) || (genD_pdgId == 310) || (genD_pdgId == 311) ||  // rho, K0S, K0
+		(genD_pdgId == 20213) ) // rho, alpha1
+	{
+       	  GetHadronicTauFinalDaughters(d, Daug);
+      	}
+      else
+	{
+	  // cout << "=== Will save daughter with pdgId = " << d.pdgId() << endl;
+	  Daug.push_back( d.index() );
+	}
+      }
   
   return;
-   
+
 }
 
 
@@ -1140,32 +1140,77 @@ void CaloPlusTracks::FillTurnOn_Denominator_(vector<GenParticle> GenTausHadronic
 //****************************************************************************
 {
 
-  if (GenTausHadronic.size() < 1) return;
-
-  // For-loop: GenTausHadronic
+  // For-loop: All taus decaying hadronically
   for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++)
     {
       if (0) tau->PrintProperties();
 
-      // Get hadronic decay products (pi+/-,pi0, K+/-, K0, K0L, KOS, eta, omegas, gammas from tau->tau+gamma transition)
-      std::vector<unsigned short> hadronicDaughters;
-      std::cout << "3 ================================================" << std::endl;
-      vector<unsigned short> test = tau->daughtersIndex();
-      auxTools_.PrintVector(test);
-      std::cout << "3 ================================================" << std::endl;
-      mcTools_.GetHadronicTauFinalDaughters(tau->index(), hadronicDaughters); //fixme: iro
+      // Get hadronic decay products (pi+/-, pi0, K+/-, K0, K0L, gammas from tau->tau+gamma transition)
+      vector<unsigned short> genP_daughtersIndex;
+      vector<GenParticle> genP_daughters;
+      GetHadronicTauFinalDaughters(*tau, genP_daughtersIndex);
+      for (unsigned int i = 0; i < genP_daughtersIndex.size(); i++) genP_daughters.push_back( GetGenParticle( genP_daughtersIndex.at(i)) );
 
-      // Sanity check
-      if (hadronicDaughters.size() < 1) cout << "E R R O R ! CaloPlusTracks::FillTurnOn_Denominator_() - This should never be reached. EXIT" << endl;
+      // Get the visible 4-momentum
+      TLorentzVector genP_visP4;
+      for (vector<GenParticle>::iterator d = genP_daughters.begin(); d != genP_daughters.end(); d++)
+	{
+	  genP_visP4 += d->p4();
+	}
 
-      // Acceptance cuts using visible 4-momenta
-      TLorentzVector tau_visP4 = GetVisibleP4(hadronicDaughters);
-      hVisEt->Fill( tau_visP4.Et() );
-
+      // Fill histo
+      hVisEt->Fill( genP_visP4.Et() );
+      
     }// For-loop: GenTausHadronic
-
+      
   return;
 
+}
+
+
+//****************************************************************************
+void CaloPlusTracks::FillTurnOn_Numerator_(const vector<L1TkTauParticle> L1TkTaus, 
+					   const double minEt,
+					   TH1D *hTurnOn)
+//****************************************************************************
+{
+  
+  // For-loop: L1TkTaus
+  for(int iTau = 0; iTau < (int) L1TkTaus.size(); iTau++)
+    {
+
+      // Skip if trigger object is not MC matched1
+      L1TkTauParticle L1TkTau = L1TkTaus.at(iTau);
+      if (!L1TkTau.HasMatchingGenParticle()) continue;	 
+      // else cout << "MATCH FOUND" << endl;
+      
+      // Skip if trigger object has eT < minEt
+      double calo_et = L1TkTau.GetCaloTau().et();
+      if ( calo_et < minEt) continue;
+
+      // Get MC-match
+      GenParticle p = L1TkTau.GetMatchingGenParticle();
+      
+      // Get hadronic decay products (pi+/-, pi0, K+/-, K0, K0L, gammas from tau->tau+gamma transition)
+      vector<unsigned short> genP_daughtersIndex;
+      vector<GenParticle> genP_daughters;
+      GetHadronicTauFinalDaughters(p, genP_daughtersIndex);
+      for (unsigned int i = 0; i < genP_daughtersIndex.size(); i++) genP_daughters.push_back( GetGenParticle( genP_daughtersIndex.at(i)) );
+
+      // Get the visible 4-momentum
+      TLorentzVector genP_visP4;
+      for (vector<GenParticle>::iterator d = genP_daughters.begin(); d != genP_daughters.end(); d++)
+	{
+	  genP_visP4 += d->p4();
+	}
+
+      // cout << "\tFilling Turn-On Histo with Et = " << genP_visP4.Et() << endl;
+      hTurnOn->Fill( genP_visP4.Et() );
+      
+    } // For-loop: L1TkTaus
+
+  return;
+   
 }
 
 
@@ -1265,10 +1310,25 @@ vector<GenParticle> CaloPlusTracks::GetGenParticles(void)
 //****************************************************************************
 {
   vector<GenParticle> theGenParticles;
-  for (Size_t genP_index = 0; genP_index < GenP_Pt->size(); genP_index++) theGenParticles.push_back( GetGenParticle(genP_index) );
+  for (Size_t genP_index = 0; genP_index < GenP_Pt->size(); genP_index++)
+    {
+      GenParticle p = GetGenParticle(genP_index);
+
+      // vector<GenParticle> Mothers;
+      // vector<GenParticle> Daughters;
+      // for (unsigned int i = 0; i < p.mothersIndex().size(); i++) Mothers.push_back( GetGenParticle( p.mothersIndex().at(i) ) );
+      // for (unsigned int i = 0; i < p.daughtersIndex().size(); i++) Daughters.push_back( GetGenParticle( p.daughtersIndex().at(i) ) );
+      // p.SetMothers(Mothers);
+      // p.SetDaughters(Daughters);
+      theGenParticles.push_back(p);
+      if (0) p.PrintProperties();
+      if (0) p.PrintDaughters();
+      if (0) p.PrintMothers();
+    }
+
+  
   return theGenParticles;
 }
-
 
 
 //****************************************************************************
@@ -1287,37 +1347,35 @@ vector<GenParticle> CaloPlusTracks::GetGenParticles(int pdgId, bool isLastCopy)
       // Apply criteria
       int genP_pdgId  = p->pdgId();
       if ( abs(genP_pdgId) != pdgId) continue;
-      if (!isLastCopy) myGenParticles.push_back(*p);
+	
+      if (!isLastCopy) myGenParticles.push_back(*p);      
       else
 	{
-
+	  
 	  // Determine if it's a last copy
 	  bool save = true;
-	  vector<unsigned short> genP_Daughters = p->daughtersIndex();
-	  
-	  // For-loop: Daughters
-	  for (size_t i = 0; i < genP_Daughters.size(); i++)
+	  bool bDecaysToSelf = false;
+	  for (unsigned int i = 0; i < p->daughtersIndex().size(); i++) 
 	    {
 
-	      unsigned short index = genP_Daughters.at(i);
-	      GenParticle d        = GetGenParticle(index);
-	      
-	      if ( abs(d.pdgId()) == abs(pdgId) )
+	      GenParticle d = GetGenParticle(p->daughtersIndex().at(i) );
+	      if (abs(d.pdgId()) == pdgId)
 		{
-		  save = false;
+		  bDecaysToSelf = true;
 		  break;
 		}
 	    }
-	  
-	  if (!save) continue;	  
+
+	  if (bDecaysToSelf) continue;	  
 	  myGenParticles.push_back(*p);
+	  if (0) p->PrintDaughters();
 	}
     }
 
   return myGenParticles;
 }
 
-
+      
 //****************************************************************************
 GenParticle CaloPlusTracks::GetGenParticle(unsigned int Index)
 //****************************************************************************
@@ -1339,8 +1397,6 @@ GenParticle CaloPlusTracks::GetGenParticle(unsigned int Index)
 
   // Construct the GenParticle
   GenParticle theGenParticle(Index, Pt, Eta, Phi, Mass, Charge, PdgId, Status, VertexX, VertexY, VertexZ, MothersIndex, DaughtersIndex);
-  // theGenParticle.SetMothers(Mothers);
-  // theGenParticle.SetDaughters(Daughters);
   
   return theGenParticle;
 }
@@ -1377,7 +1433,7 @@ vector<TTTrack> CaloPlusTracks::GetTTTracks(const double minPt,
       TTTrack tk = GetTTTrack(iTk, nFitParams);
       
       if (tk.getPt() < minPt) continue;
-      if (std::abs(tk.getEta()) > maxEta) continue;
+      if (abs(tk.getEta()) > maxEta) continue;
       if (tk.getChi2() > maxChiSq) continue;
       if (tk.getNumOfStubs() < minStubs) continue;
       if (tk.getNumOfStubsPS() < minStubsPS) continue;
@@ -1492,7 +1548,7 @@ vector<TTPixelTrack> CaloPlusTracks::GetTTPixelTracks(const double minPt,
       // double z0 = tk.getZ0();
       // double d0 = tk.getD0();
       if (pixTk.getPt() < minPt) continue;
-      if (std::abs(pixTk.getEta()) > maxEta) continue;
+      if (abs(pixTk.getEta()) > maxEta) continue;
       if (pixTk.getChi2() > maxChiSq) continue;
       if (pixTk.getNcandidatehit() < minHits) continue;
 
@@ -1653,7 +1709,7 @@ void CaloPlusTracks::GetIsolationValues(L1TkTauParticle &L1TkTau)
       isoTks_scalarSumPt += isoConeTk.getPt();
       
       // Find the track closest in Z0
-      deltaZ0 = std::abs(matchTk.getZ0() - isoConeTk.getZ0());
+      deltaZ0 = abs(matchTk.getZ0() - isoConeTk.getZ0());
       if (deltaZ0 < L1TkTau.GetVtxIsolation())
 	{
 	  L1TkTau.SetVtxIsolation(deltaZ0);
@@ -1677,9 +1733,9 @@ void CaloPlusTracks::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
 {
 
   // Sanity check
-  if (!L1TkTau.HasMatchingTk() ) return;
   if (GenTaus.size() < 1 ) return;
-  
+  // if (!L1TkTau.HasMatchingTk() ) return; //FIXME: was this needed? Can't CaloTaus have genP match without a track?
+
   // Initialise
   TTTrack matchTk  = L1TkTau.GetMatchingTk();
   double match_dR  = 9999.9;
@@ -1691,37 +1747,32 @@ void CaloPlusTracks::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
 
       if (0) tau->PrintProperties();
 
-      // Get hadronic decay products (pi+/-,pi0, K+/-, K0, K0L, KOS, eta, omegas, gammas from tau->tau+gamma transition)
-      std::vector<unsigned short> hadronicDaughters;
-      std::cout << "4 ================================================" << std::endl;
-      vector<unsigned short> test = tau->daughtersIndex();
-      auxTools_.PrintVector(test);
-      std::cout << "4 ================================================" << std::endl;
-      mcTools_.GetHadronicTauFinalDaughters(tau->index(), hadronicDaughters); //fixme: iro
-
-      // Sanity check
-      if (hadronicDaughters.size() < 1) continue;
+      // Get hadronic decay products (pi+/-, pi0, K+/-, K0, K0L, gammas from tau->tau+gamma transition)
+      vector<unsigned short> genP_daughtersIndex;
+      vector<GenParticle> genP_daughters;
+      GetHadronicTauFinalDaughters(*tau, genP_daughtersIndex);
+      for (unsigned int i = 0; i < genP_daughtersIndex.size(); i++) genP_daughters.push_back( GetGenParticle( genP_daughtersIndex.at(i)) );
       
       // For-loop: Daughters
-      vector<GenParticle> Daughters;
-      for (size_t j = 0; j < hadronicDaughters.size(); j++)
-       	{
-	  GenParticle d = GetGenParticle( hadronicDaughters.at(j) );
-	  if (d.charge() == 0) continue;
-	  if (0) d.PrintProperties();
+      for (vector<GenParticle>::iterator d = genP_daughters.begin(); d != genP_daughters.end(); d++)
+	{
+	  if (d->charge() == 0) continue;
+	  if (0) d->PrintProperties();
 
 	  // Calculate deltaR from matching tracks
-	  double deltaR = auxTools_.DeltaR( matchTk.getEta(), matchTk.getPhi(), d.eta(), d.phi() );
+	  double deltaR = auxTools_.DeltaR( matchTk.getEta(), matchTk.getPhi(), d->eta(), d->phi() );
 	  if (deltaR > mcMatching_dRMax) continue;
 
 	  if (deltaR < match_dR)
 	    {
 	      match_dR = deltaR;
-	      match_GenParticle = d;
+	      match_GenParticle = *d;
 	    }
-	}            
-    }
-  
+	  
+	}  // For-loop: Daughters
+      
+    }  // For-loop: GenTaus
+
   // Save the matching
   L1TkTau.SetMatchingGenParticle(match_GenParticle);
   L1TkTau.SetMatchingGenParticleDeltaR(match_dR);
@@ -1730,6 +1781,7 @@ void CaloPlusTracks::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
   if (0) L1TkTau.PrintProperties(false, true, false, false);
   return;
 }      
+
 
 //****************************************************************************
 vector<L1TkTauParticle> CaloPlusTracks::GetMcMatchedL1TkTaus(vector<L1TkTauParticle> L1TkTaus)

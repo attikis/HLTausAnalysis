@@ -59,9 +59,6 @@ class CaloPlusTracks : public TreeAnalyserMC{
   void ApplyDiTauZMatching(string tkCollectionType, 
 			   vector<L1TkTauParticle> &L1TkTaus);
 
-  void RemoveDuplicates(vector<L1TkTauParticle> L1TkTaus1, 
-			vector<L1TkTauParticle> &L1TkTaus2);
-
   vector<GenParticle> GetHadronicGenTaus(vector<GenParticle> GenTaus,
 					 double visEt=20.0,
 					 double visEta=2.3);
@@ -210,6 +207,9 @@ class CaloPlusTracks : public TreeAnalyserMC{
 				      bool isLastCopy=false);
   
   vector<L1TkTauParticle> GetMcMatchedL1TkTaus(vector<L1TkTauParticle> L1TkTaus);
+
+  void GetHadronicTauFinalDaughters(GenParticle hTau,
+				    vector<unsigned short> &Daug);
 
   
   // Variable declaration
