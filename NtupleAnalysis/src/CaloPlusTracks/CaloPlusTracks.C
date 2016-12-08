@@ -280,6 +280,7 @@ void CaloPlusTracks::Loop()
     nb = fChain->GetEntry(jentry);   nbytes += nb;
 
     
+    
     // Gen-Collections
     if(DEBUG) cout << "=== Gen Collections" << endl;
     vector<GenParticle> GenParticles    = GetGenParticles(false);
@@ -295,18 +296,19 @@ void CaloPlusTracks::Loop()
     
     // Track Collections
     if(DEBUG) cout << "=== Track Collections" << endl;
-    vector<TrackingParticle> TPs       = GetTrackingParticles();
-    vector<TTTrack> matchTTTracks      = GetTTTracks(matchTk_minPt_, selTks_maxEta, selTks_maxChiSq, selTks_minStubs, selTks_minStubsPS, selTks_nFitParams);
-    vector<TTTrack> selTTTracks        = GetTTTracks(selTks_minPt  , selTks_maxEta, selTks_maxChiSq, selTks_minStubs, selTks_minStubsPS, selTks_nFitParams);
-    vector<TTPixelTrack> TTPixelTracks = GetTTPixelTracks(selTks_minPt, selTks_maxEta, selTks_maxChiSq, selTksPix_minHits);
-    vector<TTTrack> pvTTTracks;
-    double pv_z = GetPVTTTracks(pvTTTracks);
-    if (0) for (vector<TrackingParticle>::iterator p = TPs.begin(); p != TPs.end(); p++) p->PrintProperties();
-    if (0) for (vector<TTTrack>::iterator t = selTTTracks.begin(); t != selTTTracks.end(); t++) t->PrintProperties();
-    if (0) for (vector<TTTrack>::iterator t = matchTTTracks.begin(); t != matchTTTracks.end(); t++) t->PrintProperties();
-    if (0) for (vector<TTTrack>::iterator t = pvTTTracks.begin(); t != pvTTTracks.end(); t++) t->PrintProperties();
-    if (0) for (vector<TTPixelTrack>::iterator t = TTPixelTracks.begin(); t != TTPixelTracks.end(); t++) t->PrintProperties();
+    vector<TrackingParticle> TPs       = GetTrackingParticles(false);
+    vector<TTTrack> matchTTTracks      = GetTTTracks(matchTk_minPt_, selTks_maxEta, selTks_maxChiSq, selTks_minStubs, selTks_minStubsPS, selTks_nFitParams, false);
+    vector<TTTrack> selTTTracks        = GetTTTracks(selTks_minPt  , selTks_maxEta, selTks_maxChiSq, selTks_minStubs, selTks_minStubsPS, selTks_nFitParams, false);
+    vector<TTPixelTrack> TTPixelTracks = GetTTPixelTracks(selTks_minPt, selTks_maxEta, selTks_maxChiSq, selTksPix_minHits, true);
+    exit(0);
+    // vector<TTTrack> pvTTTracks;
+    // double pv_z = GetPVTTTracks(pvTTTracks, true); //iro: fixme
 
+    if (DEBUG) PrintTrackingParticleCollection(TPs);
+    if (DEBUG) PrintTTTrackCollection(matchTTTracks);
+    if (DEBUG) PrintTTTrackCollection(selTTTracks);
+    if (DEBUG) PrintTTPixelTrackCollection(TTPixelTracks);
+    if (DEBUG) PrintTTPixelTrackCollection(TTPixelTracks);
     
     // Tau Collections
     if(DEBUG) cout << "=== Tau Collections" << endl;
@@ -1439,18 +1441,22 @@ GenParticle CaloPlusTracks::GetGenParticle(unsigned int Index)
 
 
 //****************************************************************************
-double CaloPlusTracks::GetPVTTTracks(vector<TTTrack> &pvTTTracks)
+double CaloPlusTracks::GetPVTTTracks(vector<TTTrack> &pvTTTracks,
+				     bool bPrintList)
 //****************************************************************************
 {
   // First get PV_z and pv-tracks indices
   vector<int> pvTks_index; 
   pv_z = 0.0;
-  pv_z = pvProducer->GetPrimaryVertexZ("default", pvTks_index);
-  
-  // Uset tk-indices to get the actual pv-tracks
+  pv_z = pvProducer->GetPrimaryVertexZ("default", pvTks_index); //iro: fixme (always empty)
+
+  // For-loop: All TTTracks fro PV
   for (Size_t iTk = 0; iTk < pvTks_index.size(); iTk++) pvTTTracks.push_back( GetTTTrack(iTk) );
+
+  if (bPrintList) PrintTTTrackCollection(pvTTTracks);
   return pv_z;
 }
+
 
 
 //****************************************************************************
@@ -1459,14 +1465,18 @@ vector<TTTrack> CaloPlusTracks::GetTTTracks(const double minPt,
 					    const double maxChiSq,
 					    const unsigned int minStubs,
 					    const unsigned int minStubsPS,
-					    const unsigned nFitParams)
+					    const unsigned nFitParams,
+					    bool bPrintList)
 //****************************************************************************
 {
-  vector<TTTrack> theTTTracks; 
+  vector<TTTrack> theTTTracks;
+
+  // For-loop: All TTTracsk
   for (Size_t iTk = 0; iTk < L1Tks_Pt->size(); iTk++)
     {
       TTTrack tk = GetTTTrack(iTk, nFitParams);
-      
+
+      // Apply selection criteria
       if (tk.getPt() < minPt) continue;
       if (abs(tk.getEta()) > maxEta) continue;
       if (tk.getChi2() > maxChiSq) continue;
@@ -1474,9 +1484,12 @@ vector<TTTrack> CaloPlusTracks::GetTTTracks(const double minPt,
       if (tk.getNumOfStubsPS() < minStubsPS) continue;
       // double z0 = tk.getZ0();
       // double d0 = tk.getD0();
-
       theTTTracks.push_back( tk );
+
     }
+
+  if (bPrintList) PrintTTTrackCollection(theTTTracks);
+  
   return theTTTracks;
 }
 
@@ -1527,11 +1540,20 @@ TTTrack CaloPlusTracks::GetTTTrack(unsigned int Index,
 
 
 //****************************************************************************
-vector<TrackingParticle> CaloPlusTracks::GetTrackingParticles(void)
+vector<TrackingParticle> CaloPlusTracks::GetTrackingParticles(bool bPrintList)
 //****************************************************************************
 {
-  vector<TrackingParticle> theTrackingParticles; 
-  for (Size_t iTP = 0; iTP < TP_Pt->size(); iTP++) theTrackingParticles.push_back( GetTrackingParticle(iTP) );
+  vector<TrackingParticle> theTrackingParticles;
+
+  // For-loop: Tracking Particles
+  for (Size_t iTP = 0; iTP < TP_Pt->size(); iTP++)
+    {
+      TrackingParticle p = GetTrackingParticle(iTP);
+      theTrackingParticles.push_back(p);
+      
+    }
+  if (bPrintList) PrintTrackingParticleCollection(theTrackingParticles);
+  
   return theTrackingParticles;
 }
 
@@ -1573,22 +1595,28 @@ TrackingParticle CaloPlusTracks::GetTrackingParticle(unsigned int Index)
 vector<TTPixelTrack> CaloPlusTracks::GetTTPixelTracks(const double minPt,
 						      const double maxEta,
 						      const double maxChiSq,
-						      const int minHits)
+						      const int minHits,
+						      bool bPrintList)
 //****************************************************************************
 {
-  vector<TTPixelTrack> theTTPixelTracks; 
+  vector<TTPixelTrack> theTTPixelTracks;
+
+  // For-loop: All TTPixelTracks
   for (Size_t iTk = 0; iTk < L1PixTks_Pt->size(); iTk++)
     {
-      TTPixelTrack pixTk = GetTTPixelTrack(iTk);
-      // double z0 = tk.getZ0();
-      // double d0 = tk.getD0();
+      TTPixelTrack pixTk  = GetTTPixelTrack(iTk);
+
+      // Apply selection criteria
       if (pixTk.getPt() < minPt) continue;
       if (abs(pixTk.getEta()) > maxEta) continue;
       if (pixTk.getChi2() > maxChiSq) continue;
       if (pixTk.getNcandidatehit() < minHits) continue;
-
+      
       theTTPixelTracks.push_back( pixTk );
     }
+  
+  if (bPrintList) PrintTTPixelTrackCollection(theTTPixelTracks);
+  
   return theTTPixelTracks;
 }
 
@@ -1858,5 +1886,113 @@ void CaloPlusTracks::PrintGenParticleCollection(vector<GenParticle> collection)
   
     return;
 }
+
+
+
+//****************************************************************************
+void CaloPlusTracks::PrintTrackingParticleCollection(vector<TrackingParticle> collection)
+//****************************************************************************
+{
+
+  Table info("Index | Pt | Eta | Phi | PdgId | Q | x0 | y0 | z0 | d0 | d0-phi | NMatch | TTTrackIndex | TTClusters | TTStubs | TTTracks", "Text");
+
+  // For-loop: Tracking Particles
+  int row=0;
+  for (vector<TrackingParticle>::iterator p = collection.begin(); p != collection.end(); p++)
+    {
+      // Construct table
+      info.AddRowColumn(row, auxTools_.ToString( p->index()) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Perp(), 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Eta() , 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Phi() , 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getPdgId()) );
+      info.AddRowColumn(row, p->getQ());
+      info.AddRowColumn(row, auxTools_.ToString( p->getX0()   , 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getY0()   , 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getZ0()   , 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getD0()   , 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getD0Phi(), 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getNMatch())       );
+      info.AddRowColumn(row, auxTools_.ToString( p->getTTTrackIndex()) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getTTClusters())   );
+      info.AddRowColumn(row, auxTools_.ToString( p->getTTStubs())      );
+      info.AddRowColumn(row, auxTools_.ToString( p->getTTTracks())     );
+      row++;
+    }
+
+  info.Print();
+  
+  return;    
+}
+
+
+//****************************************************************************
+void CaloPlusTracks::PrintTTTrackCollection(vector<TTTrack> collection)
+//****************************************************************************
+{
+
+  Table info("Index | Pt | Eta | Phi | x0 | y0 | z0 | d0 | Q | Chi2 | DOF | Chi2Red | Stubs (PS) | StubPtCons. | Genuine | Unknown | Comb.", "Text");
+      
+  // For-loop: All TTTracsk
+  int row=0;
+  for (vector<TTTrack>::iterator p = collection.begin(); p != collection.end(); p++)    
+    {
+      // Construct table
+      info.AddRowColumn(row, auxTools_.ToString( p->index()) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Perp(), 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Eta() , 3) );  
+      info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Phi() , 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getX0(), 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getY0(), 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getZ0(), 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getD0(), 3) );  
+      info.AddRowColumn(row, p->getQ());
+      info.AddRowColumn(row, auxTools_.ToString( p->getChi2(),3 ));
+      info.AddRowColumn(row, auxTools_.ToString( p->getDOF()) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getChi2Red(), 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getNumOfStubs()) + " (" + auxTools_.ToString(p->getNumOfStubsPS()) + ")");
+      info.AddRowColumn(row, auxTools_.ToString( p->getStubPtConsistency(), 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getIsGenuine()) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getIsUnknown()) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getIsCombinatoric()) );
+      row++;
+    }
+
+  info.Print();
+
+  return;
+}
+
+//****************************************************************************
+void CaloPlusTracks::PrintTTPixelTrackCollection(vector<TTPixelTrack> collection)
+//****************************************************************************
+{
+  Table info("Index | Pt | Eta | Phi | z0 | d0 | Q | Chi2 | Hits | Hit-Pattern | Hit-R | Hit-Z", "Text");
+  
+  // For-loop: All TTPixelTracks
+  int row=0;
+  for (vector<TTPixelTrack>::iterator p = collection.begin(); p != collection.end(); p++)
+  {
+    // Construct table
+    info.AddRowColumn(row, auxTools_.ToString( p->index()) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Perp(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Eta() , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Phi() , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getZ0(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getD0(), 3) );
+    info.AddRowColumn(row, p->getQ() );
+    info.AddRowColumn(row, auxTools_.ToString( p->getChi2(), 3 ) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getNhit() ) + " (" + auxTools_.ToString(p->getNcandidatehit() ) + ")" );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPixelHitsPattern() ) );
+    info.AddRowColumn(row, auxTools_.ConvertIntVectorToString( p->getPixHitsR()) );
+    info.AddRowColumn(row, auxTools_.ConvertIntVectorToString( p->getPixHitsZ()) );
+    row++;
+  }
+  
+  info.Print();
+  
+  return;
+}
+
 
 #endif

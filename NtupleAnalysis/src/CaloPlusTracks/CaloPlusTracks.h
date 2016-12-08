@@ -57,7 +57,9 @@ class CaloPlusTracks : public TreeAnalyserMC{
   void PrintSettings(void);
 
   void PrintGenParticleCollection(vector<GenParticle> collection);
-
+  void PrintTrackingParticleCollection(vector<TrackingParticle> collection);
+  void PrintTTTrackCollection(vector<TTTrack> collection);
+  void PrintTTPixelTrackCollection(vector<TTPixelTrack> collection);
   void ApplyDiTauZMatching(string tkCollectionType, 
 			   vector<L1TkTauParticle> &L1TkTaus);
 
@@ -176,7 +178,7 @@ class CaloPlusTracks : public TreeAnalyserMC{
 		  TH2D *hEfficiency);
 
   TrackingParticle GetTrackingParticle(unsigned int Index);
-  vector<TrackingParticle> GetTrackingParticles(void);
+  vector<TrackingParticle> GetTrackingParticles(bool bPrintList=false);
 
   TTTrack GetTTTrack(unsigned int Index,
 		     const unsigned int nFitParams = 5);
@@ -186,16 +188,19 @@ class CaloPlusTracks : public TreeAnalyserMC{
 			      const double maxChiSq = 9999.9,
 			      const unsigned int minStubs = 0,
 			      const unsigned int minStubsPS = 0,
-			      const unsigned nFitParams = 5);
+			      const unsigned nFitParams = 5,
+			      bool bPrintList = false);
 
-  double GetPVTTTracks(vector<TTTrack> &pvTTTracks);
+  double GetPVTTTracks(vector<TTTrack> &pvTTTracks,
+		       bool bPrintList = false);
 
   TTPixelTrack GetTTPixelTrack(unsigned int Index);
 
   vector<TTPixelTrack> GetTTPixelTracks(const double minPt = 0.0,
 					const double maxEta = 9999.9,
 					const double maxChiSq = 9999.9,
-					const int minHits = 0.0);
+					const int minHits = 0.0,
+					bool bPrintList=false);
 
   L1JetParticle GetL1CaloTau(unsigned int Index);
   
