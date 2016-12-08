@@ -20,13 +20,12 @@ TChain* FileOpener::OpenFile(const std::string SamplePath, const std::string Sam
   std::string FullFileName = SamplePath + "/" + datasetPath + "/res/output-" + datasetPath + ".root";
   std::ifstream GetFile(FullFileName.c_str());
   if (!GetFile.good() ) {
-    cout << "E R R O R ! FileOpener::OpenFile(...) - File \"" << FullFileName << "\" does not exist." << endl;
-    cout << "EXIT" << std::endl;
+    cout << "=== FileOpener::OpenFile()\n\tFile \"" << FullFileName << "\" does not exist. EXIT" << endl;
     exit(1);
   }
 
   /// Inform user of ROOT file added to the TChain
-  std::cout << "I N F O ! FileOpener::OpenFile(...) - Adding file " << FullFileName << " to the chain \n";
+  cout << "=== FileOpener::OpenFile()\n\tAdding file " << FullFileName << " to the chain" << endl;
   mychain -> Add(FullFileName.c_str());
 
   return mychain; 

@@ -169,7 +169,8 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   // Init() will be called many times when running on PROOF
   // (once per file to be processed).
 
-
+  std::cout << "=== TreeDefinitionReco::InitReco()" << std::endl;
+  
   // Set object pointer
   L1Tks_Pt                = 0;
   L1Tks_Px                = 0;
@@ -242,14 +243,14 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   L1TkJet_Vertex          = 0;
 
 
-  std::cout << "I N F O ! TreeDefinitionReco::InitReco(...) - Setting branch addresses and branch pointers." << std::endl;
+  std::cout << "\tSetting branch addresses and branch pointers." << std::endl;
   // Set branch addresses and branch pointers
   if (!tree) return;
   fChain = tree;
   fCurrent = -1;
   fChain->SetMakeClass(1); 
 					
-  std::cout << "I N F O ! TreeDefinitionReco::InitReco(...) - Setting L1 Tracks addresses." << std::endl;
+  std::cout << "\tSetting L1 Tracks addresses." << std::endl;
   fChain->SetBranchAddress("L1Tks_Pt"               , &L1Tks_Pt               , &b_L1Tks_Pt);
   fChain->SetBranchAddress("L1Tks_Px"               , &L1Tks_Px               , &b_L1Tks_Px);
   fChain->SetBranchAddress("L1Tks_Py"               , &L1Tks_Py               , &b_L1Tks_Py);
@@ -276,7 +277,7 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   fChain->SetBranchAddress("L1Tks_IsUnknown"        , &L1Tks_IsUnknown        , &b_L1Tks_IsUnknown);
   fChain->SetBranchAddress("L1Tks_IsCombinatoric"   , &L1Tks_IsCombinatoric   , &b_L1Tks_IsCombinatoric);
 
-  std::cout << "I N F O ! TreeDefinitionReco::InitReco(...) - Setting L1 Pixel Tracks addresses." << std::endl;
+  std::cout << "\tSetting L1 Pixel Tracks addresses." << std::endl;
   fChain->SetBranchAddress("L1PixTks_Pt"           , &L1PixTks_Pt           , &b_L1PixTks_Pt);
   fChain->SetBranchAddress("L1PixTks_Px"           , &L1PixTks_Px           , &b_L1PixTks_Px);
   fChain->SetBranchAddress("L1PixTks_Py"           , &L1PixTks_Py           , &b_L1PixTks_Py);
@@ -310,7 +311,7 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   fChain->SetBranchAddress("L1PixTks_CandPixHits_Phi"  , &L1PixTks_CandPixHits_Phi  , &b_L1PixTks_CandPixHits_Phi);
   fChain->SetBranchAddress("L1PixTks_CandPixHits_Type" , &L1PixTks_CandPixHits_Type , &b_L1PixTks_CandPixHits_Type);
 
-  std::cout << "I N F O ! TreeDefinitionReco::InitReco(...) - Setting L1 Calo Tau addresses." << std::endl;
+  std::cout << "\tSetting L1 Calo Tau addresses." << std::endl;
   fChain->SetBranchAddress("L1CaloTau_E"   , &L1CaloTau_E   , &b_L1CaloTau_E);
   fChain->SetBranchAddress("L1CaloTau_Et"  , &L1CaloTau_Et  , &b_L1CaloTau_Et);
   fChain->SetBranchAddress("L1CaloTau_Eta" , &L1CaloTau_Eta , &b_L1CaloTau_Eta);
@@ -318,7 +319,7 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   fChain->SetBranchAddress("L1CaloTau_Bx"  , &L1CaloTau_Bx  , &b_L1CaloTau_Bx);
   fChain->SetBranchAddress("L1CaloTau_Type", &L1CaloTau_Type, &b_L1CaloTau_Type);
 
-  std::cout << "I N F O ! TreeDefinitionReco::InitReco(...) - Setting L1 Jet addresses." << std::endl;
+  std::cout << "\tSetting L1 Jet addresses." << std::endl;
   fChain->SetBranchAddress("L1TkJet_Pt"          , &L1TkJet_Pt          , &b_L1TkJet_Pt);
   fChain->SetBranchAddress("L1TkJet_Eta"         , &L1TkJet_Eta         , &b_L1TkJet_Eta);
   fChain->SetBranchAddress("L1TkJet_Phi"         , &L1TkJet_Phi         , &b_L1TkJet_Phi);

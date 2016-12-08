@@ -9,6 +9,7 @@
 #include "../../Framework/interface/TreeDefinitionGenP.h"
 #include "../interface/AuxTools.h"
 #include "../interface/Table.h"
+// #include "../DataFormat/src/GenParticle.C"
 
 // ROOT
 #include <TLorentzVector.h>
@@ -17,6 +18,14 @@ class MCTools : public virtual TreeDefinitionGenP
 {
  public:
   virtual ~MCTools() { };
+
+  bool IsNeutrino(const int pdgId);
+  bool IsBoson(const int pdgId);
+  bool IsLepton(const int pdgId);
+  bool IsChargedLepton(const int pdgId);
+  bool IsQuark(const int pdgId);
+
+  
   void PrintGenp(Int_t Indx, bool bPrintHeaders = true);
 
   void PrintGenpFullInfo(Int_t Indx, bool bPrintHeaders = true);
@@ -39,6 +48,8 @@ class MCTools : public virtual TreeDefinitionGenP
 
   bool IsHadronicTauDecay(Int_t Indx);
   
+  // GenParticle GetGenParticle(unsigned int Index);
+
   void GetHadronicTauFinalDaughters(Int_t Indx, 
 				    std::vector<unsigned short>& Daug);
 

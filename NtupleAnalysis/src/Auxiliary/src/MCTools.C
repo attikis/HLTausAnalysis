@@ -7,6 +7,80 @@
 //#define DEBUG
 
 //****************************************************************************
+bool MCTools::IsNeutrino(const int pdgId){
+//****************************************************************************
+  //
+  // Description:
+  // Returns true if genParticle is neutrino (v_e, v_mu, v_tau), else false.
+  //
+
+  if( (abs(pdgId) == 12) || (abs(pdgId) == 14) || (abs(pdgId) == 16) ) return true;
+  else return false;
+}
+
+
+//****************************************************************************
+bool MCTools::IsBoson(const int pdgId){
+//****************************************************************************
+  //
+  // Description:
+  // Returns true if genParticle is boson, else false.
+  //
+
+  if( (abs(pdgId) == 21) || (abs(pdgId) == 22) || (abs(pdgId) == 23) ||
+      (abs(pdgId) == 24) || (abs(pdgId) == 25) || (abs(pdgId) == 32) ||
+      (abs(pdgId) == 33) || (abs(pdgId) == 34) || (abs(pdgId) == 35) ||
+      (abs(pdgId) == 36) || (abs(pdgId) == 37) ) return true;
+  else return false;
+}
+
+
+//****************************************************************************
+bool MCTools::IsLepton(const int pdgId){
+//****************************************************************************  
+  //
+  // Description:
+  // Returns true if genParticle is a lepton (e, mu, tau & associated neutrinos), else false.
+  //
+
+  if( (abs(pdgId) == 11) || (abs(pdgId) == 12)  ||
+      (abs(pdgId) == 13) || (abs(pdgId) == 14)  ||
+      (abs(pdgId) == 15) || (abs(pdgId) == 16) ) return true;
+  else return false;
+}
+
+
+//****************************************************************************
+bool MCTools::IsChargedLepton(const int pdgId){
+//****************************************************************************
+  //
+  // Description:
+  // Returns true if genParticle is a charged lepton (e, mu, tau), else false.
+  //
+
+  if( (abs(pdgId) == 11) || (abs(pdgId) == 13) || (abs(pdgId) == 15) ) return true;
+  else return false;
+}
+
+
+//****************************************************************************
+bool MCTools::IsQuark(const int pdgId){
+//****************************************************************************
+
+  //
+  // Description:
+  // Returns true if genParticle is a quark (u, d, c, s, t, b), else false.
+  //
+
+  if( (abs(pdgId) == 1) || (abs(pdgId) == 2)  ||
+      (abs(pdgId) == 3) || (abs(pdgId) == 4)  ||
+      (abs(pdgId) == 5) || (abs(pdgId) == 6) ) return true;
+  else return false;
+}
+
+
+
+//****************************************************************************
 bool MCTools::RecursivelyLookForMotherId(Int_t Indx,
 					 Int_t MoId,
 					 const bool posn)
@@ -312,6 +386,7 @@ void MCTools::GetHadronicTauFinalDaughters(Int_t Indx,
 //****************************************************************************
 {
 
+  std::cout << "GenP_PdgId->size() = " << GenP_PdgId->size() << std::endl;
   std::cout << "GenP_PdgId->at("<<Indx<<") = " << GenP_PdgId->at(Indx) << std::endl;
   std::cout << "GenP_Daughters->at(0).size() = " << GenP_Daughters->at(0).size() << std::endl;
   

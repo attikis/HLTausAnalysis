@@ -56,6 +56,8 @@ class CaloPlusTracks : public TreeAnalyserMC{
 
   void PrintSettings(void);
 
+  void PrintGenParticleCollection(vector<GenParticle> collection);
+
   void ApplyDiTauZMatching(string tkCollectionType, 
 			   vector<L1TkTauParticle> &L1TkTaus);
 
@@ -201,7 +203,7 @@ class CaloPlusTracks : public TreeAnalyserMC{
 
   GenParticle GetGenParticle(unsigned int Index);
 
-  vector<GenParticle> GetGenParticles(void);
+  vector<GenParticle> GetGenParticles(bool bPrintList=false);
 
   vector<GenParticle> GetGenParticles(int pdgId,
 				      bool isLastCopy=false);
@@ -211,6 +213,7 @@ class CaloPlusTracks : public TreeAnalyserMC{
   void GetHadronicTauFinalDaughters(GenParticle hTau,
 				    vector<unsigned short> &Daug);
 
+ 
   
   // Variable declaration
   L1TkPrimaryVertex *pvProducer;

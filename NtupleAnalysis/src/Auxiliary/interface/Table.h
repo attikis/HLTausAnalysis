@@ -48,7 +48,7 @@ class Table{
   void DeleteColumn(int iColumn);
   void DeleteRow(int iRow);
   void InitVars(string titleRow, string format, string tableSpecs="");
-  void Print(void);
+  void Print(bool printTitleRows=true);
   void PrintColumn(int iColumn=-1);
   void PrintHorizontalLine(void){ cout << hLine_ << endl; } 
   void PrintRow(int iRow=-1);

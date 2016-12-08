@@ -95,7 +95,8 @@ void TreeDefinitionGenP::InitGenP(TTree *tree)
   // code, but the routine can be extended by the user if needed.
   // Init() will be called many times when running on PROOF
   // (once per file to be processed).
-
+   std::cout << "=== TreeDefinitionGenP::InitGenP()" << std::endl;
+   
   // Set object pointer
    GenP_Pt         = 0;
    GenP_Eta        = 0;
@@ -136,12 +137,12 @@ void TreeDefinitionGenP::InitGenP(TTree *tree)
    fChain->SetBranchAddress("RunNumber", &RunNumber, &b_RunNumber);
    fChain->SetBranchAddress("EvtNumber", &EvtNumber, &b_EvtNumber);
 
-   std::cout << "I N F O ! TreeDefinitionGenP::InitGenP(...) - Setting HepMC addresses." << std::endl;
+   std::cout << "\tSetting HepMC addresses." << std::endl;
    fChain->SetBranchAddress("HepMCEvt_VtxX", &HepMCEvt_VtxX, &b_HepMCEvt_VtxX);
    fChain->SetBranchAddress("HepMCEvt_VtxY", &HepMCEvt_VtxY, &b_HepMCEvt_VtxY);
    fChain->SetBranchAddress("HepMCEvt_VtxZ", &HepMCEvt_VtxZ, &b_HepMCEvt_VtxZ);
 
-   std::cout << "I N F O ! TreeDefinitionGenP::InitGenP(...) - Setting GenP addresses." << std::endl;
+   std::cout << "\tSetting GenP addresses." << std::endl;
    fChain->SetBranchAddress("GenP_Pt"       , &GenP_Pt       , &b_GenP_Pt);
    fChain->SetBranchAddress("GenP_Eta"      , &GenP_Eta      , &b_GenP_Eta);
    fChain->SetBranchAddress("GenP_Phi"      , &GenP_Phi      , &b_GenP_Phi);
@@ -155,7 +156,7 @@ void TreeDefinitionGenP::InitGenP(TTree *tree)
    fChain->SetBranchAddress("GenP_Mothers"  , &GenP_Mothers  , &b_GenP_Mothers);
    fChain->SetBranchAddress("GenP_Daughters", &GenP_Daughters, &b_GenP_Daughters);
 
-   std::cout << "I N F O ! TreeDefinitionGenP::InitGenP(...) - Setting TP addresses." << std::endl;
+   std::cout << "\tSetting TP addresses." << std::endl;
    fChain->SetBranchAddress("TP_Pt"           , &TP_Pt          , &b_TP_Pt);
    fChain->SetBranchAddress("TP_Px"           , &TP_Px          , &b_TP_Px);
    fChain->SetBranchAddress("TP_Py"           , &TP_Py          , &b_TP_Py);

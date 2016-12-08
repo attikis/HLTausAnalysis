@@ -58,7 +58,7 @@ void CaloPlusTracks::InitVars_()
 
   // Isolation cone
   isoCone_Constant = +3.50;         // TP: 3.50 GeV
-  isoCone_VtxIsoWP = +0.40;         // TP: 1.0cm
+  isoCone_VtxIsoWP = +0.50;         // TP: 1.0cm
   isoCone_dRMin    = sigCone_dRMax; // TP: 0.4cm
   isoCone_dRMax    = +0.30;         // TP: 0.4cm
   diTau_deltaPOCAz = +0.50;         // TP: 1.0cm
@@ -239,6 +239,7 @@ void CaloPlusTracks::PrintSettings(void)
   settings.AddRowColumn(29, "N/A" );
   settings.AddRowColumn(29, "" );
 
+  settings.AddRowColumn(30, "" );
   settings.Print();
   
   return;
@@ -280,19 +281,20 @@ void CaloPlusTracks::Loop()
 
     
     // Gen-Collections
-    vector<GenParticle> GenParticles    = GetGenParticles();
+    if(DEBUG) cout << "=== Gen Collections" << endl;
+    vector<GenParticle> GenParticles    = GetGenParticles(false);
     vector<GenParticle> GenTaus         = GetGenParticles(15, true);
     vector<GenParticle> GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
-    vector<GenParticle> GenTausTrigger  = GetHadronicGenTaus(GenTaus, 20.0, 2.3);
-    if (0) for (vector<GenParticle>::iterator p = GenParticles.begin(); p != GenParticles.end(); p++) p->PrintProperties();
-    if (0) for (vector<GenParticle>::iterator p = GenTaus.begin(); p != GenTaus.end(); p++) p->PrintProperties();
-    if (0) for (vector<GenParticle>::iterator p = GenTausHadronic.begin(); p != GenTausHadronic.end(); p++) p->PrintProperties();
-    if (0) for (vector<GenParticle>::iterator p = GenTausTrigger.begin(); p != GenTausTrigger.end(); p++) p->PrintProperties();   
-    if (DEBUG) cout << "\tFound " << GenTaus.size() << "/" << nMaxNumOfHTausPossible << " taus." << endl;
-    if (DEBUG) cout << "\tFound " << GenTausHadronic.size() << " hadronic taus (max " << nMaxNumOfHTausPossible << ")." << endl;
+    vector<GenParticle> GenTausTrigger  = GetHadronicGenTaus(GenTaus, 20.0, 2.3);    
+    // Print collections 
+    if (DEBUG) PrintGenParticleCollection(GenParticles);
+    if (DEBUG) PrintGenParticleCollection(GenTaus);
+    if (DEBUG) PrintGenParticleCollection(GenTausHadronic);    
+    if (DEBUG) PrintGenParticleCollection(GenTausTrigger);
 
     
     // Track Collections
+    if(DEBUG) cout << "=== Track Collections" << endl;
     vector<TrackingParticle> TPs       = GetTrackingParticles();
     vector<TTTrack> matchTTTracks      = GetTTTracks(matchTk_minPt_, selTks_maxEta, selTks_maxChiSq, selTks_minStubs, selTks_minStubsPS, selTks_nFitParams);
     vector<TTTrack> selTTTracks        = GetTTTracks(selTks_minPt  , selTks_maxEta, selTks_maxChiSq, selTks_minStubs, selTks_minStubsPS, selTks_nFitParams);
@@ -307,6 +309,7 @@ void CaloPlusTracks::Loop()
 
     
     // Tau Collections
+    if(DEBUG) cout << "=== Tau Collections" << endl;
     vector<L1JetParticle> L1CaloTaus = GetL1CaloTaus();
     vector<L1TkTauParticle> L1TkTauCandidates;
     vector<L1TkTauParticle> L1TkTaus_Calo;
@@ -331,6 +334,7 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     // For-loop: L1CaloTaus
     ////////////////////////////////////////////////
+    if(DEBUG) cout << "=== L1CaloTaus" << endl;
     for (vector<L1JetParticle>::iterator calo = L1CaloTaus.begin(); calo != L1CaloTaus.end(); calo++)
       {
 
@@ -372,6 +376,7 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     /// Create L1TkTaus Collections
     ////////////////////////////////////////////////
+    if(DEBUG) cout << "=== L1TkTaus" << endl;
     for (size_t i = 0; i < L1TkTauCandidates.size(); i++)
       {
 	
@@ -410,6 +415,7 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     /// L1Tktau Properties 
     ////////////////////////////////////////////////
+    if(DEBUG) cout << "=== L1TkTaus: Properties" << endl;
     hL1TkTau_Multiplicity ->Fill( L1TkTaus_VtxIso.size() );
     
     // For-loop: L1TkTaus_VtxIso
@@ -587,7 +593,12 @@ void CaloPlusTracks::Loop()
     // Progress bar
     ////////////////////////////////////////////////
     if (!DEBUG) auxTools_.ProgressBar(jentry, nEntries, 100, 100);
+
     
+    // Event Info
+    // if (DEBUG) cout << "\tFound " << GenTaus.size() << "/" << nMaxNumOfHTausPossible << " taus." << endl;
+    // if (DEBUG) cout << "\tFound " << GenTausHadronic.size() << " hadronic taus (max " << nMaxNumOfHTausPossible << ")." << endl;
+
   }// For-loop: Entries
 
 
@@ -1039,7 +1050,6 @@ vector<GenParticle> CaloPlusTracks::GetHadronicGenTaus(vector<GenParticle> GenTa
 						       double visEta)
 //****************************************************************************
 {
-
   // Sanity check
   vector<GenParticle> genP_hadGenTaus;
   if (GenTaus.size() < 1 ) return genP_hadGenTaus;
@@ -1047,28 +1057,21 @@ vector<GenParticle> CaloPlusTracks::GetHadronicGenTaus(vector<GenParticle> GenTa
   // For-loop: GenTaus
   for (vector<GenParticle>::iterator tau = GenTaus.begin(); tau != GenTaus.end(); tau++)
     {
-      if (0) tau->PrintProperties();
-      if (0) tau->PrintDaughters();
-      if (0) tau->PrintMothers();
 
       // Variable declaration
       vector<unsigned short> genP_daughtersIndex;
       vector<GenParticle> genP_daughters;
 
-      // Get hadronic decay products (pi+/-, pi0, K+/-, K0, K0L, gammas from tau->tau+gamma transition)
+      // Get hadronic decay products (pi+/-, pi0, K+/-, K0, K0L)
       GetHadronicTauFinalDaughters(*tau, genP_daughtersIndex);
       for (unsigned int i = 0; i < genP_daughtersIndex.size(); i++) genP_daughters.push_back( GetGenParticle( genP_daughtersIndex.at(i)) );
 
-      // Get the visible 4-momentum
-      TLorentzVector genP_visP4;
-      for (vector<GenParticle>::iterator d = genP_daughters.begin(); d != genP_daughters.end(); d++)
-	{
-	  genP_visP4 += d->p4();
-	}
-
+      // Need to manually set the final daughters (not the direct ones)
+      tau->SetFinalDaughters(genP_daughters);
+      
       // Apply acceptance cuts
-      bool bPassVisEt  = ( genP_visP4.Et() >= visEt );
-      bool bPassVisEta = ( abs(genP_visP4.Eta()) <= visEta );
+      bool bPassVisEt  = ( tau->p4vis().Et() >= visEt);
+      bool bPassVisEta = ( abs(tau->p4vis().Eta()) <= visEta );
       if (!(bPassVisEt * bPassVisEta)) continue;
 
       // Save this hadronic generator tau
@@ -1080,54 +1083,61 @@ vector<GenParticle> CaloPlusTracks::GetHadronicGenTaus(vector<GenParticle> GenTa
 
 
 //****************************************************************************
-void CaloPlusTracks::GetHadronicTauFinalDaughters(GenParticle hTau,
+void CaloPlusTracks::GetHadronicTauFinalDaughters(GenParticle p,
 						  vector<unsigned short> &Daug)
 //****************************************************************************
 {
   //
   // Description:
-  // Keep only the pi+/-,pi0, K+/-, K0, K0L, KOS, eta, omegas and gammas
-  // from tau->tau+gamma transition. Avoid leptonic decays.
-  // Because of the mixing of Generator and Detector simulation particles
-  // in the list check if the particle has a parent already in the list.
-  // If it does then it comes from a hadronic interaction with the
-  // detector material and it is not part of the tau decay
+  // Keep only the detector-related particles (tracker/calo)
+  //  pi+/-, pi0, K+/-, K0, K0L, KOS.
+  // Avoid leptonic decays.
   //
   // Additional info:
   // We keep the K+/-(pdgId=321) and K0L(pdgId=130) and we don't get their decay
-  // products (pi+/-) because  typically they live long enought to reach the ECAL/HCAL
+  // products (pi+/-) because typically they live long enought to reach the ECAL/HCAL
   // c*tau (K+/-) =  3.713 m
   // c*tau (K0L)  = 15.33  m
   // c*tau (K0S)  =  0.026842 m
   //
 
-  // If the genParticle has no daughters return
-  if (hTau.daughtersIndex().size() < 1) return;
+  // Sanity check
+  if (p.daughtersIndex().size() < 1) return;
+
+  // Define the allowed final daugther pdgIds
+  std::vector<unsigned int> pdgIds;
+  pdgIds.push_back(111); // pi0
+  pdgIds.push_back(211); // pi+
+  pdgIds.push_back(16);  // nu_tau
+  pdgIds.push_back(130); // K0_L
+  pdgIds.push_back(310); // K0_S
+  pdgIds.push_back(311); // K0
+  pdgIds.push_back(321); // K+
+  // pdgIds.push_back(223);   // omega0
+  // pdgIds.push_back(221);   // eta0
+  // pdgIds.push_back(213);   // rho(770)+
+  // pdgIds.push_back(20213); // alpha1(1260)+ 
+    
 
   // For-loop: All daughters
-  for (unsigned int i = 0; i < hTau.daughtersIndex().size(); i++) 
+  for (unsigned int i = 0; i < p.daughtersIndex().size(); i++) 
     {
 
-      GenParticle d = GetGenParticle(hTau.daughtersIndex().at(i) );
-      int genD_pdgId = abs(d.pdgId());
-      
-      // Continue according to daughter
-      if (genD_pdgId ==  15) GetHadronicTauFinalDaughters(d, Daug);
-      else if ( mcTools_.IsQuark(genD_pdgId) ) continue; // impossible
-      else if ( mcTools_.IsChargedLepton(genD_pdgId) ) continue; // e, mu
-      else if ( mcTools_.IsNeutrino(genD_pdgId) ) continue; // nu
-      else if ( (genD_pdgId == 223) || (genD_pdgId ==  24) || (genD_pdgId == 221) ||  // omega, W, eta
-		(genD_pdgId == 213) || (genD_pdgId == 310) || (genD_pdgId == 311) ||  // rho, K0S, K0
-		(genD_pdgId == 20213) ) // rho, alpha1
+      unsigned int index = p.daughtersIndex().at(i);
+      GenParticle d      = GetGenParticle(index);
+      int genD_pdgId     = abs(d.pdgId());
+
+
+      // Check if particle is of interest
+      if ( std::find(pdgIds.begin(), pdgIds.end(), genD_pdgId) == pdgIds.end() )
 	{
-       	  GetHadronicTauFinalDaughters(d, Daug);
+	  GetHadronicTauFinalDaughters(d, Daug);
       	}
       else
 	{
-	  // cout << "=== Will save daughter with pdgId = " << d.pdgId() << endl;
 	  Daug.push_back( d.index() );
 	}
-      }
+    }
   
   return;
 
@@ -1306,26 +1316,51 @@ void CaloPlusTracks::GetIsoConeTracks(L1TkTauParticle &L1TkTau,
 
 
 //****************************************************************************
-vector<GenParticle> CaloPlusTracks::GetGenParticles(void)
+vector<GenParticle> CaloPlusTracks::GetGenParticles(bool bPrintList)
 //****************************************************************************
 {
   vector<GenParticle> theGenParticles;
+  Table table("Index | PdgId | Status | Charge | Pt | Eta | Phi | E | Vertex (mm) | Mothers | Daughters |", "Text"); //LaTeX or Text    
+  	
   for (Size_t genP_index = 0; genP_index < GenP_Pt->size(); genP_index++)
     {
       GenParticle p = GetGenParticle(genP_index);
-
-      // vector<GenParticle> Mothers;
-      // vector<GenParticle> Daughters;
-      // for (unsigned int i = 0; i < p.mothersIndex().size(); i++) Mothers.push_back( GetGenParticle( p.mothersIndex().at(i) ) );
-      // for (unsigned int i = 0; i < p.daughtersIndex().size(); i++) Daughters.push_back( GetGenParticle( p.daughtersIndex().at(i) ) );
-      // p.SetMothers(Mothers);
-      // p.SetDaughters(Daughters);
+      vector<GenParticle> Mothers;
+      vector<GenParticle> Daughters;
+      for (unsigned int i = 0; i < p.mothersIndex().size(); i++) Mothers.push_back( GetGenParticle( p.mothersIndex().at(i) ) );
+      for (unsigned int i = 0; i < p.daughtersIndex().size(); i++) Daughters.push_back( GetGenParticle( p.daughtersIndex().at(i) ) );
+      p.SetMothers(Mothers);
+      p.SetDaughters(Daughters);
       theGenParticles.push_back(p);
-      if (0) p.PrintProperties();
-      if (0) p.PrintDaughters();
-      if (0) p.PrintMothers();
+
+      table.AddRowColumn(genP_index, auxTools_.ToString(p.index())  );
+      table.AddRowColumn(genP_index, auxTools_.ToString(p.pdgId())  );
+      table.AddRowColumn(genP_index, auxTools_.ToString(p.status()) );
+      table.AddRowColumn(genP_index, auxTools_.ToString(p.charge()) );
+      table.AddRowColumn(genP_index, auxTools_.ToString(p.pt())     );
+      if (p.pdgId() != 2212) table.AddRowColumn(genP_index, auxTools_.ToString(p.eta())    );
+      else table.AddRowColumn(genP_index, "infty");
+      table.AddRowColumn(genP_index, auxTools_.ToString(p.phi())    );
+      table.AddRowColumn(genP_index, auxTools_.ToString(p.energy()) );
+      table.AddRowColumn(genP_index, "(" + auxTools_.ToString(p.vx())  + ", " + auxTools_.ToString(p.vy())  + ", " + auxTools_.ToString(p.vz())  + ", " + ")");
+      if (p.mothersIndex().size() < 4)
+	{
+	  table.AddRowColumn(genP_index, auxTools_.ConvertIntVectorToString(p.mothersIndex() ) );
+	}
+      else table.AddRowColumn(genP_index, ".. Too many .." );
+      if (p.daughtersIndex().size() < 6)
+	{
+	  table.AddRowColumn(genP_index, auxTools_.ConvertIntVectorToString(p.daughtersIndex()) );
+	}
+      else table.AddRowColumn(genP_index, ".. Too many .." );
+
+      // p.PrintProperties();
+      // p.PrintDaughters();
+      // p.PrintFinalDaughters();
+      // p.PrintMothers();
     }
 
+  if (bPrintList) table.Print();
   
   return theGenParticles;
 }
@@ -1797,6 +1832,31 @@ vector<L1TkTauParticle> CaloPlusTracks::GetMcMatchedL1TkTaus(vector<L1TkTauParti
     }
   
   return matchedL1TkTaus;
+}
+
+
+//****************************************************************************
+void CaloPlusTracks::PrintGenParticleCollection(vector<GenParticle> collection)
+//****************************************************************************
+{
+
+  for (vector<GenParticle>::iterator p = collection.begin(); p != collection.end(); p++)
+    {
+      std::cout << "\nGenParticle:" << endl;
+      p->PrintProperties();
+      std::cout << "\nDaughters:" << endl;
+      p->PrintDaughters();
+      std::cout << "\nFinal Daughters:" << endl;
+      p->PrintFinalDaughters();
+      std::cout << "\nFinal Daughters (Charged):" << endl;
+      p->PrintFinalDaughtersCharged();
+      std::cout << "\nFinal Daughters (Neutral):" << endl;
+      p->PrintFinalDaughtersNeutral();
+      std::cout << "\nMothers:" << endl;
+      p->PrintMothers();
+    }
+  
+    return;
 }
 
 #endif

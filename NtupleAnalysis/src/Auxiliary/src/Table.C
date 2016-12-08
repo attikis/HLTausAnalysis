@@ -508,16 +508,19 @@ void Table::_PrintAux(void)
 
 
 //****************************************************************************
-void Table::Print(void)
+void Table::Print(bool printTitleRows)
 //****************************************************************************
 {
 
   _DetermineMaxColumnWidths();
   _PrintAux();
-  _PrintRow(rowsTop_);
-  _PrintTitleRow();
+  if (printTitleRows)
+    {
+      _PrintRow(rowsTop_);
+      _PrintTitleRow();
+    }
   _PrintTableRows();
-  _PrintRow(rowsBottom_);
+  //  if (printTitleRows) _PrintRow(rowsBottom_); // hLine at the end not needed
   return;
  
 }
