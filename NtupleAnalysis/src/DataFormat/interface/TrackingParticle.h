@@ -57,7 +57,7 @@ class TrackingParticle{
   unsigned short getTTStubs(void) const {return theTTStubs;}
   unsigned short getTTTracks(void) const {return theTTTracks;}
   void SetTTTrack(TTTrack track) {theTTTrack = track;}
-  void PrintProperties(void);
+  void PrintProperties(bool bPrintTitleRow=true);
   void PrintAllProperties(void);
   
  private:

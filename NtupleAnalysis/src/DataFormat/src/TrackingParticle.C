@@ -170,7 +170,7 @@ string TrackingParticle::_getQ(void)
   
 
 //****************************************************************************
-void TrackingParticle::PrintProperties(void)
+void TrackingParticle::PrintProperties(bool bPrintTitleRow)
 //****************************************************************************
 {
   
@@ -193,7 +193,7 @@ void TrackingParticle::PrintProperties(void)
   info.AddRowColumn(0, auxTools.ToString( theTTClusters)   );
   info.AddRowColumn(0, auxTools.ToString( theTTStubs)      );
   info.AddRowColumn(0, auxTools.ToString( theTTTracks)     );
-  info.Print();
+  info.Print(bPrintTitleRow);
 
   return;
 }

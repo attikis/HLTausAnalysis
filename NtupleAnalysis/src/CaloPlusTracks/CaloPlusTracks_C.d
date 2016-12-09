@@ -196,6 +196,7 @@ CaloPlusTracks_C.so: ../DataFormat/src/L1JetParticle.C
 CaloPlusTracks_C.so: ../Plugins/src/L1TkPrimaryVertex.C
 CaloPlusTracks_C.so: ../Plugins/interface/L1TkPrimaryVertex.h
 CaloPlusTracks_C.so: ../Plugins/src/L1PixelTrackFit.C
+CaloPlusTracks_C.so: /Users/attikis/ROOT/v5-34-00-patches/include/TEfficiency.h
 CaloPlusTracks_C.so: /Users/attikis/ROOT/v5-34-00-patches/include/Math/VectorUtil.h
 CaloPlusTracks_C.so: /Users/attikis/ROOT/v5-34-00-patches/include/cintdictversion.h /Users/attikis/ROOT/v5-34-00-patches/include/RVersion.h
 CaloPlusTracks_C__ROOTBUILDVERSION= 5.34/35

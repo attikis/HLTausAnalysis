@@ -487,7 +487,9 @@ void Table::_PrintAux(void)
 
   if(bCalledPrintAux_) return;
 
-  tableWidth_ = std::accumulate( columnWidths_.begin(), columnWidths_.end(), 2*GetNumberOfColumns() );
+  // Determine the table width
+  tableWidth_ = std::accumulate( columnWidths_.begin(), columnWidths_.end(), GetNumberOfColumns() );
+  // tableWidth_ = std::accumulate( columnWidths_.begin(), columnWidths_.end(), 2*GetNumberOfColumns() );
   
   // Append end-of-row characters (rowEnd_)
   _AppendRowEndToEachRow();

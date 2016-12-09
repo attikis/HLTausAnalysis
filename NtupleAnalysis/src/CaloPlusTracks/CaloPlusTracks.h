@@ -26,6 +26,7 @@
 #include "../Plugins/src/L1PixelTrackFit.C"
 
 // ROOT
+#include "TEfficiency.h"
 #include "Math/GenVector/VectorUtil.h"
 #include "Math/Vector3D.h"
 #include "Math/Point3D.h"
@@ -60,6 +61,8 @@ class CaloPlusTracks : public TreeAnalyserMC{
   void PrintTrackingParticleCollection(vector<TrackingParticle> collection);
   void PrintTTTrackCollection(vector<TTTrack> collection);
   void PrintTTPixelTrackCollection(vector<TTPixelTrack> collection);
+  void PrintL1JetParticleCollection(vector<L1JetParticle> collection);
+  void PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection);
   void ApplyDiTauZMatching(string tkCollectionType, 
 			   vector<L1TkTauParticle> &L1TkTaus);
 
@@ -89,7 +92,7 @@ class CaloPlusTracks : public TreeAnalyserMC{
   void GetIsolationValues(L1TkTauParticle &L1TkTau);
   
   void GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
-			      vector<GenParticle> GenTaus);			    
+			      vector<GenParticle> hadGenTaus);			    
 
   // Public Variables
   bool DEBUG;
@@ -157,12 +160,9 @@ class CaloPlusTracks : public TreeAnalyserMC{
   void FinaliseEffHisto_(TH2D *histo, 
 			 const int nEvtsTotal);  
 
-  void FillTurnOn_Numerator_(const vector<L1TkTauParticle> L1TkTaus,
+  void FillTurnOn_Numerator_(vector<L1TkTauParticle> L1TkTaus,
 			     const double minEt,
 			     TH1D *hTurnOn);
-
-  void FillTurnOn_Denominator_(vector<GenParticle> GenTausHadronic,
-			       TH1D *hVisEt);
 
   void FillSingleTau_(vector<L1TkTauParticle> L1TkTaus,
 		      TH1D *hRate,
@@ -204,9 +204,11 @@ class CaloPlusTracks : public TreeAnalyserMC{
 
   L1JetParticle GetL1CaloTau(unsigned int Index);
   
-  vector<L1JetParticle> GetL1CaloTaus(void);
+  vector<L1JetParticle> GetL1CaloTaus(bool bPrintList=false);
 
   GenParticle GetGenParticle(unsigned int Index);
+  void SetGenParticleMomsAndDaus(GenParticle &p);
+  void SetGenParticleFinalDaughters(GenParticle &p);
 
   vector<GenParticle> GetGenParticles(bool bPrintList=false);
 
@@ -323,6 +325,7 @@ class CaloPlusTracks : public TreeAnalyserMC{
   TH2D* hDiTau_Eff_Tk_VtxIso;
 
   // Turn-Ons
+  // TEfficiency* pEff;
   TH1D* hMcHadronicTau_VisEt;
   TH1D* hCalo_TurnOn50;
   TH1D* hTk_TurnOn50;

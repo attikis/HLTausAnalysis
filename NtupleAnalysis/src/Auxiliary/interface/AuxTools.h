@@ -83,7 +83,8 @@ class AuxTools{
   void StopwatchStart(void);
 
   void StopwatchStop(const int myPrecision = 5, 
-		     const string myUnits = "seconds");
+		     const string myUnits = "seconds",
+		     const string myTitle = "Elapsed Time");
 
   char* AppendCharToCharArray(char* array,
 			      char a);

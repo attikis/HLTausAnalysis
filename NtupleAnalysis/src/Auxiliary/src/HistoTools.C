@@ -50,17 +50,17 @@ void HistoTools::DivideHistos_1D(TH1D *hNumerator,
 //****************************************************************************
 {
 
-  // Sanity Check
-  for (int i = 0; i <= hNumerator->GetNbinsX()+1; i++){
-    int N    = hNumerator  ->GetBinContent(i);
-    int D    = hDenominator->GetBinContent(i);
-    double r = double(N)/double(D);
-    if ( r > 1.0) std::cout << "W A R N I N G ! HistoTools::DivideHistos_1D(...)  - bin " << i 
-			    << " (eT = " << i*hNumerator->GetBinWidth(i) << " GeV): Numerator/Denominator = " 
-			    << N << "/" << D << " = " << r << std::endl;
-  }
-  
-  hNumerator->Divide(hNumerator, hDenominator, 1.0, 1.0, "binomial");
+   // Sanity Check
+   for (int i = 0; i <= hNumerator->GetNbinsX()+1; i++){
+     int N    = hNumerator  ->GetBinContent(i);
+     int D    = hDenominator->GetBinContent(i);
+     double r = double(N)/double(D);
+     if ( r > 1.0) std::cout << "W A R N I N G ! HistoTools::DivideHistos_1D(...)  - bin " << i 
+   			    << " (eT = " << i*hNumerator->GetBinWidth(i) << " GeV): Numerator/Denominator = " 
+   			    << N << "/" << D << " = " << r << std::endl;
+   }
+   
+   hNumerator->Divide(hNumerator, hDenominator, 1.0, 1.0, "binomial");
   return;
 }
 

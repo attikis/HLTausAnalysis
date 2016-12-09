@@ -355,7 +355,8 @@ void AuxTools::PrintPSets(TTree *t)
 
 //****************************************************************************  
 void AuxTools::StopwatchStop(const int myPrecision, 
-			     const string myUnits)
+			     const string myUnits,
+			     const string myTitle)
 //****************************************************************************  
 {
   
@@ -383,7 +384,7 @@ void AuxTools::StopwatchStop(const int myPrecision,
   double elapsed_time_secs  = double(stopwatch_stop - stopwatch_start) / CLOCKS_PER_SEC;
   double elapsed_time_units = elapsed_time_secs/double(units);
   
-  cout << "Elapsed Time: " << setprecision(myPrecision) << elapsed_time_units << " (" << myUnits << ")" << endl;
+  cout << myTitle << ": " << setprecision(myPrecision) << elapsed_time_units << " (" << myUnits << ")" << endl;
   return;
 
 }  

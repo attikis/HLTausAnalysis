@@ -63,6 +63,7 @@ void GenParticle::PrintProperties(bool bPrintTitleRows)
 {
   
   Table info("Index | Pt | Eta | Phi | Mass | Charge | PdgId | Status | vX | vY | vZ | mothers | daughters |", "Text");
+  
   info.AddRowColumn(0, auxTools.ToString( index() , 1) );
   info.AddRowColumn(0, auxTools.ToString( pt()    , 3) );
   info.AddRowColumn(0, auxTools.ToString( eta()   , 3) );
@@ -166,10 +167,10 @@ vector<GenParticle> GenParticle::mothers(void)
 //****************************************************************************
 {
 
-  if (theMothers.size() < 1)
-    {
-      std::cout << "=== GenParticle::mothers() - theMothers.size() = " << theMothers.size() << ". Have you calleed GenParticle::SetMothers()?" << std::endl;
-    }
+  // if (theMothers.size() < 1)
+  //   {
+  //     std::cout << "=== GenParticle::mothers() - theMothers.size() = " << theMothers.size() << ". Have you called GenParticle::SetMothers()?" << std::endl;
+  //   }
   return theMothers;
 }
 
@@ -179,10 +180,10 @@ vector<GenParticle> GenParticle::daughters(void)
 //****************************************************************************
 {
 
-  if (theDaughters.size() < 1)
-    {
-      std::cout << "=== GenParticle::daughters() - theDaughters.size() = " << theDaughters.size() << ". Have you calleed GenParticle::SetDaughters()?" << std::endl;
-    }
+  // if (theDaughters.size() < 1)
+  //   {
+  //     std::cout << "=== GenParticle::daughters() - theDaughters.size() = " << theDaughters.size() << ". Have you called GenParticle::SetDaughters()?" << std::endl;
+  //   }
   return theDaughters;
 }
 

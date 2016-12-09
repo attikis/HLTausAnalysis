@@ -282,7 +282,7 @@ void TTPixelTrack::PrintProperties(void)
   info.AddRowColumn(0, auxTools.ToString( theD0, 3) );
   info.AddRowColumn(0, getQ() );
   info.AddRowColumn(0, auxTools.ToString( theChi2, 3 ) );
-  info.AddRowColumn(0, auxTools.ToString( theChi2Red, 3) );
+  // info.AddRowColumn(0, auxTools.ToString( theChi2Red, 3) );
   info.AddRowColumn(0, auxTools.ToString( thenhit) + " (" + auxTools.ToString(candPixHits_Type.size()) + ")" );
   int pixHits_Pattern = getPixelHitsPattern();
   info.AddRowColumn(0, auxTools.ToString( pixHits_Pattern) );
