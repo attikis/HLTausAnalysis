@@ -129,8 +129,10 @@ def main(opts):
         DoPlots( hL1TkTau_VtxIso     , datasetPaths, datasetList) 
         DoPlots( hL1TkTau_VtxIsoAbs  , datasetPaths, datasetList) 
         DoPlots( hL1TkTau_InvMassIncl, datasetPaths, datasetList) 
-
-        
+        DoPlots( hL1TkTau_ResolutionCaloEt , datasetPaths, datasetList) 
+        DoPlots( hL1TkTau_ResolutionCaloEta, datasetPaths, datasetList) 
+        DoPlots( hL1TkTau_ResolutionCaloPhi, datasetPaths, datasetList) 
+  
     if bDoL1TkTauExtra:
         if opts.verbose:
             print "=== Doing L1TkTauExtra"
@@ -173,7 +175,7 @@ def main(opts):
         DoPlots( hL1TkTau_MatchTk_IsGenuine     , datasetPaths, datasetList)
         DoPlots( hL1TkTau_MatchTk_IsUnknown     , datasetPaths, datasetList)
         DoPlots( hL1TkTau_MatchTk_IsCombinatoric, datasetPaths, datasetList)
-
+        DoPlots( hL1TkTau_MatchTk_PtMinusCaloEt , datasetPaths, datasetList)
         
     if bDoSigTks:
         if opts.verbose:

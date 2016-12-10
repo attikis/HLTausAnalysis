@@ -38,6 +38,13 @@ pi          = 4*math.atan(1)
 ###############################################################
 kwargs   = {}
 
+Resolution = {
+    "xLabel": "(p_{T}^{gen}-p_{T}^{calo})/p_{T}^{gen}", "xUnits": "" , "xMin": -2.5 , "xMax": 2.5, "binWidthX": 1.0, "xCutLines": [0], "xCutBoxes": [], "gridX": True, "logX": False, "logXRatio": False, 
+    "yLabel": "Entries / %0.0f" , "yUnits": "" , "yMin": 1e-05 , "yMax": 1.0 , "binWidthY": None, "yCutLines": [], "yCutBoxes": [], "gridY": True, "logY": True , "logYRatio": False, 
+    "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": "P", "legOptions": "LP",
+    "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
+
+
 NTks = {
     "xLabel": "Multiplicity"    , "xUnits": "" , "xMin": -0.5 , "xMax": 299.5, "binWidthX": 5.0, "xCutLines": [], "xCutBoxes": [], "gridX": True, "logX": False, "logXRatio": False, 
     "yLabel": "Entries / %0.0f" , "yUnits": "" , "yMin": 1e-05 , "yMax": 1.0 , "binWidthY": None, "yCutLines": [], "yCutBoxes": [], "gridY": True, "logY": True , "logYRatio": False, 
@@ -67,6 +74,13 @@ POCAz = {
     "yLabel": "Entries / %0.2f" , "yUnits": ""  , "yMin": 1E-05 , "yMax": 5E-01 , "binWidthY": None, "yCutLines": [] , "yCutBoxes": [], "gridY": True, "logY": True , "logYRatio": False, 
     "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": "P", "legOptions": "LP",
     "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
+
+dPt = {
+    "xLabel": "p_{T}^{tk}-E_{T}^{calo}", "xUnits": "GeV/c", "xMin": None , "xMax": None, "binWidthX": 1.0 , "xCutLines": [0], "xCutBoxes": [], "gridX": True, "logX": False, "logXRatio": False,
+    "yLabel": "Entries / %0.0f" , "yUnits": ""     , "yMin": 1e-03, "yMax": 1.0  , "binWidthY": None, "yCutLines": []  , "yCutBoxes": [], "gridY": True, "logY": True , "logYRatio": False,
+    "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": "P", "legOptions": "LP",
+    "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
+
 
 dPOCAz = {
     "xLabel": "|#Delta z_{0}|"  , "xUnits": "cm", "xMin": 0.00 , "xMax": +1.0 , "binWidthX": 0.05, "xCutLines": [0.1, 0.5], "xCutBoxes": [], "gridX": True, "logX": False, "logXRatio": False, 
@@ -303,7 +317,10 @@ hL1TkTau_RelIso      = m_histos.TH1orTH2( folder, "L1TkTau_RelIso"      , "L1TkT
 hL1TkTau_VtxIso      = m_histos.TH1orTH2( folder, "L1TkTau_VtxIso"      , "L1TkTau", None , **VtxIso    )
 hL1TkTau_VtxIsoAbs   = m_histos.TH1orTH2( folder, "L1TkTau_VtxIsoAbs"   , "L1TkTau", None , **VtxIsoAbs )
 hL1TkTau_DeltaRGenP  = m_histos.TH1orTH2( folder, "L1TkTau_DeltaRGenP"  , "L1TkTau", None , **DeltaR    )
-
+hL1TkTau_ResolutionCaloEt  = m_histos.TH1orTH2( folder, "hL1TkTau_MatchTk_ResolutionCaloEt" , "L1TkTau", None , **Resolution )
+hL1TkTau_ResolutionCaloEta = m_histos.TH1orTH2( folder, "hL1TkTau_MatchTk_ResolutionCaloEta", "L1TkTau", None , **Resolution )
+hL1TkTau_ResolutionCaloPhi = m_histos.TH1orTH2( folder, "hL1TkTau_MatchTk_ResolutionCaloPhi", "L1TkTau", None , **Resolution )
+  
 ###############################################################
 ### L1TkTaus; SigTks 
 ###############################################################
@@ -382,3 +399,4 @@ hL1TkTau_MatchTk_StubPtCons     = m_histos.TH1orTH2( folder, "L1TkTau_MatchTk_St
 hL1TkTau_MatchTk_IsGenuine      = m_histos.TH1orTH2( folder, "L1TkTau_MatchTk_IsGenuine"     , "Match Tk", None, **IsGenuine      )
 hL1TkTau_MatchTk_IsUnknown      = m_histos.TH1orTH2( folder, "L1TkTau_MatchTk_IsUnknown"     , "Match Tk", None, **IsUnknown      )
 hL1TkTau_MatchTk_IsCombinatoric = m_histos.TH1orTH2( folder, "L1TkTau_MatchTk_IsCombinatoric", "Match Tk", None, **IsCombinatoric )
+hL1TkTau_MatchTk_PtMinusCaloEt  = m_histos.TH1orTH2( folder, "hL1TkTau_MatchTk_PtMinusCaloEt", "Match Tk", None, **dPt            )

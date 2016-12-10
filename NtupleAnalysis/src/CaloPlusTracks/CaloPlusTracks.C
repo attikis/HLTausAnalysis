@@ -380,11 +380,14 @@ void CaloPlusTracks::Loop()
 	L1TkTauParticle L1TkTau = L1TkTauCandidates.at(i);
 
 	// Calo
-	if (!L1TkTau.HasMatchingTk() )
-	  {
-	    L1TkTaus_Calo.push_back(L1TkTau);
-	  }
-	else
+	// if (!L1TkTau.HasMatchingTk() )
+	//   {
+	//     L1TkTaus_Calo.push_back(L1TkTau); //fixme: This was not correct. Tk info should not be available
+	//   }
+	// else
+	L1TkTaus_Calo.push_back(L1TkTau);
+	
+	if (L1TkTau.HasMatchingTk() )
 	  {
 	    // +Tk
 	    L1TkTaus_Tk.push_back(L1TkTau);
@@ -454,8 +457,13 @@ void CaloPlusTracks::Loop()
 	hL1TkTau_VtxIso      ->Fill( tau->GetVtxIsolation() );
 	hL1TkTau_VtxIsoAbs   ->Fill( abs(tau->GetVtxIsolation()) );
 
-	// fixme - add resolution plots here
-	
+	// L1TkTaus Resolution
+	GenParticle p = tau->GetMatchingGenParticle();
+	hL1TkTau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().eta() - p.p4vis().Pt() )/p.p4vis().Pt()  );
+	hL1TkTau_ResolutionCaloEta->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
+	hL1TkTau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().eta() - p.p4vis().Phi())/p.p4vis().Phi() );
+
+	  
 	TTTrack matchTk   = tau->GetMatchingTk();
 	double matchTk_dR = auxTools_.DeltaR(matchTk.getEta(), matchTk.getPhi(), tau->GetCaloTau().eta(), tau->GetCaloTau().phi() );
 	TLorentzVector caloTau_p4;
@@ -477,7 +485,8 @@ void CaloPlusTracks::Loop()
 	hL1TkTau_MatchTk_IsGenuine     ->Fill( matchTk.getIsGenuine() );
 	hL1TkTau_MatchTk_IsUnknown     ->Fill( matchTk.getIsUnknown() );
 	hL1TkTau_MatchTk_IsCombinatoric->Fill( matchTk.getIsCombinatoric() );
-	
+	hL1TkTau_MatchTk_PtMinusCaloEt ->Fill( matchTk.getPt() - tau->GetCaloTau().et() );
+  
 	// Matching TTTrack
 	TTTrack match_tk = tau->GetMatchingTk();
 	int sigTks_sumCharge = 0;
@@ -691,7 +700,7 @@ void CaloPlusTracks::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1TkTau_RelIso         , "L1TkTau_RelIso"      ,   1000,  0.0,  +10.0);
   histoTools_.BookHisto_1D(hL1TkTau_VtxIso         , "L1TkTau_VtxIso"      ,   1200,-30.0,  +30.0);
   histoTools_.BookHisto_1D(hL1TkTau_VtxIsoAbs      , "L1TkTau_VtxIsoAbs"   ,    600,  0.0,  +30.0);
-  histoTools_.BookHisto_1D(hL1TkTau_DeltaRGenP     , "L1TkTau_DeltaRGenP"  ,   2000,  0.0,   +2.0);
+  histoTools_.BookHisto_1D(hL1TkTau_DeltaRGenP     , "L1TkTau_DeltaRGenP"  ,   2000,  0.0,   +2.0);    
   //
   histoTools_.BookHisto_1D(hL1TkTau_SigTks_Pt               , "L1TkTau_SigTks_Pt"           ,  300,    +0.0,  +300.0  );
   histoTools_.BookHisto_1D(hL1TkTau_SigTks_Eta              , "L1TkTau_SigTks_Eta"          ,  600,    -3.0,    +3.0  );
@@ -716,24 +725,29 @@ void CaloPlusTracks::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1TkTau_IsoTks_StubPtCons       , "L1TkTau_IsoTks_StubPtCons"   ,  200,    +0.0,  +200.0  );
 
   // VtxIsolated L1TkTaus, Signal TTTracks
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_DeltaR          , "L1TkTau_MatchTk_DeltaR"        , 2000,  +0.0,   +2.0);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_PtRel           , "L1TkTau_MatchTk_PtRel"         , 2000,  +0.0,  +20.0);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_Pt              , "L1TkTau_MatchTk_Pt"            ,  300,  +0.0, +300.0);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_Eta             , "L1TkTau_MatchTk_Eta"           ,  600,  -3.0,   +3.0);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_POCAz           , "L1TkTau_MatchTk_POCAz"         ,  600, -30.0,  +30.0);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_d0              , "L1TkTau_MatchTk_d0"            , 2000, -10.0,  +10.0);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_d0Abs           , "L1TkTau_MatchTk_d0Abs"         , 1000,   0.0,  +10.0);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_NStubs          , "L1TkTau_MatchTk_NStubs"        ,   30,  -0.5,  +14.5);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_NPsStubs        , "L1TkTau_MatchTk_NPsStubs"      ,   30,  -0.5,  +14.5);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_NBarrelStubs    , "L1TkTau_MatchTk_NBarrelStubs"  ,   30,  -0.5,  +14.5);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_NEndcapStubs    , "L1TkTau_MatchTk_NEndcapStubs"  ,   30,  -0.5,  +14.5);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_StubPtCons      , "L1TkTau_MatchTk_StubPtCons"    ,  200,  +0.0, +200.0);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_ChiSquared      , "L1TkTau_MatchTk_ChiSquared"    ,  200,  +0.0, +200.0);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_RedChiSquared   , "L1TkTau_MatchTk_RedChiSquared" , 2000,  +0.0, +200.0);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_IsGenuine       , "L1TkTau_MatchTk_IsGenuine"     ,    2,  -0.5,   +1.5);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_IsUnknown       , "L1TkTau_MatchTk_IsUnknown"     ,    2,  -0.5,   +1.5);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_IsCombinatoric  , "L1TkTau_MatchTk_IsCombinatoric",    2,  -0.5,   +1.5);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_DeltaR          , "L1TkTau_MatchTk_DeltaR"        , 2000,   +0.0,   +2.0);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_PtRel           , "L1TkTau_MatchTk_PtRel"         , 2000,   +0.0,  +20.0);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_Pt              , "L1TkTau_MatchTk_Pt"            ,  150,   +0.0, +300.0);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_Eta             , "L1TkTau_MatchTk_Eta"           ,  600,   -3.0,   +3.0);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_POCAz           , "L1TkTau_MatchTk_POCAz"         ,  600,  -30.0,  +30.0);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_d0              , "L1TkTau_MatchTk_d0"            , 2000,  -10.0,  +10.0);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_d0Abs           , "L1TkTau_MatchTk_d0Abs"         , 1000,    0.0,  +10.0);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_NStubs          , "L1TkTau_MatchTk_NStubs"        ,   30,   -0.5,  +14.5);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_NPsStubs        , "L1TkTau_MatchTk_NPsStubs"      ,   30,   -0.5,  +14.5);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_NBarrelStubs    , "L1TkTau_MatchTk_NBarrelStubs"  ,   30,   -0.5,  +14.5);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_NEndcapStubs    , "L1TkTau_MatchTk_NEndcapStubs"  ,   30,   -0.5,  +14.5);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_StubPtCons      , "L1TkTau_MatchTk_StubPtCons"    ,  200,   +0.0, +200.0);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_ChiSquared      , "L1TkTau_MatchTk_ChiSquared"    ,  200,   +0.0, +200.0);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_RedChiSquared   , "L1TkTau_MatchTk_RedChiSquared" , 2000,   +0.0, +200.0);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_IsGenuine       , "L1TkTau_MatchTk_IsGenuine"     ,    2,   -0.5,   +1.5);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_IsUnknown       , "L1TkTau_MatchTk_IsUnknown"     ,    2,   -0.5,   +1.5);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_IsCombinatoric  , "L1TkTau_MatchTk_IsCombinatoric",    2,   -0.5,   +1.5);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_PtMinusCaloEt   , "L1TkTau_MatchTk_PtMinusCaloEt" ,  100, -100.0, +100.0);
 
+  // L1TkTaus Resolution
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEt , "hL1TkTau_ResolutionCaloEt"  , 100, -2.5, +2.5);
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEta, "hL1TkTau_ResolutionCaloEta" , 100, -2.5, +2.5);
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloPhi, "hL1TkTau_ResolutionCaloPhi" , 100, -2.5, +2.5);
 
   // SingleTau
   histoTools_.BookHisto_1D(hCalo_Rate  , "Calo_Rate"   , 200, 0.0,  +200.0);

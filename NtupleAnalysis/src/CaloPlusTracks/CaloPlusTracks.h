@@ -58,12 +58,18 @@ class CaloPlusTracks : public TreeAnalyserMC{
   void PrintSettings(void);
 
   void PrintGenParticleCollection(vector<GenParticle> collection);
+
   void PrintTrackingParticleCollection(vector<TrackingParticle> collection);
+
   void PrintTTTrackCollection(vector<TTTrack> collection);
+
   void PrintTTPixelTrackCollection(vector<TTPixelTrack> collection);
+
   void PrintL1JetParticleCollection(vector<L1JetParticle> collection);
+
   void PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection);
-  void ApplyDiTauZMatching(string tkCollectionType, 
+
+  void ApplyDiTauZMatching(string tkCollectionType,
 			   vector<L1TkTauParticle> &L1TkTaus);
 
   vector<GenParticle> GetHadronicGenTaus(vector<GenParticle> GenTaus,
@@ -207,7 +213,9 @@ class CaloPlusTracks : public TreeAnalyserMC{
   vector<L1JetParticle> GetL1CaloTaus(bool bPrintList=false);
 
   GenParticle GetGenParticle(unsigned int Index);
+
   void SetGenParticleMomsAndDaus(GenParticle &p);
+
   void SetGenParticleFinalDaughters(GenParticle &p);
 
   vector<GenParticle> GetGenParticles(bool bPrintList=false);
@@ -220,7 +228,6 @@ class CaloPlusTracks : public TreeAnalyserMC{
   void GetHadronicTauFinalDaughters(GenParticle hTau,
 				    vector<unsigned short> &Daug);
 
- 
   
   // Variable declaration
   L1TkPrimaryVertex *pvProducer;
@@ -256,7 +263,7 @@ class CaloPlusTracks : public TreeAnalyserMC{
   TH1D* hL1TkTau_VtxIso;
   TH1D* hL1TkTau_VtxIsoAbs;
   TH1D* hL1TkTau_DeltaRGenP;
-
+  
   TH1D* hL1TkTau_SigTks_Pt;
   TH1D* hL1TkTau_SigTks_Eta;
   TH1D* hL1TkTau_SigTks_POCAz;
@@ -297,7 +304,13 @@ class CaloPlusTracks : public TreeAnalyserMC{
   TH1D* hL1TkTau_MatchTk_IsGenuine;
   TH1D* hL1TkTau_MatchTk_IsUnknown;
   TH1D* hL1TkTau_MatchTk_IsCombinatoric;
+  TH1D* hL1TkTau_MatchTk_PtMinusCaloEt; // new 
 
+  // L1TkTaus Resolution
+  TH1D* hL1TkTau_ResolutionCaloEt;  // new
+  TH1D* hL1TkTau_ResolutionCaloEta; // new 
+  TH1D* hL1TkTau_ResolutionCaloPhi; // new
+  
   // SingleTau: Rates
   TH1D* hCalo_Rate;
   TH1D* hTk_Rate;

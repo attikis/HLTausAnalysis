@@ -35,7 +35,7 @@ void AuxTools::ProgressBar(Long64_t entry,
   Int_t completed     = ratio*barWidth;
 
   // Show the percentage completed
-  cout << "Progress: " << setprecision(3) << percentage << " % ";
+  cout << "Progress: " << setprecision(3) << percentage << " % " << " (" << entry << "/" << total << ")";
   
   // Show the progress bar
   // for (Int_t i=0; i < completed; i++) cout << "=";
