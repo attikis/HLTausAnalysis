@@ -673,7 +673,7 @@ class Plotter(object):
         '''
         '''
         self.Verbose()
-        
+
         ### Sanity check. At least one dataset is present 
         if len(self.DatasetToRootFileMap.keys()) < 1:
             self.Print(["ERROR!", "No datasets found! Exit"])

@@ -167,14 +167,14 @@ def main(opts):
         DoPlots( hL1TkTau_MatchTk_RedChiSquared , datasetPaths, datasetList)
         DoPlots( hL1TkTau_MatchTk_NStubs        , datasetPaths, datasetList)
         DoPlots( hL1TkTau_MatchTk_NPsStubs      , datasetPaths, datasetList)
-        DoPlots( hL1TkTau_MatchTk_NBarrelStubs  , datasetPaths, datasetList)
-        DoPlots( hL1TkTau_MatchTk_NEndcapStubs  , datasetPaths, datasetList)
+        # DoPlots( hL1TkTau_MatchTk_NBarrelStubs  , datasetPaths, datasetList)
+        # DoPlots( hL1TkTau_MatchTk_NEndcapStubs  , datasetPaths, datasetList)
         DoPlots( hL1TkTau_MatchTk_Eta           , datasetPaths, datasetList)
         DoPlots( hL1TkTau_MatchTk_POCAz         , datasetPaths, datasetList)
         DoPlots( hL1TkTau_MatchTk_d0            , datasetPaths, datasetList)
-        DoPlots( hL1TkTau_MatchTk_IsGenuine     , datasetPaths, datasetList)
-        DoPlots( hL1TkTau_MatchTk_IsUnknown     , datasetPaths, datasetList)
-        DoPlots( hL1TkTau_MatchTk_IsCombinatoric, datasetPaths, datasetList)
+        # DoPlots( hL1TkTau_MatchTk_IsGenuine     , datasetPaths, datasetList)
+        # DoPlots( hL1TkTau_MatchTk_IsUnknown     , datasetPaths, datasetList)
+        # DoPlots( hL1TkTau_MatchTk_IsCombinatoric, datasetPaths, datasetList)
         DoPlots( hL1TkTau_MatchTk_PtMinusCaloEt , datasetPaths, datasetList)
         
     if bDoSigTks:
@@ -185,8 +185,8 @@ def main(opts):
         DoPlots( hL1TkTau_SigTks_Eta       , datasetPaths, datasetList)
         DoPlots( hL1TkTau_SigTks_d0        , datasetPaths, datasetList)
         DoPlots( hL1TkTau_SigTks_d0Abs     , datasetPaths, datasetList)
-        DoPlots( hL1TkTau_SigTks_d0Sig     , datasetPaths, datasetList)
-        DoPlots( hL1TkTau_SigTks_d0SigAbs  , datasetPaths, datasetList)
+        # DoPlots( hL1TkTau_SigTks_d0Sig     , datasetPaths, datasetList) # TTPixelTracks
+        # DoPlots( hL1TkTau_SigTks_d0SigAbs  , datasetPaths, datasetList) # TTPixelTracks
         DoPlots( hL1TkTau_SigTks_PtRel     , datasetPaths, datasetList)
         DoPlots( hL1TkTau_SigTks_POCAz     , datasetPaths, datasetList)
         DoPlots( hL1TkTau_SigTks_DeltaPOCAz, datasetPaths, datasetList)
@@ -201,8 +201,8 @@ def main(opts):
         DoPlots( hL1TkTau_IsoTks_Eta       , datasetPaths, datasetList)
         DoPlots( hL1TkTau_IsoTks_d0        , datasetPaths, datasetList)
         DoPlots( hL1TkTau_IsoTks_d0Abs     , datasetPaths, datasetList)
-        DoPlots( hL1TkTau_IsoTks_d0Sig     , datasetPaths, datasetList)
-        DoPlots( hL1TkTau_IsoTks_d0SigAbs  , datasetPaths, datasetList)
+        # DoPlots( hL1TkTau_IsoTks_d0Sig     , datasetPaths, datasetList) # TTPixelTracks
+        # DoPlots( hL1TkTau_IsoTks_d0SigAbs  , datasetPaths, datasetList) # TTPixelTracks
         DoPlots( hL1TkTau_IsoTks_PtRel     , datasetPaths, datasetList)
         DoPlots( hL1TkTau_IsoTks_POCAz     , datasetPaths, datasetList)
         DoPlots( hL1TkTau_IsoTks_DeltaPOCAz, datasetPaths, datasetList)

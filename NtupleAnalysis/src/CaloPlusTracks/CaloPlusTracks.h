@@ -304,12 +304,12 @@ class CaloPlusTracks : public TreeAnalyserMC{
   TH1D* hL1TkTau_MatchTk_IsGenuine;
   TH1D* hL1TkTau_MatchTk_IsUnknown;
   TH1D* hL1TkTau_MatchTk_IsCombinatoric;
-  TH1D* hL1TkTau_MatchTk_PtMinusCaloEt; // new 
+  TH1D* hL1TkTau_MatchTk_PtMinusCaloEt;
 
   // L1TkTaus Resolution
-  TH1D* hL1TkTau_ResolutionCaloEt;  // new
-  TH1D* hL1TkTau_ResolutionCaloEta; // new 
-  TH1D* hL1TkTau_ResolutionCaloPhi; // new
+  TH1D* hL1TkTau_ResolutionCaloEt;
+  TH1D* hL1TkTau_ResolutionCaloEta;
+  TH1D* hL1TkTau_ResolutionCaloPhi;
   
   // SingleTau: Rates
   TH1D* hCalo_Rate;

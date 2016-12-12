@@ -301,7 +301,6 @@ void CaloPlusTracks::Loop()
       }
 
     // Track Collections
-    // auxTools_.StopwatchStop(4, "seconds", "Part-A");
     vector<TrackingParticle> TPs       = GetTrackingParticles(false);
     vector<TTTrack> matchTTTracks      = GetTTTracks(matchTk_minPt_, selTks_maxEta, selTks_maxChiSq, selTks_minStubs, selTks_minStubsPS, selTks_nFitParams, false);
     vector<TTTrack> selTTTracks        = GetTTTracks(selTks_minPt  , selTks_maxEta, selTks_maxChiSq, selTks_minStubs, selTks_minStubsPS, selTks_nFitParams, false);
@@ -320,7 +319,6 @@ void CaloPlusTracks::Loop()
     
 
     // Tau Collections
-    // auxTools_.StopwatchStop(4, "seconds", "Part-B");
     vector<L1JetParticle> L1CaloTaus = GetL1CaloTaus(false);
     vector<L1TkTauParticle> L1TkTauCandidates;
     vector<L1TkTauParticle> L1TkTaus_Calo;
@@ -328,7 +326,7 @@ void CaloPlusTracks::Loop()
     vector<L1TkTauParticle> L1TkTaus_VtxIso;    
 
     // Ensure that all taus are found
-    bool bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
+    bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
     if (bFoundAllTaus_) nEvtsWithMaxHTaus++;
     
     ////////////////////////////////////////////////
@@ -359,6 +357,7 @@ void CaloPlusTracks::Loop()
 	    GetIsoConeTracks(L1TkTauCandidate, selTTTracks);
 	    GetIsolationValues(L1TkTauCandidate);
 	    GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic);
+	    // Print properties?
 	    if (0) L1TkTauCandidate.PrintProperties(false, false, true, true);
 	  }
 	else
@@ -374,34 +373,21 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     /// Create L1TkTaus Collections
     ////////////////////////////////////////////////
-    for (size_t i = 0; i < L1TkTauCandidates.size(); i++)
+    for(vector<L1TkTauParticle>::iterator L1TkTau = L1TkTauCandidates.begin(); L1TkTau != L1TkTauCandidates.end(); L1TkTau++)
       {
-	
-	L1TkTauParticle L1TkTau = L1TkTauCandidates.at(i);
-
 	// Calo
-	// if (!L1TkTau.HasMatchingTk() )
-	//   {
-	//     L1TkTaus_Calo.push_back(L1TkTau); //fixme: This was not correct. Tk info should not be available
-	//   }
-	// else
-	L1TkTaus_Calo.push_back(L1TkTau);
-	
-	if (L1TkTau.HasMatchingTk() )
+	L1TkTaus_Calo.push_back(*L1TkTau);
+
+	// +Tk and +VtxIso
+	if (L1TkTau->HasMatchingTk() )
 	  {
-	    // +Tk
-	    L1TkTaus_Tk.push_back(L1TkTau);
-	    
-	    // +VtxIso
-	    if ( L1TkTau.GetVtxIsolation() > isoCone_VtxIsoWP)
-	      {
-		L1TkTaus_VtxIso.push_back(L1TkTau);
-	      }
+	    L1TkTaus_Tk.push_back(*L1TkTau);
+	    if (L1TkTau->GetVtxIsolation() > isoCone_VtxIsoWP) L1TkTaus_VtxIso.push_back(*L1TkTau);
 	  }
-	
       }// L1TkTauCandidates
 
-    // Print Collections
+    
+    // Print Collections?
     if (DEBUG)
       {
 	PrintL1JetParticleCollection(L1CaloTaus);
@@ -410,6 +396,7 @@ void CaloPlusTracks::Loop()
 	PrintL1TkTauParticleCollection(L1TkTaus_Tk);
 	PrintL1TkTauParticleCollection(L1TkTaus_VtxIso);
       }
+
     
     ////////////////////////////////////////////////
     // Event-Type Histograms
@@ -424,10 +411,11 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     /// L1Tktau Properties 
     ////////////////////////////////////////////////
-    hL1TkTau_Multiplicity ->Fill( L1TkTaus_VtxIso.size() );
+    vector<L1TkTauParticle> myL1TkTaus = L1TkTaus_Tk; // L1TkTaus_Calo, L1TkTaus_Tk, L1TkTaus_VtxIso
+    hL1TkTau_Multiplicity ->Fill( myL1TkTaus.size() );
     
     // For-loop: L1TkTaus_VtxIso
-    for (vector<L1TkTauParticle>::iterator tau = L1TkTaus_VtxIso.begin(); tau != L1TkTaus_VtxIso.end(); tau++)
+    for (vector<L1TkTauParticle>::iterator tau = myL1TkTaus.begin(); tau != myL1TkTaus.end(); tau++)
       {
 	
 	// tau->PrintProperties(true, true, true, true);
@@ -436,34 +424,19 @@ void CaloPlusTracks::Loop()
 	TLorentzVector sigTks_p4 = tau->GetSigConeTTTracksP4();
 	TLorentzVector isoTks_p4 = tau->GetIsoConeTTTracksP4();
 
-	// Do not Skip if using MinBias sample as no real taus exist!
+	// Do not skip if using MinBias sample as no real taus exist!
 	if (!tau->HasMatchingGenParticle() && ( mcSample.compare("MinBias") !=0 ) ) continue;
 	
-	// Fill Histos
-	hL1TkTau_Rtau        ->Fill( tau->GetSigConeLdgTk().getPt() / tau->GetCaloTau().et() );
-	hL1TkTau_CHF         ->Fill( tau->GetCaloTau().et()/sigTks_p4.Et() );
-	hL1TkTau_NHF         ->Fill( (tau->GetCaloTau().et() - sigTks_p4.Et())/tau->GetCaloTau().et() );
-	hL1TkTau_NHFAbs      ->Fill( abs( (tau->GetCaloTau().et() - sigTks_p4.Et())/tau->GetCaloTau().et() ) );
-	hL1TkTau_NSigTks     ->Fill( tau->GetSigConeTTTracks().size() );
-	hL1TkTau_NIsoTks     ->Fill( tau->GetIsoConeTTTracks().size() );
-	hL1TkTau_InvMass     ->Fill( sigTks_p4.M() ); 
-	hL1TkTau_InvMassIncl ->Fill( sigTks_p4.M() + isoTks_p4.M() );
-	hL1TkTau_SigConeRMin ->Fill( tau->GetSigConeMin() );
-	hL1TkTau_IsoConeRMin ->Fill( tau->GetIsoConeMin() );
-	hL1TkTau_SigConeRMax ->Fill( tau->GetSigConeMax() );
-	hL1TkTau_IsoConeRMax ->Fill( tau->GetIsoConeMax() );
-	hL1TkTau_DeltaRGenP  ->Fill( tau->GetMatchingGenParticleDeltaR() );
-	hL1TkTau_RelIso      ->Fill( tau->GetRelIsolation() );
-	hL1TkTau_VtxIso      ->Fill( tau->GetVtxIsolation() );
-	hL1TkTau_VtxIsoAbs   ->Fill( abs(tau->GetVtxIsolation()) );
-
-	// L1TkTaus Resolution
+	// L1TkTau Resolution
 	GenParticle p = tau->GetMatchingGenParticle();
 	hL1TkTau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().eta() - p.p4vis().Pt() )/p.p4vis().Pt()  );
 	hL1TkTau_ResolutionCaloEta->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
 	hL1TkTau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().eta() - p.p4vis().Phi())/p.p4vis().Phi() );
 
-	  
+	// Apply isolation?
+	// if (L1TkTau->GetVtxIsolation() > isoCone_VtxIsoWP) continue;
+
+	// Matching Track Variables
 	TTTrack matchTk   = tau->GetMatchingTk();
 	double matchTk_dR = auxTools_.DeltaR(matchTk.getEta(), matchTk.getPhi(), tau->GetCaloTau().eta(), tau->GetCaloTau().phi() );
 	TLorentzVector caloTau_p4;
@@ -486,29 +459,46 @@ void CaloPlusTracks::Loop()
 	hL1TkTau_MatchTk_IsUnknown     ->Fill( matchTk.getIsUnknown() );
 	hL1TkTau_MatchTk_IsCombinatoric->Fill( matchTk.getIsCombinatoric() );
 	hL1TkTau_MatchTk_PtMinusCaloEt ->Fill( matchTk.getPt() - tau->GetCaloTau().et() );
-  
-	// Matching TTTrack
-	TTTrack match_tk = tau->GetMatchingTk();
-	int sigTks_sumCharge = 0;
+
+	// Signal/Isolation Cone Variables
+	hL1TkTau_Rtau        ->Fill( tau->GetSigConeLdgTk().getPt() / tau->GetCaloTau().et() );
+	hL1TkTau_CHF         ->Fill( tau->GetCaloTau().et()/sigTks_p4.Et() );
+	hL1TkTau_NHF         ->Fill( (tau->GetCaloTau().et() - sigTks_p4.Et())/tau->GetCaloTau().et() );
+	hL1TkTau_NHFAbs      ->Fill( abs( (tau->GetCaloTau().et() - sigTks_p4.Et())/tau->GetCaloTau().et() ) );
+	hL1TkTau_NSigTks     ->Fill( tau->GetSigConeTTTracks().size() );
+	hL1TkTau_NIsoTks     ->Fill( tau->GetIsoConeTTTracks().size() );
+	hL1TkTau_InvMass     ->Fill( sigTks_p4.M() ); 
+	hL1TkTau_InvMassIncl ->Fill( sigTks_p4.M() + isoTks_p4.M() );
+	hL1TkTau_SigConeRMin ->Fill( tau->GetSigConeMin() );
+	hL1TkTau_IsoConeRMin ->Fill( tau->GetIsoConeMin() );
+	hL1TkTau_SigConeRMax ->Fill( tau->GetSigConeMax() );
+	hL1TkTau_IsoConeRMax ->Fill( tau->GetIsoConeMax() );
+	hL1TkTau_DeltaRGenP  ->Fill( tau->GetMatchingGenParticleDeltaR() );
+	hL1TkTau_RelIso      ->Fill( tau->GetRelIsolation() );
+	hL1TkTau_VtxIso      ->Fill( tau->GetVtxIsolation() );
+	hL1TkTau_VtxIsoAbs   ->Fill( abs(tau->GetVtxIsolation()) );
 	  
-	// For-loop: SigCone TTTracks
+
+	int sigTks_sumCharge   = 0;
 	vector<TTTrack> sigTks = tau->GetSigConeTTTracks();
+	// For-loop: SigCone TTTracks
 	for (vector<TTTrack>::iterator sigTk = sigTks.begin(); sigTk != sigTks.end(); sigTk++)
 	  {
+	    // Print properties?
 	    if (0) sigTk->PrintProperties();
 
-	    // Skip if tk is matching track
-	    if ( sigTk->index() == match_tk.index() ) continue;
+	    // Skip if tk is matching track?
+	    // if ( sigTk->index() == matchTk.index() ) continue; //fixme. Why skip the matching track? keep it!
 	    
 	    // Get the transverse component of this track with respect to the matching track
 	    TVector3 sigTk_p3  = sigTk->getMomentum();
-	    double sigTk_PtRel = sigTk_p3.Perp( match_tk.getMomentum() );
+	    double sigTk_PtRel = sigTk_p3.Perp( matchTk.getMomentum() );
 	 
 	    // Fill Histograms
 	    hL1TkTau_SigTks_Pt        ->Fill( sigTk->getPt()  );
 	    hL1TkTau_SigTks_Eta       ->Fill( sigTk->getEta() );
 	    hL1TkTau_SigTks_POCAz     ->Fill( sigTk->getZ0()  );
-	    hL1TkTau_SigTks_DeltaPOCAz->Fill( abs( sigTk->getZ0() - match_tk.getZ0() ) );
+	    hL1TkTau_SigTks_DeltaPOCAz->Fill( abs( sigTk->getZ0() - matchTk.getZ0() ) );
 	    hL1TkTau_SigTks_d0        ->Fill( sigTk->getD0() );
 	    hL1TkTau_SigTks_d0Abs     ->Fill( abs( sigTk->getD0()) );
 	    // hL1TkTau_SigTks_d0Sig     ->Fill( sigTk->getD0()/sigTk->getSigmaD0() );        // TTPixelTracks
@@ -526,26 +516,27 @@ void CaloPlusTracks::Loop()
 	// Fill histos for other variables
 	hL1TkTau_Charge->Fill( sigTks_sumCharge);
 
-	
+
+	vector<TTTrack> isoTks = tau->GetIsoConeTTTracks();	
 	// For-loop: IsoCone TTTracks
-	vector<TTTrack> isoTks = tau->GetIsoConeTTTracks();
 	for (vector<TTTrack>::iterator isoTk = isoTks.begin(); isoTk != isoTks.end(); isoTk++)
 	  {
 
+	    // Print properties?
 	    if (0) isoTk->PrintProperties();
 	    
 	    // Skip if tk is matching track
-	    if ( isoTk->index() == match_tk.index() ) continue;
+	    // if ( isoTk->index() == match_tk.index() ) continue; //fixme is this needed? not really!
 	
 	    // Get the transverse component of this track with respect to the matching track
 	    TVector3 isoTk_p3  = isoTk->getMomentum();
-	    double isoTk_PtRel = isoTk_p3.Perp( match_tk.getMomentum() );
+	    double isoTk_PtRel = isoTk_p3.Perp( matchTk.getMomentum() );
 	
 	    // Fill Histograms
 	    hL1TkTau_IsoTks_Pt        ->Fill( isoTk->getPt()  );
 	    hL1TkTau_IsoTks_Eta       ->Fill( isoTk->getEta() );
 	    hL1TkTau_IsoTks_POCAz     ->Fill( isoTk->getZ0()  );
-	    hL1TkTau_IsoTks_DeltaPOCAz->Fill( abs( isoTk->getZ0() - match_tk.getZ0() ) );
+	    hL1TkTau_IsoTks_DeltaPOCAz->Fill( abs( isoTk->getZ0() - matchTk.getZ0() ) );
 	    hL1TkTau_IsoTks_d0        ->Fill( isoTk->getD0() );							     
 	    hL1TkTau_IsoTks_d0Abs     ->Fill( abs( isoTk->getD0()) );
 	    // hL1TkTau_IsoTks_d0Sig     ->Fill( isoTk->getD0()/isoTk->getSigmaD0() );             // TTPixelTracks
@@ -554,10 +545,12 @@ void CaloPlusTracks::Loop()
 	    hL1TkTau_IsoTks_d0SigAbs  ->Fill( -1.0 );
 	    hL1TkTau_IsoTks_PtRel     ->Fill( isoTk_PtRel );
 	    hL1TkTau_IsoTks_StubPtCons->Fill( isoTk->getStubPtConsistency() );
+
 	  }// IsoCone_TTTracks
 
       } // L1TkTaus_VtxIso
 
+    
     ////////////////////////////////////////////////
     // Fill Turn-On histograms
     ////////////////////////////////////////////////
@@ -616,7 +609,7 @@ void CaloPlusTracks::Loop()
   histoTools_.ConvertToRateHisto_1D(hCalo_Rate  , nEntries);
   histoTools_.ConvertToRateHisto_1D(hTk_Rate    , nEntries);
   histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate, nEntries);
-  FinaliseEffHisto_( hCalo_Eff  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hCalo_Eff  , nEvtsWithMaxHTaus); // alex
   FinaliseEffHisto_( hTk_Eff    , nEvtsWithMaxHTaus);
   FinaliseEffHisto_( hVtxIso_Eff, nEvtsWithMaxHTaus);
 
@@ -745,9 +738,9 @@ void CaloPlusTracks::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1TkTau_MatchTk_PtMinusCaloEt   , "L1TkTau_MatchTk_PtMinusCaloEt" ,  100, -100.0, +100.0);
 
   // L1TkTaus Resolution
-  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEt , "hL1TkTau_ResolutionCaloEt"  , 100, -2.5, +2.5);
-  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEta, "hL1TkTau_ResolutionCaloEta" , 100, -2.5, +2.5);
-  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloPhi, "hL1TkTau_ResolutionCaloPhi" , 100, -2.5, +2.5);
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEt , "hL1TkTau_ResolutionCaloEt"  , 200, -10.0, +10.0);
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEta, "hL1TkTau_ResolutionCaloEta" , 200, -10.0, +10.0);
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloPhi, "hL1TkTau_ResolutionCaloPhi" , 200, -10.0, +10.0);
 
   // SingleTau
   histoTools_.BookHisto_1D(hCalo_Rate  , "Calo_Rate"   , 200, 0.0,  +200.0);
@@ -756,7 +749,7 @@ void CaloPlusTracks::BookHistos_(void)
   histoTools_.BookHisto_1D(hCalo_Eff   , "Calo_Eff"    , 200, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hTk_Eff     , "Tk_Eff"      , 200, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hVtxIso_Eff , "VtxIso_Eff"  , 200, 0.0,  +200.0);
-
+  
   // DiTau
   histoTools_.BookHisto_1D(hDiTau_Rate_Calo  , "DiTau_Rate_Calo"  , 200, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hDiTau_Rate_Tk    , "DiTau_Rate_Tk"    , 200, 0.0,  +200.0);
@@ -810,7 +803,7 @@ void CaloPlusTracks::FinaliseEffHisto_(TH1D *histo,
   for (int i = 0; i<= nBins; i++){
     
     const int nPass = histo->GetBinContent(i);
-    auxTools_.Efficiency(nPass, nEvtsTotal, "binomial", eff, err );
+    auxTools_.Efficiency(nPass, nEvtsTotal, "binomial", eff, err ); //fixme: use TEfficiency?
 
     // Update current histo bin to true eff value and error
     histo->SetBinContent(i, eff);
@@ -823,7 +816,7 @@ void CaloPlusTracks::FinaliseEffHisto_(TH1D *histo,
 
 //****************************************************************************
 void CaloPlusTracks::FinaliseEffHisto_(TH2D *histo, 
-				   const int nEvtsTotal)
+				       const int nEvtsTotal)
 //****************************************************************************
 {
 
@@ -915,7 +908,7 @@ void CaloPlusTracks::FillSingleTau_(vector<L1TkTauParticle> L1TkTaus,
   
   // Check that all taus were found
   if(!bFoundAllTaus_) return;
-  
+
   // Fill efficiency
   double ldgEt_mcMatched = L1TkTaus_mcMatched.at(0).GetCaloTau().et();
   FillEfficiency_(hEfficiency, ldgEt_mcMatched);
@@ -1871,11 +1864,11 @@ vector<L1TkTauParticle> CaloPlusTracks::GetMcMatchedL1TkTaus(vector<L1TkTauParti
 //****************************************************************************
 {
 
-  // Get MC-matched trigger objects above given Et Threshold
+  // Get all MC-matched trigger objects
   vector<L1TkTauParticle> matchedL1TkTaus;
   for (vector<L1TkTauParticle>::iterator tau = L1TkTaus.begin(); tau != L1TkTaus.end(); tau++)
     {
-      if (tau->HasMatchingGenParticle()) continue;
+      if (!tau->HasMatchingGenParticle()) continue;
       matchedL1TkTaus.push_back(*tau);
     }
   

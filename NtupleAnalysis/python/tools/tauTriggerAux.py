@@ -77,7 +77,7 @@ Eff2D = {
 ROC = {
     #"xLabel": "Signal Efficiency"      , "xUnits": ""   , "xMin": 0.00, "xMax": +0.6 , "binWidthX": None, "xCutLines": []     , "xCutBoxes": [], "gridX": True, "logX": False,
     #"xLabel": "Efficiency"      , "xUnits": ""   , "xMin": 0.00, "xMax": +0.8 , "binWidthX": None, "xCutLines": [0.52]     , "xCutBoxes": [[0.0, 0.52, ROOT.kBlack]], "gridX": True, "logX": False,
-    "xLabel": "Efficiency"      , "xUnits": ""   , "xMin": 0.00, "xMax": +0.60 , "binWidthX": None, "xCutLines": [0.415] , "xCutBoxes": [], "gridX": True, "logX": False,
+    "xLabel": "Efficiency"      , "xUnits": ""   , "xMin": 0.00, "xMax": +1.0 , "binWidthX": None, "xCutLines": [0.415] , "xCutBoxes": [], "gridX": True, "logX": False,
     #"xLabel": "Efficiency"      , "xUnits": ""   , "xMin": 0.00, "xMax": +0.60 , "binWidthX": None, "xCutLines": [0.51] , "xCutBoxes": [], "gridX": True, "logX": False,
     #"xLabel": "Efficiency"      , "xUnits": ""   , "xMin": 0.00, "xMax": +0.60 , "binWidthX": None, "xCutLines": [] , "xCutBoxes": [], "gridX": True, "logX": False,
     "yLabel": "Rate" , "yUnits": "kHz", "yMin": 1E+0, "yMax": +0.5E+03, "binWidthY": None, "yCutLines": [], "yCutBoxes": [[50.0, 50.0, ROOT.kBlue]], "gridY": True, "logY": True,

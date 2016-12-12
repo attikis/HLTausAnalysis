@@ -36,8 +36,8 @@ import ROOT
 # Options here
 #================================================================================================
 analysis         = "CaloPlusTracks"
-bTurnOns         = True
-bSingleTau       = False
+bTurnOns         = False
+bSingleTau       = True
 bDiTau           = False
 bDiTau_Indist    = False
 bDiTau_Dist_Calo = False
@@ -52,9 +52,15 @@ savePath         = "plots/"
 def CreateDatasetDict(inputPath, analysis, outputExt):
     '''
     '''
+    # inputPath = os.getcwd() + inputPath
+    if not inputPath.endswith("/"):
+        inputPath = inputPath + "/"
+        
     datasetPaths= {}
     for dataset in GetDatasetsList():
-        datasetPaths[dataset] = inputPath + analysis + "_Histograms_" + dataset + outputExt + ".root"
+        rFile = inputPath + analysis + "_Histograms_" + dataset + outputExt + ".root" 
+        datasetPaths[dataset] = rFile
+        #print "[%s] = %s" % (dataset, rFile)
     return datasetPaths
 
 
@@ -102,7 +108,7 @@ def DoPlots(hList, datasetPaths, datasetList, saveExt="", bLegHeader=None):
     return
 
 
-def DoROC(rateToEffMap, signalDataset, rocSaveName, bSaveAuxHistos=False):
+def DoROC(rateToEffMap, datasetPaths, signalDataset, rocSaveName, bSaveAuxHistos=False):
     
     p0 = m_plotter.Plotter( Verbose=False, BatchMode=True )
     RateHistoList, EffHistoList = p0.GetROCHistoLists(rateToEffMap)
@@ -155,9 +161,9 @@ def main(opts):
     if bSingleTau:
         if opts.verbose:
             print "=== Doing SingleTau"
-        DoPlots( SingleTau_Rate  , ["MinBias"], "")
+        DoPlots( SingleTau_Rate  , datasetPaths, ["MinBias"], "")
         DoPlots( SingleTau_Eff   , datasetPaths, datasetList, "")
-        DoROC  ( SingleTau_ROCs  , datasetList[0], "SingleTau_ROCs" + "")
+        DoROC  ( SingleTau_ROCs  , datasetPaths, datasetList[0], "SingleTau_ROCs" + "")
 
 
     if bDiTau:
