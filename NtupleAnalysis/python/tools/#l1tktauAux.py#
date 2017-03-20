@@ -329,7 +329,8 @@ InvMass = {
 DeltaR = {
     "xLabel": "#Delta R"       , "xUnits": "", "xMin": +0.0 , "xMax": 0.35, "binWidthX": 0.01, "xCutLines": [], "xCutBoxes": [], "gridX": True, "logX": False, "logXRatio": False, 
     "yLabel": "Entries / %0.3f", "yUnits": "", "yMin": +1e-4, "yMax": 1.00, "binWidthY": None , "yCutLines": [], "yCutBoxes": [], "gridY": True, "logY": True, "logYRatio": False, 
-    "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": drawOpts, "legOptions": legOpts,
+    "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": drawOpts,
+    "legOptions": legOpts,
     "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82}
 
 RelIso = {      

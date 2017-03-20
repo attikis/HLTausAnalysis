@@ -1,9 +1,9 @@
-#ifndef CaloPlusTracks_cxx
-#define CaloPlusTracks_cxx
+#ifndef CaloTk_cxx
+#define CaloTk_cxx
 
 // User
 #include "../Auxiliary/interface/constants.h"
-#include "CaloPlusTracks.h"
+#include "CaloTk.h"
 
 // ROOT
 #include "TFitResult.h"
@@ -13,9 +13,9 @@
 // C++
 #include <stdexcept>
 
-//****************************************************************************
-void CaloPlusTracks::InitObjects(void)
-//****************************************************************************
+//============================================================================
+void CaloTk::InitObjects(void)
+//============================================================================
 {
 
   pvProducer = new L1TkPrimaryVertex(this->s);
@@ -24,9 +24,9 @@ void CaloPlusTracks::InitObjects(void)
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::InitVars_()
-//****************************************************************************
+//============================================================================
+void CaloTk::InitVars_()
+//============================================================================
 {
 
   DEBUG = false;
@@ -36,28 +36,47 @@ void CaloPlusTracks::InitVars_()
   realTauMom = datasets_.McTauMomPdgId_;
   nMaxNumOfHTausPossible = datasets_.nMcTaus_;
 
-  // Tracks
-  selTks_Collection = "TTTracks"; // TP: "TTTracks" (not "TTPixelTracks")
-  selTks_nFitParams =   5;        // TP:   5
-  selTks_minPt      =   2.0;      // TP:   2.0
-  selTks_maxEta     = 999.9;      // TP: 999.9
-  selTks_maxChiSq   = 200.0;      // TP: 200.0
-  selTks_minStubs   =   0;        // TP:   0
-  selTks_minStubsPS =   0;        // TP:   0
-  selTksPix_minHits =   0;        // TP:   N/A
+  // Matching tracks
+  matchTk_Collection  =  "TTTracks"; // TP: "TTTracks" (not "TTPixelTracks")
+  matchTk_nFitParams  =   5;         // TP:   5
+  matchTk_minPt       =   5.00;      // TP:   5.0
+  matchTk_maxEta      = 999.9;       // TP: 999.9
+  matchTk_maxChiSqRed =   2.0;       // TP: 200.0
+  matchTk_minStubs    =   4;         // TP:   0
+  matchTk_minStubsPS  =   0;         // TP:   0
+  matchTk_maxStubsPS  = 999;         // TP:   N/A
+  matchTk_caloDeltaR  =   0.10;      // TP: 0.10
+
+  // Signal cone tracks
+  sigConeTks_Collection  = matchTk_Collection; // TP: "TTTracks" (not "TTPixelTracks")
+  sigConeTks_nFitParams  = matchTk_nFitParams; // TP:   5
+  sigConeTks_minPt       =   2.0;              // TP:   2.0
+  sigConeTks_maxEta      = 999.9;              // TP: 999.9
+  sigConeTks_maxChiSqRed = 200.0;              // TP: 200.0
+  sigConeTks_minStubs    =   0;                // TP:   0
+  sigConeTks_minStubsPS  =   0;                // TP:   0
+  sigConeTks_maxStubsPS  = 999;                // TP:   N/A
+
+  // Isolation cone tracks
+  isoConeTks_Collection  = matchTk_Collection;    // TP: "TTTracks" (not "TTPixelTracks")
+  isoConeTks_nFitParams  = matchTk_nFitParams;    // TP:   5
+  isoConeTks_minPt       =   2.0;                 // TP:   2.0
+  isoConeTks_maxEta      = 999.9;                 // TP: 999.9
+  isoConeTks_maxChiSqRed = 200.0;                 // TP: 200.0
+  isoConeTks_minStubs    =   0;                   // TP:   0
+  isoConeTks_minStubsPS  =   0;                   // TP:   0
+  isoConeTks_maxStubsPS  = 999;                   // TP:   N/A
   
-  // L1TkTau - Signal cone
-  matchTk_minPt_          = +5.00; // TP: 5.00
-  matchTk_caloDeltaR_     = +0.12; // TP: 0.10
+  // Signal cone parameters
   sigCone_Constant        = +0.00; // TP: 0.00
   sigCone_dRMin           = +0.00; // WARNING! If > 0 the matching Track will NOT be added in sigCone_TTTracks.
-  sigCone_dRMax           = +0.15; // TP: 0.15
-  sigCone_cutoffDeltaR    = +0.15; // TP: 0.15
+  sigCone_dRMax           = +0.12; // TP: 0.15
+  sigCone_cutoffDeltaR    = +0.12; // TP: 0.15
   sigCone_maxTkInvMass    = +1.77; // TP: Unused (3-pr)
   sigCone_maxTkDeltaPOCAz = +0.20; // TP: Unused (3-pr)
 
   // Isolation cone
-  isoCone_Constant = +3.50;         // TP: 3.50 GeV
+  isoCone_Constant = +5.00;         // TP: 3.50 GeV
   isoCone_VtxIsoWP = +0.50;         // TP: 1.0cm
   isoCone_dRMin    = sigCone_dRMax; // TP: 0.4cm
   isoCone_dRMax    = +0.30;         // TP: 0.4cm
@@ -73,9 +92,9 @@ void CaloPlusTracks::InitVars_()
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::PrintSettings(void)
-//****************************************************************************
+//============================================================================
+void CaloTk::PrintSettings(void)
+//============================================================================
 {
 
   // Inform user of settings
@@ -84,178 +103,263 @@ void CaloPlusTracks::PrintSettings(void)
   settings.AddRowColumn(0, "==" );
   settings.AddRowColumn(0, mcSample );
 
+  settings.AddRowColumn(1, "Matching Tracks: Collection");
+  settings.AddRowColumn(1, "==");
+  settings.AddRowColumn(1, matchTk_Collection);
+  settings.AddRowColumn(1, "TTTracks");
   settings.AddRowColumn(1, "");
   
-  settings.AddRowColumn(2, "Tracks: Collection");
+  settings.AddRowColumn(2, "Matching Tracks: Fit Parameters");
   settings.AddRowColumn(2, "==");
-  settings.AddRowColumn(2, selTks_Collection);
-  settings.AddRowColumn(2, "TTTracks");
+  settings.AddRowColumn(2, auxTools_.ToString( matchTk_nFitParams) );
+  settings.AddRowColumn(2, "5");
   settings.AddRowColumn(2, "");
-  
-  settings.AddRowColumn(3, "Tracks: Fit Parameters");
-  settings.AddRowColumn(3, "==");
-  settings.AddRowColumn(3, auxTools_.ToString( selTks_nFitParams) );
-  settings.AddRowColumn(3, "5");
-  settings.AddRowColumn(3, "");
 
-  settings.AddRowColumn(4, "Tracks: Pt");
-  settings.AddRowColumn(4, ">=");
-  settings.AddRowColumn(4, auxTools_.ToString( selTks_minPt) );
-  settings.AddRowColumn(4, "2" );
-  settings.AddRowColumn(4, "GeV/c" );
+  settings.AddRowColumn(3, "Matching Tracks: Pt");
+  settings.AddRowColumn(3, ">=");
+  settings.AddRowColumn(3, auxTools_.ToString( matchTk_minPt) );
+  settings.AddRowColumn(3, "2" );
+  settings.AddRowColumn(3, "GeV/c" );
   
-  settings.AddRowColumn(5, "Tracks: |Eta|");
+  settings.AddRowColumn(4, "Matching Tracks: |Eta|");
+  settings.AddRowColumn(4, "<=");
+  settings.AddRowColumn(4, auxTools_.ToString( matchTk_maxEta) );
+  settings.AddRowColumn(4, "1e+03" );
+  settings.AddRowColumn(4, "" );
+  
+  settings.AddRowColumn(5, "Matching Tracks: ChiSqRed");
   settings.AddRowColumn(5, "<=");
-  settings.AddRowColumn(5, auxTools_.ToString( selTks_maxEta) );
-  settings.AddRowColumn(5, "1e+03" );
-  settings.AddRowColumn(5, "" );
-  
-  settings.AddRowColumn(6, "Tracks: ChiSq");
-  settings.AddRowColumn(6, "<=");
-  settings.AddRowColumn(6, auxTools_.ToString( selTks_maxChiSq) );
-  settings.AddRowColumn(6, "10 (8) (chi2/DOF)");
-  settings.AddRowColumn(6, "");
+  settings.AddRowColumn(5, auxTools_.ToString( matchTk_maxChiSqRed) );
+  settings.AddRowColumn(5, "200/DOF"); // Cut was on ChiSq, not ChiSqRed
+  settings.AddRowColumn(5, "");
 
-  settings.AddRowColumn(7, "Tracks: Stubs");
-  settings.AddRowColumn(7, ">=");
-  settings.AddRowColumn(7, auxTools_.ToString( selTks_minStubs) );
-  settings.AddRowColumn(7, "4" );
-  settings.AddRowColumn(7, "" );
+  settings.AddRowColumn(6, "Matching Tracks: Stubs");
+  settings.AddRowColumn(6, ">=");
+  settings.AddRowColumn(6, auxTools_.ToString( matchTk_minStubs) );
+  settings.AddRowColumn(6, "4" );
+  settings.AddRowColumn(6, "" );
   
-  settings.AddRowColumn(8, "Tracks: PS-Stubs");
-  settings.AddRowColumn(8, ">=");
-  settings.AddRowColumn(8, auxTools_.ToString( selTks_minStubsPS) );
-  settings.AddRowColumn(8, "0" );
+  settings.AddRowColumn(7, "Matching Tracks: PS-Stubs (min)");
+  settings.AddRowColumn(7, ">=");
+  settings.AddRowColumn(7, auxTools_.ToString( matchTk_minStubsPS) );
+  settings.AddRowColumn(7, "0" );
+  settings.AddRowColumn(7, "" );
+
+  settings.AddRowColumn(8, "Matching Tracks: PS-Stubs (max)");
+  settings.AddRowColumn(8, "<=");
+  settings.AddRowColumn(8, auxTools_.ToString( matchTk_maxStubsPS) );
+  settings.AddRowColumn(8, "N/A" );
   settings.AddRowColumn(8, "" );
 
-  settings.AddRowColumn(9, "Tracks: Pixel Hits");
-  settings.AddRowColumn(9, ">=");
-  settings.AddRowColumn(9, auxTools_.ToString( selTksPix_minHits) );
-  settings.AddRowColumn(9, "N/A" );
-  settings.AddRowColumn(9, "" );
-  			
+  settings.AddRowColumn(9, "Matching Tracks: DeltaR");
+  settings.AddRowColumn(9, "<=");
+  settings.AddRowColumn(9, auxTools_.ToString(matchTk_caloDeltaR) );
+  settings.AddRowColumn(9, "0.10" );
+  settings.AddRowColumn(9, "");
+
+  // settings.AddRowColumn(10, "");
+  settings.AddRowColumn(10, "Signal Cone Tks: Collection");
+  settings.AddRowColumn(10, "==");
+  settings.AddRowColumn(10, sigConeTks_Collection);
+  settings.AddRowColumn(10, "TTTracks");
   settings.AddRowColumn(10, "");
-
-  settings.AddRowColumn(11, "Matching Track: Pt");
-  settings.AddRowColumn(11, ">=");
-  settings.AddRowColumn(11, auxTools_.ToString(matchTk_minPt_) );
-  settings.AddRowColumn(11, "15" );
-  settings.AddRowColumn(11, "GeV/c");
-
-  settings.AddRowColumn(12, "Matching Track: DeltaR");
-  settings.AddRowColumn(12, "<=");
-  settings.AddRowColumn(12, auxTools_.ToString(matchTk_caloDeltaR_) );
-  settings.AddRowColumn(12, "0.10" );
-  settings.AddRowColumn(12, "");
-
-  settings.AddRowColumn(13, "");
-
-  settings.AddRowColumn(14, "Signal Cone: Shrink Constant");
-  settings.AddRowColumn(14, "==");
-  settings.AddRowColumn(14, auxTools_.ToString(sigCone_Constant) );
-  settings.AddRowColumn(14, "0" );
-  settings.AddRowColumn(14, "GeV");
-
-  settings.AddRowColumn(15, "Signal Cone: DeltaR");
-  settings.AddRowColumn(15, ">=");
-  settings.AddRowColumn(15, auxTools_.ToString(sigCone_dRMin) );
-  settings.AddRowColumn(15, "0.0" );
-  settings.AddRowColumn(15, "" );
-
-  settings.AddRowColumn(16, "Signal Cone: DeltaR");
-  settings.AddRowColumn(16, "<=");
-  settings.AddRowColumn(16, auxTools_.ToString(sigCone_dRMax) );
-  settings.AddRowColumn(16, "0.15" );
-  settings.AddRowColumn(16, "" );
   
-  settings.AddRowColumn(17, "Signal Cone:-3pr InvMass");
+  settings.AddRowColumn(11, "Signal Cone Tks: Fit Parameters");
+  settings.AddRowColumn(11, "==");
+  settings.AddRowColumn(11, auxTools_.ToString( sigConeTks_nFitParams) );
+  settings.AddRowColumn(11, "5");
+  settings.AddRowColumn(11, "");
+
+  settings.AddRowColumn(12, "Signal Cone Tks: Pt");
+  settings.AddRowColumn(12, ">=");
+  settings.AddRowColumn(12, auxTools_.ToString( sigConeTks_minPt) );
+  settings.AddRowColumn(12, "2" );
+  settings.AddRowColumn(12, "GeV/c" );
+  
+  settings.AddRowColumn(13, "Signal Cone Tks: |Eta|");
+  settings.AddRowColumn(13, "<=");
+  settings.AddRowColumn(13, auxTools_.ToString( sigConeTks_maxEta) );
+  settings.AddRowColumn(13, "1e+03" );
+  settings.AddRowColumn(13, "" );
+  
+  settings.AddRowColumn(14, "Signal Cone Tks: ChiSqRed");
+  settings.AddRowColumn(14, "<=");
+  settings.AddRowColumn(14, auxTools_.ToString( sigConeTks_maxChiSqRed) );
+  settings.AddRowColumn(14, "200 (but on ChiSq, not ChiSqRed)");
+  settings.AddRowColumn(14, "");
+
+  settings.AddRowColumn(15, "Signal Cone Tks: Stubs");
+  settings.AddRowColumn(15, ">=");
+  settings.AddRowColumn(15, auxTools_.ToString( sigConeTks_minStubs) );
+  settings.AddRowColumn(15, "4" );
+  settings.AddRowColumn(15, "" );
+  
+  settings.AddRowColumn(16, "Signal Cone Tks: PS-Stubs (min)");
+  settings.AddRowColumn(16, ">=");
+  settings.AddRowColumn(16, auxTools_.ToString( sigConeTks_minStubsPS) );
+  settings.AddRowColumn(16, "0" );
+  settings.AddRowColumn(16, "" );
+
+  settings.AddRowColumn(17, "Signal Cone Tks: PS-Stubs (max)");
   settings.AddRowColumn(17, "<=");
-  settings.AddRowColumn(17, auxTools_.ToString(sigCone_maxTkInvMass) );
+  settings.AddRowColumn(17, auxTools_.ToString( sigConeTks_maxStubsPS) );
   settings.AddRowColumn(17, "N/A" );
-  settings.AddRowColumn(17, "GeV/c^{-2}");
+  settings.AddRowColumn(17, "" );
 
-  settings.AddRowColumn(18, "Signal Cone:-3pr maxTkDeltaPOCAz");
-  settings.AddRowColumn(18, "<=");
-  settings.AddRowColumn(18, auxTools_.ToString(sigCone_maxTkDeltaPOCAz) );
-  settings.AddRowColumn(18, "N/A" );
-  settings.AddRowColumn(18, "cm");
-
+  settings.AddRowColumn(18, "Isolation Cone Tks: Collection");
+  settings.AddRowColumn(18, "==");
+  settings.AddRowColumn(18, isoConeTks_Collection);
+  settings.AddRowColumn(18, "TTTracks");
+  settings.AddRowColumn(18, "");
+  
+  settings.AddRowColumn(19, "Isolation Cone Tks: Fit Parameters");
+  settings.AddRowColumn(19, "==");
+  settings.AddRowColumn(19, auxTools_.ToString( isoConeTks_nFitParams) );
+  settings.AddRowColumn(19, "5");
   settings.AddRowColumn(19, "");
 
-  settings.AddRowColumn(20, "Isolation Cone: Shrink Constant");
-  settings.AddRowColumn(20, "==");
-  settings.AddRowColumn(20, auxTools_.ToString(isoCone_Constant) );
-  settings.AddRowColumn(20, "3.5");
-  settings.AddRowColumn(20, "GeV");
-
-  settings.AddRowColumn(21, "Isolation Cone: DeltaR");
-  settings.AddRowColumn(21, ">=");
-  settings.AddRowColumn(21, auxTools_.ToString(isoCone_dRMin) );
-  settings.AddRowColumn(21, "0.15" );
+  settings.AddRowColumn(20, "Isolation Cone Tks: Pt");
+  settings.AddRowColumn(20, ">=");
+  settings.AddRowColumn(20, auxTools_.ToString( isoConeTks_minPt) );
+  settings.AddRowColumn(20, "2" );
+  settings.AddRowColumn(20, "GeV/c" );
+  
+  settings.AddRowColumn(21, "Isolation Cone Tks: |Eta|");
+  settings.AddRowColumn(21, "<=");
+  settings.AddRowColumn(21, auxTools_.ToString( isoConeTks_maxEta) );
+  settings.AddRowColumn(21, "1e+03" );
   settings.AddRowColumn(21, "" );
-
-  settings.AddRowColumn(22, "Isolation Cone: DeltaR");
-  settings.AddRowColumn(22, "=<");
-  settings.AddRowColumn(22, auxTools_.ToString(isoCone_dRMax) );
-  settings.AddRowColumn(22, "0.30");
+  
+  settings.AddRowColumn(22, "Isolation Cone Tks: ChiSqRed");
+  settings.AddRowColumn(22, "<=");
+  settings.AddRowColumn(22, auxTools_.ToString( isoConeTks_maxChiSqRed) );
+  settings.AddRowColumn(22, "200 (but on ChiSq, not ChiSqRed)");
   settings.AddRowColumn(22, "");
 
-  settings.AddRowColumn(23, "Isolation Cone: VtxIso" );
-  settings.AddRowColumn(23, "<=" );
-  settings.AddRowColumn(23, auxTools_.ToString(isoCone_VtxIsoWP) );
-  settings.AddRowColumn(23, "1.0");
-  settings.AddRowColumn(23, "cm");
-  settings.AddRowColumn(23, "");
-
-  settings.AddRowColumn(24, "Di-Tau |Delta z0|");
-  settings.AddRowColumn(24, "<");
-  settings.AddRowColumn(24, auxTools_.ToString(diTau_deltaPOCAz) );
-  settings.AddRowColumn(24, "1.0" );
-  settings.AddRowColumn(24, "cm");
-
-  settings.AddRowColumn(25, "");
-
-  settings.AddRowColumn(26, "MC-Matching DeltaR");
-  settings.AddRowColumn(26, "<=");
-  settings.AddRowColumn(26, auxTools_.ToString(mcMatching_dRMax) );
-  settings.AddRowColumn(26, "0.05" );
-  settings.AddRowColumn(26, "" );
-
-  settings.AddRowColumn(27, "MC-Matching IsUnique");
-  settings.AddRowColumn(27, "==");
-  settings.AddRowColumn(27, auxTools_.ToString(mcMatching_unique) );
-  settings.AddRowColumn(27, "1" );
-  settings.AddRowColumn(27, "" );
+  settings.AddRowColumn(23, "Isolation Cone Tks: Stubs");
+  settings.AddRowColumn(23, ">=");
+  settings.AddRowColumn(23, auxTools_.ToString( isoConeTks_minStubs) );
+  settings.AddRowColumn(23, "4" );
+  settings.AddRowColumn(23, "" );
   
-  settings.AddRowColumn(28, "MC-Taus: Mom PdgId");
-  settings.AddRowColumn(28, "==");
-  settings.AddRowColumn(28, auxTools_.ToString(realTauMom));
-  settings.AddRowColumn(28, "N/A" );
+  settings.AddRowColumn(24, "Isolation Cone Tks: PS-Stubs (min)");
+  settings.AddRowColumn(24, ">=");
+  settings.AddRowColumn(24, auxTools_.ToString( isoConeTks_minStubsPS) );
+  settings.AddRowColumn(24, "0" );
+  settings.AddRowColumn(24, "" );
+
+  settings.AddRowColumn(25, "Isolation Cone Tks: PS-Stubs (max)");
+  settings.AddRowColumn(25, "<=");
+  settings.AddRowColumn(25, auxTools_.ToString( isoConeTks_maxStubsPS) );
+  settings.AddRowColumn(25, "N/A" );
+  settings.AddRowColumn(25, "" );
+
+  settings.AddRowColumn(26, "Signal Cone: Shrink Constant");
+  settings.AddRowColumn(26, "==");
+  settings.AddRowColumn(26, auxTools_.ToString(sigCone_Constant) );
+  settings.AddRowColumn(26, "0" );
+  settings.AddRowColumn(26, "GeV");
+
+  settings.AddRowColumn(27, "Signal Cone: DeltaR");
+  settings.AddRowColumn(27, ">=");
+  settings.AddRowColumn(27, auxTools_.ToString(sigCone_dRMin) );
+  settings.AddRowColumn(27, "0.0" );
+  settings.AddRowColumn(27, "" );
+
+  settings.AddRowColumn(28, "Signal Cone: DeltaR");
+  settings.AddRowColumn(28, "<=");
+  settings.AddRowColumn(28, auxTools_.ToString(sigCone_dRMax) );
+  settings.AddRowColumn(28, "0.15" );
   settings.AddRowColumn(28, "" );
-
-  settings.AddRowColumn(29, "MC-Taus: Number Expected");
-  settings.AddRowColumn(29, ">=");
-  settings.AddRowColumn(29, auxTools_.ToString(nMaxNumOfHTausPossible));
+  
+  settings.AddRowColumn(29, "Signal Cone:-3pr InvMass");
+  settings.AddRowColumn(29, "<=");
+  settings.AddRowColumn(29, auxTools_.ToString(sigCone_maxTkInvMass) );
   settings.AddRowColumn(29, "N/A" );
-  settings.AddRowColumn(29, "" );
+  settings.AddRowColumn(29, "GeV/c^{-2}");
 
-  settings.AddRowColumn(30, "" );
+  settings.AddRowColumn(30, "Signal Cone:-3pr maxTkDeltaPOCAz");
+  settings.AddRowColumn(30, "<=");
+  settings.AddRowColumn(30, auxTools_.ToString(sigCone_maxTkDeltaPOCAz) );
+  settings.AddRowColumn(30, "N/A" );
+  settings.AddRowColumn(30, "cm");
+
+  // settings.AddRowColumn(19, "");
+
+  settings.AddRowColumn(31, "Isolation Cone: Shrink Constant");
+  settings.AddRowColumn(31, "==");
+  settings.AddRowColumn(31, auxTools_.ToString(isoCone_Constant) );
+  settings.AddRowColumn(31, "3.5");
+  settings.AddRowColumn(31, "GeV");
+
+  settings.AddRowColumn(32, "Isolation Cone: DeltaR");
+  settings.AddRowColumn(32, ">=");
+  settings.AddRowColumn(32, auxTools_.ToString(isoCone_dRMin) );
+  settings.AddRowColumn(32, "0.15" );
+  settings.AddRowColumn(32, "" );
+
+  settings.AddRowColumn(33, "Isolation Cone: DeltaR");
+  settings.AddRowColumn(33, "=<");
+  settings.AddRowColumn(33, auxTools_.ToString(isoCone_dRMax) );
+  settings.AddRowColumn(33, "0.30");
+  settings.AddRowColumn(33, "");
+
+  settings.AddRowColumn(34, "Isolation Cone: VtxIso" );
+  settings.AddRowColumn(34, "<=" );
+  settings.AddRowColumn(34, auxTools_.ToString(isoCone_VtxIsoWP) );
+  settings.AddRowColumn(34, "1.0");
+  settings.AddRowColumn(34, "cm");
+  settings.AddRowColumn(34, "");
+
+  settings.AddRowColumn(35, "Di-Tau |Delta z0|");
+  settings.AddRowColumn(35, "<");
+  settings.AddRowColumn(35, auxTools_.ToString(diTau_deltaPOCAz) );
+  settings.AddRowColumn(35, "1.0" );
+  settings.AddRowColumn(35, "cm");
+
+  // settings.AddRowColumn(25, "");
+
+  settings.AddRowColumn(36, "MC-Matching DeltaR");
+  settings.AddRowColumn(36, "<=");
+  settings.AddRowColumn(36, auxTools_.ToString(mcMatching_dRMax) );
+  settings.AddRowColumn(36, "0.05" );
+  settings.AddRowColumn(36, "" );
+
+  settings.AddRowColumn(37, "MC-Matching IsUnique");
+  settings.AddRowColumn(37, "==");
+  settings.AddRowColumn(37, auxTools_.ToString(mcMatching_unique) );
+  settings.AddRowColumn(37, "1" );
+  settings.AddRowColumn(37, "" );
+  
+  settings.AddRowColumn(38, "MC-Taus: Mom PdgId");
+  settings.AddRowColumn(38, "==");
+  settings.AddRowColumn(38, auxTools_.ToString(realTauMom));
+  settings.AddRowColumn(38, "N/A" );
+  settings.AddRowColumn(38, "" );
+
+  settings.AddRowColumn(39, "MC-Taus: Number Expected");
+  settings.AddRowColumn(39, ">=");
+  settings.AddRowColumn(39, auxTools_.ToString(nMaxNumOfHTausPossible));
+  settings.AddRowColumn(39, "N/A" );
+  settings.AddRowColumn(39, "" );
+
+  settings.AddRowColumn(40, "" );
   settings.Print();
   
   return;
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::Loop()
-//****************************************************************************
+//============================================================================
+void CaloTk::Loop()
+//============================================================================
 {
 
   // Sanity check
   if (fChain == 0) return;
   const Long64_t nEntries = (MaxEvents == -1) ? fChain->GetEntries() : min((int)fChain->GetEntries(), MaxEvents);
   
-  cout << "=== CaloPlusTracks:\n\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
+  cout << "=== CaloTk:\n\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
   // Initialisations
   InitVars_();
   BookHistos_();
@@ -278,20 +382,19 @@ void CaloPlusTracks::Loop()
     nb = fChain->GetEntry(jentry);
     nbytes += nb;
 
-
-    // Sanity checks
-    // auxTools_.EnsureVectorIsSorted(*L1CaloTau_Et, true);
-    // auxTools_.EnsureVectorIsSorted(*TP_Pt, true); // is not sorted. does not have to be either
-    // auxTools_.EnsureVectorIsSorted(*L1Tks_Pt    , true);
-    // auxTools_.EnsureVectorIsSorted(*L1PixTks_Pt , true);
-
-    
     // Gen-Collections
-    // vector<GenParticle> GenParticles    = GetGenParticles(false); // time-consuming
-    vector<GenParticle> GenTaus  = GetGenParticles(15, true);
-    vector<GenParticle> GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
-    vector<GenParticle> GenTausTrigger  = GetHadronicGenTaus(GenTaus, 20.0, 2.3);    
-    // Print collections 
+    vector<GenParticle> GenParticles;
+    vector<GenParticle> GenTaus;
+    vector<GenParticle> GenTausHadronic;
+    vector<GenParticle> GenTausTrigger;
+    if (mcSample.compare("MinBias") !=0 )
+      {
+	// GenParticles = GetGenParticles(false); // time-consuming
+	GenTaus  = GetGenParticles(15, true);
+	GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
+	GenTausTrigger  = GetHadronicGenTaus(GenTaus, 20.0, 2.3);    
+      }
+    
     if (DEBUG)
       {
 	// PrintGenParticleCollection(GenParticles);
@@ -302,19 +405,20 @@ void CaloPlusTracks::Loop()
 
     // Track Collections
     vector<TrackingParticle> TPs       = GetTrackingParticles(false);
-    vector<TTTrack> matchTTTracks      = GetTTTracks(matchTk_minPt_, selTks_maxEta, selTks_maxChiSq, selTks_minStubs, selTks_minStubsPS, selTks_nFitParams, false);
-    vector<TTTrack> selTTTracks        = GetTTTracks(selTks_minPt  , selTks_maxEta, selTks_maxChiSq, selTks_minStubs, selTks_minStubsPS, selTks_nFitParams, false);
-    vector<TTPixelTrack> TTPixelTracks = GetTTPixelTracks(selTks_minPt, selTks_maxEta, selTks_maxChiSq, selTksPix_minHits, false);
+    vector<TTTrack> matchTTTracks      = GetTTTracks(matchTk_minPt, matchTk_maxEta, matchTk_maxChiSqRed, matchTk_minStubs, matchTk_minStubsPS, matchTk_maxStubsPS, matchTk_nFitParams, false);
+    vector<TTTrack> sigTTTracks        = GetTTTracks(sigConeTks_minPt , sigConeTks_maxEta, sigConeTks_maxChiSqRed, sigConeTks_minStubs, sigConeTks_minStubsPS, sigConeTks_maxStubsPS, sigConeTks_nFitParams, false);
+    vector<TTTrack> isoTTTracks        = GetTTTracks(isoConeTks_minPt , isoConeTks_maxEta, isoConeTks_maxChiSqRed, isoConeTks_minStubs, isoConeTks_minStubsPS, isoConeTks_maxStubsPS, isoConeTks_nFitParams, false);
+
     vector<TTTrack> pvTTTracks;
     double pv_z = GetPVTTTracks(pvTTTracks, false); // fixme (empty)
-    // Print collections
     if (DEBUG)
       {
 	PrintTrackingParticleCollection(TPs);
 	PrintTTTrackCollection(matchTTTracks);
-	PrintTTTrackCollection(selTTTracks);
+	PrintTTTrackCollection(sigTTTracks);
+	PrintTTTrackCollection(isoTTTracks);
 	PrintTTTrackCollection(pvTTTracks);
-	PrintTTPixelTrackCollection(TTPixelTracks);
+	// PrintTTPixelTrackCollection(TTPixelTracks);
       }
     
 
@@ -339,32 +443,23 @@ void CaloPlusTracks::Loop()
 	GetShrinkingConeSizes(calo->et(), sigCone_Constant, isoCone_Constant, sigCone_cutoffDeltaR,
 			      sigCone_dRMin, sigCone_dRMax, isoCone_dRMin, isoCone_dRMax);
 
-	// Construct the CaloPlusTracks candidate
-	L1TkTauParticle	L1TkTauCandidate(0.0, matchTk_caloDeltaR_, sigCone_dRMin, sigCone_dRMax, isoCone_dRMin, isoCone_dRMax);
+	// Construct the CaloTk candidate
+	L1TkTauParticle	L1TkTauCandidate(0.0, matchTk_caloDeltaR, sigCone_dRMin, sigCone_dRMax, isoCone_dRMin, isoCone_dRMax);
 
 
-	// Proceed according to track collection type 
-	if ( selTks_Collection.compare("TTPixelTracks") == 0 )
-	  {
-	    cout << "=== ERROR: Track Collection Type \"" << selTks_Collection << "\" is unsupported yet. EXIT" << endl;
-	    exit(1);
-	  }      
-	else if ( selTks_Collection.compare("TTTracks") == 0 )
+	if ( matchTk_Collection.compare("TTTracks") != 0 )
 	  {
 	    
-	    GetMatchingTrack(L1TkTauCandidate, *calo, matchTTTracks);
-	    GetSigConeTracks(L1TkTauCandidate, selTTTracks);
-	    GetIsoConeTracks(L1TkTauCandidate, selTTTracks);
-	    GetIsolationValues(L1TkTauCandidate);
-	    GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic);
-	    // Print properties?
-	    if (0) L1TkTauCandidate.PrintProperties(false, false, true, true);
-	  }
-	else
-	  {
-	    cout << "=== ERROR: Invalid Track Collection Type \"" << selTks_Collection << "\". EXIT" << endl;
+	    cout << "=== ERROR: Invalid Track Collection Type \"" << matchTk_Collection << "\". EXIT" << endl;
 	    exit(1);
 	  }
+	    
+	GetMatchingTrack(L1TkTauCandidate, *calo, matchTTTracks);
+	GetSigConeTracks(L1TkTauCandidate, sigTTTracks);
+	GetIsoConeTracks(L1TkTauCandidate, isoTTTracks);
+	GetIsolationValues(L1TkTauCandidate);
+	GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic);
+	if (DEBUG) L1TkTauCandidate.PrintProperties(false, false, true, true);
 	
 	// Save L1TkTau Candidate
 	L1TkTauCandidates.push_back(L1TkTauCandidate);
@@ -386,8 +481,6 @@ void CaloPlusTracks::Loop()
 	  }
       }// L1TkTauCandidates
 
-    
-    // Print Collections?
     if (DEBUG)
       {
 	PrintL1JetParticleCollection(L1CaloTaus);
@@ -411,7 +504,6 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     /// L1TkTaus_Calo Properties 
     ////////////////////////////////////////////////
-    // For-loop: L1TkTaus_Calo
     for (vector<L1TkTauParticle>::iterator tau = L1TkTaus_Calo.begin(); tau != L1TkTaus_Calo.end(); tau++)
       {
 
@@ -428,12 +520,10 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     vector<L1TkTauParticle> myL1TkTaus = L1TkTaus_Tk; // L1TkTaus_Calo, L1TkTaus_Tk, L1TkTaus_VtxIso
     hL1TkTau_Multiplicity ->Fill( myL1TkTaus.size() );
-    
-    // For-loop: L1TkTaus_VtxIso
     for (vector<L1TkTauParticle>::iterator tau = myL1TkTaus.begin(); tau != myL1TkTaus.end(); tau++)
       {
 	
-	// tau->PrintProperties(true, true, true, true);
+	if (DEBUG) tau->PrintProperties(true, true, true, true);
 	
 	// Variables
 	TLorentzVector sigTks_p4 = tau->GetSigConeTTTracksP4();
@@ -444,6 +534,8 @@ void CaloPlusTracks::Loop()
 	
 	// L1TkTau Resolution
 	GenParticle p = tau->GetMatchingGenParticle();
+
+	// Resolution
 	hL1TkTau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().eta() - p.p4vis().Pt() )/p.p4vis().Pt()  );
 	hL1TkTau_ResolutionCaloEta->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
 	hL1TkTau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().eta() - p.p4vis().Phi())/p.p4vis().Phi() );
@@ -482,8 +574,8 @@ void CaloPlusTracks::Loop()
 	hL1TkTau_NHFAbs      ->Fill( abs( (tau->GetCaloTau().et() - sigTks_p4.Et())/tau->GetCaloTau().et() ) );
 	hL1TkTau_NSigTks     ->Fill( tau->GetSigConeTTTracks().size() );
 	hL1TkTau_NIsoTks     ->Fill( tau->GetIsoConeTTTracks().size() );
-	hL1TkTau_InvMass     ->Fill( sigTks_p4.M() ); 
-	hL1TkTau_InvMassIncl ->Fill( sigTks_p4.M() + isoTks_p4.M() );
+	if (tau->GetSigConeTTTracks().size() > 1) hL1TkTau_InvMass->Fill( sigTks_p4.M() );
+	hL1TkTau_InvMassIncl ->Fill( sigTks_p4.M() );
 	hL1TkTau_SigConeRMin ->Fill( tau->GetSigConeMin() );
 	hL1TkTau_IsoConeRMin ->Fill( tau->GetIsoConeMin() );
 	hL1TkTau_SigConeRMax ->Fill( tau->GetSigConeMax() );
@@ -494,16 +586,13 @@ void CaloPlusTracks::Loop()
 	// hL1TkTau_VtxIsoAbs   ->Fill( abs(tau->GetVtxIsolation()) );
 	  
 
+	// SigCone TTTracks
 	int sigTks_sumCharge   = 0;
 	vector<TTTrack> sigTks = tau->GetSigConeTTTracks();
-	// For-loop: SigCone TTTracks
 	for (vector<TTTrack>::iterator sigTk = sigTks.begin(); sigTk != sigTks.end(); sigTk++)
 	  {
 	    // Print properties?
-	    if (0) sigTk->PrintProperties();
-
-	    // Skip if tk is matching track?
-	    // if ( sigTk->index() == matchTk.index() ) continue; //fixme. Why skip the matching track? keep it!
+	    if (DEBUG) sigTk->PrintProperties();
 	    
 	    // Get the transverse component of this track with respect to the matching track
 	    TVector3 sigTk_p3  = sigTk->getMomentum();
@@ -513,7 +602,7 @@ void CaloPlusTracks::Loop()
 	    hL1TkTau_SigTks_Pt        ->Fill( sigTk->getPt()  );
 	    hL1TkTau_SigTks_Eta       ->Fill( sigTk->getEta() );
 	    hL1TkTau_SigTks_POCAz     ->Fill( sigTk->getZ0()  );
-	    hL1TkTau_SigTks_DeltaPOCAz->Fill( abs( sigTk->getZ0() - matchTk.getZ0() ) );
+	    if (sigTks.size() > 1) hL1TkTau_SigTks_DeltaPOCAz->Fill( abs( sigTk->getZ0() - matchTk.getZ0() ) );
 	    hL1TkTau_SigTks_d0        ->Fill( sigTk->getD0() );
 	    hL1TkTau_SigTks_d0Abs     ->Fill( abs( sigTk->getD0()) );
 	    // hL1TkTau_SigTks_d0Sig     ->Fill( sigTk->getD0()/sigTk->getSigmaD0() );        // TTPixelTracks
@@ -530,19 +619,17 @@ void CaloPlusTracks::Loop()
 
 	// Fill histos for other variables
 	hL1TkTau_Charge->Fill( sigTks_sumCharge);
+	hL1TkTau_ChargeAbs->Fill( abs(sigTks_sumCharge) );
 
 
+	// IsoCone TTTracks
 	vector<TTTrack> isoTks = tau->GetIsoConeTTTracks();	
-	// For-loop: IsoCone TTTracks
 	for (vector<TTTrack>::iterator isoTk = isoTks.begin(); isoTk != isoTks.end(); isoTk++)
 	  {
 
 	    // Print properties?
 	    if (0) isoTk->PrintProperties();
 	    
-	    // Skip if tk is matching track
-	    // if ( isoTk->index() == match_tk.index() ) continue; //fixme is this needed? not really!
-	
 	    // Get the transverse component of this track with respect to the matching track
 	    TVector3 isoTk_p3  = isoTk->getMomentum();
 	    double isoTk_PtRel = isoTk_p3.Perp( matchTk.getMomentum() );
@@ -575,7 +662,8 @@ void CaloPlusTracks::Loop()
     FillTurnOn_Numerator_(L1TkTaus_VtxIso , 25.0, hVtxIso_TurnOn25);
     FillTurnOn_Numerator_(L1TkTaus_Calo   , 50.0, hCalo_TurnOn50  );
     FillTurnOn_Numerator_(L1TkTaus_Tk     , 50.0, hTk_TurnOn50    );
-    
+
+
     FillTurnOn_Numerator_(L1TkTaus_VtxIso , 50.0, hVtxIso_TurnOn50);
     FillTurnOn_Numerator_(L1TkTaus_Calo   , 66.0, hCalo_TurnOn_SingleTau50KHz  );
     FillTurnOn_Numerator_(L1TkTaus_Tk     , 65.0, hTk_TurnOn_SingleTau50KHz    );
@@ -604,8 +692,8 @@ void CaloPlusTracks::Loop()
     ////////////////////////////////////////////////
     // WARNING: Erases L1TkTaus from vector!
     ////////////////////////////////////////////////
-    ApplyDiTauZMatching(selTks_Collection, L1TkTaus_Tk);
-    ApplyDiTauZMatching(selTks_Collection, L1TkTaus_VtxIso); 
+    ApplyDiTauZMatching(matchTk_Collection, L1TkTaus_Tk);
+    ApplyDiTauZMatching(matchTk_Collection, L1TkTaus_VtxIso); 
 
     FillDiTau_(L1TkTaus_Calo  , hDiTau_Rate_Calo  , hDiTau_Eff_Calo  );
     FillDiTau_(L1TkTaus_Tk    , hDiTau_Rate_Tk    , hDiTau_Eff_Tk    );
@@ -618,7 +706,7 @@ void CaloPlusTracks::Loop()
 
 
   ////////////////////////////////////////////////
-  // Convert or Finalise Histos
+  // Convert/Finalise Histos
   ////////////////////////////////////////////////
   // SingleTau
   histoTools_.ConvertToRateHisto_1D(hCalo_Rate  , nEntries);
@@ -678,9 +766,9 @@ void CaloPlusTracks::Loop()
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::BookHistos_(void)
-//****************************************************************************
+//============================================================================
+void CaloTk::BookHistos_(void)
+//============================================================================
 {
   
   // Event-Type Histograms
@@ -705,6 +793,7 @@ void CaloPlusTracks::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1TkTau_IsoConeRMin , "L1TkTau_IsoConeRMin" , "",   100,  0.0,   +1.0);
   histoTools_.BookHisto_1D(hL1TkTau_IsoConeRMax , "L1TkTau_IsoConeRMax" , "",   100,  0.0,   +1.0);
   histoTools_.BookHisto_1D(hL1TkTau_Charge      , "L1TkTau_Charge"      , "",    19, -9.5,   +9.5);
+  histoTools_.BookHisto_1D(hL1TkTau_ChargeAbs   , "L1TkTau_ChargeAbs"   , "",    19, -9.5,   +9.5);
   histoTools_.BookHisto_1D(hL1TkTau_RelIso      , "L1TkTau_RelIso"      , "",   100,  0.0,   +5.0);
   histoTools_.BookHisto_1D(hL1TkTau_VtxIso      , "L1TkTau_VtxIso"      , "",   300,  0.0,  +30.0);
   // histoTools_.BookHisto_1D(hL1TkTau_VtxIso      , "L1TkTau_VtxIso"      ,   1200,-30.0,  +30.0);
@@ -756,11 +845,11 @@ void CaloPlusTracks::BookHistos_(void)
   // Resolutions 
   histoTools_.BookHisto_1D(hL1CaloTau_ResolutionCaloEt , "L1CaloTau_ResolutionCaloEt" , ";E_{T} (GeV);Events / %.0f GeV", 100,  -5.0,  +5.0);
   histoTools_.BookHisto_1D(hL1CaloTau_ResolutionCaloEta, "L1CaloTau_ResolutionCaloEta", ";#eta;Events / %.2f", 100,  -5.0,  +5.0);
-  histoTools_.BookHisto_1D(hL1CaloTau_ResolutionCaloPhi, "L1CaloTau_ResolutionCaloPhi", ";#phi (rads);Events / %.2f rads", 100,  -5.0,  +5.0);
+  histoTools_.BookHisto_1D(hL1CaloTau_ResolutionCaloPhi, "L1CaloTau_ResolutionCaloPhi", ";#phi (rads);Events / %.2f rads", 200,  -10.0,  +10.0);
 
   histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEt , "L1TkTau_ResolutionCaloEt" , ";E_{T} (GeV);Events / %.0f GeV", 100,  -5.0,  +5.0);
   histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEta, "L1TkTau_ResolutionCaloEta", ";#eta;Events / %.2f", 100,  -5.0,  +5.0);
-  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloPhi, "L1TkTau_ResolutionCaloPhi", ";#phi (rads);Events / %.2f rads", 100,  -5.0,  +5.0);
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloPhi, "L1TkTau_ResolutionCaloPhi", ";#phi (rads);Events / %.2f rads", 100,  -10.0,  +10.0);
 
   // SingleTau
   histoTools_.BookHisto_1D(hCalo_Rate  , "Calo_Rate"  , "", 200, 0.0,  +200.0);
@@ -810,10 +899,10 @@ void CaloPlusTracks::BookHistos_(void)
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::FinaliseEffHisto_(TH1D *histo, 
+//============================================================================
+void CaloTk::FinaliseEffHisto_(TH1D *histo, 
 				       const int nEvtsTotal)
-//****************************************************************************
+//============================================================================
 {
 
   const int nBins = histo->GetNbinsX()+1;
@@ -834,10 +923,10 @@ void CaloPlusTracks::FinaliseEffHisto_(TH1D *histo,
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::FinaliseEffHisto_(TH2D *histo, 
+//============================================================================
+void CaloTk::FinaliseEffHisto_(TH2D *histo, 
 				       const int nEvtsTotal)
-//****************************************************************************
+//============================================================================
 {
 
   const int nBinsX  = histo->GetNbinsX()+1;
@@ -865,10 +954,10 @@ void CaloPlusTracks::FinaliseEffHisto_(TH2D *histo,
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::ApplyDiTauZMatching(string tkCollectionType, 
+//============================================================================
+void CaloTk::ApplyDiTauZMatching(string tkCollectionType, 
 					 vector<L1TkTauParticle> &L1TkTaus)
-//****************************************************************************
+//============================================================================
 {
   
   // Sanity check
@@ -888,14 +977,14 @@ void CaloPlusTracks::ApplyDiTauZMatching(string tkCollectionType,
       
     if ( tkCollectionType.compare("TTPixelTracks") == 0 )
       {
-	cout << "=== CaloPlusTracks::ApplyDiTauZMatching() - Unsupported track collection. Exit" << endl;
+	cout << "=== CaloTk::ApplyDiTauZMatching() - Unsupported track collection. Exit" << endl;
 	exit(1);
       }
     else if ( tkCollectionType.compare("TTTracks") == 0 ) {
       deltaPOCAz = abs( match_tk0.getZ0() - match_tk.getZ0() );
     }
     else{
-      cout << "=== CaloPlusTracks::ApplyDiTauZMatching() - Unknown sample \"" << mcSample << "\". EXIT" << endl;
+      cout << "=== CaloTk::ApplyDiTauZMatching() - Unknown sample \"" << mcSample << "\". EXIT" << endl;
       exit(1);
     }
     
@@ -908,11 +997,11 @@ void CaloPlusTracks::ApplyDiTauZMatching(string tkCollectionType,
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::FillSingleTau_(vector<L1TkTauParticle> L1TkTaus, 
+//============================================================================
+void CaloTk::FillSingleTau_(vector<L1TkTauParticle> L1TkTaus, 
 				    TH1D *hRate,
 				    TH1D *hEfficiency)
-//****************************************************************************
+//============================================================================
 {
 
   // Sanity check
@@ -937,11 +1026,11 @@ void CaloPlusTracks::FillSingleTau_(vector<L1TkTauParticle> L1TkTaus,
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::FillDiTau_(vector<L1TkTauParticle> L1TkTaus, 
+//============================================================================
+void CaloTk::FillDiTau_(vector<L1TkTauParticle> L1TkTaus, 
 				TH1D *hRate,
 				TH1D *hEfficiency)
-//****************************************************************************
+//============================================================================
 {
 
   // Sanity check
@@ -967,12 +1056,12 @@ void CaloPlusTracks::FillDiTau_(vector<L1TkTauParticle> L1TkTaus,
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::FillDiTau_(vector<L1TkTauParticle> L1TkTaus1,
+//============================================================================
+void CaloTk::FillDiTau_(vector<L1TkTauParticle> L1TkTaus1,
 				vector<L1TkTauParticle> L1TkTaus2, 
 				TH2D *hRate,
 				TH2D *hEfficiency)
-//****************************************************************************
+//============================================================================
 {
 
   // Sanity check
@@ -1031,10 +1120,10 @@ void CaloPlusTracks::FillDiTau_(vector<L1TkTauParticle> L1TkTaus1,
 
 
 
-//****************************************************************************
-void CaloPlusTracks::FillRate_(TH1D *hRate,
+//============================================================================
+void CaloTk::FillRate_(TH1D *hRate,
 			   const double ldgEt)
-//****************************************************************************
+//============================================================================
 {
   
   if (ldgEt < 0) return;
@@ -1044,11 +1133,11 @@ void CaloPlusTracks::FillRate_(TH1D *hRate,
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::FillRate_(TH2D *hRate,
+//============================================================================
+void CaloTk::FillRate_(TH2D *hRate,
 			   const double ldgEt1,
 			   const double ldgEt2)
-//****************************************************************************
+//============================================================================
 {
   
   if (ldgEt1 < 0) return;
@@ -1060,10 +1149,10 @@ void CaloPlusTracks::FillRate_(TH2D *hRate,
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::FillEfficiency_(TH1D *hEfficiency,
+//============================================================================
+void CaloTk::FillEfficiency_(TH1D *hEfficiency,
 				 const double ldgEt)
-//****************************************************************************
+//============================================================================
 {
   
   histoTools_.FillAllBinsUpToValue_1D(hEfficiency, ldgEt);
@@ -1073,11 +1162,11 @@ void CaloPlusTracks::FillEfficiency_(TH1D *hEfficiency,
 
 
 
-//****************************************************************************
-vector<GenParticle> CaloPlusTracks::GetHadronicGenTaus(vector<GenParticle> GenTaus,
+//============================================================================
+vector<GenParticle> CaloTk::GetHadronicGenTaus(vector<GenParticle> GenTaus,
 						       double visEt,
 						       double visEta)
-//****************************************************************************
+//============================================================================
 {
   // Sanity check
   vector<GenParticle> genP_hadGenTaus;
@@ -1109,10 +1198,10 @@ vector<GenParticle> CaloPlusTracks::GetHadronicGenTaus(vector<GenParticle> GenTa
 }      
 
 
-//****************************************************************************
-void CaloPlusTracks::GetHadronicTauFinalDaughters(GenParticle p,
+//============================================================================
+void CaloTk::GetHadronicTauFinalDaughters(GenParticle p,
 						  vector<unsigned short> &Daug)
-//****************************************************************************
+//============================================================================
 {
   //
   // Description:
@@ -1171,11 +1260,11 @@ void CaloPlusTracks::GetHadronicTauFinalDaughters(GenParticle p,
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::FillTurnOn_Numerator_(vector<L1TkTauParticle> L1TkTaus, 
+//============================================================================
+void CaloTk::FillTurnOn_Numerator_(vector<L1TkTauParticle> L1TkTaus, 
 					   const double minEt,
 					   TH1D *hTurnOn)
-//****************************************************************************
+//============================================================================
 {
   
   // For-loop: L1TkTaus
@@ -1201,12 +1290,12 @@ void CaloPlusTracks::FillTurnOn_Numerator_(vector<L1TkTauParticle> L1TkTaus,
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::GetMatchingTrack(L1TkTauParticle &L1TkTau,
+//============================================================================
+void CaloTk::GetMatchingTrack(L1TkTauParticle &L1TkTau,
 				      L1JetParticle L1CaloTau,
 				      vector<TTTrack> TTTracks)
 
-//****************************************************************************
+//============================================================================
 {
 
   // Initialise variables
@@ -1239,10 +1328,10 @@ void CaloPlusTracks::GetMatchingTrack(L1TkTauParticle &L1TkTau,
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::GetSigConeTracks(L1TkTauParticle &L1TkTau,
-				      vector<TTTrack> TTTracks)
-//****************************************************************************
+//============================================================================
+void CaloTk::GetSigConeTracks(L1TkTauParticle &L1TkTau,
+			      vector<TTTrack> TTTracks)
+//============================================================================
 {
   if (!L1TkTau.HasMatchingTk()) return; 
   vector<TTTrack> sigConeTks;
@@ -1276,10 +1365,10 @@ void CaloPlusTracks::GetSigConeTracks(L1TkTauParticle &L1TkTau,
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::GetIsoConeTracks(L1TkTauParticle &L1TkTau,
+//============================================================================
+void CaloTk::GetIsoConeTracks(L1TkTauParticle &L1TkTau,
 				      vector<TTTrack> TTTracks)
-//****************************************************************************
+//============================================================================
 {
   if (!L1TkTau.HasMatchingTk()) return; 
   vector<TTTrack> isoConeTks;
@@ -1302,9 +1391,9 @@ void CaloPlusTracks::GetIsoConeTracks(L1TkTauParticle &L1TkTau,
 }
 
 
-//****************************************************************************
-vector<GenParticle> CaloPlusTracks::GetGenParticles(bool bPrintList)
-//****************************************************************************
+//============================================================================
+vector<GenParticle> CaloTk::GetGenParticles(bool bPrintList)
+//============================================================================
 {
   vector<GenParticle> theGenParticles;
   Table info("Index | PdgId | Status | Charge | Pt | Eta | Phi | E | Vertex (mm) | Mothers | Daughters |", "Text"); //LaTeX or Text    
@@ -1349,9 +1438,9 @@ vector<GenParticle> CaloPlusTracks::GetGenParticles(bool bPrintList)
 }
 
 
-//****************************************************************************
-vector<GenParticle> CaloPlusTracks::GetGenParticles(int pdgId, bool isLastCopy)
-//****************************************************************************
+//============================================================================
+vector<GenParticle> CaloTk::GetGenParticles(int pdgId, bool isLastCopy)
+//============================================================================
 {
 
   // Initialise variables
@@ -1360,13 +1449,14 @@ vector<GenParticle> CaloPlusTracks::GetGenParticles(int pdgId, bool isLastCopy)
   // For-lool: All GenParticles
   for (unsigned int genP_index = 0; genP_index < GenP_Pt->size(); genP_index++)
     {
-      
+
+      // Only examine particles of specific pdgId
+      if ( abs(GenP_PdgId->at(genP_index) ) != pdgId) continue;
+
+      // Get the genParticle
       GenParticle p = GetGenParticle(genP_index);
       SetGenParticleMomsAndDaus(p);
-	
-      // Apply criteria
-      if ( abs(p.pdgId()) != pdgId) continue;
-	
+		
       if (!isLastCopy) myGenParticles.push_back(p);
       else
 	{
@@ -1398,9 +1488,9 @@ vector<GenParticle> CaloPlusTracks::GetGenParticles(int pdgId, bool isLastCopy)
 }
 
       
-//****************************************************************************
-GenParticle CaloPlusTracks::GetGenParticle(unsigned int Index)
-//****************************************************************************
+//============================================================================
+GenParticle CaloTk::GetGenParticle(unsigned int Index)
+//============================================================================
 {
 
   // Get the GenParticle properties
@@ -1425,9 +1515,9 @@ GenParticle CaloPlusTracks::GetGenParticle(unsigned int Index)
 
 
 
-//****************************************************************************
-void CaloPlusTracks::SetGenParticleMomsAndDaus(GenParticle &p)
-//****************************************************************************
+//============================================================================
+void CaloTk::SetGenParticleMomsAndDaus(GenParticle &p)
+//============================================================================
 {
 
   // Variable declaration
@@ -1445,9 +1535,9 @@ void CaloPlusTracks::SetGenParticleMomsAndDaus(GenParticle &p)
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::SetGenParticleFinalDaughters(GenParticle &p)
-//****************************************************************************
+//============================================================================
+void CaloTk::SetGenParticleFinalDaughters(GenParticle &p)
+//============================================================================
 {
 
   // Variable declaration
@@ -1473,10 +1563,10 @@ void CaloPlusTracks::SetGenParticleFinalDaughters(GenParticle &p)
 
 
 
-//****************************************************************************
-double CaloPlusTracks::GetPVTTTracks(vector<TTTrack> &pvTTTracks,
+//============================================================================
+double CaloTk::GetPVTTTracks(vector<TTTrack> &pvTTTracks,
 				     bool bPrintList)
-//****************************************************************************
+//============================================================================
 {
   // First get PV_z and pv-tracks indices
   vector<int> pvTks_index; 
@@ -1492,15 +1582,16 @@ double CaloPlusTracks::GetPVTTTracks(vector<TTTrack> &pvTTTracks,
 
 
 
-//****************************************************************************
-vector<TTTrack> CaloPlusTracks::GetTTTracks(const double minPt,
-					    const double maxEta,
-					    const double maxChiSq,
-					    const unsigned int minStubs,
-					    const unsigned int minStubsPS,
-					    const unsigned nFitParams,
-					    bool bPrintList)
-//****************************************************************************
+//============================================================================
+vector<TTTrack> CaloTk::GetTTTracks(const double minPt,
+				    const double maxEta,
+				    const double maxChiSqRed,
+				    const unsigned int minStubs,
+				    const unsigned int minStubsPS,
+				    const unsigned int maxStubsPS,
+				    const unsigned nFitParams,
+				    bool bPrintList)
+//============================================================================
 {
   vector<TTTrack> theTTTracks;
 
@@ -1512,9 +1603,10 @@ vector<TTTrack> CaloPlusTracks::GetTTTracks(const double minPt,
       // Apply selection criteria
       if (tk.getPt() < minPt) continue;
       if (abs(tk.getEta()) > maxEta) continue;
-      if (tk.getChi2() > maxChiSq) continue;
+      if (tk.getChi2Red() > maxChiSqRed) continue;
       if (tk.getNumOfStubs() < minStubs) continue;
       if (tk.getNumOfStubsPS() < minStubsPS) continue;
+      if (tk.getNumOfStubsPS() > maxStubsPS) continue;
       // double z0 = tk.getZ0();
       // double d0 = tk.getD0();
       theTTTracks.push_back( tk );
@@ -1527,10 +1619,10 @@ vector<TTTrack> CaloPlusTracks::GetTTTracks(const double minPt,
 }
 
 
-//****************************************************************************
-TTTrack CaloPlusTracks::GetTTTrack(unsigned int Index,
+//============================================================================
+TTTrack CaloTk::GetTTTrack(unsigned int Index,
 				   const unsigned int nFitParams)
-//****************************************************************************
+//============================================================================
 {
   
   // Initialise variables
@@ -1572,9 +1664,9 @@ TTTrack CaloPlusTracks::GetTTTrack(unsigned int Index,
 
 
 
-//****************************************************************************
-vector<TrackingParticle> CaloPlusTracks::GetTrackingParticles(bool bPrintList)
-//****************************************************************************
+//============================================================================
+vector<TrackingParticle> CaloTk::GetTrackingParticles(bool bPrintList)
+//============================================================================
 {
   vector<TrackingParticle> theTrackingParticles;
 
@@ -1591,9 +1683,9 @@ vector<TrackingParticle> CaloPlusTracks::GetTrackingParticles(bool bPrintList)
 }
 
 
-//****************************************************************************
-TrackingParticle CaloPlusTracks::GetTrackingParticle(unsigned int Index)
-//****************************************************************************
+//============================================================================
+TrackingParticle CaloTk::GetTrackingParticle(unsigned int Index)
+//============================================================================
 {
 
   // Initialise variables
@@ -1624,13 +1716,13 @@ TrackingParticle CaloPlusTracks::GetTrackingParticle(unsigned int Index)
 
 
 
-//****************************************************************************
-vector<TTPixelTrack> CaloPlusTracks::GetTTPixelTracks(const double minPt,
+//============================================================================
+vector<TTPixelTrack> CaloTk::GetTTPixelTracks(const double minPt,
 						      const double maxEta,
-						      const double maxChiSq,
+						      const double maxChiSqRed,
 						      const int minHits,
 						      bool bPrintList)
-//****************************************************************************
+//============================================================================
 {
   vector<TTPixelTrack> theTTPixelTracks;
 
@@ -1642,7 +1734,7 @@ vector<TTPixelTrack> CaloPlusTracks::GetTTPixelTracks(const double minPt,
       // Apply selection criteria
       if (pixTk.getPt() < minPt) continue;
       if (abs(pixTk.getEta()) > maxEta) continue;
-      if (pixTk.getChi2() > maxChiSq) continue;
+      if (pixTk.getChi2Red() > maxChiSqRed) continue;
       if (pixTk.getNcandidatehit() < minHits) continue;
       
       theTTPixelTracks.push_back( pixTk );
@@ -1654,9 +1746,9 @@ vector<TTPixelTrack> CaloPlusTracks::GetTTPixelTracks(const double minPt,
 }
 
 
-//****************************************************************************
-TTPixelTrack CaloPlusTracks::GetTTPixelTrack(unsigned int Index)
-//****************************************************************************
+//============================================================================
+TTPixelTrack CaloTk::GetTTPixelTrack(unsigned int Index)
+//============================================================================
 {
 
   // Initialise variables
@@ -1721,9 +1813,9 @@ TTPixelTrack CaloPlusTracks::GetTTPixelTrack(unsigned int Index)
 }
 
 
-//****************************************************************************
-vector<L1JetParticle> CaloPlusTracks::GetL1CaloTaus(bool bPrintList)
-//****************************************************************************
+//============================================================================
+vector<L1JetParticle> CaloTk::GetL1CaloTaus(bool bPrintList)
+//============================================================================
 {
   vector<L1JetParticle> theL1CaloTaus;
   for (Size_t iCalo = 0; iCalo < L1CaloTau_E->size(); iCalo++)
@@ -1736,9 +1828,9 @@ vector<L1JetParticle> CaloPlusTracks::GetL1CaloTaus(bool bPrintList)
 }
 
 
-//****************************************************************************
-L1JetParticle CaloPlusTracks::GetL1CaloTau(unsigned int Index)
-//****************************************************************************
+//============================================================================
+L1JetParticle CaloTk::GetL1CaloTau(unsigned int Index)
+//============================================================================
 {
 
   double E    = L1CaloTau_E->at(Index);
@@ -1751,8 +1843,9 @@ L1JetParticle CaloPlusTracks::GetL1CaloTau(unsigned int Index)
   return theL1CaloTau;
 }
 
-//****************************************************************************
-void CaloPlusTracks::GetShrinkingConeSizes(double calo_et,
+
+//============================================================================
+void CaloTk::GetShrinkingConeSizes(double calo_et,
 					   double sigCone_Constant,
 					   double isoCone_Constant,
 					   const double sigCone_dRCutoff,
@@ -1760,7 +1853,7 @@ void CaloPlusTracks::GetShrinkingConeSizes(double calo_et,
 					   double &sigCone_dRMax,
 					   double &isoCone_dRMin,
 					   double &isoCone_dRMax)
-//****************************************************************************
+//============================================================================
 {
   
   double signalCone_min = (sigCone_Constant)/(calo_et);
@@ -1779,9 +1872,10 @@ void CaloPlusTracks::GetShrinkingConeSizes(double calo_et,
   return;
 }
 
-//****************************************************************************
-void CaloPlusTracks::GetIsolationValues(L1TkTauParticle &L1TkTau)
-//****************************************************************************
+
+//============================================================================
+void CaloTk::GetIsolationValues(L1TkTauParticle &L1TkTau)
+//============================================================================
 {
 
   // Store default values
@@ -1827,10 +1921,10 @@ void CaloPlusTracks::GetIsolationValues(L1TkTauParticle &L1TkTau)
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
+//============================================================================
+void CaloTk::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
 					    vector<GenParticle> hadGenTaus)					    
-//****************************************************************************
+//============================================================================
 {
 
   //
@@ -1879,9 +1973,9 @@ void CaloPlusTracks::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
 }      
 
 
-//****************************************************************************
-vector<L1TkTauParticle> CaloPlusTracks::GetMcMatchedL1TkTaus(vector<L1TkTauParticle> L1TkTaus)
-//****************************************************************************
+//============================================================================
+vector<L1TkTauParticle> CaloTk::GetMcMatchedL1TkTaus(vector<L1TkTauParticle> L1TkTaus)
+//============================================================================
 {
 
   // Get all MC-matched trigger objects
@@ -1896,9 +1990,9 @@ vector<L1TkTauParticle> CaloPlusTracks::GetMcMatchedL1TkTaus(vector<L1TkTauParti
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::PrintGenParticleCollection(vector<GenParticle> collection)
-//****************************************************************************
+//============================================================================
+void CaloTk::PrintGenParticleCollection(vector<GenParticle> collection)
+//============================================================================
 {
 
   for (vector<GenParticle>::iterator p = collection.begin(); p != collection.end(); p++)
@@ -1921,10 +2015,9 @@ void CaloPlusTracks::PrintGenParticleCollection(vector<GenParticle> collection)
 }
 
 
-
-//****************************************************************************
-void CaloPlusTracks::PrintTrackingParticleCollection(vector<TrackingParticle> collection)
-//****************************************************************************
+//============================================================================
+void CaloTk::PrintTrackingParticleCollection(vector<TrackingParticle> collection)
+//============================================================================
 {
 
   Table info("Index | Pt | Eta | Phi | PdgId | Q | x0 | y0 | z0 | d0 | d0-phi | NMatch | TTTrackIndex | TTClusters | TTStubs | TTTracks", "Text");
@@ -1959,9 +2052,9 @@ void CaloPlusTracks::PrintTrackingParticleCollection(vector<TrackingParticle> co
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::PrintTTTrackCollection(vector<TTTrack> collection)
-//****************************************************************************
+//============================================================================
+void CaloTk::PrintTTTrackCollection(vector<TTTrack> collection)
+//============================================================================
 {
 
   Table info("Index | Pt | Eta | Phi | x0 | y0 | z0 | d0 | Q | Chi2 | DOF | Chi2Red | Stubs (PS) | StubPtCons. | Genuine | Unknown | Comb.", "Text");
@@ -1996,9 +2089,10 @@ void CaloPlusTracks::PrintTTTrackCollection(vector<TTTrack> collection)
   return;
 }
 
-//****************************************************************************
-void CaloPlusTracks::PrintTTPixelTrackCollection(vector<TTPixelTrack> collection)
-//****************************************************************************
+
+//============================================================================
+void CaloTk::PrintTTPixelTrackCollection(vector<TTPixelTrack> collection)
+//============================================================================
 {
   Table info("Index | Pt | Eta | Phi | z0 | d0 | Q | Chi2 | Hits | Hit-Pattern | Hit-R | Hit-Z", "Text");
   
@@ -2028,9 +2122,9 @@ void CaloPlusTracks::PrintTTPixelTrackCollection(vector<TTPixelTrack> collection
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::PrintL1JetParticleCollection(vector<L1JetParticle> collection)
-//****************************************************************************
+//============================================================================
+void CaloTk::PrintL1JetParticleCollection(vector<L1JetParticle> collection)
+//============================================================================
 {
   
   Table info("Index | Energy | Et | Eta | Phi | Bx | Type", "Text");
@@ -2055,9 +2149,9 @@ void CaloPlusTracks::PrintL1JetParticleCollection(vector<L1JetParticle> collecti
 }
 
 
-//****************************************************************************
-void CaloPlusTracks::PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection)
-//****************************************************************************
+//============================================================================
+void CaloTk::PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection)
+//============================================================================
 {
   
   Table info("Match-Cone | Sig-Cone | Iso-Cone | Calo-Et | Calo-Eta | Tk-Pt | Tk-Eta | Tk-dR | Gen-Pt | Gen-Eta | Gen-dR | Sig-Tks | Iso-Tks | VtxIso | RelIso", "Text");

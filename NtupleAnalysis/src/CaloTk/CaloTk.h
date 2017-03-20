@@ -1,5 +1,5 @@
-#ifndef CaloPlusTracks_h
-#define CaloPlusTracks_h
+#ifndef CaloTk_h
+#define CaloTk_h
 
 // System 
 #include <iostream>
@@ -35,17 +35,17 @@
 
 using namespace std;
 
-class CaloPlusTracks : public TreeAnalyserMC{
+class CaloTk : public TreeAnalyserMC{
  public:
   // Constructors/Destructors
-  ~CaloPlusTracks(){};
- CaloPlusTracks(const string SamplePath,
+  ~CaloTk(){};
+ CaloTk(const string SamplePath,
 		const string SampleName,
 		const string text_, 
 		const int maxEvents_ = -1, 
 		TTree* tree=0) : 
   
-  TreeAnalyserMC("CaloPlusTracks", SamplePath, SampleName, text_, maxEvents_, tree) 
+  TreeAnalyserMC("CaloTk", SamplePath, SampleName, text_, maxEvents_, tree) 
     { 
       auxTools_.StopwatchStart();
       mcSample = SampleName;
@@ -104,20 +104,40 @@ class CaloPlusTracks : public TreeAnalyserMC{
   bool DEBUG;
   bool mcMatching_unique;
   double diTau_deltaPOCAz;
-  double matchTk_caloDeltaR_;
-  double matchTk_minPt_;
+
+  // L1TkTau - Matching track
+  string matchTk_Collection;
+  int matchTk_nFitParams;
+  double matchTk_minPt;
+  double matchTk_maxEta;
+  double matchTk_maxChiSqRed;
+  double matchTk_minStubs;
+  double matchTk_minStubsPS;
+  double matchTk_maxStubsPS;
+  double matchTk_caloDeltaR;
+  // Signal Cone Tracks
+  string sigConeTks_Collection;
+  int sigConeTks_nFitParams;
+  double sigConeTks_minPt;
+  double sigConeTks_maxEta;
+  double sigConeTks_maxChiSqRed;
+  unsigned int sigConeTks_minStubs;
+  unsigned int sigConeTks_minStubsPS;
+  unsigned int sigConeTks_maxStubsPS;
+  // Isolation Cone Tracks
+  string isoConeTks_Collection;
+  int isoConeTks_nFitParams;
+  double isoConeTks_minPt;
+  double isoConeTks_maxEta;
+  double isoConeTks_maxChiSqRed;
+  unsigned int isoConeTks_minStubs;
+  unsigned int isoConeTks_minStubsPS;
+  unsigned int isoConeTks_maxStubsPS;
+
   double mcMatching_dRMax;
   double pv_deltaZMax;
   double pv_z;
-  //
-  string selTks_Collection;
-  double selTks_minPt;
-  double selTks_maxEta;
-  double selTks_maxChiSq;
-  unsigned int selTks_minStubs;
-  unsigned int selTks_minStubsPS;
-  unsigned int selTks_nFitParams;
-  int selTksPix_minHits;
+
   //
   double sigCone_Constant;
   double sigCone_cutoffDeltaR;
@@ -191,9 +211,10 @@ class CaloPlusTracks : public TreeAnalyserMC{
   
   vector<TTTrack> GetTTTracks(const double minPt = 0.0,
 			      const double maxEta = 9999.9,
-			      const double maxChiSq = 9999.9,
+			      const double maxChiSqRed = 9999.9,
 			      const unsigned int minStubs = 0,
 			      const unsigned int minStubsPS = 0,
+			      const unsigned int maxStubsPS = 999,
 			      const unsigned nFitParams = 5,
 			      bool bPrintList = false);
 
@@ -204,7 +225,7 @@ class CaloPlusTracks : public TreeAnalyserMC{
 
   vector<TTPixelTrack> GetTTPixelTracks(const double minPt = 0.0,
 					const double maxEta = 9999.9,
-					const double maxChiSq = 9999.9,
+					const double maxChiSqRed = 9999.9,
 					const int minHits = 0.0,
 					bool bPrintList=false);
 
@@ -259,6 +280,7 @@ class CaloPlusTracks : public TreeAnalyserMC{
   TH1D* hL1TkTau_IsoConeRMin;
   TH1D* hL1TkTau_IsoConeRMax;
   TH1D* hL1TkTau_Charge;
+  TH1D* hL1TkTau_ChargeAbs;
   TH1D* hL1TkTau_RelIso;
   TH1D* hL1TkTau_VtxIso;
   TH1D* hL1TkTau_VtxIsoAbs;

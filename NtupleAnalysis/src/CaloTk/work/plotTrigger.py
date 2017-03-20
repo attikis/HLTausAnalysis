@@ -35,14 +35,14 @@ import ROOT
 #================================================================================================
 # Options here
 #================================================================================================
-analysis         = "CaloPlusTracks"
+analysis         = "CaloTk"
 bTurnOns         = False
 bSingleTau       = True
 bDiTau           = False
 bDiTau_Indist    = False
 bDiTau_Dist_Calo = False
 bDiTau_Dist_Tk   = False
-datasetList      = ["VBF"] #["MinBias", "VBF", "HPlus160"]
+datasetList      = ["VBF"] #"VBF", "HPlus160"]
 saveFormats      = ["png"]
 savePath         = "plots/"
 

@@ -5,7 +5,7 @@ Usage:
 cd HLTausAnalysis
 source setup.csh
 source /Users/attikis/ROOT/v5-34-00-patches/bin/thisroot.csh
-./plotL1TkTaus.py -m results/test/
+./plotCaloTk.py -m results/test/
 
 Comments:
 
@@ -33,7 +33,7 @@ import ROOT
 #================================================================================================
 # Options here
 #================================================================================================
-analysis         = "CaloPlusTracks"
+analysis         = "CaloTk"
 bDoL1TkTau       = True
 bDoL1TkTauExtra  = True
 bDoMatchTk       = True
@@ -127,7 +127,7 @@ def main(opts):
         DoPlots( hL1TkTau_Rtau       , datasetPaths, datasetList) 
         DoPlots( hL1TkTau_RelIso     , datasetPaths, datasetList) 
         DoPlots( hL1TkTau_VtxIso     , datasetPaths, datasetList) 
-        DoPlots( hL1TkTau_VtxIsoAbs  , datasetPaths, datasetList) 
+        # DoPlots( hL1TkTau_VtxIsoAbs  , datasetPaths, datasetList) 
         DoPlots( hL1TkTau_InvMassIncl, datasetPaths, datasetList) 
         DoPlots( hL1TkTau_ResolutionCaloEt , datasetPaths, datasetList) 
         DoPlots( hL1TkTau_ResolutionCaloEta, datasetPaths, datasetList) 
@@ -141,7 +141,8 @@ def main(opts):
         DoPlots( hL1TkTau_IsoConeRMin, datasetPaths, datasetList) 
         DoPlots( hL1TkTau_IsoConeRMax, datasetPaths, datasetList) 
         DoPlots( hL1TkTau_DeltaRGenP , datasetPaths, datasetList) 
-        DoPlots( hL1TkTau_Charge     , datasetPaths, datasetList) 
+        DoPlots( hL1TkTau_Charge     , datasetPaths, datasetList)
+        DoPlots( hL1TkTau_ChargeAbs  , datasetPaths, datasetList) 
 
         
     if bDoEfficiencies:
@@ -153,7 +154,8 @@ def main(opts):
         DoEfficiency( hL1TkTau_InvMass              , datasetPaths, datasetList, ["<"] )
         DoEfficiency( hL1TkTau_Rtau                 , datasetPaths, datasetList, [">", "<"] )
         DoEfficiency( hL1TkTau_RelIso               , datasetPaths, datasetList, ["<"] )
-        DoEfficiency( hL1TkTau_VtxIsoAbs            , datasetPaths, datasetList, [">"] )
+        DoEfficiency( hL1TkTau_VtxIso               , datasetPaths, datasetList, [">"] )
+        # DoEfficiency( hL1TkTau_VtxIsoAbs            , datasetPaths, datasetList, [">"] )
 
         
     if bDoMatchTk:

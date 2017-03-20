@@ -25,7 +25,7 @@ void runCaloPlusTracks(const std::string MulticrabDir = "",
 		   const int maxEvents = -1)
 {
 
-  gSystem->CompileMacro("CaloPlusTracks.C");
+  gSystem->CompileMacro("../CaloPlusTracks.C");
 
   // const std::string absolutePath = "/Users/attikis/my_work/cms/lxplus/hltaus/rootFiles/TTrees/CMSSW_6_2_0_SLHC12_patch1/TkTauFromCaloAnalyzer_v3";
   // const std::string absolutePath = "/Users/attikis/my_work/cms/lxplus/hltaus/rootFiles/TTrees/CMSSW_6_2_0_SLHC12_patch1/TkTauFromCaloAnalyzer_v6";

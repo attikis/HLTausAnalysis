@@ -21,13 +21,15 @@ class HistoTools{
  public:
   virtual ~HistoTools() { };
   void BookHisto_1D(TH1D *&histo, 
-		    const char* hName, 
+		    const char* hName,
+		    const char* hTitle, 
 		    const Int_t nBins, 
 		    const Double_t xMin,  
 		    const Double_t xMax);
 
   void BookHisto_2D(TH2D *&histo, 
-		    const char* hName, 
+		    const char* hName,
+		    const char* hTitle, 
 		    const Int_t nBinsX, 
 		    const Double_t xMin,  
 		    const Double_t xMax, 

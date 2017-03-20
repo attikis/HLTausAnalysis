@@ -13,14 +13,16 @@
 
 //****************************************************************************
 void HistoTools::BookHisto_1D(TH1D *&histo, 
-			      const char *hName, 
+			      const char *hName,
+			      const char *hTitle, 
 			      const Int_t nBins, 
 			      const Double_t xMin,  
 			      const Double_t xMax)
 //****************************************************************************
 {
 
-  histo = new TH1D(hName, hName, nBins, xMin, xMax);
+  
+  histo = new TH1D(hName, hTitle, nBins, xMin, xMax);
   histo->Sumw2();
   return;
 }
@@ -28,7 +30,8 @@ void HistoTools::BookHisto_1D(TH1D *&histo,
 
 //****************************************************************************
 void HistoTools::BookHisto_2D(TH2D *&histo, 
-			      const char *hName, 
+			      const char *hName,
+			      const char *hTitle, 
 			      const Int_t nBinsX, 
 			      const Double_t xMin,  
 			      const Double_t xMax,
@@ -38,7 +41,7 @@ void HistoTools::BookHisto_2D(TH2D *&histo,
 //****************************************************************************
 {
 
-  histo = new TH2D(hName, hName, nBinsX, xMin, xMax, nBinsY, yMin, yMax);
+  histo = new TH2D(hName, hTitle, nBinsX, xMin, xMax, nBinsY, yMin, yMax);
   histo->Sumw2();
   return;
 }

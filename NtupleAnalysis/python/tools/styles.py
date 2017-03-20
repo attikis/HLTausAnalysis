@@ -60,7 +60,7 @@ class StyleClass(object):
 
         ### CMSSW_620 (Central Production)
         self._SetDefaults("MinBias"          , colour=ROOT.kBlack     , markerStyle=ROOT.kFullCircle      ,
-                          lineWidth=2, lineStyle=1, fillStyle=1001, drawOptions="HIST", legOptions="F")
+                          lineWidth=2, lineStyle=1, fillStyle=3001, drawOptions="HIST", legOptions="F")
         self._SetDefaults("PiPlus"           , colour=ROOT.kGreen-2   , markerStyle=ROOT.kOpenCircle      ,
                           lineWidth=2, lineStyle=1, fillStyle=1001, drawOptions="HIST", legOptions="F")
         self._SetDefaults("PiMinus"          , colour=ROOT.kViolet-5  , markerStyle=ROOT.kOpenCircle      ,
