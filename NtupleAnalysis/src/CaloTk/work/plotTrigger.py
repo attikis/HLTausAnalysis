@@ -108,7 +108,7 @@ def DoPlots(hList, datasetPaths, datasetList, saveExt="", bLegHeader=None):
     return
 
 
-def DoROC(rateToEffMap, datasetPaths, signalDataset, rocSaveName, bSaveAuxHistos=False):
+def DoROC(rateToEffMap, datasetPaths, signalDataset, rocSaveName, bSaveAuxHistos=False, **kwargs):
     
     p0 = m_plotter.Plotter( Verbose=False, BatchMode=True )
     RateHistoList, EffHistoList = p0.GetROCHistoLists(rateToEffMap)
@@ -132,8 +132,8 @@ def DoROC(rateToEffMap, datasetPaths, signalDataset, rocSaveName, bSaveAuxHistos
     ### ROCs
     p3 = m_plotter.Plotter( Verbose=False, BatchMode=True )
     p3.SetBoolUseDatasetAsLegEntry(False)
-    p3.ConvertToROC( p1.GetHistos(), p2.GetHistos(), decimals = 3, bDrawZValues=True, **ROC)
-    p3.DrawMultigraph(rocSaveName, **ROC)
+    p3.ConvertToROC( p1.GetHistos(), p2.GetHistos(), decimals = 3, bDrawZValues=True, **kwargs)
+    p3.DrawMultigraph(rocSaveName, **kwargs)
     p3.SetTLegendHeader(signalDataset, "")
     p3.SaveHistos(True, savePath, saveFormats)
     return
@@ -163,19 +163,19 @@ def main(opts):
             print "=== Doing SingleTau"
         #DoPlots( SingleTau_Rate, datasetPaths, ["MinBias"], "")
         #DoPlots( SingleTau_Eff , datasetPaths, datasetList, "")
-        #DoROC  ( SingleTau_ROCs, datasetPaths, datasetList[0], "SingleTau_ROCs" + "")
+        DoROC  ( SingleTau_ROCs, datasetPaths, datasetList[0], "SingleTau_ROCs" + "", **ROC)
+        
+        #DoPlots( SingleTau_Rate_C, datasetPaths, ["MinBias"], "")
+        #DoPlots( SingleTau_Eff_C , datasetPaths, datasetList, "")
+        DoROC  ( SingleTau_ROCs_C, datasetPaths, datasetList[0], "SingleTau_ROCs_C" + "", **ROC_C)
 
-        DoPlots( SingleTau_Rate_C, datasetPaths, ["MinBias"], "")
-        DoPlots( SingleTau_Eff_C , datasetPaths, datasetList, "")
-        DoROC  ( SingleTau_ROCs_C, datasetPaths, datasetList[0], "SingleTau_ROCs_C" + "")
+        #DoPlots( SingleTau_Rate_I, datasetPaths, ["MinBias"], "")
+        #DoPlots( SingleTau_Eff_I , datasetPaths, datasetList, "")
+        DoROC  ( SingleTau_ROCs_I, datasetPaths, datasetList[0], "SingleTau_ROCs_I" + "", **ROC_I)
 
-        DoPlots( SingleTau_Rate_I, datasetPaths, ["MinBias"], "")
-        DoPlots( SingleTau_Eff_I , datasetPaths, datasetList, "")
-        DoROC  ( SingleTau_ROCs_I, datasetPaths, datasetList[0], "SingleTau_ROCs_I" + "")
-
-        DoPlots( SingleTau_Rate_F, datasetPaths, ["MinBias"], "")
-        DoPlots( SingleTau_Eff_F , datasetPaths, datasetList, "")
-        DoROC  ( SingleTau_ROCs_F, datasetPaths, datasetList[0], "SingleTau_ROCs_F" + "")
+        #DoPlots( SingleTau_Rate_F, datasetPaths, ["MinBias"], "")
+        #DoPlots( SingleTau_Eff_F , datasetPaths, datasetList, "")
+        DoROC  ( SingleTau_ROCs_F, datasetPaths, datasetList[0], "SingleTau_ROCs_F" + "", **ROC_F)
 
 
     if bDiTau:
@@ -188,19 +188,19 @@ def main(opts):
         DoPlots( DiTau_Rate   , datasetPaths, ["MinBias"], "")
         DoPlots( DiTau_Eff    , datasetPaths, datasetList, "")
         DoROC  ( DiTau_ROCs   , datasetPaths, datasetList[0], "DiTau_ROCs" + "")
-        #DoROC  ( DiTau_ROCs_TP, datasetPaths, datasetList[0], "DiTau_ROCs" + "")
+        #DoROC  ( DiTau_ROCs_TP, datasetPaths, datasetList[0], "DiTau_ROCs" + "", **ROC)
 
         DoPlots( DiTau_Rate_C, datasetPaths, ["MinBias"], "")
         DoPlots( DiTau_Eff_C , datasetPaths, datasetList, "")
-        DoROC  ( DiTau_ROCs_C, datasetPaths, datasetList[0], "DiTau_ROCs_C" + "")
+        DoROC  ( DiTau_ROCs_C, datasetPaths, datasetList[0], "DiTau_ROCs_C" + "", **ROC)
 
         DoPlots( DiTau_Rate_I, datasetPaths, ["MinBias"], "")
         DoPlots( DiTau_Eff_I , datasetPaths, datasetList, "")
-        DoROC  ( DiTau_ROCs_I, datasetPaths, datasetList[0], "DiTau_ROCs_I" + "")
+        DoROC  ( DiTau_ROCs_I, datasetPaths, datasetList[0], "DiTau_ROCs_I" + "", **ROC)
 
         DoPlots( DiTau_Rate_F, datasetPaths, ["MinBias"], "")
         DoPlots( DiTau_Eff_F , datasetPaths, datasetList, "")
-        DoROC  ( DiTau_ROCs_F, datasetPaths, datasetList[0], "DiTau_ROCs_F" + "")
+        DoROC  ( DiTau_ROCs_F, datasetPaths, datasetList[0], "DiTau_ROCs_F" + "", **ROC)
 
 
 
