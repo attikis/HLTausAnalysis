@@ -161,9 +161,21 @@ def main(opts):
     if bSingleTau:
         if opts.verbose:
             print "=== Doing SingleTau"
-        DoPlots( SingleTau_Rate  , datasetPaths, ["MinBias"], "")
-        DoPlots( SingleTau_Eff   , datasetPaths, datasetList, "")
-        DoROC  ( SingleTau_ROCs  , datasetPaths, datasetList[0], "SingleTau_ROCs" + "")
+        #DoPlots( SingleTau_Rate, datasetPaths, ["MinBias"], "")
+        #DoPlots( SingleTau_Eff , datasetPaths, datasetList, "")
+        #DoROC  ( SingleTau_ROCs, datasetPaths, datasetList[0], "SingleTau_ROCs" + "")
+
+        DoPlots( SingleTau_Rate_C, datasetPaths, ["MinBias"], "")
+        DoPlots( SingleTau_Eff_C , datasetPaths, datasetList, "")
+        DoROC  ( SingleTau_ROCs_C, datasetPaths, datasetList[0], "SingleTau_ROCs_C" + "")
+
+        DoPlots( SingleTau_Rate_I, datasetPaths, ["MinBias"], "")
+        DoPlots( SingleTau_Eff_I , datasetPaths, datasetList, "")
+        DoROC  ( SingleTau_ROCs_I, datasetPaths, datasetList[0], "SingleTau_ROCs_I" + "")
+
+        DoPlots( SingleTau_Rate_F, datasetPaths, ["MinBias"], "")
+        DoPlots( SingleTau_Eff_F , datasetPaths, datasetList, "")
+        DoROC  ( SingleTau_ROCs_F, datasetPaths, datasetList[0], "SingleTau_ROCs_F" + "")
 
 
     if bDiTau:
@@ -173,9 +185,24 @@ def main(opts):
         #    DoPlots( h, ["MinBias"])
         #for h in DiTau_Eff_CaloIso:
         #    DoPlots( h , datasetList)
-        DoPlots( DiTau_Rate   , ["MinBias"], "")
+        DoPlots( DiTau_Rate   , datasetPaths, ["MinBias"], "")
         DoPlots( DiTau_Eff    , datasetPaths, datasetList, "")
-        DoROC  ( DiTau_ROCs_TP, datasetList[0], "DiTau_ROCs" + "")
+        DoROC  ( DiTau_ROCs   , datasetPaths, datasetList[0], "DiTau_ROCs" + "")
+        #DoROC  ( DiTau_ROCs_TP, datasetPaths, datasetList[0], "DiTau_ROCs" + "")
+
+        DoPlots( DiTau_Rate_C, datasetPaths, ["MinBias"], "")
+        DoPlots( DiTau_Eff_C , datasetPaths, datasetList, "")
+        DoROC  ( DiTau_ROCs_C, datasetPaths, datasetList[0], "DiTau_ROCs_C" + "")
+
+        DoPlots( DiTau_Rate_I, datasetPaths, ["MinBias"], "")
+        DoPlots( DiTau_Eff_I , datasetPaths, datasetList, "")
+        DoROC  ( DiTau_ROCs_I, datasetPaths, datasetList[0], "DiTau_ROCs_I" + "")
+
+        DoPlots( DiTau_Rate_F, datasetPaths, ["MinBias"], "")
+        DoPlots( DiTau_Eff_F , datasetPaths, datasetList, "")
+        DoROC  ( DiTau_ROCs_F, datasetPaths, datasetList[0], "DiTau_ROCs_F" + "")
+
+
 
 
     if bDiTau_Indist:
