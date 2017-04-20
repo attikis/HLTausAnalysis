@@ -22,12 +22,12 @@ import math
 from optparse import OptionParser
 
 # User
-import HLTausAnalysis.NtupleAnalysis.tools.plotter as m_plotter
-import HLTausAnalysis.NtupleAnalysis.tools.histos as m_histos
-from HLTausAnalysis.NtupleAnalysis.tools.tauTriggerAux import *
-import HLTausAnalysis.NtupleAnalysis.tools.styles as m_styles
-import HLTausAnalysis.NtupleAnalysis.tools.aux as m_aux
-import HLTausAnalysis.NtupleAnalysis.tools.datasets as m_datasets
+import HLTausAnalysis.NtupleAnalysis.tools.old.plotter as m_plotter
+import HLTausAnalysis.NtupleAnalysis.tools.old.histos as m_histos
+from HLTausAnalysis.NtupleAnalysis.tools.old.tauTriggerAux import *
+import HLTausAnalysis.NtupleAnalysis.tools.old.styles as m_styles
+import HLTausAnalysis.NtupleAnalysis.tools.old.aux as m_aux
+import HLTausAnalysis.NtupleAnalysis.tools.old.datasets as m_datasets
 
 # ROOT
 import ROOT
