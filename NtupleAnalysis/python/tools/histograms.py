@@ -85,6 +85,9 @@ uncertaintyMode = Uncertainty()
 ## Default energy text
 energyText = "13 TeV"
 
+## Default PU text
+pileupText = "PU=140"
+
 ## Class to provide default positions of the various texts.
 #
 # The attributes which can be set are the x and y coordinates and the
@@ -96,6 +99,7 @@ class TextDefaults:
         self._setDefaults("cmsPreliminary", x=0.62, y=0.96)
         self._setDefaults("energy", x=0.19, y=0.96)
         self._setDefaults("lumi", x=0.43, y=0.96)
+        self._setDefaults("pileup", x=0.17, y=0.96)
 
     ## Modify the default values
     # 
@@ -121,6 +125,9 @@ class TextDefaults:
     # \param kwargs  Keyword arguments (forwarded to _setDefaults())
     def setEnergyDefaults(self, **kwargs):
         self._setDefaults("energy", **kwargs)
+
+    def setPileupDefaults(self, **kwargs):
+        self._setDefaults("pileup", **kwargs)
         
     ## Modify the default position of integrated luminosity text
     #
@@ -331,6 +338,14 @@ def addEnergyText(x=None, y=None, s=None):
         text = s
     addText(x, y, "#sqrt{s} = "+text, textDefaults.getSize("energy"), bold=False)
 
+def addPileupText(x=None, y=None, s=None):
+    _printTextDeprecationWarning("histograms.addPileupText()")
+    (x, y) = textDefaults.getValues("pileup", x, y)
+    text = pileupText
+    if s != None:
+        text = s
+    addText(x, y, "PU="+text, textDefaults.getSize("pileup"), bold=False)
+    
 ## Format luminosity number to fb
 #
 # \param lumi  Luminosity in pb^-1
@@ -404,13 +419,14 @@ def addStandardTexts(lumi=None, sqrts=None, addCmsText=True, cmsTextPosition=Non
         else:
             lumiText = formatLuminosityInFb(lumi)
         lumiText += " fb^{-1} ("
+
+    lumiText += pileupText + ", "
     if sqrts is not None:
         lumiText += sqrts
     else:
         lumiText += energyText
-    if lumi is not None:
-        lumiText += ")"
 
+    
     lumiTextOffset = 0.2
     l = ROOT.gPad.GetLeftMargin()
     t = ROOT.gPad.GetTopMargin()

@@ -325,6 +325,12 @@ invertedStyle     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.
 altEwkStyle       = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta-2, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
                                    StyleLine(lineColor=ROOT.kMagenta-2, lineStyle=ROOT.kSolid, lineWidth=3),
                                    StyleFill(fillColor=ROOT.kMagenta-2, fillStyle=3001)])
+HToTauTauStyle    = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                                   StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kDotted, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kRed, fillStyle=1001)])
+MinBiasStyle     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
+                                   StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kBlack, fillStyle=3001)])
 
 
 

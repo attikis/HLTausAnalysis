@@ -33,7 +33,7 @@ from sys import platform as _platform
 #================================================================================================
 # Global Definitions
 #================================================================================================
-DEBUG = True
+DEBUG = False
 _debugNAllEvents = False
 _debugCounters = False
 
@@ -113,10 +113,10 @@ def getDatasetsFromMulticrabDirs(multiDirs, **kwargs):
     # For-loop: All multicrab directories
     for d in multiDirs:
         if isinstance(d, str):
-            Print("Getting datasets from multicrab.cfg file (directory=%s)" % (d), True) # hplus-to-hltaus
+            Verbose("Getting datasets from multicrab.cfg file (directory=%s)" % (d), True) # hplus-to-hltaus
             dset = getDatasetsFromMulticrabCfg(directory=d, **kwargs)
         else:
-            Print("Getting datasets from multicrab.cfg file (directory=%s, namePostfix=%s" % (d[0], d[1]), True)
+            Verbose("Getting datasets from multicrab.cfg file (directory=%s, namePostfix=%s" % (d[0], d[1]), True)
             dset = getDatasetsFromMulticrabCfg(directory=d[0], namePostfix=d[1], **kwargs) # hplus-to-hltaus
         datasets.extend(dset)
 
@@ -202,7 +202,7 @@ def readFromMulticrabCfg(**kwargs):
     taskDirs = aux.includeExcludeTasks(taskDirs, **kwargs)
     taskDirs.sort()
 
-    Print("Reading from CRAB dirs (taskDirs=%s, baseDirectory=%s)" % (taskDirs, dirname), True)
+    Verbose("Reading from CRAB dirs (taskDirs=%s, baseDirectory=%s)" % (taskDirs, dirname), True)
     managerCreator = readFromCrabDirs(taskDirs, baseDirectory=dirname, **kwargs)
     return managerCreator
 

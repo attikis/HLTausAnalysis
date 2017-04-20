@@ -31,7 +31,7 @@ https://twiki.cern.ch/twiki/bin/view/CMS/HowToGenXSecAnalyzer#Running_the_GenXSe
 
 '''
 
-DEGUB = False
+DEBUG = False
 def Verbose(msg, printHeader=False):
     '''
     Calls Print() only if verbose options is set to true.
@@ -116,6 +116,8 @@ class CrossSectionList:
 # [17] https://twiki.cern.ch/twiki/bin/view/CMS/SummaryTable1G25ns#DY_Z and https://arxiv.org/pdf/1105.0020v1.pdf
 # [18] top mass 172.5, https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
 # [19} https://twiki.cern.ch/twiki/bin/viewauth/CMS/SingleTopSigma
+# [20] https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt14TeV#VBF_Process
+# [21] http://ac.els-cdn.com/S2405601415006240/1-s2.0-S2405601415006240-main.pdf?_tid=ba665958-25bf-11e7-8a34-00000aab0f26&acdnat=1492689285_2ebe153f5603767e979806f35c427599
 
 backgroundCrossSections = CrossSectionList(
     CrossSection("QCD_Pt_15to30", {
@@ -570,6 +572,12 @@ backgroundCrossSections = CrossSectionList(
     CrossSection("ttbb_4FS_ckm_amcatnlo_madspin_pythia8", {
             "13": 1.393e+01, #1.393e+01 +- 3.629e-02 pb [16] (inputFiles="0641890F-F72C-E611-9EA8-02163E014B5F.root")
             }),   
+    CrossSection("Neutrino_Pt2to20_gun", {
+            "14": (100.0/1000.0)*1e12, #100 mb
+            }),
+    CrossSection("VBF_HToTauTau_125_14TeV_powheg_pythia6", {
+        "14": 4.278*0.063, #[20, 21]
+    }),   
     )
 
 ## Set background process cross sections
@@ -611,7 +619,7 @@ def setBackgroundCrossSectionForDataset(dataset, doWNJetsWeighting=True, quietMo
             msg = ""
         if not quietMode:
             msg = txtAlign.format("Setting", dataset.getName(), "cross section to ", "%0.6f" %(value), "pb", msg)
-            Print(msg, False)
+            Verbose(msg, False)
     else:
         Print("Warning: no cross section for dataset %s with energy %s TeV (see python/tools/crosssection.py)" % (dataset.getName(), dataset.getEnergy()), True)
 

@@ -109,6 +109,9 @@ _physicalMcAdd = {
     "DYJetsToLL_M_50_ext"        : "DYJetsToLL_M_50",
     "DYJetsToLL_M_50_ext1"       : "DYJetsToLL_M_50",
 
+    "Neutrino_Pt2to20_gun"                  : "MinBias",
+    "VBF_HToTauTau_125_14TeV_powheg_pythia6": "VBF_HToTauTau",
+    
     "ChargedHiggs_HplusTB_HplusToTauNu_M_500_ext1" : "ChargedHiggs_HplusTB_HplusToTauNu_M_500",
     "ChargedHiggs_HplusTB_HplusToTauNu_M_750_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_750",
     "ChargedHiggs_HplusTB_HplusToTauNu_M_800_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_800",
@@ -332,7 +335,11 @@ _datasetMerge = {
     "WZ"    : "Diboson",
     "ZZ"    : "Diboson",
 
-    "ttbb_4FS_ckm_amcatnlo_madspin_pythia8"     : "TTBB",
+    "ttbb_4FS_ckm_amcatnlo_madspin_pythia8" : "TTBB",
+
+    "Neutrino_Pt2to20_gun"                  : "MinBias",
+    "VBF_HToTauTau_125_14TeV_powheg_pythia6": "VBF_HToTauTau",
+
 
     #"ChargedHiggs_HplusTB_HplusToTauNu_M_200": "ChargedHiggs_HplusTB_HplusToTauNu_M_200",
     #"ChargedHiggs_HplusTB_HplusToTauB_M_200": "ChargedHiggs_HplusTB_HplusToTauNu_M_200",
@@ -389,6 +396,8 @@ _datasetOrder.extend([
     "WWTo4Q",      # Htb
     "TTBB",        # Htb
     "TTTT",        # Htb
+    "MinBias",
+    "VBF_HToTauTau",    
     ]) 
 
 ## Map the logical dataset names to legend labels
@@ -428,6 +437,9 @@ _legendLabels = {
     "WJets_1bquark": "W+jets (1 b)",
     "WJets_2bquark": "W+jets (2 b)",
     "WJets_3bquark": "W+jets (#geq3 b)",   
+
+    "MinBias"      : "MB",
+    "VBF_HToTauTau": "VBF H^{0}#rightarrow#tau#tau",
 
     "QCD_Pt15to30"    : "QCD,   15 < #hat{p}_{T} <   30",
     "QCD_Pt30to50"    : "QCD,   30 < #hat{p}_{T} <   50",
@@ -557,6 +569,10 @@ _plotStyles = {
     "WWTo4Q"        : styles.dibStyle,
     "WZ"            : styles.dibStyle,
     "ZZ"            : styles.dibStyle,
+
+    "MinBias"       : styles.MinBiasStyle,
+    "VBF_HToTauTau" : styles.HToTauTauStyle,
+
 
     "WJets_0bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+1),
     "WJets_1bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+4),

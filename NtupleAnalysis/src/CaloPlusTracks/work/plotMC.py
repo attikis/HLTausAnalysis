@@ -2,20 +2,15 @@
 '''
 
 Usage (single plot):
-./plotMC.py -m <pseudo_mcrab_directory> <jsonfile>
+./plotMC.py -m <multicrab_directory> <jsonfile> [opts]
 
 Usage (multiple plots):
-./plotMC.py -m <pseudo_mcrab_directory> json/AfterAllSelections/*.json
-or
-./plotMC.py -m <pseudo_mcrab_directory> json/AfterAllSelections/*.json json/AfterStandardSelections/*.json
-
+./plotMC.py -m <pseudo_mcrab_directory> json/*.json
+./plotMC.py -m <pseudo_mcrab_directory> json/*.json json/L1TkTau/*.json
 
 Last Used:
-./plotMC.py -m Hplus2tbAnalysis_161128_082955/ json/AfterAllSelections/BjetPt.json
-or
-./plotMC.py -m Hplus2tbAnalysis_161128_082955/ json/AfterAllSelections/*.json
-or
-./plotMC.py -m Hplus2tbAnalysis_161128_082955/ json/AfterAllSelections/*/*.json
+./plotMC.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/L1TkTau/Multiplicity.json -i "VBF|Neutrino"
+./plotMC.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/*/*.json -i "VBF|Neutrino"
 '''
 
 #================================================================================================
@@ -73,17 +68,27 @@ def GetLumi(datasetsMgr):
 def GetDatasetsFromDir(opts, json):
     Verbose("Getting datasets")
     
-    if len(json["samples"])<1:
-        Print("No samples defined in the JSON file. Exit", True)
-        print __doc__
-        sys.exit()
+    if (not opts.includeOnlyTasks and not opts.excludeTasks):
+        datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
+                                                        dataEra=json["dataEra"],
+                                                        searchMode=None, 
+                                                        analysisName=json["analysis"])
+    elif (opts.includeOnlyTasks):
+        datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
+                                                        dataEra=json["dataEra"],
+                                                        searchMode=None,
+                                                        analysisName=json["analysis"],
+                                                        includeOnlyTasks=opts.includeOnlyTasks)
+    elif (opts.excludeTasks):
+        datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
+                                                        dataEra=json["dataEra"],
+                                                        searchMode=None,
+                                                        analysisName=json["analysis"],
+                                                        excludeTasks=opts.excludeTasks)
     else:
-        return dataset.getDatasetsFromMulticrabDirs([opts.mcrab], 
-                                                    dataEra=json["dataEra"],
-                                                    searchMode=None,
-                                                    analysisName=json["analysis"],
-                                                    includeOnlyTasks="|".join(json["samples"]),
-                                                    optimizationMode=json["optMode"])
+        raise Exception("This should never be reached")
+    return datasets
+    
     
 def Plot(jsonfile, opts):
     Verbose("Plotting")
@@ -91,7 +96,7 @@ def Plot(jsonfile, opts):
     with open(os.path.abspath(jsonfile)) as jfile:
         j = json.load(jfile)
 
-        Print("Plotting %s in %s" % (j["title"], j["saveDir"]), True)
+        Verbose("Plotting %s. Will save under \"%s\"" % (j["title"], j["saveDir"]), True)
 
         # Setup the style
         style = tdrstyle.TDRStyle()
@@ -103,7 +108,8 @@ def Plot(jsonfile, opts):
 
         # Setup & configure the dataset manager
         datasetsMgr = GetDatasetsFromDir(opts, j)
-        datasetsMgr.loadLuminosities()
+        if 0:
+            datasetsMgr.loadLuminosities()
         #datasetsMgr.updateNAllEventsToPUWeighted()
 
         # Print information
@@ -133,7 +139,7 @@ def MCPlot(datasetsMgr, json):
     # Create the MC Plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
     if json["normalization"]=="normalizeToLumi":
         kwargs = {}
-        p = plots.MCPlot(datasetsMgr, json["histogram"], normalizeToLumi=float(json["luminosity"]), **kwargs)
+        p = plots.MCPlot(datasetsMgr, json["histogram"], normalizeToLumi=opts.intLumi, **kwargs)
     else:
         kwargs = {json["normalization"]: True}
         p = plots.MCPlot(datasetsMgr, json["histogram"], **kwargs)
@@ -231,18 +237,28 @@ if __name__ == "__main__":
     global opts
     BATCHMODE = True
     VERBOSE   = False
+    INTLUMI   = 1.0
 
     parser = OptionParser(usage="Usage: %prog [options]" , add_help_option=False,conflict_handler="resolve")
-
-    parser.add_option("-m", "--mcrab", dest="mcrab", action="store", 
-                      help="Path to the multicrab directory for input")
-
-    parser.add_option("-b", "--batchMode", dest="batchMode", action="store_false", default=BATCHMODE, 
-                      help="Enables batch mode (canvas creation  NOT generates a window) [default: %s]" % BATCHMODE)
 
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=VERBOSE, 
                       help="Enables verbose mode (for debugging purposes) [default: %s]" % VERBOSE)
 
+    parser.add_option("-b", "--batchMode", dest="batchMode", action="store_false", default=BATCHMODE, 
+                      help="Enables batch mode (canvas creation  NOT generates a window) [default: %s]" % BATCHMODE)
+
+    parser.add_option("-m", "--mcrab", dest="mcrab", action="store", 
+                      help="Path to the multicrab directory for input")
+
+    parser.add_option("--intLumi", dest="intLumi", type=float, default=INTLUMI,
+                      help="Override the integrated lumi [default: %s]" % INTLUMI)
+
+    parser.add_option("-i", "--includeOnlyTasks", dest="includeOnlyTasks", action="store", 
+                      help="List of datasets in mcrab to include")
+
+    parser.add_option("-e", "--excludeTasks", dest="excludeTasks", action="store", 
+                      help="List of datasets in mcrab to exclude")
+    
     (opts, parseArgs) = parser.parse_args()
 
     # Require at least two arguments (script-name, path to multicrab)
