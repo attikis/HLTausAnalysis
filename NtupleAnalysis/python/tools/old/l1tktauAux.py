@@ -83,13 +83,13 @@ PtRes = {
     "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
 
 EtaRes = {
-    "xLabel": "(#eta^{gen}-#eta^{calo})/#eta^{gen}", "xUnits": "" , "xMin": -2.5 , "xMax": 2.5, "binWidthX": None, "xCutLines": [0], "xCutBoxes": [], "gridX": True, "logX": False, "logXRatio": False, 
+    "xLabel": "(#eta^{gen}-#eta^{calo})/#eta^{gen}", "xUnits": "" , "xMin": -3.5 , "xMax": 3.5, "binWidthX": None, "xCutLines": [0], "xCutBoxes": [], "gridX": True, "logX": False, "logXRatio": False, 
     "yLabel": "Entries / %0.2f" , "yUnits": "" , "yMin": 1e-05 , "yMax": 1.0 , "binWidthY": None, "yCutLines": [], "yCutBoxes": [], "gridY": True, "logY": True , "logYRatio": False, 
     "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": drawOpts, "legOptions": legOpts,
     "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
 
 PhiRes = {
-    "xLabel": "(#phi^{gen}-#phi^{calo})/#phi^{gen}", "xUnits": "" , "xMin": -4.5 , "xMax": 4.5, "binWidthX": None, "xCutLines": [0], "xCutBoxes": [], "gridX": True, "logX": False, "logXRatio": False, 
+    "xLabel": "(#phi^{gen}-#phi^{calo})/#phi^{gen}", "xUnits": "" , "xMin": -8.5 , "xMax": 8.5, "binWidthX": None, "xCutLines": [0], "xCutBoxes": [], "gridX": True, "logX": False, "logXRatio": False, 
     "yLabel": "Entries / %0.2f" , "yUnits": "" , "yMin": 1e-05 , "yMax": 1.0 , "binWidthY": None, "yCutLines": [], "yCutBoxes": [], "gridY": True, "logY": True , "logYRatio": False, 
     "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": drawOpts, "legOptions": legOpts,
     "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
@@ -114,8 +114,8 @@ Pt = {
     "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
 
 Eta = {
-    "xLabel": "#eta"            , "xUnits": "", "xMin": -2.8 , "xMax": +2.8 , "binWidthX": 0.1 , "xCutLines": [-1.6, 0.0, +1.6], "gridX": True, "logX": False,
-    #"xCutBoxes": [[0.0, 0.8, ROOT.kRed], [0.8, 1.6, ROOT.kBlue], [1.6, 2.5, ROOT.kGreen]],
+    "xLabel": "#eta"            , "xUnits": "", "xMin": -2.8 , "xMax": +2.8 , "binWidthX": 0.1 , "xCutLines": [-1.6, -1.0, 0.0, +1.0, +1.6], "gridX": True, "logX": False,
+    #"xCutBoxes": [[0.0, 1.0, ROOT.kRed], [1.0, 1.6, ROOT.kBlue], [1.6, 2.5, ROOT.kGreen]],
     "yLabel": "Entries / %0.2f" , "yUnits": "", "yMin": 2E-03, "yMax": 2E-1 , "yCutLines": []  , "yCutBoxes": [], "gridY": True, "logY": True , "logYRatio": False, 
     "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": drawOpts,
     "legOptions": legOpts, "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
@@ -170,22 +170,22 @@ ChargeAbs = {
     "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
 
 D0 = {
-    "xLabel": "d_{0}"          , "xUnits": "cm", "xMin": -1.0 , "xMax": +1.0, "binWidthX": 0.1, "xCutLines": [0], "xCutBoxes": [], "gridX": True, "logX": False,
+    "xLabel": "d_{0}"          , "xUnits": "cm", "xMin": -0.6 , "xMax": +0.6, "binWidthX": 0.01, "xCutLines": [0], "xCutBoxes": [], "gridX": True, "logX": False,
     "yLabel": "Entries / %0.2f", "yUnits": ""  , "yMin": 1E-05, "yMax": +2.0, "binWidthY": None, "yCutLines": [] , "yCutBoxes": [], "gridY": True, "logY": True,
-    "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": drawOpts, "legOptions": legOpts,
-    "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
+    "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": drawOpts,
+    "legOptions": legOpts, "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
 
 D0Abs = {
-    "xLabel": "|d_{0}|"         , "xUnits": "cm", "xMin": 0.0 , "xMax": +0.4, "binWidthX": 0.1, "xCutLines": [4.0], "xCutBoxes": [], "gridX": True, "logX": False,
+    "xLabel": "|d_{0}|"         , "xUnits": "cm", "xMin": 0.0 , "xMax": +0.6, "binWidthX": 0.01, "xCutLines": [], "xCutBoxes": [], "gridX": True, "logX": False,
     "yLabel": "Entries / %0.2f", "yUnits": ""  , "yMin": 1e-04, "yMax": +2.0, "binWidthY": None, "yCutLines": []   , "yCutBoxes": [], "gridY": True, "logY": True,
-    "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": drawOpts, "legOptions": legOpts,
-    "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
+    "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": drawOpts,
+    "legOptions": legOpts, "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
 
 D0Sig = {
     "xLabel": "d_{0}/#sigma(d_{0})", "xUnits": "", "xMin": -20.0 , "xMax": +20.0, "binWidthX": 0.50, "xCutLines": [0], "xCutBoxes": [], "gridX": True, "logX": False,
     "yLabel": "Entries / %0.2f"    , "yUnits": "", "yMin": 1e-03, "yMax": 1.0, "binWidthY": None, "yCutLines": [] , "yCutBoxes": [], "gridY": True, "logY": True,
-    "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": drawOpts, "legOptions": legOpts,
-    "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
+    "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": drawOpts,
+    "legOptions": legOpts, "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
 
 D0SigAbs = {
     "xLabel": "|d_{0}/#sigma(d_{0})|", "xUnits": "", "xMin": 0.0  , "xMax": +20.0, "binWidthX": 0.50, "xCutLines": [], "xCutBoxes": [], "gridX": True, "logX": False,
@@ -248,7 +248,7 @@ NStubs = {
     "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
 
 NPsStubs = {
-    "xLabel": "PS Stubs Multiplicity", "xUnits": "", "xMin": +0.5, "xMax": 9.5, "binWidthX": 1.0 , "xCutLines": [], "xCutBoxes": [], "gridX": True, "logX": False, "logXRatio": False, 
+    "xLabel": "PS Stubs Multiplicity", "xUnits": "", "xMin": +0.5, "xMax": 9.5, "binWidthX": 1.0 , "xCutLines": [3,4], "xCutBoxes": [], "gridX": True, "logX": False, "logXRatio": False, 
     "yLabel": "Entries / %0.0f"      , "yUnits": "", "yMin": 1e-4, "yMax": +2.0, "binWidthY": None, "yCutLines": [], "yCutBoxes": [], "gridY": True, "logY": True , "logYRatio": False, 
     "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": drawOpts, "legOptions": legOpts,
     "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82 }
@@ -327,7 +327,7 @@ InvMass = {
     "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82}
 
 DeltaR = {
-    "xLabel": "#Delta R"       , "xUnits": "", "xMin": +0.0 , "xMax": 0.35, "binWidthX": 0.01, "xCutLines": [], "xCutBoxes": [], "gridX": True, "logX": False, "logXRatio": False, 
+    "xLabel": "#Delta R"       , "xUnits": "", "xMin": +0.0 , "xMax": 0.50, "binWidthX": 0.01, "xCutLines": [], "xCutBoxes": [], "gridX": True, "logX": False, "logXRatio": False, 
     "yLabel": "Entries / %0.3f", "yUnits": "", "yMin": +1e-4, "yMax": 1.00, "binWidthY": None , "yCutLines": [], "yCutBoxes": [], "gridY": True, "logY": True, "logYRatio": False, 
     "ratioLabel": ratioLabel, "ratio": bRatio, "invRatio": bInvRatio, "yMinRatio": yMinRatio, "yMaxRatio": yMaxRatio, "normaliseTo": normFactor, "drawOptions": drawOpts, "legOptions": legOpts,
     "xLegMin": 0.65, "xLegMax": 0.90, "yLegMin": 0.68, "yLegMax": 0.82}
@@ -392,6 +392,14 @@ hL1TkTau_SigTks_d0Sig         = m_histos.TH1orTH2( folder, "L1TkTau_SigTks_d0Sig
 hL1TkTau_SigTks_d0SigAbs      = m_histos.TH1orTH2( folder, "L1TkTau_SigTks_d0SigAbs"     , "SigTks", None, **D0SigAbs  )  
 hL1TkTau_SigTks_PtRel         = m_histos.TH1orTH2( folder, "L1TkTau_SigTks_PtRel"        , "SigTks", None, **PtRel     )
 hL1TkTau_SigTks_StubPtCons    = m_histos.TH1orTH2( folder, "L1TkTau_SigTks_StubPtCons"   , "SigTks", None, **StubPtCons)
+hL1TkTau_SigTks_DeltaR        = m_histos.TH1orTH2( folder, "L1TkTau_SigTks_DeltaR"       , "SigTks", None, **DeltaR    )
+hL1TkTau_SigTks_NStubs        = m_histos.TH1orTH2( folder, "L1TkTau_SigTks_NStubs"       , "SigTks", None, **NStubs    )
+hL1TkTau_SigTks_NPsStubs      = m_histos.TH1orTH2( folder, "L1TkTau_SigTks_NPsStubs"     , "SigTks", None, **NPsStubs  )
+hL1TkTau_SigTks_NBarrelStubs  = m_histos.TH1orTH2( folder, "L1TkTau_SigTks_NBarrelStubs" , "SigTks", None, **NBStubs   )
+hL1TkTau_SigTks_NEndcapStubs  = m_histos.TH1orTH2( folder, "L1TkTau_SigTks_NEndcapStubs" , "SigTks", None, **NEStubs   )
+hL1TkTau_SigTks_ChiSquared    = m_histos.TH1orTH2( folder, "L1TkTau_SigTks_ChiSquared"   , "SigTks", None, **ChiSq     )
+hL1TkTau_SigTks_RedChiSquared = m_histos.TH1orTH2( folder, "L1TkTau_SigTks_RedChiSquared", "SigTks", None, **RedChiSq  )
+hL1TkTau_SigTks_PtMinusCaloEt = m_histos.TH1orTH2( folder, "L1TkTau_SigTks_PtMinusCaloEt", "SigTks", None, **dPt       )
 
 ###############################################################
 ### L1TkTaus; IsoTks 
@@ -407,6 +415,14 @@ hL1TkTau_IsoTks_d0Sig         = m_histos.TH1orTH2( folder, "L1TkTau_IsoTks_d0Sig
 hL1TkTau_IsoTks_d0SigAbs      = m_histos.TH1orTH2( folder, "L1TkTau_IsoTks_d0SigAbs"     , "IsoTks", None, **D0SigAbs  )  
 hL1TkTau_IsoTks_PtRel         = m_histos.TH1orTH2( folder, "L1TkTau_IsoTks_PtRel"        , "IsoTks", None, **PtRel     )
 hL1TkTau_IsoTks_StubPtCons    = m_histos.TH1orTH2( folder, "L1TkTau_IsoTks_StubPtCons"   , "IsoTks", None, **StubPtCons)
+hL1TkTau_IsoTks_DeltaR        = m_histos.TH1orTH2( folder, "L1TkTau_IsoTks_DeltaR"       , "IsoTks", None, **DeltaR    )
+hL1TkTau_IsoTks_NStubs        = m_histos.TH1orTH2( folder, "L1TkTau_IsoTks_NStubs"       , "IsoTks", None, **NStubs    )
+hL1TkTau_IsoTks_NPsStubs      = m_histos.TH1orTH2( folder, "L1TkTau_IsoTks_NPsStubs"     , "IsoTks", None, **NPsStubs  )
+hL1TkTau_IsoTks_NBarrelStubs  = m_histos.TH1orTH2( folder, "L1TkTau_IsoTks_NBarrelStubs" , "IsoTks", None, **NBStubs   )
+hL1TkTau_IsoTks_NEndcapStubs  = m_histos.TH1orTH2( folder, "L1TkTau_IsoTks_NEndcapStubs" , "IsoTks", None, **NEStubs   )
+hL1TkTau_IsoTks_ChiSquared    = m_histos.TH1orTH2( folder, "L1TkTau_IsoTks_ChiSquared"   , "IsoTks", None, **ChiSq     )
+hL1TkTau_IsoTks_RedChiSquared = m_histos.TH1orTH2( folder, "L1TkTau_IsoTks_RedChiSquared", "IsoTks", None, **RedChiSq  )
+hL1TkTau_IsoTks_PtMinusCaloEt = m_histos.TH1orTH2( folder, "L1TkTau_IsoTks_PtMinusCaloEt", "IsoTks", None, **dPt       )
 
 ###############################################################
 ### L1TkTaus: Matching Pixel Track
@@ -445,7 +461,7 @@ hL1TkTau_MatchTk_Pt             = m_histos.TH1orTH2( folder, "L1TkTau_MatchTk_Pt
 hL1TkTau_MatchTk_Eta            = m_histos.TH1orTH2( folder, "L1TkTau_MatchTk_Eta"           , "Match Tk", None, **Eta            )
 hL1TkTau_MatchTk_POCAz          = m_histos.TH1orTH2( folder, "L1TkTau_MatchTk_POCAz"         , "Match Tk", None, **POCAz          )
 hL1TkTau_MatchTk_d0             = m_histos.TH1orTH2( folder, "L1TkTau_MatchTk_d0"            , "Match Tk", None, **D0             )
-hL1TkTau_MatchTk_d0Abs          = m_histos.TH1orTH2( folder, "L1TkTau_MatchTk_d0"            , "Match Tk", None, **D0Abs          )
+hL1TkTau_MatchTk_d0Abs          = m_histos.TH1orTH2( folder, "L1TkTau_MatchTk_d0Abs"         , "Match Tk", None, **D0Abs          )
 hL1TkTau_MatchTk_ChiSquared     = m_histos.TH1orTH2( folder, "L1TkTau_MatchTk_ChiSquared"    , "Match Tk", None, **ChiSq          )
 hL1TkTau_MatchTk_RedChiSquared  = m_histos.TH1orTH2( folder, "L1TkTau_MatchTk_RedChiSquared" , "Match Tk", None, **RedChiSq       )
 hL1TkTau_MatchTk_NStubs         = m_histos.TH1orTH2( folder, "L1TkTau_MatchTk_NStubs"        , "Match Tk", None, **NStubs         )

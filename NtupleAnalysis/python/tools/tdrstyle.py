@@ -1,8 +1,3 @@
-###############################################################
-### Author .........: Matti Kortelainen
-### Institute ......: University Of Cyprus (UCY)
-### Email ..........: matti.kortelainen@cern.ch
-###############################################################
 ## \package tdrstyle
 # Provides pythonized version of CMS TDR style
 
@@ -28,7 +23,7 @@ class TDRStyle:
         if absoluteSize:
             # helvetica, size absolute
             self.font = 43
-            self.titleSize = 33 #33=tdr (29=mine)
+            self.titleSize = 33
             self.labelSize = 27
             self.statSize = 14
         else:
@@ -79,8 +74,7 @@ class TDRStyle:
 
         self.tdrStyle.SetEndErrorSize(2)
         # self.tdrStyle.SetErrorMarker(20)
-        #self.tdrStyle.SetErrorX(0.)
-        self.tdrStyle.SetErrorX(0.5) # needed for uncertainty histograms
+        self.tdrStyle.SetErrorX(0.)
 
         self.tdrStyle.SetMarkerStyle(20)
 
@@ -113,8 +107,7 @@ class TDRStyle:
         # self.tdrStyle.SetStatY(Float_t y = 0)
 
         # Margins:
-        #self.rightMargin = 0.1 
-        self.rightMargin = 0.05 #default!
+        self.rightMargin = 0.05
         self.tdrStyle.SetPadTopMargin(0.05) # default
         #self.tdrStyle.SetPadTopMargin(0.13)
         self.tdrStyle.SetPadBottomMargin(0.13)
@@ -122,6 +115,14 @@ class TDRStyle:
         self.tdrStyle.SetPadLeftMargin(0.16)
         self.tdrStyle.SetPadRightMargin(self.rightMargin) # default
         #self.tdrStyle.SetPadRightMargin(0.13)
+
+        # Based on the new example myMacro.C, increase top margin
+        # slightly
+        # https://ghm.web.cern.ch/ghm/plots/
+        self.tdrStyle.SetPadTopMargin(0.06)
+        #self.tdrStyle.SetPadBottomMargin(0.12)
+        #self.tdrStyle.SetPadLeftMargin(0.12)
+        #self.tdrStyle.SetPadRightMargin(0.04)
 
         # For the Global title:
 
@@ -193,7 +194,13 @@ class TDRStyle:
     # \param onoff  If True (False), set the grid on (off)
     def setGrid(self, onoff):
         self.tdrStyle.SetPadGridX(onoff)
+        self.tdrStyle.SetPadGridY(onoff)
+
+    def setGridX(self, onoff):
         self.tdrStyle.SetPadGridX(onoff)
+
+    def setGridY(self, onoff):
+        self.tdrStyle.SetPadGridY(onoff)
 
     ## Set pretty palette style
     def setPalettePretty(self):
@@ -215,7 +222,7 @@ class TDRStyle:
     ## Widen the default canvas and pad widths to be able to draw with "*Z" draw styles
     #
     # \param onoff  If True (False), make the canvas and pad wider (normal)     
-    def setWide(self, onoff=False):
+    def setWide(self, onoff):
         if onoff:
             self.tdrStyle.SetCanvasDefW(int(1.08*self.canvasW))
             self.tdrStyle.SetPadRightMargin(0.08+self.rightMargin)

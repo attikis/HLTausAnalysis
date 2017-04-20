@@ -26,12 +26,12 @@ import re
 import collections #for ordered dictionaries
 
 ### User
-import HLTausAnalysis.NtupleAnalysis.tools.datasets as m_datasets
-import HLTausAnalysis.NtupleAnalysis.tools.tdrstyle as m_tdrstyle
-import HLTausAnalysis.NtupleAnalysis.tools.text as m_text
-import HLTausAnalysis.NtupleAnalysis.tools.aux as m_aux
-import HLTausAnalysis.NtupleAnalysis.tools.styles as m_styles
-import HLTausAnalysis.NtupleAnalysis.tools.histos as m_histos
+import HLTausAnalysis.NtupleAnalysis.tools.old.datasets as m_datasets
+import HLTausAnalysis.NtupleAnalysis.tools.old.tdrstyle as m_tdrstyle
+import HLTausAnalysis.NtupleAnalysis.tools.old.text as m_text
+import HLTausAnalysis.NtupleAnalysis.tools.old.aux as m_aux
+import HLTausAnalysis.NtupleAnalysis.tools.old.styles as m_styles
+import HLTausAnalysis.NtupleAnalysis.tools.old.histos as m_histos
 
 ### ROOT
 import ROOT

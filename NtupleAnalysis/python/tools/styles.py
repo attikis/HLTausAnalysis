@@ -1,354 +1,444 @@
-###############################################################
-### Author .........: Alexandros X. Attikis 
-### Institute ......: University Of Cyprus (UCY)
-### Email ..........: attikis@cern.ch
-###############################################################
+'''
+\package styles
 
-###############################################################
-### All imported modules
-###############################################################
-### System
-import os, sys
-import array
-import math
-import copy
-import inspect
-import glob
-from optparse import OptionParser
-from itertools import cycle
+Histogram/graph (line/marker/fill) style classes and objects
 
-### User
-import HLTausAnalysis.NtupleAnalysis.tools.text as m_text
+\todo This package would benefit from a major overhaul...
+'''
 
-### ROOT
+#================================================================================================  
+# Import Modules
+#================================================================================================  
 import ROOT
 
-###############################################################
-### Define class here
-###############################################################
-class StyleClass(object):
-    def __init__(self, verbose = False):
-        self.verbose = verbose
-        self.bEnableColourPalette   = False
-        self.TextObject             = m_text.TextClass(verbose=self.verbose)
-        self.styleTypeList          = []
-        self.styleTypeSpecialList   = []
-        self.colourPaletteList      = [ROOT.kBlack, ROOT.kRed-4, ROOT.kAzure+6, ROOT.kSpring+2, ROOT.kMagenta-2, ROOT.kGray, ROOT.kOrange+5, ROOT.kYellow-4, ROOT.kBlue-4,
-                                       ROOT.kGreen-2, ROOT.kViolet-5, ROOT.kPink-8, ROOT.kTeal-1, ROOT.kCyan-7]
-        self.markerStyleCounterList = [ROOT.kFullCircle, ROOT.kOpenCircle, ROOT.kOpenSquare, ROOT.kOpenTriangleUp, ROOT.kOpenTriangleDown, ROOT.kOpenCross, ROOT.kFullSquare,
-                                       ROOT.kFullTriangleUp, ROOT.kFullTriangleDown, ROOT.kFullCross, ROOT.kFullDiamond, ROOT.kOpenDiamond, ROOT.kFullStar, ROOT.kOpenStar]
-        self.fillStyleCounterList   = [3001, 3002, 3003, 3004, 3005, 3006, 3007, 3144, 3244, 3444]
-        self.lineStyleCounterList   = [i for i in range(+1, +10, +1)]
-        self.colourShadeList        = [i for i in range(-9, +4, +3)]
-        self.colourPalette          = {}
-        self.markerStyleCounter     = {}
-        self.fillStyleCounter       = {}
-        self.lineStyleCounter       = {}
-        self.colourShade            = {}
-        self.MsgCounter             = 0
-        ### CMSSW_620 (Private Production)
-        self._SetDefaults("SingleMuMinus_Pt_2_10_NoPU", colour=ROOT.kBlue-1    , markerStyle=ROOT.kFullTriangleDown,
-                          lineWidth=2, lineStyle=1, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("SingleMuPlus_Pt_2_10_NoPU" , colour=ROOT.kPink+7    , markerStyle=ROOT.kFullTriangleUp  ,
-                          lineWidth=2, lineStyle=1, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("SingleMuon_NoPU"           , colour=ROOT.kViolet+2  , markerStyle=ROOT.kFullCircle      ,
-                          lineWidth=2, lineStyle=1, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("SingleMuPlus_NoPU"         , colour=ROOT.kPink-9    , markerStyle=ROOT.kFullTriangleUp  ,
-                          lineWidth=2, lineStyle=1, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("SingleMuon_PU140"          , colour=ROOT.kOrange-4  , markerStyle=ROOT.kOpenStar        ,
-                          lineWidth=2, lineStyle=1, fillStyle=1001, drawOptions="HIST", legOptions="F")
 
-        ### CMSSW_620 (Central Production)
-        self._SetDefaults("MinBias"          , colour=ROOT.kBlack     , markerStyle=ROOT.kFullCircle      ,
-                          lineWidth=2, lineStyle=1, fillStyle=3001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("PiPlus"           , colour=ROOT.kGreen-2   , markerStyle=ROOT.kOpenCircle      ,
-                          lineWidth=2, lineStyle=1, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("PiMinus"          , colour=ROOT.kViolet-5  , markerStyle=ROOT.kOpenCircle      ,
-                          lineWidth=2, lineStyle=2, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("SingleTauGun1p"   , colour=ROOT.kOrange+4  , markerStyle=ROOT.kOpenSquare      ,
-                          lineWidth=2, lineStyle=1, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("DiTauGun3p"       , colour=ROOT.kTeal-1    , markerStyle=ROOT.kFullSquare      ,
-                          lineWidth=2, lineStyle=2, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("VBF"              , colour=ROOT.kRed-4     , markerStyle=ROOT.kFullTriangleDown,
-                          lineWidth=2, lineStyle=1, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("TTbar"            , colour=ROOT.kAzure+6   , markerStyle=ROOT.kFullTriangleUp  ,
-                          lineWidth=2, lineStyle=1, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("HPlus160"         , colour=ROOT.kBlue-4    , markerStyle=ROOT.kFullCross       ,
-                          lineWidth=2, lineStyle=1, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("HPlus200"         , colour=ROOT.kSpring+2  , markerStyle=ROOT.kFullCross       ,
-                          lineWidth=2, lineStyle=2, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("SingleMuMinus"    , colour=ROOT.kBlue-1    , markerStyle=ROOT.kFullTriangleDown,
-                          lineWidth=2, lineStyle=2, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("SingleMuPlus"     , colour=ROOT.kOrange-4  , markerStyle=ROOT.kFullTriangleUp  ,
-                          lineWidth=2, lineStyle=2, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("SingleElectron"   , colour=ROOT.kViolet+8  , markerStyle=ROOT.kFullCircle      ,
-                          lineWidth=2, lineStyle=2, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("SinglePositron"   , colour=ROOT.kViolet+4  , markerStyle=ROOT.kOpenCircle      ,
-                          lineWidth=2, lineStyle=2, fillStyle=1001, drawOptions="HIST", legOptions="F")
-        self._SetDefaults("SinglePhoton"     , colour=ROOT.kGreen+4   , markerStyle=ROOT.kFullSquare      ,
-                          lineWidth=2, lineStyle=2, fillStyle=1001, drawOptions="HIST", legOptions="F")
+#================================================================================================  
+# Class Definition
+#================================================================================================  
+class StyleBase:
+    '''
+    Base class for styles
+    
+    The only abstraction it provides is forwarding the function call to
+    apply() method call.
+    
+    Deribing classes should implement the \a apply() method.
+    '''
+    def __call__(self, h):
+        '''
+        Function call syntax
+        
+        \param h   histograms.Histo object
+        
+        Call apply() method with the ROOT histogram/graph object.
+        '''
+        self.apply(h.getRootHisto())
 
-        ### other
-        self._SetSpecials("random", colour = cycle(self.colourPaletteList).next(), markerStyle=ROOT.kFullCircle, lineWidth=3, lineStyle=0, fillStyle=3001, drawOptions="HIST", legOptions="F")
-        self.Verbose()
+        gr = h.getSystematicUncertaintyGraph()
+        if gr is not None:
+            self.applyUncertainty(gr)
+
+    def applyUncertainty(self, gr):
+        pass
+
+## Basic style (marker style, marker and line color)
+class Style(StyleBase):
+    ## Constructor
+    #
+    # \param marker   Marker style
+    # \param color    Marker and line color
+    def __init__(self, marker, color):
+        self.marker = marker
+        self.color = color
+
+    ## Apply the style
+    #
+    # \param h ROOT object
+    def apply(self, h):
+        h.SetLineWidth(2)
+        h.SetLineColor(self.color)
+        h.SetMarkerColor(self.color)
+        h.SetMarkerStyle(self.marker)
+        h.SetMarkerSize(1.2)
+	h.SetFillColor(0)
+
+    def clone(self):
+        return Style(self.marker, self.color)
+
+## Compound style
+#
+# Applies are contained styles
+class StyleCompound(StyleBase):
+    ## Constructor
+    #
+    # \param styles   List of style objects
+    def __init__(self, styles=[]):
+        self.styles = styles
+
+    ## Append a style object
+    def append(self, style):
+        self.styles.append(style)
+
+    ## Extend style objects
+    def extend(self, styles):
+        self.styles.extend(styles)
+
+    ## Apply the style
+    #
+    # \param h ROOT object
+    def apply(self, h):
+        for s in self.styles:
+            s.apply(h)
+
+    def applyUncertainty(self, gr):
+        for s in self.styles:
+            s.applyUncertainty(gr)
+
+    # Clone the compound style
+    def clone(self):
+        return StyleCompound(self.styles[:])
+
+## Fill style
+#
+# Contains a base style, and applies fill style and color on top of
+# that.
+#
+# \todo Remove the holding of the style, this is done with
+# styles.StyleCompound in much cleaner way
+class StyleFill(StyleBase):
+    ## Constructor
+    #
+    # \param style      Other style object
+    # \param fillStyle  Fill style
+    # \param fillColor  Fill color (if not given, line color is used as fill color)
+    def __init__(self, style=None, fillStyle=1001, fillColor=None):
+        self.style     = style
+        self.fillStyle = fillStyle
+	self.fillColor = fillColor
+
+    ## Apply the style
+    #
+    # \param h ROOT object
+    def apply(self, h):
+	if self.style != None:
+            self.style.apply(h)
+	if self.fillColor != None:
+	    h.SetFillColor(self.fillColor)
+	else:
+	    h.SetFillColor(h.GetLineColor())
+        h.SetFillStyle(self.fillStyle)
+
+## Line style
+class StyleLine(StyleBase):
+    def __init__(self, lineStyle=None, lineWidth=None, lineColor=None):
+        self.lineStyle = lineStyle
+        self.lineWidth = lineWidth
+        self.lineColor = lineColor
+
+    ## Apply the style
+    #
+    # \param h ROOT object
+    def apply(self, h):
+        if self.lineStyle != None:
+            h.SetLineStyle(self.lineStyle)
+        if self.lineWidth != None:
+            h.SetLineWidth(self.lineWidth)
+        if self.lineColor != None:
+            h.SetLineColor(self.lineColor)
+
+## Marker style
+#
+# \todo markerSizes should be handled in a cleaner way
+class StyleMarker(StyleBase):
+    ## Constructor
+    #
+    # \param markerSize   Marker size
+    # \param markerColor  Marker color
+    # \param markerStyle  Marker style
+    # \param markerSizes  List of marker sizes. If given, marker sizes are drawn from this list succesively.
+    def __init__(self, markerSize=1.2, markerColor=None, markerSizes=None, markerStyle=None):
+        self.markerSize = markerSize
+        self.markerColor = markerColor
+        self.markerSizes = markerSizes
+	self.markerStyle = markerStyle
+        self.markerSizeIndex = 0
+
+    ## Apply the style
+    #
+    # \param h ROOT object
+    def apply(self, h):
+        if self.markerSizes == None:
+            h.SetMarkerSize(self.markerSize)
+        else:
+            h.SetMarkerSize(self.markerSizes[self.markerSizeIndex])
+            self.markerSizeIndex = (self.markerSizeIndex+1)%len(self.markerSizes)
+        if self.markerColor != None:
+            h.SetMarkerColor(self.markerColor)
+	if self.markerStyle != None:
+	    h.SetMarkerStyle(self.markerStyle)
+
+## Error style
+class StyleError(StyleBase):
+    ## Constructor
+    #
+    # \param color      Fill color
+    # \param style      Fill style
+    # \param linecolor  Line color
+    def __init__(self, color, style=3004, linecolor=None, styleSyst=3005):
+        self.color = color
+        self.style = style
+        self.linecolor = linecolor
+        self.styleSyst = styleSyst
+
+    ## Apply the style
+    #
+    # \param h ROOT object
+    def apply(self, h):
+        h.SetFillStyle(self.style)
+        h.SetFillColor(self.color)
+        h.SetMarkerStyle(0)
+        if self.linecolor != None:
+            h.SetLineColor(self.color)
+        else:
+            h.SetLineStyle(0)
+            h.SetLineWidth(0)
+            h.SetLineColor(ROOT.kWhite)
+
+    def applyUncertainty(self, gr):
+        self.apply(gr)
+        gr.SetFillStyle(self.styleSyst)
         
 
-    def Verbose(self, messageList=None):
-        '''
-        Custome made verbose system. Will print all messages in the messageList
-        only if the verbosity boolean is set to true.
-        '''
-        if self.verbose == False:
-            return
-        
-        print "%s:" % (self.__class__.__name__ + "." + sys._getframe(1).f_code.co_name + "()")
-        if messageList==None:
-            return
-        else:
-            for message in messageList:
-                print "\t", message
-        return
+dataStyle = StyleCompound([Style(ROOT.kFullCircle, ROOT.kBlack)])
+dataMcStyle = dataStyle.clone()
+errorStyle = StyleCompound([StyleError(ROOT.kBlack, 3345, styleSyst=3354)])
+errorStyle2 = StyleCompound([StyleError(ROOT.kGray+2, 3354)])
+errorStyle3 = StyleCompound([StyleError(ROOT.kRed-10, 1001, linecolor=ROOT.kRed-10)])
+errorRatioStatStyle = StyleCompound([StyleError(ROOT.kGray, 1001, linecolor=ROOT.kGray)])
+errorRatioSystStyle = StyleCompound([StyleError(ROOT.kGray+1, 1001, linecolor=ROOT.kGray+1)])
+
+ratioStyle = dataStyle.clone()
+ratioLineStyle = StyleCompound([StyleLine(lineColor=ROOT.kRed, lineWidth=2, lineStyle=3)])
+
+#mcStyle = Style(ROOT.kFullSquare, ROOT.kGreen-2)
+mcStyle = StyleCompound([Style(ROOT.kFullSquare, ROOT.kRed+1)])
+mcStyle2 = StyleCompound([Style(33, ROOT.kBlue-4)])
+signalStyle = StyleCompound([Style(34, ROOT.kAzure+9), 
+                             StyleLine(lineStyle=ROOT.kSolid, lineWidth=4)
+                             ])
+signalHHStyle = StyleCompound([Style(34, ROOT.kRed-8), 
+                             StyleLine(lineStyle=8, lineWidth=6)
+                             ])
+signal80Style =  signalStyle.clone()
+signal90Style =  signalStyle.clone()
+signal100Style = signalStyle.clone()
+signal120Style = signalStyle.clone()
+signal140Style = signalStyle.clone()
+signal150Style = signalStyle.clone()
+signal155Style = signalStyle.clone()
+signal160Style = signalStyle.clone()
+
+signalHH80Style =  signalHHStyle.clone()
+signalHH90Style =  signalHHStyle.clone()
+signalHH100Style = signalHHStyle.clone()
+signalHH120Style = signalHHStyle.clone()
+signalHH140Style = signalHHStyle.clone()
+signalHH150Style = signalHHStyle.clone()
+signalHH155Style = signalHHStyle.clone()
+signalHH160Style = signalHHStyle.clone()
+
+signal180Style = signalStyle.clone()
+signal190Style = signalStyle.clone()
+"""
+# Problem with StyleCompound: solid signal histo in control plots. 13122016/SL
+signal200Style = StyleCompound([
+        Style(ROOT.kFullCross, ROOT.kBlue), 
+        StyleMarker(markerSize=1.2, markerColor=ROOT.kBlue, markerSizes=None, markerStyle=ROOT.kFullCross),
+        StyleFill(fillStyle=1001, fillColor=ROOT.kBlue), 
+        StyleLine(lineStyle=ROOT.kDashed, lineWidth=3, lineColor=ROOT.kBlue) ])
+signal220Style = signalStyle.clone()
+signal250Style = signalStyle.clone()
+signal300Style = StyleCompound([
+        Style(ROOT.kFullTriangleUp, ROOT.kRed), 
+        StyleMarker(markerSize=1.2, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+        StyleFill(fillStyle=1001, fillColor=ROOT.kRed), 
+        StyleLine(lineStyle=ROOT.kSolid, lineWidth=3, lineColor=ROOT.kRed) ])
+signal350Style = signalStyle.clone()
+signal400Style = StyleCompound([
+        Style(ROOT.kFullTriangleDown, ROOT.kSpring+5), 
+        StyleMarker(markerSize=1.2, markerColor=ROOT.kSpring+5, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+        StyleFill(fillStyle=1001, fillColor=ROOT.kSpring+5), 
+        StyleLine(lineStyle=ROOT.kSolid, lineWidth=3, lineColor=ROOT.kSpring+5) ])
+signal500Style = StyleCompound([
+        Style(ROOT.kFullCircle, ROOT.kBlue+3), 
+        StyleMarker(markerSize=1.2, markerColor=ROOT.kBlue+3, markerSizes=None, markerStyle=ROOT.kFullCircle),
+        StyleFill(fillStyle=1001, fillColor=ROOT.kBlue+3), 
+        StyleLine(lineStyle=ROOT.kDashed, lineWidth=3, lineColor=ROOT.kBlue+3) ])
+"""
+signal200Style = signalStyle.clone()
+signal220Style = signalStyle.clone()
+signal250Style = signalStyle.clone()
+signal300Style = signalStyle.clone()   
+signal350Style = signalStyle.clone()   
+signal400Style = signalStyle.clone()   
+signal500Style = signalStyle.clone()   
+signal600Style = signalStyle.clone()
+signal700Style = signalStyle.clone()
+signal750Style = signalStyle.clone()
+signal800Style = signalStyle.clone()
+signal1000Style = signalStyle.clone()
+signal1500Style = signalStyle.clone()
+signal2000Style = signalStyle.clone()
+signal3000Style = signalStyle.clone()
+
+dibStyle          = Style(ROOT.kMultiply, ROOT.kBlue-4)
+dyStyle           = Style(ROOT.kStar, ROOT.kTeal-9)
+ewkFillStyle      = StyleCompound([StyleFill(fillColor=ROOT.kMagenta-2)])
+ewkStyle          = Style(ROOT.kFullTriangleDown, ROOT.kRed-4)
+ewkfakeFillStyle  = StyleCompound([StyleFill(fillColor=ROOT.kGreen+2)])
+qcdBEnrichedStyle = Style(ROOT.kOpenTriangleUp, ROOT.kOrange-3)
+qcdFillStyle      = StyleCompound([StyleFill(fillColor=ROOT.kOrange-2)])
+qcdStyle          = Style(ROOT.kFullTriangleUp, ROOT.kOrange-2)
+singleTopStyle    = Style(ROOT.kOpenDiamond, ROOT.kTeal+9)
+stStyle           = Style(ROOT.kPlus, ROOT.kSpring+4)
+stsStyle          = Style(ROOT.kPlus, ROOT.kSpring-9)
+sttStyle          = Style(ROOT.kPlus, ROOT.kSpring-7)
+sttwStyle         = stStyle
+ttStyle           = Style(ROOT.kFullSquare, ROOT.kMagenta-2)
+ttbbStyle         = Style(ROOT.kOpenCross, ROOT.kPink-9)
+ttjetsStyle       = Style(ROOT.kPlus, ROOT.kMagenta-4)
+ttttStyle         = Style(ROOT.kFullStar, ROOT.kYellow-9)
+ttwStyle          = Style(ROOT.kOpenSquare, ROOT.kSpring+9)
+ttzStyle          = Style(ROOT.kFullDiamond, ROOT.kAzure-4)
+wStyle            = Style(ROOT.kFullTriangleDown, ROOT.kOrange+9)
+wjetsStyle        = Style(ROOT.kStar, ROOT.kOrange+9)
+wwStyle           = Style(ROOT.kMultiply, ROOT.kPink-9)
+wzStyle           = Style(ROOT.kMultiply, ROOT.kPink-7)
+zjetsStyle        = Style(ROOT.kFullCross, ROOT.kRed-7)
+zzStyle           = Style(ROOT.kMultiply, ROOT.kPink-5)
+baselineStyle     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                                   StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kSolid, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kRed, fillStyle=1001)])
+invertedStyle     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlue, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+                                   StyleLine(lineColor=ROOT.kBlue, lineStyle=ROOT.kSolid, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kBlue, fillStyle=3001)])
+altEwkStyle       = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta-2, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+                                   StyleLine(lineColor=ROOT.kMagenta-2, lineStyle=ROOT.kSolid, lineWidth=3),
+                                   StyleFill(fillColor=ROOT.kMagenta-2, fillStyle=3001)])
 
 
-    def Print(self, messageList=[""]):
-        '''
-        Custome made print system. Will print all messages in the messageList
-        even if the verbosity boolean is set to false.
-        '''
 
-        self.MsgCounter = self.MsgCounter  + 1
-        print "[%s] %s:" % (self.MsgCounter, self.__class__.__name__ + "." + sys._getframe(1).f_code.co_name + "()")
-        for message in messageList:
-            print "\t", message
-        return
+styles = [ 
+    Style(26, ROOT.kBlue),
+    Style(27, ROOT.kRed),
+    Style(23, ROOT.kGreen+2),
+    Style(24, ROOT.kMagenta),
+    Style(28, ROOT.kCyan),
+    Style(29, ROOT.kYellow+2),
+    Style(30, ROOT.kOrange+9),
+    Style(31, ROOT.kOrange+3),
+    Style(32, ROOT.kMagenta+3),
+    Style(33, ROOT.kGray+2),
+    Style(34, ROOT.kBlue+3),
+    Style(35, ROOT.kOrange+1),
+    Style(36, ROOT.kCyan-5),
+    Style(22, ROOT.kBlue),
+    Style(25, ROOT.kBlack)
+    ]
 
-
-    def SetVerbose(self, verbose):
-        '''
-        Manually enable/disable verbosity.
-        '''
-        self.verbose = verbose
-        self.Verbose(["Verbose mode = ", self.verbose])
-        return
-
-
-    def _SetDefaults(self, name, **kwargs):
-        '''
-        Call this function to initialise some default self values when an object is first created.
-        Append the style name to a list so that the object is aware of all available pre-defined defaults.
-        '''
-        self.Verbose()
-
-        ### Remove dependence on upper-case characters
-        name = name.lower()
-
-        self.colourPalette[name]      = cycle(self.colourPaletteList)
-        self.colourShade[name]        = cycle(self.colourShadeList)
-        self.lineStyleCounter[name]   = cycle(self.lineStyleCounterList)
-        self.fillStyleCounter[name]   = cycle(self.fillStyleCounterList)
-        self.markerStyleCounter[name] = cycle(self.markerStyleCounterList)
-
-        ### Set all arguments and their values
-        for argument, value in kwargs.iteritems():
-            setattr(self, name + "_" + argument, value)
-            #self.drawOptions  = kwargs.get("drawOptions", None)
-            #print "'%s': '%s' =  '%s'" % (name, argument , value)
-
-        self.styleTypeList.append( name.lower() )
-        return
+stylesCompound = [ 
+    StyleCompound([
+            StyleMarker(markerSize=1.2, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
+            StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
+            StyleFill(fillColor=ROOT.kBlack, fillStyle=1001)]),
+    StyleCompound([
+            StyleMarker(markerSize=1.2, markerColor=ROOT.kOrange-2, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+            StyleLine(lineColor=ROOT.kOrange-2, lineStyle=ROOT.kDashed, lineWidth=3), 
+            StyleFill(fillColor=ROOT.kOrange-2, fillStyle=1001)]),
+    StyleCompound([
+            StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta-2, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+            StyleLine(lineColor=ROOT.kMagenta-2, lineStyle=ROOT.kSolid, lineWidth=3),  #ROOT.kDashDotted
+            StyleFill(fillColor=ROOT.kMagenta-2, fillStyle=3001)]),
+    StyleCompound([
+            StyleMarker(markerSize=1.2, markerColor=ROOT.kGreen+2, markerSizes=None, markerStyle=ROOT.kFullCross),
+            StyleLine(lineColor=ROOT.kGreen+2, lineStyle=ROOT.kDotted, lineWidth=3), 
+            StyleFill(fillColor=ROOT.kGreen+2, fillStyle=1001)]),
+    ]
 
 
-    def _SetSpecials(self, name, **kwargs):
-        '''
-        Call this function to initialise some special self values when an object is first created.
-        Append the style name to a list so that the object is aware of all available pre-defined defaults.
-        '''
-        self.Verbose()
+def applyStyle(h, ind):
+    styles[ind].apply(h)
 
-        self.colourPalette[name]      = cycle(self.colourPaletteList)
-        self.colourShade[name]        = cycle(self.colourShadeList)
-        self.lineStyleCounter[name]   = cycle(self.lineStyleCounterList)
-        self.fillStyleCounter[name]   = cycle(self.fillStyleCounterList)
-        self.markerStyleCounter[name] = cycle(self.markerStyleCounterList)
+def getDataStyle():
+    return dataStyle
 
-        ### Set all arguments and their values
-        for argument, value in kwargs.iteritems():
-            setattr(self, name + "_" + argument, value)
-            #print "'%s': '%s' =  '%s'" % (name, argument , value)
+def getEWKStyle():
+    return ewkFillStyle
 
-        self.styleTypeSpecialList.append(name)
-        return
+def getAltEWKStyle():
+    return altEwkStyle
 
+def getEWKFillStyle():
+    return ewkFillStyle
 
-    def EnableColourPalette(self, bEnable):
-        '''
-        This boolean controls whether the fillColour is the same for each dataset (just a shade change)
-        or if it is different (full colour change).
-        '''
-        self.Verbose()
-        self.bEnableColourPalette=bEnable
-        return
+def getEWKLineStyle():
+    return ewkStyle
 
+def getEWKFakeStyle():
+    return ewkfakeFillStyle
 
-    def _GetTH1Values(self, styleType):
-        '''
-        '''
-        self.Verbose()
-        
-        if self.bEnableColourPalette==True:
-            fillColour  = self.colourPalette[styleType].next()
-            markerStyle = self.markerStyleCounter[styleType].next()
-        else:
-            fillColour  = getattr(self, styleType + "_colour" ) # + self.colourShade[styleType].next()
-            markerStyle = getattr(self, styleType + "_markerStyle"  )
+def getQCDStyle():
+    return qcdFillStyle
 
-        self.Verbose(["StyleType '%s', FillColour = '%s'" % (styleType, fillColour)])        
-        markerSize  = 1.0
-        lineColour  = fillColour
-        lineWidth   = getattr(self, styleType + "_lineWidth"   )
-        lineStyle   = getattr(self, styleType + "_lineStyle"   )
-        fillStyle   = getattr(self, styleType + "_fillStyle"   )
-        drawOptions = getattr(self, styleType + "_drawOptions" )
-        legOptions  = getattr(self, styleType + "_legOptions"  )
-        return (fillColour, lineColour, markerStyle, markerSize, lineWidth, lineStyle, fillStyle, drawOptions, legOptions)
+def getQCDFillStyle():
+    return qcdFillStyle
 
+def getQCDLineStyle():
+    return qcdStyle
 
-    def _GetTGraphValues(self, styleType):
-        self.Verbose()
-        
-        if self.bEnableColourPalette==True:
-            fillColour  = self.colourPalette[styleType].next()
-            markerStyle = self.markerStyleCounter[styleType].next()
-        else:
-            fillColour  = getattr(self, styleType + "_colour" ) # + self.colourShade[styleType].next()
-            markerStyle = getattr(self, styleType + "_markerStyle"  )
+def getBaselineStyle():
+    return baselineStyle
 
-        self.Verbose(["StyleType '%s', FillColour = '%s'" % (styleType, fillColour)])
-        markerSize  = 1.0
-        lineColour  = fillColour
-        lineWidth   = getattr(self, styleType + "_lineWidth" )
-        lineStyle   = getattr(self, styleType + "_lineStyle" )
-        fillStyle   = 3002 #self.fillStyleCounter[styleType].next()
-        drawOptions = getattr(self, styleType + "_drawOptions" )
-        legOptions  = getattr(self, styleType + "_legOptions" )
-        return (fillColour, lineColour, markerStyle, markerSize, lineWidth, lineStyle, fillStyle, drawOptions, legOptions)
+def getInvertedStyle():
+    return invertedStyle
 
+def getSignalStyle():
+    return signalStyle
 
-    def _GetTH1SpecialValues(self, styleType):
-        '''
-        '''
-        self.Verbose()
-        
-        if self.bEnableColourPalette==True:
-            fillColour  = self.colourPalette[styleType].next()
-        else:
-            fillColour  = getattr(self, styleType + "_colour" ) + self.colourShade[styleType].next()
+def getErrorStyle():
+    return errorStyle
 
-        markerStyle = self.markerStyleCounter[styleType].next()
-        markerSize  = 1.0
-        lineColour  = fillColour
-        lineWidth   = getattr(self, styleType + "_lineWidth" )
-        lineStyle   = getattr(self, styleType + "_lineStyle" )
-        fillStyle   = getattr(self, styleType + "_fillStyle" )
-        drawOptions = getattr(self, styleType + "_drawOptions" )
-        legOptions  = getattr(self, styleType + "_legOptions" )
-        return (fillColour, lineColour, markerStyle, markerSize, lineWidth, lineStyle, fillStyle, drawOptions, legOptions)
+def getStyles():
+    return styles
 
+def getStylesFill(**kwargs):
+    return [StyleFill(s, **kwargs) for s in styles]
 
-    def _GetTH2Values(self, styleType):
-        '''
-        '''
-        self.Verbose()
-        
-        if self.bEnableColourPalette==True:
-            fillColour  = self.colourPalette[styleType].next()
-        else:
-            fillColour  = getattr(self, styleType + "_colour" ) + self.colourShade[styleType].next()
+class Generator:
+    def __init__(self, styles):
+        self.styles = styles
+        self.index = 0
 
-        markerStyle = self.markerStyleCounter[styleType].next()
-        markerSize  = 1.0
+    def reset(self, index=0):
+        self.index = index
 
-        lineColour  = fillColour
-        lineWidth   = getattr(self, styleType + "_lineWidth" )
-        lineStyle   = getattr(self, styleType + "_lineStyle" ) # + self.lineStyleCounter[styleType].next()
+    def reorder(self, indices):
+        self.styles = [self.styles[i] for i in indices]
 
-        fillStyle   = getattr(self, styleType + "_fillStyle" ) # + self.fillStyleCounter[styleType].next()
+    def next(self):
+        self.index = (self.index+1) % len(self.styles)
 
-        drawOptions = "COL"
-        legOptions  = getattr(self, styleType + "_legOptions" )
-        return (fillColour, lineColour, markerStyle, markerSize, lineWidth, lineStyle, fillStyle, drawOptions, legOptions)
+    def __call__(self, h):
+        self.styles[self.index](h)
+        self.next()
 
+def generator(fill=False, **kwargs):
+    if fill:
+        return Generator(getStylesFill(**kwargs))
+    else:
+        return Generator(getStyles(**kwargs))
 
-    def PrintAttributes(self):
-        '''
-        Call this function to print all histogram attributes.
-        '''
-        self.Verbose(["Attributes: %s" % (self.__dict__)])
-        return
-
-
-    def GetTH1Styles(self, histoObject):
-        '''
-        Get the style attributes for a ROOT.TH1 histogram, such as colour, markerStyle, markerSize, lineWidth, lineStyle, fillStyle and options.
-        '''
-        self.Verbose()
-        
-        styleType = None
-
-        if histoObject.styleType != None:
-            styleType = histoObject.styleType.lower()
-        else:
-            styleType = histoObject.dataset.lower()
-                    
-        self.Verbose(["styleType: %s" % (styleType)])
-        if styleType in self.styleTypeList:
-            return self._GetTH1Values(styleType)
-        elif styleType in self.styleTypeSpecialList:
-            return self._GetTH1SpecialValues(styleType)
-        else:
-            return self._GetTH1Values("random")
-
-
-    def GetTH2Styles(self, histoObject):
-        '''
-        Get the style attributes for a ROOT.TH2 histogram, such as colour, markerStyle, markerSize, lineWidth, lineStyle, fillStyle and options.
-        '''
-        self.Verbose()
-        
-        styleType = None
-        
-        if histoObject.styleType != None:
-            styleType = histoObject.styleType.lower()
-        else:
-            styleType = histoObject.dataset.lower()
-
-        if styleType in self.styleTypeList:
-            return self._GetTH2Values(styleType)
-        else:
-            return self._GetTH2Values("random")
-
-
-    def GetTGraphStyles(self, styleType, dataset = None):
-        '''
-        Get the style attributes for a ROOT.TH1 histogram, such as colour, markerStyle, markerSize, lineWidth, lineStyle, fillStyle and options.
-        '''
-        self.Verbose()
-        
-        if dataset == None:
-            if (styleType == None or styleType == "") and dataset == None:
-                self.Print( ["ERROR! Could not find the style type '%s' ['%s']. Please select one of the following style names:" % (styleType, type(styleType)), 
-                             "\n\t".join(self.styleTypeList), "EXIT"])
-                sys.exit()
-            else:
-                pass
-        else:
-            styleType = self.TextObject.ConvertLatexToText(dataset).lower()
-
-
-        styleType = styleType.lower()
-        if styleType in self.styleTypeList:
-            return self._GetTGraphValues(styleType)
-        elif styleType in self.styleTypeSpecialList:
-            return self._GetTH1SpecialValues(styleType)
-        else:
-            return self._GetTH2Values("random")
+def generator2(styleCustomisations, styles=styles):
+    if not isinstance(styleCustomisations, list):
+        styleCustomisations = [styleCustomisations]
+    return Generator([StyleCompound([s]+styleCustomisations) for s in styles])

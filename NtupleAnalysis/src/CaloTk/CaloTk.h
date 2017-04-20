@@ -365,7 +365,7 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkTau_ResolutionCaloPhi;
   
   // SingleTau: Rates
-  TH1D* hCalo_Rate;
+  TH1D* hCalo_Rate; // Inclusive = C+I+F
   TH1D* hCalo_Rate_C;
   TH1D* hCalo_Rate_I;
   TH1D* hCalo_Rate_F;
@@ -378,7 +378,7 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hVtxIso_Rate_I;
   TH1D* hVtxIso_Rate_F;
   // SingleTau: Efficiencies
-  TH1D* hCalo_Eff;
+  TH1D* hCalo_Eff;  // Inclusive = C+I+F
   TH1D* hCalo_Eff_C;
   TH1D* hCalo_Eff_I;
   TH1D* hCalo_Eff_F;
@@ -392,7 +392,7 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hVtxIso_Eff_F;      
 
   // DiTau: Rates
-  TH1D* hDiTau_Rate_Calo;
+  TH1D* hDiTau_Rate_Calo; // Inclusive = C+I+F
   TH1D* hDiTau_Rate_Calo_C;
   TH1D* hDiTau_Rate_Calo_I;
   TH1D* hDiTau_Rate_Calo_F;
@@ -405,7 +405,7 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hDiTau_Rate_VtxIso_I;
   TH1D* hDiTau_Rate_VtxIso_F;
   // DiTau: Efficiencies
-  TH1D* hDiTau_Eff_Calo;
+  TH1D* hDiTau_Eff_Calo; // Inclusive = C+I+F
   TH1D* hDiTau_Eff_Calo_C;
   TH1D* hDiTau_Eff_Calo_I;
   TH1D* hDiTau_Eff_Calo_F;
