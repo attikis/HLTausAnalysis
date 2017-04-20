@@ -137,13 +137,17 @@ def MCPlot(datasetsMgr, json):
     Verbose("Creating MC plot")
         
     # Create the MC Plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
+    ylabel_ = json["ylabel"]
     if json["normalization"]=="normalizeToLumi":
         kwargs = {}
         p = plots.MCPlot(datasetsMgr, json["histogram"], normalizeToLumi=opts.intLumi, **kwargs)
-    else:
-        kwargs = {json["normalization"]: True}
+    elif json["normalization"]=="normalizeToOne":
+        ylabel_ = ylabel_.replace(json["ylabel"].split(" /")[0], "Arbitrary Units")
+        kwargs  = {json["normalization"]: True}
         p = plots.MCPlot(datasetsMgr, json["histogram"], **kwargs)
-
+    else:
+        raise Exception("Invalid normalization \"%s\"" % (json["normalization"]) )
+    
     # Label size (optional. Commonly Used in counters)
     xlabelSize = None
     if "xlabelsize" in json:
@@ -151,13 +155,13 @@ def MCPlot(datasetsMgr, json):
     ylabelSize = None
     if "ylabelsize" in json:
         ylabelSize = json["ylabelsize"]
-
+    
     # Draw a customised plot
     saveName = os.path.join(json["saveDir"], json["title"])
     plots.drawPlot(p, 
                    saveName,                  
                    xlabel            = json["xlabel"], 
-                   ylabel            = json["ylabel"],
+                   ylabel            = ylabel_,
                    rebinX            = json["rebinX"],
                    rebinY            = json["rebinY"], 
                    stackMCHistograms = json["stackMCHistograms"]=="True", 
