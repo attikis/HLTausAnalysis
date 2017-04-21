@@ -140,6 +140,7 @@ def MCPlot(datasetsMgr, json):
     ylabel_ = json["ylabel"]
     if json["normalization"]=="normalizeToLumi":
         kwargs = {}
+        #p = plots.MCPlot(datasetsMgr, json["histogram"], normalizeByCrossSection=True, **kwargs)
         p = plots.MCPlot(datasetsMgr, json["histogram"], normalizeToLumi=opts.intLumi, **kwargs)
     elif json["normalization"]=="normalizeToOne":
         ylabel_ = ylabel_.replace(json["ylabel"].split(" /")[0], "Arbitrary Units")
@@ -147,7 +148,13 @@ def MCPlot(datasetsMgr, json):
         p = plots.MCPlot(datasetsMgr, json["histogram"], **kwargs)
     else:
         raise Exception("Invalid normalization \"%s\"" % (json["normalization"]) )
-    
+
+    # Customise styling
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetFillStyle(0))
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerSize(1.2))
+    p.histoMgr.setHistoDrawStyleAll(json["drawStyle"])
+    p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
+
     # Label size (optional. Commonly Used in counters)
     xlabelSize = None
     if "xlabelsize" in json:
@@ -157,24 +164,24 @@ def MCPlot(datasetsMgr, json):
         ylabelSize = json["ylabelsize"]
     
     # Draw a customised plot
-    saveName = os.path.join(json["saveDir"], json["title"])
+    saveName = os.path.join(json["saveDir"], json["title"])    
+    
     plots.drawPlot(p, 
                    saveName,                  
                    xlabel            = json["xlabel"], 
                    ylabel            = ylabel_,
                    rebinX            = json["rebinX"],
-                   rebinY            = json["rebinY"], 
                    stackMCHistograms = json["stackMCHistograms"]=="True", 
-                   addMCUncertainty  = json["addMCUncertainty"]=="True" and json["normalization"]!="normalizeToOne",
-                   addLuminosityText = json["addLuminosityText"]=="True",
                    addCmsText        = json["addCmsText"]=="True",
                    cmsExtraText      = json["cmsExtraText"],
                    opts              = json["opts"],
                    log               = json["logY"]=="True", 
-                   errorBarsX        = json["errorBarsX"]=="True", 
                    moveLegend        = json["moveLegend"],
-                   # cutLine           = json["cutValue"], #cannot have this and "cutBox" defined
-                   cutBox            = {"cutValue": json["cutValue"], "fillColor": json["cutFillColour"], "box": json["cutBox"]=="True", "line": json["cutLine"]=="True", "greaterThan": json["cutGreaterThan"]=="True"},
+                   cutBox            = {"cutValue": json["cutValue"],
+                                        "fillColor": json["cutFillColour"],
+                                        "box": json["cutBox"]=="True",
+                                        "line": json["cutLine"]=="True",
+                                        "greaterThan": json["cutGreaterThan"]=="True"},
                    xlabelsize        = xlabelSize,
                    ylabelsize        = ylabelSize,
                    )
@@ -218,7 +225,7 @@ def main(opts):
             except ValueError, e:
                 Print("Problem loading JSON file %s. Please check the file" % (arg))
                 sys.exit()
-
+            
     # Sanity check - At least 1 json file found
     if len(jsonFiles) == 0:
         Print("No JSON files found. Please read the script instructions. Exit", True)
@@ -241,7 +248,7 @@ if __name__ == "__main__":
     global opts
     BATCHMODE = True
     VERBOSE   = False
-    INTLUMI   = 1.0
+    INTLUMI   = 1000.0 #3703.703
 
     parser = OptionParser(usage="Usage: %prog [options]" , add_help_option=False,conflict_handler="resolve")
 

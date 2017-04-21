@@ -25,7 +25,7 @@ import ROOT
 ###############################################################
 ### Histogram Options
 ###############################################################
-hFolder     = ""
+hFolder     = "HLTausAnalysis_TP2015"
 yMin        = 1
 yMax        = None
 yMinRatio   = 0.0

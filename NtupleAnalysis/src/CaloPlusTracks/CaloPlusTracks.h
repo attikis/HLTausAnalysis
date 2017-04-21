@@ -238,6 +238,7 @@ class CaloPlusTracks : public TreeAnalyserMC{
   bool bFoundAllTaus_;
 
   // Event-Type Histograms
+  TH1D* hCounters;
   TH1D* hHepMCEvt_VtxZ;
   TH2D* hHepMCEvt_VtxX_VtxY;
   TH1D* hL1TkPV_VtxZ;

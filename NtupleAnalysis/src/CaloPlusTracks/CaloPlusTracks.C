@@ -261,15 +261,16 @@ void CaloPlusTracks::Loop()
   BookHistos_();
   Long64_t nbytes       = 0;
   Long64_t nb           = 0;
-  int nEvtsWithMaxHTaus = 0; 
+  int nEvtsWithMaxHTaus = 0;
+  unsigned int nEvts    = 0;
+  unsigned int nAllEvts = fChain->GetEntries();
   // L1PixelTrackFit f(3.8112); // Bz in Tesla (for pixel re-fitting)
-
-  
+ 
   ////////////////////////////////////////////////
   // For-loop: Entries
   ////////////////////////////////////////////////
-  for (int jentry = 0; jentry < nEntries; jentry++){
-  
+  for (int jentry = 0; jentry < nEntries; jentry++, nEvts++){
+           
     if(DEBUG) cout << "\tEntry = " << jentry << endl;
     
     // Init variables
@@ -417,9 +418,9 @@ void CaloPlusTracks::Loop()
 
 	// L1TkTau Resolution
 	GenParticle p = tau->GetMatchingGenParticle();	
-	hL1CaloTau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().eta() - p.p4vis().Pt() )/p.p4vis().Pt()  );
+	hL1CaloTau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().et( ) - p.p4vis().Et() )/p.p4vis().Et()  );
 	hL1CaloTau_ResolutionCaloEta->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
-	hL1CaloTau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().eta() - p.p4vis().Phi())/p.p4vis().Phi() );
+	hL1CaloTau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().phi() - p.p4vis().Phi())/p.p4vis().Phi() );
 
       }
     
@@ -444,9 +445,9 @@ void CaloPlusTracks::Loop()
 	
 	// L1TkTau Resolution
 	GenParticle p = tau->GetMatchingGenParticle();
-	hL1TkTau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().eta() - p.p4vis().Pt() )/p.p4vis().Pt()  );
+	hL1TkTau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().et()  - p.p4vis().Et() )/p.p4vis().Et()  );
 	hL1TkTau_ResolutionCaloEta->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
-	hL1TkTau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().eta() - p.p4vis().Phi())/p.p4vis().Phi() );
+	hL1TkTau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().phi() - p.p4vis().Phi())/p.p4vis().Phi() );
 
 	// Apply isolation?
 	// if (L1TkTau->GetVtxIsolation() > isoCone_VtxIsoWP) continue;
@@ -616,6 +617,10 @@ void CaloPlusTracks::Loop()
     
   }// For-loop: Entries
 
+  // Fill counters
+  hCounters->SetBinContent(1, nAllEvts);
+  hCounters->SetBinContent(2, nEvts);
+
 
   ////////////////////////////////////////////////
   // Convert or Finalise Histos
@@ -684,6 +689,7 @@ void CaloPlusTracks::BookHistos_(void)
 {
   
   // Event-Type Histograms
+  histoTools_.BookHisto_1D(hCounters, "Counters",  "", 2, 0.0, +2.0);
   histoTools_.BookHisto_1D(hL1TkPV_VtxZ            , "L1TkPV_VtxZ"            ,  "", 600, -30.0,  +30.0);
   histoTools_.BookHisto_1D(hHepMCEvt_VtxZ          , "HepMCEvt_VtxZ"          ,  "", 600, -30.0,  +30.0);
   histoTools_.BookHisto_2D(hHepMCEvt_VtxX_VtxY     , "HepMCEvt_VtxX_VtxY"     ,  "", 400,  -0.01,  +0.01, 400,  -0.01,  +0.01);
@@ -1362,11 +1368,11 @@ vector<GenParticle> CaloPlusTracks::GetGenParticles(int pdgId, bool isLastCopy)
     {
       
       GenParticle p = GetGenParticle(genP_index);
-      SetGenParticleMomsAndDaus(p);
-	
       // Apply criteria
       if ( abs(p.pdgId()) != pdgId) continue;
-	
+     
+      SetGenParticleMomsAndDaus(p); // fixme: extremely time-consuming
+		
       if (!isLastCopy) myGenParticles.push_back(p);
       else
 	{

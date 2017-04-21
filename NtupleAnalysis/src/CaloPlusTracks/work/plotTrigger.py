@@ -42,7 +42,7 @@ bDiTau           = False
 bDiTau_Indist    = False
 bDiTau_Dist_Calo = False
 bDiTau_Dist_Tk   = False
-datasetList      = ["VBF"] #["MinBias", "VBF", "HPlus160"]
+datasetList      = ["VBF_HToTauTau_125_14TeV_powheg_pythia6"] #"Neutrino_Pt2to20_gun"
 saveFormats      = ["png"]
 savePath         = "plots/"
 
@@ -58,20 +58,22 @@ def CreateDatasetDict(inputPath, analysis, outputExt):
         
     datasetPaths= {}
     for dataset in GetDatasetsList():
-        rFile = inputPath + analysis + "_Histograms_" + dataset + outputExt + ".root" 
+        resultsDir = "%s/results/" % (dataset)
+        rFile = inputPath + resultsDir + "histograms-%s.root" % (dataset)
         datasetPaths[dataset] = rFile
-        #print "[%s] = %s" % (dataset, rFile)
     return datasetPaths
 
 
 def GetDatasetsList():
     '''
     '''
-    datasets = ["MinBias", "VBF", "PiPlus", "PiMinus", "SingleTauGun1p",
-                "DiTauGun3p", "TTbar", "HPlus160", "HPlus200", "SingleElectron",
-                "SinglePositron", "SingleMuPlus", "SingleMuMinus", "SinglePhoton",
-                "SingleMuon_NoPU", "SingleMuMinus_Pt_2_10_NoPU", "SingleMuPlus_Pt_2_10_NoPU",
-                "SingleMuPlus_NoPU"]    
+    #datasets = ["MinBias", "VBF", "PiPlus", "PiMinus", "SingleTauGun1p",
+    #            "DiTauGun3p", "TTbar", "HPlus160", "HPlus200", "SingleElectron",
+    #            "SinglePositron", "SingleMuPlus", "SingleMuMinus", "SinglePhoton",
+    #            "SingleMuon_NoPU", "SingleMuMinus_Pt_2_10_NoPU", "SingleMuPlus_Pt_2_10_NoPU",
+    #            "SingleMuPlus_NoPU"]    
+    datasets = ["Neutrino_Pt2to20_gun",
+                "VBF_HToTauTau_125_14TeV_powheg_pythia6"]    
     return datasets
 
 
@@ -97,7 +99,7 @@ def DoPlots(hList, datasetPaths, datasetList, saveExt="", bLegHeader=None):
 
     p = m_plotter.Plotter( Verbose=False, BatchMode=True )
     for dataset in datasetList:
-        p.AddDataset(dataset, datasetPaths[dataset])
+        p.AddDataset(GetOldDatasetName(dataset), datasetPaths[dataset])
     p.AddHisto(hList)
     p.SetBoolUseDatasetAsLegEntry(False)
     p.EnableColourPalette(True)
@@ -108,6 +110,15 @@ def DoPlots(hList, datasetPaths, datasetList, saveExt="", bLegHeader=None):
     return
 
 
+def GetOldDatasetName(dataset):
+    if "Neutrino_Pt2to20_gun":
+        return "MinBias"
+    elif "VBF_HToTauTau_125_14TeV_powheg_pythia6":
+        return "VBF"
+    else:
+        return "Unknown"
+
+
 def DoROC(rateToEffMap, datasetPaths, signalDataset, rocSaveName, bSaveAuxHistos=False):
     
     p0 = m_plotter.Plotter( Verbose=False, BatchMode=True )
@@ -116,7 +127,7 @@ def DoROC(rateToEffMap, datasetPaths, signalDataset, rocSaveName, bSaveAuxHistos
     ### Rates
     p1 = m_plotter.Plotter( Verbose=False, BatchMode=True )
     p1.SetBoolUseDatasetAsLegEntry(False)
-    p1.AddDataset("MinBias", datasetPaths["MinBias"])
+    p1.AddDataset(GetOldDatasetName("Neutrino_Pt2to20_gun"), datasetPaths["Neutrino_Pt2to20_gun"])
     p1.AddHisto(RateHistoList)
     p1.Draw(THStackDrawOpt="nostack", bStackInclusive = False)
     p1.SaveHistos(bSaveAuxHistos, savePath, saveFormats)
@@ -124,7 +135,7 @@ def DoROC(rateToEffMap, datasetPaths, signalDataset, rocSaveName, bSaveAuxHistos
     ### Efficiencies
     p2 = m_plotter.Plotter( Verbose=False, BatchMode=True )
     p2.SetBoolUseDatasetAsLegEntry(False)
-    p2.AddDataset(signalDataset, datasetPaths[signalDataset])
+    p2.AddDataset(GetOldDatasetName(signalDataset), datasetPaths[signalDataset])
     p2.AddHisto(EffHistoList)
     p2.Draw(THStackDrawOpt="nostack", bStackInclusive = False)
     p2.SaveHistos(bSaveAuxHistos, savePath, saveFormats)
@@ -161,19 +172,19 @@ def main(opts):
     if bSingleTau:
         if opts.verbose:
             print "=== Doing SingleTau"
-        DoPlots( SingleTau_Rate  , datasetPaths, ["MinBias"], "")
+        DoPlots( SingleTau_Rate  , datasetPaths, ["Neutrino_Pt2to20_gun"], "")
         DoPlots( SingleTau_Eff   , datasetPaths, datasetList, "")
-        DoROC  ( SingleTau_ROCs  , datasetPaths, datasetList[0], "SingleTau_ROCs" + "")
+        #DoROC  ( SingleTau_ROCs  , datasetPaths, datasetList[0], "SingleTau_ROCs" + "")
 
 
     if bDiTau:
         if opts.verbose:
             print "=== Doing DiTau"
         #for h in DiTau_Rate_CaloIso:
-        #    DoPlots( h, ["MinBias"])
+        #    DoPlots( h, ["Neutrino_Pt2to20_gun"])
         #for h in DiTau_Eff_CaloIso:
         #    DoPlots( h , datasetList)
-        DoPlots( DiTau_Rate   , ["MinBias"], "")
+        DoPlots( DiTau_Rate   , ["Neutrino_Pt2to20_gun"], "")
         DoPlots( DiTau_Eff    , datasetPaths, datasetList, "")
         DoROC  ( DiTau_ROCs_TP, datasetList[0], "DiTau_ROCs" + "")
 
@@ -186,7 +197,7 @@ def main(opts):
         DoPlots( DiTau_TurnOn      , datasetList)
         DoPlots( DiTau_TurnOn_50KHz, datasetList)
         ### ROCs
-        DoPlots( DiTau_Rate  , ["MinBias"])
+        DoPlots( DiTau_Rate  , ["Neutrino_Pt2to20_gun"])
         DoPlots( DiTau_Eff   , datasetList)
         DoROC  ( DiTau_ROCs  , datasetList[0], "DiTau_ROCs_Indist")
     
@@ -197,7 +208,7 @@ def main(opts):
         DoPlots( DiTau_TurnOn      , datasetList)
         DoPlots( DiTau_TurnOn_50KHz, datasetList)
         for h in DiTau_Rate_CaloIso:
-            DoPlots( h, ["MinBias"])
+            DoPlots( h, ["Neutrino_Pt2to20_gun"])
         for h in DiTau_Eff_CaloIso:
             DoPlots( h , datasetList)
         DoROC  ( DiTau_ROCs_CaloIso, datasetList[0], "DiTau_ROCs_CaloIso")
@@ -210,7 +221,7 @@ def main(opts):
         DoPlots( DiTau_TurnOn      , datasetList)
         DoPlots( DiTau_TurnOn_50KHz, datasetList)
         for h in DiTau_Rate_TkIso:
-            DoPlots( h, ["MinBias"])
+            DoPlots( h, ["Neutrino_Pt2to20_gun"])
         for h in DiTau_Eff_TkIso:
             DoPlots( h , datasetList)
         DoROC  ( DiTau_ROCs_TkIso, datasetList[0], "DiTau_ROCs_TkIso")

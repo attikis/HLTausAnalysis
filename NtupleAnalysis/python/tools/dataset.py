@@ -2980,8 +2980,10 @@ class Dataset:
         try:
             (counter, realName) = self.getRootHisto(self.counterDir+"/counter") #unweighted
             ctr = _histoToCounter(counter)
-            self.nAllEventsUnweighted = ctr[0][1].value() # first counter, second element of the tuple, corresponds to ttree: skimCounterAll
+            #self.nAllEventsUnweighted = ctr[0][1].value() # first counter, second element of the tuple, corresponds to ttree: skimCounterAll
+            self.nAllEventsUnweighted = ctr[1][1].value() # Base::Events = events processed (not Base::AllEvents)
             if _debugCounters: # Debug print
+                print "DEBUG: self.nAllEventsUnweighted = ", self.nAllEventsUnweighted
                 print "DEBUG: Unweighted counters, Dataset name: "+self.getName()
                 for i in range(counter.GetNbinsX()+1):
                     if counter.GetXaxis().GetBinLabel(i) == "Base::AllEvents":
