@@ -198,7 +198,7 @@ def ComparisonPlot(datasetsMgr, json):
             p.histoMgr.setHistoLegendStyle(hName, "LP")
         if json["drawStyle"]=="HIST":
             p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetFillStyle(0))
-            p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerSize(0.0))
+            #p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerSize(0.0))
 
     # Set legend labels
     p.histoMgr.setHistoLegendLabelMany( legendDict)
@@ -223,6 +223,7 @@ def ComparisonPlot(datasetsMgr, json):
                    addCmsText        = json["addCmsText"]=="True",
                    cmsExtraText      = json["cmsExtraText"],
                    opts              = json["opts"],
+                   opts2             = json["opts2"],
                    log               = json["logY"]=="True", 
                    moveLegend        = json["moveLegend"],
                    cutBox            = {"cutValue": json["cutValue"],
@@ -232,6 +233,9 @@ def ComparisonPlot(datasetsMgr, json):
                                         "greaterThan": json["cutGreaterThan"]=="True"},
                    xlabelsize        = xlabelSize,
                    ylabelsize        = ylabelSize,
+                   ratio             = json["ratio"]=="True",
+                   ratioInvert       = json["ratioInvert"]=="True",
+                   ratioYlabel       = json["ratioYlabel"],
                    )
     
     # Remove legend?
