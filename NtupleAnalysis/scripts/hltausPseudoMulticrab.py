@@ -20,7 +20,11 @@ hltausPseudoMulticrab.py -f test.root --cmssw "612SLHC6mc"
 hltausPseudoMulticrab.py -f test.root --dir multicrab_test -v 
 hltausPseudoMulticrab.py -f test.root --dir multicrab_CaloPlusTracks_v_20170419T1926/ --dataset Neutrino_Pt2to20_gun
 hltausPseudoMulticrab.py -f results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/CaloPlusTracks_Histograms_VBF.root
-hltausPseudoMulticrab.py -f results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/CaloPlusTracks_Histograms_MinBias.root --dir multicrab_CaloPlusTracks_v612SLHC6_20170420T1226/ --dataset Neutrino_Pt2to20_gun
+hltausPseudoMulticrab.py -f results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/CaloPlusTracks_Histograms_MinBias.root --dataset Neutrino_Pt2to20_gun --dir multicrab_CaloPlusTracks_v612SLHC6_20170420T1226
+
+Last Used:
+hltausPseudoMulticrab.py -f CaloPlusTracks_Histograms_VBF.root
+hltausPseudoMulticrab.py -f CaloPlusTracks_Histograms_MinBias.root --dataset Neutrino_Pt2to20_gun --dir multicrab_CaloPlusTracks_v61XSLHC6_20170421T1554
 '''
 
 #================================================================================================
@@ -96,15 +100,21 @@ def writeConfigInfoToRootFile(fileName, opts):
     myConfigInfoDir = fOUT.mkdir("configInfo")
 
     # Create configinfo histogram
-    hConfigInfo = ROOT.TH1F("configinfo", "configinfo", 4, 0, 4)
+    hConfigInfo = ROOT.TH1F("configinfo", "configinfo", 6, 0, 4)
     hConfigInfo.GetXaxis().SetBinLabel(1, "control")
     hConfigInfo.SetBinContent(1, 1)
     hConfigInfo.GetXaxis().SetBinLabel(2, "energy")
     hConfigInfo.SetBinContent(2, 14)
-    hConfigInfo.GetXaxis().SetBinLabel(3,"luminosity")
-    hConfigInfo.SetBinContent(3, opts.lumi*1e+34)
-    hConfigInfo.GetXaxis().SetBinLabel(4,"pileup")
-    hConfigInfo.SetBinContent(4, opts.pileup)
+    hConfigInfo.GetXaxis().SetBinLabel(3, "isData")
+    hConfigInfo.SetBinContent(3, 0)
+    hConfigInfo.GetXaxis().SetBinLabel(3, "isPileupReweighted")
+    hConfigInfo.SetBinContent(3, 0)
+    hConfigInfo.GetXaxis().SetBinLabel(4, "isTopPtReweighted")
+    hConfigInfo.SetBinContent(4, 0)
+    hConfigInfo.GetXaxis().SetBinLabel(5,"luminosity")
+    hConfigInfo.SetBinContent(5, opts.lumi*1e+34)
+    hConfigInfo.GetXaxis().SetBinLabel(6,"pileup")
+    hConfigInfo.SetBinContent(6, opts.pileup)
     
     # Write a copy of data version and code version
     hConfigInfo.SetDirectory(myConfigInfoDir)
@@ -148,27 +158,31 @@ def writeCounters(fileName, opts):
 
     # Create the  counters folder
     folderName = opts.analysisName + "_" + opts.dataEra
+    hCounters = fOUT.Get(folderName + "/Counters")
+                         
     fOUT.cd(folderName)
-    folderName += "/counters"
+    folderName += "/counters"    
     countersDir = fOUT.mkdir(folderName)
     fOUT.cd(folderName)
     # Write counter histogram
-    hCounter = ROOT.TH1F("counter", "counter", 10, 0, 10)
-    hCounter.GetXaxis().SetBinLabel(1, "control")
-    hCounter.SetBinContent(1, 1)
-    hCounter.GetXaxis().SetBinLabel(2, "energy")
-    hCounter.SetBinContent(2, 14)
-    hCounter.GetXaxis().SetBinLabel(3,"luminosity")
-    hCounter.SetBinContent(3, opts.lumi*1e+34)
-    hCounter.GetXaxis().SetBinLabel(4,"pileup")
-    hCounter.SetBinContent(4, opts.pileup)
-    
+    hCounter = ROOT.TH1F("counter", "counter", 2, 0, 2)
+    # hCounter.GetXaxis().SetBinLabel(?, "ttree:: skimCounterAll")
+    # hCounter.GetXaxis().SetBinLabel(?, "ttree:: skimCounterPassed")
+    hCounter.GetXaxis().SetBinLabel(1, "Base::AllEvents")
+    hCounter.SetBinContent(1, hCounters.GetBinContent(1))
+    hCounter.GetXaxis().SetBinLabel(2, "Base::Events")
+    hCounter.SetBinContent(2, hCounters.GetBinContent(2))
+        
     # Create the counters/weighted folder
     folderName += "/weighted"
     weightedCountersDir = fOUT.mkdir(folderName)
     fOUT.cd(folderName)
     # Write counter histogram
-    hCounterWeighted = ROOT.TH1F("counter", "counter", 10, 0, 10)
+    hCounterWeighted = ROOT.TH1F("counter", "counter", 2, 0, 2)
+    hCounterWeighted.GetXaxis().SetBinLabel(1, "Base::AllEvents")
+    hCounterWeighted.SetBinContent(1, hCounters.GetBinContent(1))
+    hCounterWeighted.GetXaxis().SetBinLabel(2, "Base::Events")
+    hCounterWeighted.SetBinContent(2, hCounters.GetBinContent(2))
 
     # Write and close the root file
     fOUT.cd("/")

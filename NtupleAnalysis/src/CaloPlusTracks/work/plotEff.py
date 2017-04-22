@@ -2,15 +2,15 @@
 '''
 
 Usage (single plot):
-./plotMC.py -m <multicrab_directory> <jsonfile> [opts]
+./plotEff.py -m <multicrab_directory> <jsonfile> [opts]
 
 Usage (multiple plots):
-./plotMC.py -m <pseudo_mcrab_directory> json/*.json
-./plotMC.py -m <pseudo_mcrab_directory> json/*.json json/L1TkTau/*.json
+./plotEff.py -m <pseudo_mcrab_directory> json/*.json
+./plotEff.py -m <pseudo_mcrab_directory> json/*.json json/L1TkTau/*.json
 
 Last Used:
-./plotMC.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/L1TkTau/Multiplicity.json -i "VBF|Neutrino"
-./plotMC.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/*/*.json -i "VBF|Neutrino"
+./plotEff.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/L1TkTau/Multiplicity.json -i "VBF|Neutrino"
+./plotEff.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/*/*.json -i "VBF|Neutrino"
 '''
 
 #================================================================================================
@@ -72,6 +72,7 @@ def GetDatasetsFromDir(opts, json):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
                                                         dataEra=json["dataEra"],
                                                         searchMode=None, 
+                                                        includeOnlyTasks="|".join(json["samples"]),
                                                         analysisName=json["analysis"])
     elif (opts.includeOnlyTasks):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
@@ -129,32 +130,62 @@ def Plot(jsonfile, opts):
         datasetsMgr.PrintInfo()
 
         # Plot the histogram
-        MCPlot(datasetsMgr, j)
+        ComparisonPlot(datasetsMgr, j)
         return
 
 
-def MCPlot(datasetsMgr, json):
+def getHistos(datasetsMgr, datasetName, name1, name2):
+
+    h1 = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(name1)
+    h1.setName("h1" + "-" + datasetName)
+
+    h2 = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(name2)
+    h2.setName("h2" + "-" + datasetName)
+    return [h1, h2]
+
+def getHisto(datasetsMgr, datasetName, histoName):
+
+    h1 = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(histoName)
+    h1.setName("h1" + "-" + datasetName)
+    return [h1]
+
+
+def ComparisonPlot(datasetsMgr, json):
     Verbose("Creating MC plot")
         
     # Create the MC Plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
-    ylabel_ = json["ylabel"]
-    if json["normalization"]=="normalizeToLumi":
-        kwargs = {}
-        #p = plots.MCPlot(datasetsMgr, json["histogram"], normalizeByCrossSection=True, **kwargs)
-        p = plots.MCPlot(datasetsMgr, json["histogram"], normalizeToLumi=opts.intLumi, **kwargs)
-    elif json["normalization"]=="normalizeToOne":
+    kwargs     = {}
+    ylabel_    = json["ylabel"]
+    normToOne_ = json["normalizationToOne"]=="True"
+    if normToOne_:
         ylabel_ = ylabel_.replace(json["ylabel"].split(" /")[0], "Arbitrary Units")
-        kwargs  = {json["normalization"]: True}
-        p = plots.MCPlot(datasetsMgr, json["histogram"], **kwargs)
-    else:
-        raise Exception("Invalid normalization \"%s\"" % (json["normalization"]) )
-
+    #p = plots.PlotSameBase(datasetsMgr, json["histogram"], normalizeToOne=normToOne_, **kwargs) #works
+    #p = plots.ComparisonPlot(*getHistos(datasetsMgr, json['samples'][0], json['histogram'], json['histogram'])) #works
+    p = plots.ComparisonPlot(*getHistos(datasetsMgr, json['samples'][0], json['histogram'], "Tk_Eff"))
+    
     # Customise styling
     p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetFillStyle(0))
     p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerSize(1.2))
     p.histoMgr.setHistoDrawStyleAll(json["drawStyle"])
     p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
 
+    # Apply styles
+    ##########################################
+    p.histoMgr.forHisto("h1-VBF_HToTauTau" , styles.getBaselineStyle() )
+    p.histoMgr.forHisto("h2-VBF_HToTauTau" , styles.getInvertedStyle() )
+
+    # Set draw style
+    p.histoMgr.setHistoDrawStyle("h1-VBF_HToTauTau", "LP")
+    p.histoMgr.setHistoLegendStyle("h2-VBF_HToTauTau", "LP")
+    # p.histoMgr.setHistoLegendStyleAll("LP")
+
+    # Set legend labels
+    p.histoMgr.setHistoLegendLabelMany({
+            "h1-VBF_HToTauTau" : "h1",
+            "h2-VBF_HToTauTau" : "h2",
+            })
+    ##########################################
+    
     # Label size (optional. Commonly Used in counters)
     xlabelSize = None
     if "xlabelsize" in json:
@@ -162,7 +193,6 @@ def MCPlot(datasetsMgr, json):
     ylabelSize = None
     if "ylabelsize" in json:
         ylabelSize = json["ylabelsize"]
-    
     # Draw a customised plot
     saveName = os.path.join(json["saveDir"], json["title"])    
     
@@ -235,7 +265,7 @@ def main(opts):
     # For-loop: All json files
     for j in jsonFiles:
         Print("Processing JSON file \"%s\"" % (j), True)
-        Plot(j, opts)    
+        Plot(j, opts)
     return
 
 
@@ -248,7 +278,7 @@ if __name__ == "__main__":
     global opts
     BATCHMODE = True
     VERBOSE   = False
-    INTLUMI   = 1000.0 #3703.703
+    #INTLUMI   = 1.0
 
     parser = OptionParser(usage="Usage: %prog [options]" , add_help_option=False,conflict_handler="resolve")
 
@@ -261,8 +291,8 @@ if __name__ == "__main__":
     parser.add_option("-m", "--mcrab", dest="mcrab", action="store", 
                       help="Path to the multicrab directory for input")
 
-    parser.add_option("--intLumi", dest="intLumi", type=float, default=INTLUMI,
-                      help="Override the integrated lumi [default: %s]" % INTLUMI)
+    #parser.add_option("--intLumi", dest="intLumi", type=float, default=INTLUMI,
+    #                  help="Override the integrated lumi [default: %s]" % INTLUMI)
 
     parser.add_option("-i", "--includeOnlyTasks", dest="includeOnlyTasks", action="store", 
                       help="List of datasets in mcrab to include")
@@ -282,4 +312,4 @@ if __name__ == "__main__":
     main(opts)
 
     if not opts.batchMode:
-        raw_input("=== plotMC.py: Press any key to quit ROOT ...")
+        raw_input("=== plotEff.py: Press any key to quit ROOT ...")
