@@ -640,7 +640,7 @@ if __name__ == "__main__":
     # Default Values
     VERBOSE      = False
     ASK          = False
-    PSET         = "miniAOD2TTree_CaloPlusTracks_cfg.py"
+    PSET         = "miniAOD2TTree_CaloTk_cfg.py"
     DIRNAME      = ""
     DATASET      = ""
     CMSSW        = "61XSLHC6"

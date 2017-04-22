@@ -1,13 +1,13 @@
 void TurnOn25()
 {
 //=========Macro generated from canvas: plots/TurnOn25/
-//=========  (Sat Apr 22 23:09:32 2017) by ROOT version6.07/03
+//=========  (Sat Apr 22 23:20:39 2017) by ROOT version6.07/03
    TCanvas *plots/TurnOn25 = new TCanvas("plots/TurnOn25", "",0,0,600,600);
    gStyle->SetOptFit(1);
    gStyle->SetOptStat(0);
    gStyle->SetOptTitle(0);
    plots/TurnOn25->SetHighLightColor(2);
-   plots/TurnOn25->Range(-40.50633,-0.1604938,212.6582,1.074074);
+   plots/TurnOn25->Range(-40.50633,-0.1925926,212.6582,1.288889);
    plots/TurnOn25->SetFillColor(0);
    plots/TurnOn25->SetBorderMode(0);
    plots/TurnOn25->SetBorderSize(2);
@@ -26,7 +26,7 @@ void TurnOn25()
    
    TH1F *hframe__1 = new TH1F("hframe__1","",1000,0,200);
    hframe__1->SetMinimum(0);
-   hframe__1->SetMaximum(1);
+   hframe__1->SetMaximum(1.2);
    hframe__1->SetDirectory(0);
    hframe__1->SetStats(0);
    hframe__1->SetLineStyle(0);
@@ -375,6 +375,10 @@ void TurnOn25()
    Calo_TurnOn25_VBF_HToTauTau_cloned__4->GetZaxis()->SetTitleSize(0.035);
    Calo_TurnOn25_VBF_HToTauTau_cloned__4->GetZaxis()->SetTitleFont(42);
    Calo_TurnOn25_VBF_HToTauTau_cloned__4->Draw("P same");
+   TLine *line = new TLine(25,0,25,1.2);
+   line->SetLineStyle(2);
+   line->SetLineWidth(3);
+   line->Draw();
    
    TLegend *leg = new TLegend(0.71,0.33,0.91,0.47,NULL,"brNDC");
    leg->SetBorderSize(0);
@@ -421,7 +425,7 @@ void TurnOn25()
    
    TH1F *hframe_copy__5 = new TH1F("hframe_copy__5","",1000,0,200);
    hframe_copy__5->SetMinimum(0);
-   hframe_copy__5->SetMaximum(1);
+   hframe_copy__5->SetMaximum(1.2);
    hframe_copy__5->SetDirectory(0);
    hframe_copy__5->SetStats(0);
    hframe_copy__5->SetLineStyle(0);
@@ -465,7 +469,7 @@ tex->SetNDC();
    tex->SetTextSize(22.8);
    tex->SetLineWidth(2);
    tex->Draw();
-      tex = new TLatex(0.72,0.49,"H^{0}#rightarrow#tau#tau (VBF)");
+      tex = new TLatex(0.72,0.49,"VBF H^{0}#rightarrow#tau#tau");
 tex->SetNDC();
    tex->SetTextFont(63);
    tex->SetTextSize(17);

@@ -83,7 +83,7 @@ class Uncertainty:
 uncertaintyMode = Uncertainty()
 
 ## Default energy text
-energyText = "13 TeV"
+energyText = "14 TeV"
 
 ## Default PU text
 pileupText = "PU=140"

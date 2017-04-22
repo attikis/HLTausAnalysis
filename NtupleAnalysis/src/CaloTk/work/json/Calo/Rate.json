@@ -25,7 +25,7 @@
     "cmsExtraText": "Phase-2 Simulation",
     "removeLegend": "False",
     "moveLegend": {"dx": -0.02, "dy": -0.05, "dh": -0.16},
-    "extraText": {"text": "H^{0}#rightarrow#tau#tau (VBF)", "x": 0.72, "y": 0.89, "size": 17},
+    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.72, "y": 0.89, "size": 17},
     "cutValue": 10.0,
     "cutFillColour": 16,
     "cutBox": "False",
