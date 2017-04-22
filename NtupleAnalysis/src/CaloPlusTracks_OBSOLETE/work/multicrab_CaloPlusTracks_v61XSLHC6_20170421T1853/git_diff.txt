@@ -1,0 +1,1033 @@
+diff --git a/.DS_Store b/.DS_Store
+index e83ec47..5008ddf 100644
+Binary files a/.DS_Store and b/.DS_Store differ
+diff --git a/NtupleAnalysis/python/tools/dataset.py b/NtupleAnalysis/python/tools/dataset.py
+index f0ccc95..05bc340 100644
+--- a/NtupleAnalysis/python/tools/dataset.py
++++ b/NtupleAnalysis/python/tools/dataset.py
+@@ -2980,8 +2980,10 @@ class Dataset:
+         try:
+             (counter, realName) = self.getRootHisto(self.counterDir+"/counter") #unweighted
+             ctr = _histoToCounter(counter)
+-            self.nAllEventsUnweighted = ctr[0][1].value() # first counter, second element of the tuple, corresponds to ttree: skimCounterAll
++            #self.nAllEventsUnweighted = ctr[0][1].value() # first counter, second element of the tuple, corresponds to ttree: skimCounterAll
++            self.nAllEventsUnweighted = ctr[1][1].value() # Base::Events = events processed (not Base::AllEvents)
+             if _debugCounters: # Debug print
++                print "DEBUG: self.nAllEventsUnweighted = ", self.nAllEventsUnweighted
+                 print "DEBUG: Unweighted counters, Dataset name: "+self.getName()
+                 for i in range(counter.GetNbinsX()+1):
+                     if counter.GetXaxis().GetBinLabel(i) == "Base::AllEvents":
+diff --git a/NtupleAnalysis/python/tools/old/tauTriggerAux.py b/NtupleAnalysis/python/tools/old/tauTriggerAux.py
+index 36b1554..2571701 100644
+--- a/NtupleAnalysis/python/tools/old/tauTriggerAux.py
++++ b/NtupleAnalysis/python/tools/old/tauTriggerAux.py
+@@ -25,7 +25,7 @@ import ROOT
+ ###############################################################
+ ### Histogram Options
+ ###############################################################
+-hFolder     = ""
++hFolder     = "HLTausAnalysis_TP2015"
+ yMin        = 1
+ yMax        = None
+ yMinRatio   = 0.0
+diff --git a/NtupleAnalysis/scripts/hltausPseudoMulticrab.py b/NtupleAnalysis/scripts/hltausPseudoMulticrab.py
+index c5e116f..87115f7 100755
+--- a/NtupleAnalysis/scripts/hltausPseudoMulticrab.py
++++ b/NtupleAnalysis/scripts/hltausPseudoMulticrab.py
+@@ -21,6 +21,10 @@ hltausPseudoMulticrab.py -f test.root --dir multicrab_test -v
+ hltausPseudoMulticrab.py -f test.root --dir multicrab_CaloPlusTracks_v_20170419T1926/ --dataset Neutrino_Pt2to20_gun
+ hltausPseudoMulticrab.py -f results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/CaloPlusTracks_Histograms_VBF.root
+ hltausPseudoMulticrab.py -f results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/CaloPlusTracks_Histograms_MinBias.root --dir multicrab_CaloPlusTracks_v612SLHC6_20170420T1226/ --dataset Neutrino_Pt2to20_gun
++
++Last Used:
++hltausPseudoMulticrab.py -f CaloPlusTracks_Histograms_VBF.root
++hltausPseudoMulticrab.py -f CaloPlusTracks_Histograms_MinBias.root --dir multicrab_CaloPlusTracks_v61XSLHC6_20170421T1554 --dataset Neutrino_Pt2to20_gun
+ '''
+ 
+ #================================================================================================
+@@ -96,15 +100,21 @@ def writeConfigInfoToRootFile(fileName, opts):
+     myConfigInfoDir = fOUT.mkdir("configInfo")
+ 
+     # Create configinfo histogram
+-    hConfigInfo = ROOT.TH1F("configinfo", "configinfo", 4, 0, 4)
++    hConfigInfo = ROOT.TH1F("configinfo", "configinfo", 6, 0, 4)
+     hConfigInfo.GetXaxis().SetBinLabel(1, "control")
+     hConfigInfo.SetBinContent(1, 1)
+     hConfigInfo.GetXaxis().SetBinLabel(2, "energy")
+     hConfigInfo.SetBinContent(2, 14)
+-    hConfigInfo.GetXaxis().SetBinLabel(3,"luminosity")
+-    hConfigInfo.SetBinContent(3, opts.lumi*1e+34)
+-    hConfigInfo.GetXaxis().SetBinLabel(4,"pileup")
+-    hConfigInfo.SetBinContent(4, opts.pileup)
++    hConfigInfo.GetXaxis().SetBinLabel(3, "isData")
++    hConfigInfo.SetBinContent(3, 0)
++    hConfigInfo.GetXaxis().SetBinLabel(3, "isPileupReweighted")
++    hConfigInfo.SetBinContent(3, 0)
++    hConfigInfo.GetXaxis().SetBinLabel(4, "isTopPtReweighted")
++    hConfigInfo.SetBinContent(4, 0)
++    hConfigInfo.GetXaxis().SetBinLabel(5,"luminosity")
++    hConfigInfo.SetBinContent(5, opts.lumi*1e+34)
++    hConfigInfo.GetXaxis().SetBinLabel(6,"pileup")
++    hConfigInfo.SetBinContent(6, opts.pileup)
+     
+     # Write a copy of data version and code version
+     hConfigInfo.SetDirectory(myConfigInfoDir)
+@@ -148,27 +158,31 @@ def writeCounters(fileName, opts):
+ 
+     # Create the  counters folder
+     folderName = opts.analysisName + "_" + opts.dataEra
++    hCounters = fOUT.Get(folderName + "/Counters")
++                         
+     fOUT.cd(folderName)
+-    folderName += "/counters"
++    folderName += "/counters"    
+     countersDir = fOUT.mkdir(folderName)
+     fOUT.cd(folderName)
+     # Write counter histogram
+-    hCounter = ROOT.TH1F("counter", "counter", 10, 0, 10)
+-    hCounter.GetXaxis().SetBinLabel(1, "control")
+-    hCounter.SetBinContent(1, 1)
+-    hCounter.GetXaxis().SetBinLabel(2, "energy")
+-    hCounter.SetBinContent(2, 14)
+-    hCounter.GetXaxis().SetBinLabel(3,"luminosity")
+-    hCounter.SetBinContent(3, opts.lumi*1e+34)
+-    hCounter.GetXaxis().SetBinLabel(4,"pileup")
+-    hCounter.SetBinContent(4, opts.pileup)
+-    
++    hCounter = ROOT.TH1F("counter", "counter", 2, 0, 2)
++    # hCounter.GetXaxis().SetBinLabel(?, "ttree:: skimCounterAll")
++    # hCounter.GetXaxis().SetBinLabel(?, "ttree:: skimCounterPassed")
++    hCounter.GetXaxis().SetBinLabel(1, "Base::AllEvents")
++    hCounter.SetBinContent(1, hCounters.GetBinContent(1))
++    hCounter.GetXaxis().SetBinLabel(2, "Base::Events")
++    hCounter.SetBinContent(2, hCounters.GetBinContent(2))
++        
+     # Create the counters/weighted folder
+     folderName += "/weighted"
+     weightedCountersDir = fOUT.mkdir(folderName)
+     fOUT.cd(folderName)
+     # Write counter histogram
+-    hCounterWeighted = ROOT.TH1F("counter", "counter", 10, 0, 10)
++    hCounterWeighted = ROOT.TH1F("counter", "counter", 2, 0, 2)
++    hCounterWeighted.GetXaxis().SetBinLabel(1, "Base::AllEvents")
++    hCounterWeighted.SetBinContent(1, hCounters.GetBinContent(1))
++    hCounterWeighted.GetXaxis().SetBinLabel(2, "Base::Events")
++    hCounterWeighted.SetBinContent(2, hCounters.GetBinContent(2))
+ 
+     # Write and close the root file
+     fOUT.cd("/")
+diff --git a/NtupleAnalysis/src/CaloPlusTracks/CaloPlusTracks.C b/NtupleAnalysis/src/CaloPlusTracks/CaloPlusTracks.C
+index 7c09c87..cbb1e4d 100644
+--- a/NtupleAnalysis/src/CaloPlusTracks/CaloPlusTracks.C
++++ b/NtupleAnalysis/src/CaloPlusTracks/CaloPlusTracks.C
+@@ -261,15 +261,16 @@ void CaloPlusTracks::Loop()
+   BookHistos_();
+   Long64_t nbytes       = 0;
+   Long64_t nb           = 0;
+-  int nEvtsWithMaxHTaus = 0; 
++  int nEvtsWithMaxHTaus = 0;
++  unsigned int nEvts    = 0;
++  unsigned int nAllEvts = fChain->GetEntries();
+   // L1PixelTrackFit f(3.8112); // Bz in Tesla (for pixel re-fitting)
+-
+-  
++ 
+   ////////////////////////////////////////////////
+   // For-loop: Entries
+   ////////////////////////////////////////////////
+-  for (int jentry = 0; jentry < nEntries; jentry++){
+-  
++  for (int jentry = 0; jentry < nEntries; jentry++, nEvts++){
++           
+     if(DEBUG) cout << "\tEntry = " << jentry << endl;
+     
+     // Init variables
+@@ -417,9 +418,9 @@ void CaloPlusTracks::Loop()
+ 
+ 	// L1TkTau Resolution
+ 	GenParticle p = tau->GetMatchingGenParticle();	
+-	hL1CaloTau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().eta() - p.p4vis().Pt() )/p.p4vis().Pt()  );
++	hL1CaloTau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().et( ) - p.p4vis().Et() )/p.p4vis().Et()  );
+ 	hL1CaloTau_ResolutionCaloEta->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
+-	hL1CaloTau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().eta() - p.p4vis().Phi())/p.p4vis().Phi() );
++	hL1CaloTau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().phi() - p.p4vis().Phi())/p.p4vis().Phi() );
+ 
+       }
+     
+@@ -444,9 +445,9 @@ void CaloPlusTracks::Loop()
+ 	
+ 	// L1TkTau Resolution
+ 	GenParticle p = tau->GetMatchingGenParticle();
+-	hL1TkTau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().eta() - p.p4vis().Pt() )/p.p4vis().Pt()  );
++	hL1TkTau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().et()  - p.p4vis().Et() )/p.p4vis().Et()  );
+ 	hL1TkTau_ResolutionCaloEta->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
+-	hL1TkTau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().eta() - p.p4vis().Phi())/p.p4vis().Phi() );
++	hL1TkTau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().phi() - p.p4vis().Phi())/p.p4vis().Phi() );
+ 
+ 	// Apply isolation?
+ 	// if (L1TkTau->GetVtxIsolation() > isoCone_VtxIsoWP) continue;
+@@ -616,6 +617,10 @@ void CaloPlusTracks::Loop()
+     
+   }// For-loop: Entries
+ 
++  // Fill counters
++  hCounters->SetBinContent(1, nAllEvts);
++  hCounters->SetBinContent(2, nEvts);
++
+ 
+   ////////////////////////////////////////////////
+   // Convert or Finalise Histos
+@@ -684,6 +689,7 @@ void CaloPlusTracks::BookHistos_(void)
+ {
+   
+   // Event-Type Histograms
++  histoTools_.BookHisto_1D(hCounters, "Counters",  "", 2, 0.0, +2.0);
+   histoTools_.BookHisto_1D(hL1TkPV_VtxZ            , "L1TkPV_VtxZ"            ,  "", 600, -30.0,  +30.0);
+   histoTools_.BookHisto_1D(hHepMCEvt_VtxZ          , "HepMCEvt_VtxZ"          ,  "", 600, -30.0,  +30.0);
+   histoTools_.BookHisto_2D(hHepMCEvt_VtxX_VtxY     , "HepMCEvt_VtxX_VtxY"     ,  "", 400,  -0.01,  +0.01, 400,  -0.01,  +0.01);
+@@ -1362,11 +1368,11 @@ vector<GenParticle> CaloPlusTracks::GetGenParticles(int pdgId, bool isLastCopy)
+     {
+       
+       GenParticle p = GetGenParticle(genP_index);
+-      SetGenParticleMomsAndDaus(p);
+-	
+       // Apply criteria
+       if ( abs(p.pdgId()) != pdgId) continue;
+-	
++     
++      SetGenParticleMomsAndDaus(p); // fixme: extremely time-consuming
++		
+       if (!isLastCopy) myGenParticles.push_back(p);
+       else
+ 	{
+diff --git a/NtupleAnalysis/src/CaloPlusTracks/CaloPlusTracks.h b/NtupleAnalysis/src/CaloPlusTracks/CaloPlusTracks.h
+index e1b037c..561d97d 100644
+--- a/NtupleAnalysis/src/CaloPlusTracks/CaloPlusTracks.h
++++ b/NtupleAnalysis/src/CaloPlusTracks/CaloPlusTracks.h
+@@ -238,6 +238,7 @@ class CaloPlusTracks : public TreeAnalyserMC{
+   bool bFoundAllTaus_;
+ 
+   // Event-Type Histograms
++  TH1D* hCounters;
+   TH1D* hHepMCEvt_VtxZ;
+   TH2D* hHepMCEvt_VtxX_VtxY;
+   TH1D* hL1TkPV_VtxZ;
+diff --git a/NtupleAnalysis/src/CaloPlusTracks/work/L1TkTau_Multiplicity.C b/NtupleAnalysis/src/CaloPlusTracks/work/L1TkTau_Multiplicity.C
+deleted file mode 100644
+index c1ea497..0000000
+--- a/NtupleAnalysis/src/CaloPlusTracks/work/L1TkTau_Multiplicity.C
++++ /dev/null
+@@ -1,251 +0,0 @@
+-void L1TkTau_Multiplicity()
+-{
+-//=========Macro generated from canvas: L1TkTau_Multiplicity/
+-//=========  (Thu Apr 20 15:18:06 2017) by ROOT version6.07/03
+-   TCanvas *L1TkTau_Multiplicity = new TCanvas("L1TkTau_Multiplicity", "",1,1,600,576);
+-   gStyle->SetOptFit(1);
+-   gStyle->SetOptStat(0);
+-   gStyle->SetOptTitle(0);
+-   L1TkTau_Multiplicity->SetHighLightColor(2);
+-   L1TkTau_Multiplicity->Range(-2.025316,-3.959421,10.63291,-0.255717);
+-   L1TkTau_Multiplicity->SetFillColor(0);
+-   L1TkTau_Multiplicity->SetBorderMode(0);
+-   L1TkTau_Multiplicity->SetBorderSize(2);
+-   L1TkTau_Multiplicity->SetLogy();
+-   L1TkTau_Multiplicity->SetGridy();
+-   L1TkTau_Multiplicity->SetTickx(1);
+-   L1TkTau_Multiplicity->SetTicky(1);
+-   L1TkTau_Multiplicity->SetLeftMargin(0.16);
+-   L1TkTau_Multiplicity->SetRightMargin(0.05);
+-   L1TkTau_Multiplicity->SetTopMargin(0.06);
+-   L1TkTau_Multiplicity->SetBottomMargin(0.13);
+-   L1TkTau_Multiplicity->SetFrameFillStyle(0);
+-   L1TkTau_Multiplicity->SetFrameBorderMode(0);
+-   L1TkTau_Multiplicity->SetFrameFillStyle(0);
+-   L1TkTau_Multiplicity->SetFrameBorderMode(0);
+-   
+-   TH1F *hframe__5 = new TH1F("hframe__5","",1000,0,10);
+-   hframe__5->SetMinimum(1);
+-   hframe__5->SetMaximum(0.3327061);
+-   hframe__5->SetDirectory(0);
+-   hframe__5->SetStats(0);
+-   hframe__5->SetLineStyle(0);
+-   hframe__5->SetMarkerStyle(20);
+-   hframe__5->GetXaxis()->SetTitle("Jet Multiplicity");
+-   hframe__5->GetXaxis()->SetLabelFont(43);
+-   hframe__5->GetXaxis()->SetLabelOffset(0.007);
+-   hframe__5->GetXaxis()->SetLabelSize(27);
+-   hframe__5->GetXaxis()->SetTitleSize(33);
+-   hframe__5->GetXaxis()->SetTitleOffset(0.9);
+-   hframe__5->GetXaxis()->SetTitleFont(43);
+-   hframe__5->GetYaxis()->SetTitle("Events / 0.50");
+-   hframe__5->GetYaxis()->SetLabelFont(43);
+-   hframe__5->GetYaxis()->SetLabelOffset(0.007);
+-   hframe__5->GetYaxis()->SetLabelSize(27);
+-   hframe__5->GetYaxis()->SetTitleSize(33);
+-   hframe__5->GetYaxis()->SetTitleOffset(1.25);
+-   hframe__5->GetYaxis()->SetTitleFont(43);
+-   hframe__5->GetZaxis()->SetLabelFont(43);
+-   hframe__5->GetZaxis()->SetLabelOffset(0.007);
+-   hframe__5->GetZaxis()->SetLabelSize(27);
+-   hframe__5->GetZaxis()->SetTitleSize(33);
+-   hframe__5->GetZaxis()->SetTitleFont(43);
+-   hframe__5->Draw(" ");
+-   
+-   TH1D *L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6 = new TH1D("L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6","L1TkTau_Multiplicity",30,-0.5,14.5);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinContent(2,0.03715418);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinContent(4,0.1531809);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinContent(6,0.2772551);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinContent(8,0.2689675);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinContent(10,0.1617088);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinContent(12,0.07042479);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinContent(14,0.02354166);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinContent(16,0.006085599);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinContent(18,0.001281179);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinContent(20,0.000240221);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinContent(22,0.0001201105);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinContent(24,4.003683e-05);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinError(2,0.001219646);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinError(4,0.002476465);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinError(6,0.003331729);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinError(8,0.003281555);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinError(10,0.002544466);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinError(12,0.001679162);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinError(14,0.0009708416);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinError(16,0.0004936072);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinError(18,0.0002264825);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinError(20,9.806981e-05);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinError(22,6.934583e-05);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetBinError(24,4.003683e-05);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetEntries(24981);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetDirectory(0);
+-
+-   Int_t ci;      // for color index setting
+-   TColor *color; // for color definition with alpha
+-   ci = TColor::GetColor("#ff0000");
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetFillColor(ci);
+-
+-   ci = TColor::GetColor("#ff0000");
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetLineColor(ci);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetLineStyle(3);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetLineWidth(3);
+-
+-   ci = TColor::GetColor("#ff0000");
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetMarkerColor(ci);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetMarkerStyle(22);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->SetMarkerSize(1.2);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->GetXaxis()->SetRange(1,30);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->GetXaxis()->SetLabelFont(42);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->GetXaxis()->SetLabelSize(0.035);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->GetXaxis()->SetTitleSize(0.035);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->GetXaxis()->SetTitleFont(42);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->GetYaxis()->SetLabelFont(42);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->GetYaxis()->SetLabelSize(0.035);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->GetYaxis()->SetTitleSize(0.035);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->GetYaxis()->SetTitleFont(42);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->GetZaxis()->SetLabelFont(42);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->GetZaxis()->SetLabelSize(0.035);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->GetZaxis()->SetTitleSize(0.035);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->GetZaxis()->SetTitleFont(42);
+-   L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned__6->Draw("HIST same");
+-   
+-   TH1D *L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7 = new TH1D("L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7","L1TkTau_Multiplicity",30,-0.5,14.5);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinContent(2,0.03715418);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinContent(4,0.1531809);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinContent(6,0.2772551);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinContent(8,0.2689675);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinContent(10,0.1617088);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinContent(12,0.07042479);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinContent(14,0.02354166);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinContent(16,0.006085599);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinContent(18,0.001281179);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinContent(20,0.000240221);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinContent(22,0.0001201105);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinContent(24,4.003683e-05);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinError(2,0.001219646);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinError(4,0.002476465);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinError(6,0.003331729);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinError(8,0.003281555);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinError(10,0.002544466);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinError(12,0.001679162);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinError(14,0.0009708416);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinError(16,0.0004936072);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinError(18,0.0002264825);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinError(20,9.806981e-05);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinError(22,6.934583e-05);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetBinError(24,4.003683e-05);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetEntries(24981);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetDirectory(0);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetFillColor(1);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetFillStyle(3001);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetLineWidth(3);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetMarkerStyle(20);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->SetMarkerSize(1.2);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->GetXaxis()->SetRange(1,30);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->GetXaxis()->SetLabelFont(42);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->GetXaxis()->SetLabelSize(0.035);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->GetXaxis()->SetTitleSize(0.035);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->GetXaxis()->SetTitleFont(42);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->GetYaxis()->SetLabelFont(42);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->GetYaxis()->SetLabelSize(0.035);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->GetYaxis()->SetTitleSize(0.035);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->GetYaxis()->SetTitleFont(42);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->GetZaxis()->SetLabelFont(42);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->GetZaxis()->SetLabelSize(0.035);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->GetZaxis()->SetTitleSize(0.035);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->GetZaxis()->SetTitleFont(42);
+-   L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned__7->Draw("HIST same");
+-   TLine *line = new TLine(0,1,0,0.3327061);
+-   line->SetLineStyle(2);
+-   line->SetLineWidth(3);
+-   line->Draw();
+-   
+-   TLegend *leg = new TLegend(0.68,0.72,0.88,0.92,NULL,"brNDC");
+-   leg->SetBorderSize(0);
+-   leg->SetTextFont(62);
+-   leg->SetTextSize(0.035);
+-   leg->SetLineColor(1);
+-   leg->SetLineStyle(1);
+-   leg->SetLineWidth(1);
+-   leg->SetFillColor(0);
+-   leg->SetFillStyle(4000);
+-   TLegendEntry *entry=leg->AddEntry("L1TkTau_Multiplicity_Neutrino_Pt2to20_gun_cloned_forLegend","Neutrino_Pt2to20_gun","F");
+-   entry->SetFillColor(1);
+-   entry->SetFillStyle(3001);
+-   entry->SetLineColor(1);
+-   entry->SetLineStyle(1);
+-   entry->SetLineWidth(1);
+-   entry->SetMarkerColor(1);
+-   entry->SetMarkerStyle(21);
+-   entry->SetMarkerSize(1);
+-   entry->SetTextFont(62);
+-   entry=leg->AddEntry("L1TkTau_Multiplicity_VBF_HToTauTau_125_14TeV_powheg_pythia6_cloned_forLegend","VBF_HToTauTau_125_14TeV_powheg_pythia6","F");
+-
+-   ci = TColor::GetColor("#ff0000");
+-   entry->SetFillColor(ci);
+-   entry->SetFillStyle(1001);
+-   entry->SetLineColor(1);
+-   entry->SetLineStyle(3);
+-   entry->SetLineWidth(1);
+-   entry->SetMarkerColor(1);
+-   entry->SetMarkerStyle(21);
+-   entry->SetMarkerSize(1);
+-   entry->SetTextFont(62);
+-   leg->Draw();
+-   
+-   TH1F *hframe_copy__8 = new TH1F("hframe_copy__8","",1000,0,10);
+-   hframe_copy__8->SetMinimum(1);
+-   hframe_copy__8->SetMaximum(0.3327061);
+-   hframe_copy__8->SetDirectory(0);
+-   hframe_copy__8->SetStats(0);
+-   hframe_copy__8->SetLineStyle(0);
+-   hframe_copy__8->SetMarkerStyle(20);
+-   hframe_copy__8->GetXaxis()->SetTitle("Jet Multiplicity");
+-   hframe_copy__8->GetXaxis()->SetLabelFont(43);
+-   hframe_copy__8->GetXaxis()->SetLabelOffset(0.007);
+-   hframe_copy__8->GetXaxis()->SetLabelSize(27);
+-   hframe_copy__8->GetXaxis()->SetTitleSize(33);
+-   hframe_copy__8->GetXaxis()->SetTitleOffset(0.9);
+-   hframe_copy__8->GetXaxis()->SetTitleFont(43);
+-   hframe_copy__8->GetYaxis()->SetTitle("Events / 0.50");
+-   hframe_copy__8->GetYaxis()->SetLabelFont(43);
+-   hframe_copy__8->GetYaxis()->SetLabelOffset(0.007);
+-   hframe_copy__8->GetYaxis()->SetLabelSize(27);
+-   hframe_copy__8->GetYaxis()->SetTitleSize(33);
+-   hframe_copy__8->GetYaxis()->SetTitleOffset(1.25);
+-   hframe_copy__8->GetYaxis()->SetTitleFont(43);
+-   hframe_copy__8->GetZaxis()->SetLabelFont(43);
+-   hframe_copy__8->GetZaxis()->SetLabelOffset(0.007);
+-   hframe_copy__8->GetZaxis()->SetLabelSize(27);
+-   hframe_copy__8->GetZaxis()->SetTitleSize(33);
+-   hframe_copy__8->GetZaxis()->SetTitleFont(43);
+-   hframe_copy__8->Draw("sameaxis");
+-   TLatex *   tex = new TLatex(0.95,0.952,"14 TeV");
+-tex->SetNDC();
+-   tex->SetTextAlign(31);
+-   tex->SetTextFont(43);
+-   tex->SetTextSize(24);
+-   tex->SetLineWidth(2);
+-   tex->Draw();
+-      tex = new TLatex(0.16,0.952,"CMS");
+-tex->SetNDC();
+-   tex->SetTextFont(63);
+-   tex->SetTextSize(30);
+-   tex->SetLineWidth(2);
+-   tex->Draw();
+-      tex = new TLatex(0.2706,0.952,"Preliminary");
+-tex->SetNDC();
+-   tex->SetTextFont(53);
+-   tex->SetTextSize(22.8);
+-   tex->SetLineWidth(2);
+-   tex->Draw();
+-      tex = new TLatex(0.18,0.92,"");
+-tex->SetNDC();
+-   tex->SetTextFont(63);
+-   tex->SetTextSize(17);
+-   tex->SetLineWidth(2);
+-   tex->Draw();
+-   L1TkTau_Multiplicity->Modified();
+-   L1TkTau_Multiplicity->cd();
+-   L1TkTau_Multiplicity->SetSelected(L1TkTau_Multiplicity);
+-}
+diff --git a/NtupleAnalysis/src/CaloPlusTracks/work/json/L1TkTau/IsoConeRMin.json b/NtupleAnalysis/src/CaloPlusTracks/work/json/L1TkTau/IsoConeRMin.json
+index fccfa9b..e6a05bc 100644
+--- a/NtupleAnalysis/src/CaloPlusTracks/work/json/L1TkTau/IsoConeRMin.json
++++ b/NtupleAnalysis/src/CaloPlusTracks/work/json/L1TkTau/IsoConeRMin.json
+@@ -9,7 +9,7 @@
+     "saveDir": "plots",
+     "samples": ["VBF", "Neutrino"],
+     "normalization": "normalizeToOne",
+-    "rebinX": 5,
++    "rebinX": 1,
+     "rebinY": "None",
+     "xlabel": "#DeltaR_{iso}^{min}",
+     "ylabel": "Events / %.2f",
+diff --git a/NtupleAnalysis/src/CaloPlusTracks/work/json/L1TkTau/VtxIsoAbs.json b/NtupleAnalysis/src/CaloPlusTracks/work/json/L1TkTau/VtxIsoAbs.json
+deleted file mode 100644
+index 11dbf67..0000000
+--- a/NtupleAnalysis/src/CaloPlusTracks/work/json/L1TkTau/VtxIsoAbs.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_VtxIsoAbs",
+-    "title": "L1TkTau_VtxIsoAbs",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 2,
+-    "rebinY": "None",
+-    "xlabel": "min(|z_{0}^{tk_{m}} - z_{0}^{tk_{i}}|)",
+-    "ylabel": "Events / %.1f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 20.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/CaloPlusTracks/work/multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/git_commit.txt b/NtupleAnalysis/src/CaloPlusTracks/work/multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/git_commit.txt
+deleted file mode 100644
+index f6d72fc..0000000
+--- a/NtupleAnalysis/src/CaloPlusTracks/work/multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/git_commit.txt
++++ /dev/null
+@@ -1 +0,0 @@
+-b485d6128e07cdb07f959cdda19e0af0b0db2363
+diff --git a/NtupleAnalysis/src/CaloPlusTracks/work/multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/git_diff.txt b/NtupleAnalysis/src/CaloPlusTracks/work/multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/git_diff.txt
+deleted file mode 100644
+index 757c74d..0000000
+--- a/NtupleAnalysis/src/CaloPlusTracks/work/multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/git_diff.txt
++++ /dev/null
+@@ -1,306 +0,0 @@
+-diff --git a/NtupleAnalysis/python/tools/crosssection.py b/NtupleAnalysis/python/tools/crosssection.py
+-index 477904c..e9c3ca4 100644
+---- a/NtupleAnalysis/python/tools/crosssection.py
+-+++ b/NtupleAnalysis/python/tools/crosssection.py
+-@@ -31,7 +31,7 @@ https://twiki.cern.ch/twiki/bin/view/CMS/HowToGenXSecAnalyzer#Running_the_GenXSe
+- 
+- '''
+- 
+--DEGUB = False
+-+DEBUG = False
+- def Verbose(msg, printHeader=False):
+-     '''
+-     Calls Print() only if verbose options is set to true.
+-@@ -116,6 +116,8 @@ class CrossSectionList:
+- # [17] https://twiki.cern.ch/twiki/bin/view/CMS/SummaryTable1G25ns#DY_Z and https://arxiv.org/pdf/1105.0020v1.pdf
+- # [18] top mass 172.5, https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
+- # [19} https://twiki.cern.ch/twiki/bin/viewauth/CMS/SingleTopSigma
+-+# [20] https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt14TeV#VBF_Process
+-+# [21] http://ac.els-cdn.com/S2405601415006240/1-s2.0-S2405601415006240-main.pdf?_tid=ba665958-25bf-11e7-8a34-00000aab0f26&acdnat=1492689285_2ebe153f5603767e979806f35c427599
+- 
+- backgroundCrossSections = CrossSectionList(
+-     CrossSection("QCD_Pt_15to30", {
+-@@ -570,6 +572,12 @@ backgroundCrossSections = CrossSectionList(
+-     CrossSection("ttbb_4FS_ckm_amcatnlo_madspin_pythia8", {
+-             "13": 1.393e+01, #1.393e+01 +- 3.629e-02 pb [16] (inputFiles="0641890F-F72C-E611-9EA8-02163E014B5F.root")
+-             }),   
+-+    CrossSection("Neutrino_Pt2to20_gun", {
+-+            "14": (100.0/1000.0)*1e12, #100 mb
+-+            }),
+-+    CrossSection("VBF_HToTauTau_125_14TeV_powheg_pythia6", {
+-+        "14": 4.278*0.063, #[20, 21]
+-+    }),   
+-     )
+- 
+- ## Set background process cross sections
+-@@ -611,7 +619,7 @@ def setBackgroundCrossSectionForDataset(dataset, doWNJetsWeighting=True, quietMo
+-             msg = ""
+-         if not quietMode:
+-             msg = txtAlign.format("Setting", dataset.getName(), "cross section to ", "%0.6f" %(value), "pb", msg)
+--            Print(msg, False)
+-+            Verbose(msg, False)
+-     else:
+-         Print("Warning: no cross section for dataset %s with energy %s TeV (see python/tools/crosssection.py)" % (dataset.getName(), dataset.getEnergy()), True)
+- 
+-diff --git a/NtupleAnalysis/python/tools/dataset.py b/NtupleAnalysis/python/tools/dataset.py
+-index cb09899..f0ccc95 100644
+---- a/NtupleAnalysis/python/tools/dataset.py
+-+++ b/NtupleAnalysis/python/tools/dataset.py
+-@@ -33,7 +33,7 @@ from sys import platform as _platform
+- #================================================================================================
+- # Global Definitions
+- #================================================================================================
+--DEBUG = True
+-+DEBUG = False
+- _debugNAllEvents = False
+- _debugCounters = False
+- 
+-@@ -113,10 +113,10 @@ def getDatasetsFromMulticrabDirs(multiDirs, **kwargs):
+-     # For-loop: All multicrab directories
+-     for d in multiDirs:
+-         if isinstance(d, str):
+--            Print("Getting datasets from multicrab.cfg file (directory=%s)" % (d), True) # hplus-to-hltaus
+-+            Verbose("Getting datasets from multicrab.cfg file (directory=%s)" % (d), True) # hplus-to-hltaus
+-             dset = getDatasetsFromMulticrabCfg(directory=d, **kwargs)
+-         else:
+--            Print("Getting datasets from multicrab.cfg file (directory=%s, namePostfix=%s" % (d[0], d[1]), True)
+-+            Verbose("Getting datasets from multicrab.cfg file (directory=%s, namePostfix=%s" % (d[0], d[1]), True)
+-             dset = getDatasetsFromMulticrabCfg(directory=d[0], namePostfix=d[1], **kwargs) # hplus-to-hltaus
+-         datasets.extend(dset)
+- 
+-@@ -202,7 +202,7 @@ def readFromMulticrabCfg(**kwargs):
+-     taskDirs = aux.includeExcludeTasks(taskDirs, **kwargs)
+-     taskDirs.sort()
+- 
+--    Print("Reading from CRAB dirs (taskDirs=%s, baseDirectory=%s)" % (taskDirs, dirname), True)
+-+    Verbose("Reading from CRAB dirs (taskDirs=%s, baseDirectory=%s)" % (taskDirs, dirname), True)
+-     managerCreator = readFromCrabDirs(taskDirs, baseDirectory=dirname, **kwargs)
+-     return managerCreator
+- 
+-diff --git a/NtupleAnalysis/python/tools/histograms.py b/NtupleAnalysis/python/tools/histograms.py
+-index 41b49b6..d4aae3b 100644
+---- a/NtupleAnalysis/python/tools/histograms.py
+-+++ b/NtupleAnalysis/python/tools/histograms.py
+-@@ -85,6 +85,9 @@ uncertaintyMode = Uncertainty()
+- ## Default energy text
+- energyText = "13 TeV"
+- 
+-+## Default PU text
+-+pileupText = "PU=140"
+-+
+- ## Class to provide default positions of the various texts.
+- #
+- # The attributes which can be set are the x and y coordinates and the
+-@@ -96,6 +99,7 @@ class TextDefaults:
+-         self._setDefaults("cmsPreliminary", x=0.62, y=0.96)
+-         self._setDefaults("energy", x=0.19, y=0.96)
+-         self._setDefaults("lumi", x=0.43, y=0.96)
+-+        self._setDefaults("pileup", x=0.17, y=0.96)
+- 
+-     ## Modify the default values
+-     # 
+-@@ -121,6 +125,9 @@ class TextDefaults:
+-     # \param kwargs  Keyword arguments (forwarded to _setDefaults())
+-     def setEnergyDefaults(self, **kwargs):
+-         self._setDefaults("energy", **kwargs)
+-+
+-+    def setPileupDefaults(self, **kwargs):
+-+        self._setDefaults("pileup", **kwargs)
+-         
+-     ## Modify the default position of integrated luminosity text
+-     #
+-@@ -331,6 +338,14 @@ def addEnergyText(x=None, y=None, s=None):
+-         text = s
+-     addText(x, y, "#sqrt{s} = "+text, textDefaults.getSize("energy"), bold=False)
+- 
+-+def addPileupText(x=None, y=None, s=None):
+-+    _printTextDeprecationWarning("histograms.addPileupText()")
+-+    (x, y) = textDefaults.getValues("pileup", x, y)
+-+    text = pileupText
+-+    if s != None:
+-+        text = s
+-+    addText(x, y, "PU="+text, textDefaults.getSize("pileup"), bold=False)
+-+    
+- ## Format luminosity number to fb
+- #
+- # \param lumi  Luminosity in pb^-1
+-@@ -404,13 +419,14 @@ def addStandardTexts(lumi=None, sqrts=None, addCmsText=True, cmsTextPosition=Non
+-         else:
+-             lumiText = formatLuminosityInFb(lumi)
+-         lumiText += " fb^{-1} ("
+-+
+-+    lumiText += pileupText + ", "
+-     if sqrts is not None:
+-         lumiText += sqrts
+-     else:
+-         lumiText += energyText
+--    if lumi is not None:
+--        lumiText += ")"
+- 
+-+    
+-     lumiTextOffset = 0.2
+-     l = ROOT.gPad.GetLeftMargin()
+-     t = ROOT.gPad.GetTopMargin()
+-diff --git a/NtupleAnalysis/python/tools/plots.py b/NtupleAnalysis/python/tools/plots.py
+-index 0bcd7fd..f561d15 100644
+---- a/NtupleAnalysis/python/tools/plots.py
+-+++ b/NtupleAnalysis/python/tools/plots.py
+-@@ -109,6 +109,9 @@ _physicalMcAdd = {
+-     "DYJetsToLL_M_50_ext"        : "DYJetsToLL_M_50",
+-     "DYJetsToLL_M_50_ext1"       : "DYJetsToLL_M_50",
+- 
+-+    "Neutrino_Pt2to20_gun"                  : "MinBias",
+-+    "VBF_HToTauTau_125_14TeV_powheg_pythia6": "VBF_HToTauTau",
+-+    
+-     "ChargedHiggs_HplusTB_HplusToTauNu_M_500_ext1" : "ChargedHiggs_HplusTB_HplusToTauNu_M_500",
+-     "ChargedHiggs_HplusTB_HplusToTauNu_M_750_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_750",
+-     "ChargedHiggs_HplusTB_HplusToTauNu_M_800_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_800",
+-@@ -332,7 +335,11 @@ _datasetMerge = {
+-     "WZ"    : "Diboson",
+-     "ZZ"    : "Diboson",
+- 
+--    "ttbb_4FS_ckm_amcatnlo_madspin_pythia8"     : "TTBB",
+-+    "ttbb_4FS_ckm_amcatnlo_madspin_pythia8" : "TTBB",
+-+
+-+    "Neutrino_Pt2to20_gun"                  : "MinBias",
+-+    "VBF_HToTauTau_125_14TeV_powheg_pythia6": "VBF_HToTauTau",
+-+
+- 
+-     #"ChargedHiggs_HplusTB_HplusToTauNu_M_200": "ChargedHiggs_HplusTB_HplusToTauNu_M_200",
+-     #"ChargedHiggs_HplusTB_HplusToTauB_M_200": "ChargedHiggs_HplusTB_HplusToTauNu_M_200",
+-@@ -389,6 +396,8 @@ _datasetOrder.extend([
+-     "WWTo4Q",      # Htb
+-     "TTBB",        # Htb
+-     "TTTT",        # Htb
+-+    "MinBias",
+-+    "VBF_HToTauTau",    
+-     ]) 
+- 
+- ## Map the logical dataset names to legend labels
+-@@ -429,6 +438,9 @@ _legendLabels = {
+-     "WJets_2bquark": "W+jets (2 b)",
+-     "WJets_3bquark": "W+jets (#geq3 b)",   
+- 
+-+    "MinBias"      : "MB",
+-+    "VBF_HToTauTau": "VBF H^{0} #rightarrow #tau #tau",
+-+
+-     "QCD_Pt15to30"    : "QCD,   15 < #hat{p}_{T} <   30",
+-     "QCD_Pt30to50"    : "QCD,   30 < #hat{p}_{T} <   50",
+-     "QCD_Pt50to80"    : "QCD,   50 < #hat{p}_{T} <   80",
+-@@ -558,6 +570,10 @@ _plotStyles = {
+-     "WZ"            : styles.dibStyle,
+-     "ZZ"            : styles.dibStyle,
+- 
+-+    "MinBias"       : styles.MinBiasStyle,
+-+    "VBF_HToTauTau" : styles.HToTauTauStyle,
+-+
+-+
+-     "WJets_0bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+1),
+-     "WJets_1bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+4),
+-     "WJets_2bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+3),
+-diff --git a/NtupleAnalysis/python/tools/styles.py b/NtupleAnalysis/python/tools/styles.py
+-index 1f910c0..c5c2c62 100644
+---- a/NtupleAnalysis/python/tools/styles.py
+-+++ b/NtupleAnalysis/python/tools/styles.py
+-@@ -325,6 +325,12 @@ invertedStyle     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.
+- altEwkStyle       = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta-2, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+-                                    StyleLine(lineColor=ROOT.kMagenta-2, lineStyle=ROOT.kSolid, lineWidth=3),
+-                                    StyleFill(fillColor=ROOT.kMagenta-2, fillStyle=3001)])
+-+HToTauTauStyle    = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+-+                                   StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kDotted, lineWidth=3), 
+-+                                   StyleFill(fillColor=ROOT.kRed, fillStyle=1001)])
+-+MinBiasStyle     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
+-+                                   StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
+-+                                   StyleFill(fillColor=ROOT.kBlack, fillStyle=3001)])
+- 
+- 
+- 
+-diff --git a/NtupleAnalysis/python/tools/styles.pyc b/NtupleAnalysis/python/tools/styles.pyc
+-index 3f7ab84..a77d217 100644
+-Binary files a/NtupleAnalysis/python/tools/styles.pyc and b/NtupleAnalysis/python/tools/styles.pyc differ
+-diff --git a/NtupleAnalysis/src/CaloPlusTracks/work/json/L1TkTau/Multiplicity.json b/NtupleAnalysis/src/CaloPlusTracks/work/json/L1TkTau/Multiplicity.json
+-index 6f78219..6429c7e 100644
+---- a/NtupleAnalysis/src/CaloPlusTracks/work/json/L1TkTau/Multiplicity.json
+-+++ b/NtupleAnalysis/src/CaloPlusTracks/work/json/L1TkTau/Multiplicity.json
+-@@ -6,21 +6,22 @@
+-     "histogram": "L1TkTau_Multiplicity",
+-     "title": "L1TkTau_Multiplicity",
+-     "saveFormats": [".png", ".pdf", ".C"],
+--    "saveDir": "",
+-+    "saveDir": "plots",
+-     "samples": ["VBF", "Neutrino"],
+-+    "normalization": "normalizeToOne",
+-     "rebinX": 1,
+-     "rebinY": "None",
+--    "xlabel": "jet #eta",
+-+    "xlabel": "Jet Multiplicity",
+-     "ylabel": "Events / %.2f",
+-     "divideByBinWidth": "False",
+-     "drawStyle": "COLZ",
+--    "opts": {"xmin": -2.5, "xmax": 2.5, "ymin": 1e+0, "ymaxfactor": 100},
+--    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-+    "opts": {"xmin": 0.0, "xmax": 11.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-+    "ratioOpts": {"emacs ymin": 0.0, "ymax": 2.0},
+-     "ratio": "True",
+--    "ratioYlabel": "Data/MC",
+-+    "ratioYlabel": "Ratio",
+-     "ratioInvert": "False",
+--    "stackMCHistograms": "True",
+--    "addMCUncertainty": "True",
+-+    "stackMCHistograms": "False",
+-+    "addMCUncertainty": "False",
+-     "addLuminosityText": "False",
+-     "addCmsText": "True",
+-     "errorBarsX": "True",
+-@@ -28,13 +29,13 @@
+-     "logY": "True",
+-     "gridX": "False",
+-     "gridY": "True",
+--    "cmsExtraText": "Preliminary",
+-+    "cmsExtraText": "Phase-2 Simulation",
+-     "removeLegend": "False",
+--    "moveLegend": {"dx": -0.05, "dy": 0.0, "dh": 0.1},
+-+    "moveLegend": {"dx": -0.10, "dy": 0.0, "dh": -0.1},
+-     "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+--    "cutValue": 0.0,
+-+    "cutValue": 1.0,
+-     "cutFillColour": 16,
+-     "cutBox": "False",
+--    "cutLine": "True",
+--    "cutGreaterThan": "True"
+-+    "cutLine": "False",
+-+    "cutGreaterThan": "False"
+- }
+-diff --git a/NtupleAnalysis/src/CaloPlusTracks/work/plotMC.py b/NtupleAnalysis/src/CaloPlusTracks/work/plotMC.py
+-index 81e8261..6f00ad7 100755
+---- a/NtupleAnalysis/src/CaloPlusTracks/work/plotMC.py
+-+++ b/NtupleAnalysis/src/CaloPlusTracks/work/plotMC.py
+-@@ -91,7 +91,7 @@ def Plot(jsonfile, opts):
+-     with open(os.path.abspath(jsonfile)) as jfile:
+-         j = json.load(jfile)
+- 
+--        Print("Plotting %s in %s" % (j["title"], j["saveDir"]), True)
+-+        Verbose("Plotting %s. Will save under \"%s\"" % (j["title"], j["saveDir"]), True)
+- 
+-         # Setup the style
+-         style = tdrstyle.TDRStyle()
+-@@ -103,7 +103,8 @@ def Plot(jsonfile, opts):
+- 
+-         # Setup & configure the dataset manager
+-         datasetsMgr = GetDatasetsFromDir(opts, j)
+--        datasetsMgr.loadLuminosities()
+-+        if 0:
+-+            datasetsMgr.loadLuminosities()
+-         #datasetsMgr.updateNAllEventsToPUWeighted()
+- 
+-         # Print information
+-@@ -133,7 +134,7 @@ def MCPlot(datasetsMgr, json):
+-     # Create the MC Plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
+-     if json["normalization"]=="normalizeToLumi":
+-         kwargs = {}
+--        p = plots.MCPlot(datasetsMgr, json["histogram"], normalizeToLumi=float(json["luminosity"]), **kwargs)
+-+        p = plots.MCPlot(datasetsMgr, json["histogram"], normalizeToLumi=1.0, **kwargs)
+-     else:
+-         kwargs = {json["normalization"]: True}
+-         p = plots.MCPlot(datasetsMgr, json["histogram"], **kwargs)
+-
+diff --git a/NtupleAnalysis/src/CaloPlusTracks/work/multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/git_status.txt b/NtupleAnalysis/src/CaloPlusTracks/work/multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/git_status.txt
+deleted file mode 100644
+index 4304679..0000000
+--- a/NtupleAnalysis/src/CaloPlusTracks/work/multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/git_status.txt
++++ /dev/null
+@@ -1,23 +0,0 @@
+-On branch master
+-Changes not staged for commit:
+-  (use "git add <file>..." to update what will be committed)
+-  (use "git checkout -- <file>..." to discard changes in working directory)
+-
+-	modified:   ../../../python/tools/crosssection.py
+-	modified:   ../../../python/tools/dataset.py
+-	modified:   ../../../python/tools/histograms.py
+-	modified:   ../../../python/tools/plots.py
+-	modified:   ../../../python/tools/styles.py
+-	modified:   ../../../python/tools/styles.pyc
+-	modified:   json/L1TkTau/Multiplicity.json
+-	modified:   plotMC.py
+-
+-Untracked files:
+-  (use "git add <file>..." to include in what will be committed)
+-
+-	L1TkTau_Multiplicity.C
+-	multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/
+-	plots/
+-
+-no changes added to commit (use "git add" and/or "git commit -a")
+-
+diff --git a/NtupleAnalysis/src/CaloPlusTracks/work/multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/miniAOD2TTree_CaloPlusTracks_cfg.py b/NtupleAnalysis/src/CaloPlusTracks/work/multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/miniAOD2TTree_CaloPlusTracks_cfg.py
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/NtupleAnalysis/src/CaloPlusTracks/work/plotMC.py b/NtupleAnalysis/src/CaloPlusTracks/work/plotMC.py
+index 5b298ff..1848c73 100755
+--- a/NtupleAnalysis/src/CaloPlusTracks/work/plotMC.py
++++ b/NtupleAnalysis/src/CaloPlusTracks/work/plotMC.py
+@@ -166,7 +166,7 @@ def MCPlot(datasetsMgr, json):
+                    rebinY            = json["rebinY"], 
+                    stackMCHistograms = json["stackMCHistograms"]=="True", 
+                    addMCUncertainty  = json["addMCUncertainty"]=="True" and json["normalization"]!="normalizeToOne",
+-                   addLuminosityText = json["normalization"]=="normalizeToLumi",
++                   addLuminosityText = json["addLuminosityText"]=="True",
+                    addCmsText        = json["addCmsText"]=="True",
+                    cmsExtraText      = json["cmsExtraText"],
+                    opts              = json["opts"],
+diff --git a/NtupleAnalysis/src/CaloPlusTracks/work/plotTrigger.py b/NtupleAnalysis/src/CaloPlusTracks/work/plotTrigger.py
+index b607d04..40b56d5 100755
+--- a/NtupleAnalysis/src/CaloPlusTracks/work/plotTrigger.py
++++ b/NtupleAnalysis/src/CaloPlusTracks/work/plotTrigger.py
+@@ -42,7 +42,7 @@ bDiTau           = False
+ bDiTau_Indist    = False
+ bDiTau_Dist_Calo = False
+ bDiTau_Dist_Tk   = False
+-datasetList      = ["VBF"] #["MinBias", "VBF", "HPlus160"]
++datasetList      = ["VBF_HToTauTau_125_14TeV_powheg_pythia6"] #"Neutrino_Pt2to20_gun"
+ saveFormats      = ["png"]
+ savePath         = "plots/"
+ 
+@@ -58,20 +58,22 @@ def CreateDatasetDict(inputPath, analysis, outputExt):
+         
+     datasetPaths= {}
+     for dataset in GetDatasetsList():
+-        rFile = inputPath + analysis + "_Histograms_" + dataset + outputExt + ".root" 
++        resultsDir = "%s/results/" % (dataset)
++        rFile = inputPath + resultsDir + "histograms-%s.root" % (dataset)
+         datasetPaths[dataset] = rFile
+-        #print "[%s] = %s" % (dataset, rFile)
+     return datasetPaths
+ 
+ 
+ def GetDatasetsList():
+     '''
+     '''
+-    datasets = ["MinBias", "VBF", "PiPlus", "PiMinus", "SingleTauGun1p",
+-                "DiTauGun3p", "TTbar", "HPlus160", "HPlus200", "SingleElectron",
+-                "SinglePositron", "SingleMuPlus", "SingleMuMinus", "SinglePhoton",
+-                "SingleMuon_NoPU", "SingleMuMinus_Pt_2_10_NoPU", "SingleMuPlus_Pt_2_10_NoPU",
+-                "SingleMuPlus_NoPU"]    
++    #datasets = ["MinBias", "VBF", "PiPlus", "PiMinus", "SingleTauGun1p",
++    #            "DiTauGun3p", "TTbar", "HPlus160", "HPlus200", "SingleElectron",
++    #            "SinglePositron", "SingleMuPlus", "SingleMuMinus", "SinglePhoton",
++    #            "SingleMuon_NoPU", "SingleMuMinus_Pt_2_10_NoPU", "SingleMuPlus_Pt_2_10_NoPU",
++    #            "SingleMuPlus_NoPU"]    
++    datasets = ["Neutrino_Pt2to20_gun",
++                "VBF_HToTauTau_125_14TeV_powheg_pythia6"]    
+     return datasets
+ 
+ 
+@@ -97,7 +99,7 @@ def DoPlots(hList, datasetPaths, datasetList, saveExt="", bLegHeader=None):
+ 
+     p = m_plotter.Plotter( Verbose=False, BatchMode=True )
+     for dataset in datasetList:
+-        p.AddDataset(dataset, datasetPaths[dataset])
++        p.AddDataset(GetOldDatasetName(dataset), datasetPaths[dataset])
+     p.AddHisto(hList)
+     p.SetBoolUseDatasetAsLegEntry(False)
+     p.EnableColourPalette(True)
+@@ -108,6 +110,15 @@ def DoPlots(hList, datasetPaths, datasetList, saveExt="", bLegHeader=None):
+     return
+ 
+ 
++def GetOldDatasetName(dataset):
++    if "Neutrino_Pt2to20_gun":
++        return "MinBias"
++    elif "VBF_HToTauTau_125_14TeV_powheg_pythia6":
++        return "VBF"
++    else:
++        return "Unknown"
++
++
+ def DoROC(rateToEffMap, datasetPaths, signalDataset, rocSaveName, bSaveAuxHistos=False):
+     
+     p0 = m_plotter.Plotter( Verbose=False, BatchMode=True )
+@@ -116,7 +127,7 @@ def DoROC(rateToEffMap, datasetPaths, signalDataset, rocSaveName, bSaveAuxHistos
+     ### Rates
+     p1 = m_plotter.Plotter( Verbose=False, BatchMode=True )
+     p1.SetBoolUseDatasetAsLegEntry(False)
+-    p1.AddDataset("MinBias", datasetPaths["MinBias"])
++    p1.AddDataset(GetOldDatasetName("Neutrino_Pt2to20_gun"), datasetPaths["Neutrino_Pt2to20_gun"])
+     p1.AddHisto(RateHistoList)
+     p1.Draw(THStackDrawOpt="nostack", bStackInclusive = False)
+     p1.SaveHistos(bSaveAuxHistos, savePath, saveFormats)
+@@ -124,7 +135,7 @@ def DoROC(rateToEffMap, datasetPaths, signalDataset, rocSaveName, bSaveAuxHistos
+     ### Efficiencies
+     p2 = m_plotter.Plotter( Verbose=False, BatchMode=True )
+     p2.SetBoolUseDatasetAsLegEntry(False)
+-    p2.AddDataset(signalDataset, datasetPaths[signalDataset])
++    p2.AddDataset(GetOldDatasetName(signalDataset), datasetPaths[signalDataset])
+     p2.AddHisto(EffHistoList)
+     p2.Draw(THStackDrawOpt="nostack", bStackInclusive = False)
+     p2.SaveHistos(bSaveAuxHistos, savePath, saveFormats)
+@@ -161,19 +172,19 @@ def main(opts):
+     if bSingleTau:
+         if opts.verbose:
+             print "=== Doing SingleTau"
+-        DoPlots( SingleTau_Rate  , datasetPaths, ["MinBias"], "")
++        DoPlots( SingleTau_Rate  , datasetPaths, ["Neutrino_Pt2to20_gun"], "")
+         DoPlots( SingleTau_Eff   , datasetPaths, datasetList, "")
+-        DoROC  ( SingleTau_ROCs  , datasetPaths, datasetList[0], "SingleTau_ROCs" + "")
++        #DoROC  ( SingleTau_ROCs  , datasetPaths, datasetList[0], "SingleTau_ROCs" + "")
+ 
+ 
+     if bDiTau:
+         if opts.verbose:
+             print "=== Doing DiTau"
+         #for h in DiTau_Rate_CaloIso:
+-        #    DoPlots( h, ["MinBias"])
++        #    DoPlots( h, ["Neutrino_Pt2to20_gun"])
+         #for h in DiTau_Eff_CaloIso:
+         #    DoPlots( h , datasetList)
+-        DoPlots( DiTau_Rate   , ["MinBias"], "")
++        DoPlots( DiTau_Rate   , ["Neutrino_Pt2to20_gun"], "")
+         DoPlots( DiTau_Eff    , datasetPaths, datasetList, "")
+         DoROC  ( DiTau_ROCs_TP, datasetList[0], "DiTau_ROCs" + "")
+ 
+@@ -186,7 +197,7 @@ def main(opts):
+         DoPlots( DiTau_TurnOn      , datasetList)
+         DoPlots( DiTau_TurnOn_50KHz, datasetList)
+         ### ROCs
+-        DoPlots( DiTau_Rate  , ["MinBias"])
++        DoPlots( DiTau_Rate  , ["Neutrino_Pt2to20_gun"])
+         DoPlots( DiTau_Eff   , datasetList)
+         DoROC  ( DiTau_ROCs  , datasetList[0], "DiTau_ROCs_Indist")
+     
+@@ -197,7 +208,7 @@ def main(opts):
+         DoPlots( DiTau_TurnOn      , datasetList)
+         DoPlots( DiTau_TurnOn_50KHz, datasetList)
+         for h in DiTau_Rate_CaloIso:
+-            DoPlots( h, ["MinBias"])
++            DoPlots( h, ["Neutrino_Pt2to20_gun"])
+         for h in DiTau_Eff_CaloIso:
+             DoPlots( h , datasetList)
+         DoROC  ( DiTau_ROCs_CaloIso, datasetList[0], "DiTau_ROCs_CaloIso")
+@@ -210,7 +221,7 @@ def main(opts):
+         DoPlots( DiTau_TurnOn      , datasetList)
+         DoPlots( DiTau_TurnOn_50KHz, datasetList)
+         for h in DiTau_Rate_TkIso:
+-            DoPlots( h, ["MinBias"])
++            DoPlots( h, ["Neutrino_Pt2to20_gun"])
+         for h in DiTau_Eff_TkIso:
+             DoPlots( h , datasetList)
+         DoROC  ( DiTau_ROCs_TkIso, datasetList[0], "DiTau_ROCs_TkIso")
+

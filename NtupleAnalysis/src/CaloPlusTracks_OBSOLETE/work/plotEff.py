@@ -72,7 +72,7 @@ def GetDatasetsFromDir(opts, json):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
                                                         dataEra=json["dataEra"],
                                                         searchMode=None, 
-                                                        includeOnlyTasks="|".join(json["sample"]),
+                                                        includeOnlyTasks="|".join(json["samples"]),
                                                         analysisName=json["analysis"])
     elif (opts.includeOnlyTasks):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
@@ -134,37 +134,20 @@ def Plot(jsonfile, opts):
         return
 
 
-def getHisto(datasetsMgr, datasetName, name):
-
-    h1 = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(name)
-    h1.setName("h0" + "-" + datasetName)
-    return h1
-
-
-def getHistos3(datasetsMgr, datasetName, name1, name2, name3):
+def getHistos(datasetsMgr, datasetName, name1, name2):
 
     h1 = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(name1)
     h1.setName("h1" + "-" + datasetName)
 
     h2 = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(name2)
     h2.setName("h2" + "-" + datasetName)
+    return [h1, h2]
 
-    h3 = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(name3)
-    h3.setName("h3" + "-" + datasetName)
-    return [h1, h2, h3]
+def getHisto(datasetsMgr, datasetName, histoName):
 
-
-def getHistos(datasetsMgr, datasetName, histoNames, skipIndex=0):
-
-    histos = []
-    for i, name in enumerate(histoNames):
-        if i==skipIndex:
-            continue
-        h = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(name)
-        hName ="h%s-%s" % (i, datasetName)
-        h.setName(hName)
-        histos.append(h)
-    return histos
+    h1 = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(histoName)
+    h1.setName("h1" + "-" + datasetName)
+    return [h1]
 
 
 def ComparisonPlot(datasetsMgr, json):
@@ -176,33 +159,32 @@ def ComparisonPlot(datasetsMgr, json):
     normToOne_ = json["normalizationToOne"]=="True"
     if normToOne_:
         ylabel_ = ylabel_.replace(json["ylabel"].split(" /")[0], "Arbitrary Units")
-
-    if 0:
-        p = plots.ComparisonPlot(*getHistos(datasetsMgr, json['sample'], json['histograms'][0], json['histograms'][1]))
-    histoReference = getHisto(datasetsMgr, json['sample'], json['histograms'][0])
-    histoCompares  = getHistos(datasetsMgr, json['sample'], json['histograms'])
-    p = plots.ComparisonManyPlot(histoReference, histoCompares, saveFormats=[])
+    #p = plots.PlotSameBase(datasetsMgr, json["histogram"], normalizeToOne=normToOne_, **kwargs) #works
+    #p = plots.ComparisonPlot(*getHistos(datasetsMgr, json['samples'][0], json['histogram'], json['histogram'])) #works
+    p = plots.ComparisonPlot(*getHistos(datasetsMgr, json['samples'][0], json['histogram'], "Tk_Eff"))
     
-    # Set universal histo styles
+    # Customise styling
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetFillStyle(0))
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerSize(1.2))
     p.histoMgr.setHistoDrawStyleAll(json["drawStyle"])
     p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
 
-    # Set individual styles
-    legendDict = {}
-    for i in range(0, len(histoCompares)+1):
-        hName = "h%s-%s" % (i, json["sample"])
-        legendDict[hName] = styles.getCaloLegend(i)
-        p.histoMgr.forHisto(hName, styles.getCaloStyle(i) )
-        if 0:
-            p.histoMgr.setHistoDrawStyle(hName, "L")
-            p.histoMgr.setHistoLegendStyle(hName, "LP")
-        if json["drawStyle"]=="HIST":
-            p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetFillStyle(0))
-            p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerSize(0.0))
+    # Apply styles
+    ##########################################
+    p.histoMgr.forHisto("h1-VBF_HToTauTau" , styles.getBaselineStyle() )
+    p.histoMgr.forHisto("h2-VBF_HToTauTau" , styles.getInvertedStyle() )
+
+    # Set draw style
+    p.histoMgr.setHistoDrawStyle("h1-VBF_HToTauTau", "LP")
+    p.histoMgr.setHistoLegendStyle("h2-VBF_HToTauTau", "LP")
+    # p.histoMgr.setHistoLegendStyleAll("LP")
 
     # Set legend labels
-    p.histoMgr.setHistoLegendLabelMany( legendDict)
-
+    p.histoMgr.setHistoLegendLabelMany({
+            "h1-VBF_HToTauTau" : "h1",
+            "h2-VBF_HToTauTau" : "h2",
+            })
+    ##########################################
     
     # Label size (optional. Commonly Used in counters)
     xlabelSize = None
@@ -296,6 +278,7 @@ if __name__ == "__main__":
     global opts
     BATCHMODE = True
     VERBOSE   = False
+    #INTLUMI   = 1.0
 
     parser = OptionParser(usage="Usage: %prog [options]" , add_help_option=False,conflict_handler="resolve")
 
@@ -307,6 +290,9 @@ if __name__ == "__main__":
 
     parser.add_option("-m", "--mcrab", dest="mcrab", action="store", 
                       help="Path to the multicrab directory for input")
+
+    #parser.add_option("--intLumi", dest="intLumi", type=float, default=INTLUMI,
+    #                  help="Override the integrated lumi [default: %s]" % INTLUMI)
 
     parser.add_option("-i", "--includeOnlyTasks", dest="includeOnlyTasks", action="store", 
                       help="List of datasets in mcrab to include")
