@@ -5,11 +5,10 @@ Usage (single plot):
 ./plot2d.py -m <multicrab_directory> <jsonfile> [opts]
 
 Usage (multiple plots):
-./plot2d.py -m <pseudo_mcrab_directory> json/*.json
-./plot2d.py -m <pseudo_mcrab_directory> json/*.json json/L1TkTau/*.json
+./plot2d.py -m <multicrab> json/Perfrormance/DiTau_Eff.json -i 'VBF'
 
 Last Used:
-./plot2d.py -m <multicrab> json/Perfrormance/DiTau_Eff.json -i 'VBF'
+./plot2d.py -m multicrab_CaloTk_v61XSLHC6_20170422T1650/ json/Performance/DiTau_Eff_Calo_Tk.json -i VBF
 '''
 
 #================================================================================================
@@ -187,6 +186,7 @@ def ComparisonPlot(datasetsMgr, json):
     # Set universal histo styles
     p.histoMgr.setHistoDrawStyleAll(json["drawStyle"])
     p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
+    print json['histogram']
     p.histoMgr.forEachHisto(lambda h: h.getRootHisto().RebinX(json["rebinX"]))
     p.histoMgr.forEachHisto(lambda h: h.getRootHisto().RebinY(json["rebinY"]))
     p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetTitle(zlabel_))
@@ -221,6 +221,10 @@ def ComparisonPlot(datasetsMgr, json):
     # Remove legend?
     if json["removeLegend"] == "True":
         p.removeLegend()
+
+    # Set log-z?
+    if json["zlog"]=="True":
+        p.getPad().SetLogz(True)
 
     # Additional text
     histograms.addText(json["extraText"].get("x"), json["extraText"].get("y"), json["extraText"].get("text"), json["extraText"].get("size") )

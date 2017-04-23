@@ -1,8 +1,8 @@
 {
     "analysis": "HLTausAnalysis",
     "dataEra": "TP2015",
-    "histogram": "DiTau_Eff_Calo_VtxIso",
-    "title": "DiTau_Eff_Calo_VtxIso",
+    "histogram": "DiTau_Eff_Tk_VtxIso",
+    "title": "DiTau_Eff_Tk_VtxIso",
     "saveFormats": [".png", ".pdf", ".C"],
     "saveDir": "plots",
     "sample": "VBF_HToTauTau",
@@ -14,6 +14,7 @@
     "zlabel": "Efficiency",
     "zmin"  : 0.0,
     "zmax"  : 1.0,
+    "zlog"  : "False",
     "drawStyle": "COLZ",
     "legendStyle": "L",
     "opts": {"xmin": 0.0, "xmax": 100.0, "ymin": 1e-04, "ymax": 100.0},
