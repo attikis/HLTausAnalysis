@@ -191,8 +191,9 @@ def ComparisonPlot(datasetsMgr, json):
     p.histoMgr.forEachHisto(lambda h: h.getRootHisto().RebinY(json["rebinY"]))
     p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetTitle(zlabel_))
     p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetTitleOffset(1.3))
-    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMinimum(json["zmin"]))
-    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMaximum(json["zmax"]))
+    if json["zmin"]!=0 and  json["zmax"]!=0 :
+        p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMinimum(json["zmin"]))
+        p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMaximum(json["zmax"]))
     #p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetRangeUser(json["zmin"], json["zmax"]))
 
     # Set legend labels
