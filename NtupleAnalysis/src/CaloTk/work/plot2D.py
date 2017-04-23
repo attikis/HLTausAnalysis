@@ -2,15 +2,14 @@
 '''
 
 Usage (single plot):
-./plot2D.py.py -m <multicrab_directory> <jsonfile> [opts]
+./plot2d.py -m <multicrab_directory> <jsonfile> [opts]
 
 Usage (multiple plots):
-./plot2D.py.py -m <pseudo_mcrab_directory> json/*.json
-./plot2D.py.py -m <pseudo_mcrab_directory> json/*.json json/L1TkTau/*.json
+./plot2d.py -m <pseudo_mcrab_directory> json/*.json
+./plot2d.py -m <pseudo_mcrab_directory> json/*.json json/L1TkTau/*.json
 
 Last Used:
-./plot2D.py.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/L1TkTau/Multiplicity.json -i "VBF|Neutrino"
-./plot2D.py.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/*/*.json -i "VBF|Neutrino"
+./plot2d.py -m <multicrab> json/Perfrormance/DiTau_Eff.json -i 'VBF'
 '''
 
 #================================================================================================
@@ -173,7 +172,7 @@ def ComparisonPlot(datasetsMgr, json):
     legendDict = {}
     kwargs     = {}
     ylabel_    = json["ylabel"]
-    zlabel_    = "Events"
+    zlabel_    = json["zlabel"]
     cutBox_    = {"cutValue": json["cutValue"] , "fillColor": json["cutFillColour"],
                   "box": json["cutBox"]=="True", "line": json["cutLine"]=="True",
                   "greaterThan": json["cutGreaterThan"]=="True"}
@@ -188,10 +187,17 @@ def ComparisonPlot(datasetsMgr, json):
     # Set universal histo styles
     p.histoMgr.setHistoDrawStyleAll(json["drawStyle"])
     p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().RebinX(json["rebinX"]))
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().RebinY(json["rebinY"]))
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetTitle(zlabel_))
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetTitleOffset(1.3))
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMinimum(json["zmin"]))
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMaximum(json["zmax"]))
+    #p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetRangeUser(json["zmin"], json["zmax"]))
 
     # Set legend labels
     p.histoMgr.setHistoLegendLabelMany(legendDict)
-    
+
     # Draw a customised plot
     saveName = os.path.join(json["saveDir"], json["title"])    
 
@@ -201,8 +207,6 @@ def ComparisonPlot(datasetsMgr, json):
                    xlabel            = json["xlabel"], 
                    ylabel            = ylabel_,
                    zLabel            = zlabel_,
-                   rebinX            = json["rebinX"],
-                   rebinY            = json["rebinY"],
                    stackMCHistograms = json["stackMCHistograms"]=="True", 
                    addCmsText        = json["addCmsText"]=="True",
                    cmsExtraText      = json["cmsExtraText"],
@@ -210,6 +214,7 @@ def ComparisonPlot(datasetsMgr, json):
                    opts2             = json["opts2"],
                    log               = json["logY"]=="True", 
                    moveLegend        = json["moveLegend"],
+                   #backgroundColor   = ROOT.kAzure,
                    cutBox            = cutBox_,
                    )
 
@@ -219,8 +224,7 @@ def ComparisonPlot(datasetsMgr, json):
 
     # Additional text
     histograms.addText(json["extraText"].get("x"), json["extraText"].get("y"), json["extraText"].get("text"), json["extraText"].get("size") )
-
-    p.draw()
+    
     # Save in all formats chosen by user
     saveFormats = json["saveFormats"]
     for i, ext in enumerate(saveFormats):
@@ -306,4 +310,4 @@ if __name__ == "__main__":
     main(opts)
 
     if not opts.batchMode:
-        raw_input("=== plot2D.py.py: Press any key to quit ROOT ...")
+        raw_input("=== plot2d.py: Press any key to quit ROOT ...")
