@@ -331,6 +331,10 @@ HToTauTauStyle    = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.
 MinBiasStyle      = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
                                    StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kBlack, fillStyle=3001)])
+Tau3prStyle       = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kViolet-3, markerSizes=None, markerStyle=ROOT.kOpenCircle),
+                                   StyleLine(lineColor=ROOT.kViolet-3, lineStyle=ROOT.kDotted, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kViolet-3, fillStyle=1001)])
+
 caloStyle1        = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
                                    StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kBlack, fillStyle=3001)])

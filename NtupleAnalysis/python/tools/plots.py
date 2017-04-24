@@ -111,6 +111,7 @@ _physicalMcAdd = {
 
     "Neutrino_Pt2to20_gun"                  : "MinBias",
     "VBF_HToTauTau_125_14TeV_powheg_pythia6": "VBF_HToTauTau",
+    "TauThreeProngs"                        : "TauThreeProngs",
     
     "ChargedHiggs_HplusTB_HplusToTauNu_M_500_ext1" : "ChargedHiggs_HplusTB_HplusToTauNu_M_500",
     "ChargedHiggs_HplusTB_HplusToTauNu_M_750_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_750",
@@ -339,7 +340,7 @@ _datasetMerge = {
 
     "Neutrino_Pt2to20_gun"                  : "MinBias",
     "VBF_HToTauTau_125_14TeV_powheg_pythia6": "VBF_HToTauTau",
-
+    "TauThreeProngs"                        : "TauThreeProngs",
 
     #"ChargedHiggs_HplusTB_HplusToTauNu_M_200": "ChargedHiggs_HplusTB_HplusToTauNu_M_200",
     #"ChargedHiggs_HplusTB_HplusToTauB_M_200": "ChargedHiggs_HplusTB_HplusToTauNu_M_200",
@@ -397,7 +398,8 @@ _datasetOrder.extend([
     "TTBB",        # Htb
     "TTTT",        # Htb
     "MinBias",
-    "VBF_HToTauTau",    
+    "VBF_HToTauTau",
+    "TauThreeProngs"
     ]) 
 
 ## Map the logical dataset names to legend labels
@@ -438,8 +440,9 @@ _legendLabels = {
     "WJets_2bquark": "W+jets (2 b)",
     "WJets_3bquark": "W+jets (#geq3 b)",   
 
-    "MinBias"      : "MB",
-    "VBF_HToTauTau": "VBF H^{0}#rightarrow#tau#tau",
+    "MinBias"       : "MB",
+    "VBF_HToTauTau" : "VBF H^{0}#rightarrow#tau#tau",
+    "TauThreeProngs": "#tau#tau gun (3pr)",
 
     "QCD_Pt15to30"    : "QCD,   15 < #hat{p}_{T} <   30",
     "QCD_Pt30to50"    : "QCD,   30 < #hat{p}_{T} <   50",
@@ -572,6 +575,7 @@ _plotStyles = {
 
     "MinBias"       : styles.MinBiasStyle,
     "VBF_HToTauTau" : styles.HToTauTauStyle,
+    "TauThreeProngs": styles.Tau3prStyle,
 
 
     "WJets_0bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+1),

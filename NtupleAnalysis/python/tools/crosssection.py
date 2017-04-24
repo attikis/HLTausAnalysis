@@ -577,7 +577,10 @@ backgroundCrossSections = CrossSectionList(
             }),
     CrossSection("VBF_HToTauTau_125_14TeV_powheg_pythia6", {
         "14": 4.278*0.063, #[20, 21]
-    }),   
+            }),
+    CrossSection("TauThreeProngs", {
+        "14": (100.0/1000.0)*1e12, #dumbie value!
+            }), 
     )
 
 ## Set background process cross sections
