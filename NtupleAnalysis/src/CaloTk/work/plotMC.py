@@ -158,8 +158,10 @@ def MCPlot(datasetsMgr, json):
         ylabelSize = json["ylabelsize"]
 
     # Set universal histo styles
-    p.histoMgr.setHistoDrawStyleAll(json["drawStyle"])
-    p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
+    if("drawStyle" in json):
+        p.histoMgr.setHistoDrawStyleAll(json["drawStyle"])
+    if("legendStyle" in json):
+        p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
     
     # Draw a customised plot
     saveName = os.path.join(json["saveDir"], json["title"])
