@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 '''
 Creation/Submission:
-multicrab.py --create -s T2_CH_CERN -p raw2ttree_CaloTk.py
-multicrab.py --create -s T3_US_FNALLPC -p raw2ttree_CaloTk_cfg.py
+multicrab.py --create -s T2_CH_CERN -p raw2TTree_CaloTkSkim_cfg.py
+multicrab.py --create -s T3_US_FNALLPC -p raw2ttree_CaloTkSkim_cfg.py
 
 
 
@@ -1460,44 +1460,76 @@ def GetRequestName(dataset):
 	return dataset.getName()
     
     # Create compiled regular expression objects
-    datadataset_re = re.compile("^/(?P<name>\S+?)/(?P<run>Run\S+?)/")
-    mcdataset_re   = re.compile("^/(?P<name>\S+?)/")
-    tune_re        = re.compile("(?P<name>\S+)_Tune")
-    tev_re         = re.compile("(?P<name>\S+)_13TeV")
-    ext_re         = re.compile("(?P<name>_ext\d+)-")
-    runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_")
+    # datadataset_re = re.compile("^/(?P<name>\S+?)/(?P<run>Run\S+?)/")
+    # mcdataset_re   = re.compile("^/(?P<name>\S+?)/")
+    # tune_re        = re.compile("(?P<name>\S+)_Tune")
+    # tev_re         = re.compile("(?P<name>\S+)_13TeV")
+    # ext_re         = re.compile("(?P<name>_ext\d+)-")
+    # runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_")
+    # pileup_re      = re.compile("(?P<name>\S+?<PU>\d+)-")
     # runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_13TeV_PromptReco_Collisions15(?P<BunchSpacing>\S*)_JSON(?P<Silver>(_\S+|))\.")
     # runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_13TeV_PromptReco_Collisions15(?P<BunchSpacing>\S*)_JSON")
     # runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_13TeV_PromptReco_Collisions15_(?P<BunchSpacing>\d+ns)_JSON_v")
-    
     # Scan through the string 'dataset.URL' & look for any location where the compiled RE 'mcdataset_re' matches
+    # match = mcdataset_re.search(dataset.URL)
+    # if dataset.isData():
+    #     match = datadataset_re.search(dataset.URL)
+    #     
+    # # Append the dataset name
+    # if match:
+    #     requestName = match.group("name")
+    # 
+    # # Append the Run number (for Data samples only)
+    # if dataset.isData():
+    #     requestName+= "_"
+    #     requestName+= match.group("run")
+    # 
+    # # Append the MC-tune (for MC samples only) 
+    # tune_match = tune_re.search(requestName)
+    # if tune_match:
+    #     requestName += tune_match.group("name")
+    # 
+    # # Append the COM Energy (for MC samples only) 
+    # tev_match = tev_re.search(requestName)
+    # if tev_match:
+    #     requestName += tev_match.group("name")
+    # 
+    # # Append the Ext
+    # ext_match = ext_re.search(dataset.URL)
+    # if ext_match:
+    #     requestName+=ext_match.group("name")
+    # 
+    # # Append the Pileup
+    # pileup_match = pileup_re.search(dataset.URL)
+    # if pileup_match:
+    #     #requestName+=pileup_match.group("PU")
+    #     requestName += pileup_match.group()
+
+    # New regular expressions for HLTausAnalysis
+    mcdataset_re   = re.compile("^/(?P<name>\S+?)/")
+    tune_re        = re.compile("Tune\w+_")
+    tev_re         = re.compile("\d*TeV")
+    pileup_re      = re.compile("\w*PU\d*")
+
+    # Scan through the string 'dataset' & look for any location where the compiled RE 'mcdataset_re' matches
     match = mcdataset_re.search(dataset.URL)
-    if dataset.isData():
-	match = datadataset_re.search(dataset.URL)
-        
-    # Append the dataset name
     if match:
-	requestName = match.group("name")
+        requestName = match.group().split("_")[0]        
 
-    # Append the Run number (for Data samples only)
-    if dataset.isData():
-	requestName+= "_"
-	requestName+= match.group("run")
-
-    # Append the MC-tune (for MC samples only) 
-    tune_match = tune_re.search(requestName)
+    # Append the MC-tune
+    tune_match = tune_re.search(dataset.URL)
     if tune_match:
-        requestName = tune_match.group("name")
+        requestName += "_" + tune_match.group()
 
-    # Append the COM Energy (for MC samples only) 
-    tev_match = tev_re.search(requestName)
+    # Append the COM Energy
+    tev_match = tev_re.search(dataset.URL)
     if tev_match:
-	requestName = tev_match.group("name")
+        requestName += tev_match.group()
 
-    # Append the Ext
-    ext_match = ext_re.search(dataset.URL)
-    if ext_match:
-	requestName+=ext_match.group("name")
+    # Append the Pileup
+    pileup_match = pileup_re.search(dataset.URL)
+    if pileup_match:
+        requestName += "_" + pileup_match.group()
 
     # Append the Run Range (for Data samples only)
     if dataset.isData():
@@ -1513,6 +1545,7 @@ def GetRequestName(dataset):
 
     # Finally, replace dashes with underscores    
     requestName = requestName.replace("-","_")
+    requestName = requestName.replace("/","")
     return requestName
 
 

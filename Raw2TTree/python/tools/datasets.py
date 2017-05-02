@@ -96,8 +96,8 @@ datasetsTTJpsiFilter.append(Dataset('/TT_JpsiFilter_TuneCUETP8M1_mtop166_5_14TeV
 
 datasetsTT = []
 datasetsTT.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsTT.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsTT.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-PU200_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsTT.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
+datasetsTT.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-PU200_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
 
 datasetsTTbar = []
 datasetsTTbar.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
@@ -111,8 +111,8 @@ datasetsTTbar.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpr
 L1TauDatasets = []
 #L1TauDatasets.extend(datasetsSinglePion0)
 #L1TauDatasets.extend(datasetsSinglePion)
-#L1TauDatasets.extend(datasetsSingleTau)
-#L1TauDatasets.extend(datasetsSingleNu)
+L1TauDatasets.extend(datasetsSingleTau)
+L1TauDatasets.extend(datasetsSingleNu)
 #L1TauDatasets.extend(datasetsTTJpsiFilter)
 L1TauDatasets.extend(datasetsTT)
 #L1TauDatasets.extend(datasetsTTbar)
