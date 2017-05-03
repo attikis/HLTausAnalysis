@@ -8,10 +8,10 @@
 # Note:
 # tested so far LOCATION="" and LOCATION="jade"
 #================================================================================================
-# if ( $?HLTAUSANALYSIS_BASE ) then
-#     echo "Standalone environment already loaded"
-#     exit
-# endif
+if ( $?HLTAUSANALYSIS_BASE ) then
+    echo "Standalone environment already loaded"
+    exit
+endif
 
 set LOCATION=""
 if ( $?CMSSW_BASE ) then
