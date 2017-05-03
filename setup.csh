@@ -8,10 +8,10 @@
 # Note:
 # tested so far LOCATION="" and LOCATION="jade"
 #================================================================================================
-if ( $?HLTAUSANALYSIS_BASE ) then
-    echo "Standalone environment already loaded"
-    exit
-endif
+# if ( $?HLTAUSANALYSIS_BASE ) then
+#     echo "Standalone environment already loaded"
+#     exit
+# endif
 
 set LOCATION=""
 if ( $?CMSSW_BASE ) then
@@ -187,6 +187,9 @@ endif
 #echo "=== Setting PATH variable"
 setenv PATH "${HLTAUSANALYSIS_BASE}/NtupleAnalysis/scripts:${PATH}"
 
+# Get the python version
+set PYTHON_VERSION=`python -c 'import sys ;version=sys.version_info[:3]; print("{0}.{1}.{2}".format(*version))'`
+
 echo
 echo "=== The environment variables set are:"
 echo "LOCATION is $LOCATION"
@@ -197,30 +200,38 @@ echo "ROOTSYS is $ROOTSYS"
 echo "LD_LIBRARY_PATH is $LD_LIBRARY_PATH"
 echo "PYTHONPATH is $PYTHONPATH"
 echo "PATH is $PATH"
+echo "PYTHON_VERSION is $PYTHON_VERSION"
 echo
 
+if ( $PYTHON_VERSION =~ *"2.6"* ) then
+    echo "=== WARNING! Requires python 2.7 and later. The python version used is:"
+    python -V
+    echo
 
-echo "=== WARNING! Requires python 2.7 and later. The python version used is:"
-python -V
-echo
-
-# Python versions on LXPLUS [https://cern.service-now.com/service-portal/article.do?n=KB0000730]
-if ( $LOCATION == "lxplus" || $LOCATION == "lxbatch" ) then
-    # echo "=== Printing list of available python versions:"
-    # scl -l | grep python
-    # echo
-
-    echo "=== To enable python27 for SHELL=$SHELL copy/paste the following:"
-    if ( $SHELL == "/bin/tcsh") then
-	echo "scl enable python27 csh"
-	#scl enable python27 csh
+    # Python versions on LXPLUS [https://cern.service-now.com/service-portal/article.do?n=KB0000730]
+    if ( $LOCATION == "lxplus" || $LOCATION == "lxbatch" ) then
+	echo "=== Printing list of available python versions:"
+	scl -l | grep python
 	echo
-    else if ( $SHELL == "/bin/bash") then
+
+	echo "=== To enable python27 for SHELL=$SHELL copy/paste the following:"
+	if ( $SHELL == "/bin/tcsh") then
+	    echo "scl enable python27 csh"
+	    # scl enable python27 csh
+	    echo
+	else if ( $SHELL == "/bin/bash") then
 	echo "scl enable python27 bash"
 	#scl enable python27 bash
 	echo
+	endif 
     else
 	echo "Unsupported SHELL == $SHELL. EXIT shell script"
 	exit 1
     endif
+else
+    echo "=== The python version used is:"
+    python -V
+    echo 
 endif
+
+
