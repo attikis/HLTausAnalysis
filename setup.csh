@@ -16,7 +16,7 @@ endif
 set LOCATION=""
 if ( $?CMSSW_BASE ) then
     set LOCATION="CMSSW"
-    echo "=== LOCATION is $LOCATION. Known problems with Python when 'cmsenv' is set (Perhaps PYTHONPATH?. Press any key to continue: "
+    echo "=== LOCATION is $LOCATION. Known problems with Python when 'cmsenv' is set. Press any key to continue: "
     set proceed=$<
     echo "Continuing ..."
 endif
@@ -39,8 +39,7 @@ setenv HLTAUSANALYSIS_BASE $PWD
 
 set LD_LIBRARY_PATH_APPEND=""
 if ( $LOCATION == "lxplus" || $LOCATION == "lxbatch" ) then
-    echo "=== Sourcing $LOCATION environments (Hand-picked from CMSSW_7_6_5)"
-    echo "To update:"
+    echo "=== Sourcing $LOCATION environments (Hand-picked from CMSSW_7_6_5). To update these follow the instutions below:"
     echo "1) create a developer area (cmsrel):"
     echo "cmsrel CMSWW_X_Y_Z"
     echo "2) source the CMSSW environment (cmsenv):"
@@ -48,21 +47,26 @@ if ( $LOCATION == "lxplus" || $LOCATION == "lxbatch" ) then
     echo "cmcsev"
     echo "3) Look the new paths with 'scram tool list' and 'scram tool info'"
     echo "[See setup.csh for more details]"
-
+       
     # scram tool info gcc-cxxcompiler (Look for GCC_CXXCOMPILER_BASE)
     set GCC_BASE=/cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/gcc/4.9.3
+    #echo "=== GCC_BASE=${GCC_BASE}"
 
     # scram tool info root_interface (Look for ROOT_INTERFACE_BASE)
     setenv ROOTSYS /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.02.12-kpegke4
+    #echo "=== ROOTSYS=$ROOTSYS"
 
     # scram tool info xrootd (Look for XROOTD_BASE)
     set XROOTD_BASE=/cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2
+    #echo "=== XROOTD_BASE=${XROOTD_BASE}"
 
     # scram tool info xz (Look for XZ_BASE)
     set XZ_BASE=/cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xz/5.2.1
+    #echo "=== XZ_BASE=${XZ_BASE}"
 
     # scram tool info python
     set PYTHON_BASE=/cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke
+    #echo "=== PYTHON_BASE=${PYTHON_BASE}"
 
     # Set the run-time shared library loader (ld.so) an extra set of directories to look for when searching for shared libraries.
     set LD_LIBRARY_PATH_APPEND=$ROOTSYS/lib:$GCC_BASE/lib64:$GCC_BASE/lib:$XROOTD_BASE/lib:$XZ_BASE/lib:$PYTHON_BASE/lib:/cvmfs/cms.cern.ch/slc6_amd64_gcc491/external/libjpg/8b-cms/lib:/cvmfs/cms.cern.ch/slc6_amd64_gcc491/external/libpng/1.6.16/lib
@@ -70,18 +74,19 @@ if ( $LOCATION == "lxplus" || $LOCATION == "lxbatch" ) then
     # Tell the shell which directories to search for executable files
     setenv PATH $ROOTSYS/bin:$GCC_BASE/bin:$XROOTD_BASE/bin:$PATH
 
+    # $?VAR expands to 1 (true) if $VAR is set (to anything, even the empty string), 0 (false) if it isn't.
     if ($?PYTHONPATH) then
 	setenv PYTHONPATH "$ROOTSYS/lib:$PYTHONPATH"
     else
-	setenv PYTHONPATH "$ROOTSYS/lib"
+        setenv PYTHONPATH "$ROOTSYS/lib"
     endif
 endif
 
-
+# Working locally?
 if ( $LOCATION == "mac" ) then
     echo "=== Setting ROOT version 5-34-00-patches"
-    source /Users/attikis/ROOT/v5-34-00-patches/bin/thisroot.csh
-    setenv ROOTSYS /Users/attikis/ROOT/v5-34-00-patches/
+    source /Users/$USER/ROOT/v5-34-00-patches/bin/thisroot.csh
+    setenv ROOTSYS /Users/$USER/ROOT/v5-34-00-patches/
     if ($?PYTHONPATH) then
     setenv PYTHONPATH "$ROOTSYS/lib:$PYTHONPATH"
     else
@@ -90,6 +95,7 @@ if ( $LOCATION == "mac" ) then
 endif
 
 
+echo
 echo "=== Appending to LD_LIBRARY_PATH"
 set LD_LIBRARY_PATH_APPEND="$HLTAUSANALYSIS_BASE/NtupleAnalysis/lib:${LD_LIBRARY_PATH_APPEND}"
 if ( ! $?LD_LIBRARY_PATH ) then
@@ -168,13 +174,11 @@ else
         endif
     end
 
-    # Set PYTHONPATH
+    # Set PYTHONPATH (-z string is null, that is, has zero length)
     if ( -z PYTHONPATH ) then
         setenv PYTHONPATH ${PWD}/${PATHPREFIX} #NOTE: Double quotes will NOT WORK for some shells!!!
-        echo "PYTHONPATH is $PYTHONPATH"
     else
         setenv PYTHONPATH ${PWD}/${PATHPREFIX}:${PYTHONPATH}  #NOTE: Double quotes will NOT WORK for some shells!!!
-        echo "PYTHONPATH is $PYTHONPATH"
     endif
 
 endif
@@ -183,11 +187,40 @@ endif
 #echo "=== Setting PATH variable"
 setenv PATH "${HLTAUSANALYSIS_BASE}/NtupleAnalysis/scripts:${PATH}"
 
+echo
 echo "=== The environment variables set are:"
 echo "LOCATION is $LOCATION"
+echo "PYTHONPATH is $PYTHONPATH"
 echo "HLTAUSANALYSIS_BASE is $HLTAUSANALYSIS_BASE"
 echo "PATHPREFIX is $PATHPREFIX"
 echo "ROOTSYS is $ROOTSYS"
 echo "LD_LIBRARY_PATH is $LD_LIBRARY_PATH"
 echo "PYTHONPATH is $PYTHONPATH"
 echo "PATH is $PATH"
+echo
+
+
+echo "=== WARNING! Requires python 2.7 and later. The python version used is:"
+python -V
+echo
+
+# Python versions on LXPLUS [https://cern.service-now.com/service-portal/article.do?n=KB0000730]
+if ( $LOCATION == "lxplus" || $LOCATION == "lxbatch" ) then
+    # echo "=== Printing list of available python versions:"
+    # scl -l | grep python
+    # echo
+
+    echo "=== To enable python27 for SHELL=$SHELL copy/paste the following:"
+    if ( $SHELL == "/bin/tcsh") then
+	echo "scl enable python27 csh"
+	#scl enable python27 csh
+	echo
+    else if ( $SHELL == "/bin/bash") then
+	echo "scl enable python27 bash"
+	#scl enable python27 bash
+	echo
+    else
+	echo "Unsupported SHELL == $SHELL. EXIT shell script"
+	exit 1
+    endif
+endif
