@@ -611,7 +611,8 @@ def CreateJob(opts, args):
 
         writeConfigInfoToRootFile(resultsPath, opts)
         moveAllHistosIntoAnalysisFolder(resultsPath, opts)
-        writeCounters(resultsPath, opts)
+        if 0:
+            writeCounters(resultsPath, opts)
 
     Print("Successfully created pseudo-multicrab directory \"%s\" " % (taskDirName))
     multicrabCfg.close()
