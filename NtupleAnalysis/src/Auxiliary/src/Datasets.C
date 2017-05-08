@@ -24,6 +24,7 @@ Datasets::Datasets(string alias,
   geometry_       = geometry;
   datasetPath_    = datasetPath;
   datasetPathExt_ = datasetPathExt;
+  if (datasetPathExt == "") datasetPathExt_ = datasetPath;
   nPileUp_        = nPileUp;
   nEvents_        = nEvents;
   nMcTaus_        = nMcTaus;
@@ -44,6 +45,7 @@ void Datasets::PrintSamples(const string mcProduction,
 
   // First create the tables for the known MC Productions
   if (datasets_TTI2023Updg14D.size() < 1 ) CreateMcProductions_();
+  if (datasets_TTI2023Updg14D.size() < 1 ) CreateMcProductions_();
 
   // Check that the mcProduction variable is valid
   IsValidMcProduction_(mcProduction, myDatasets);
@@ -63,6 +65,7 @@ void Datasets::IsValidMcProduction_(const string mcProduction,
 
   // Declare currently supported MC-Productions
   mcProductions.push_back("2023TTIUpg14");
+  mcProductions.push_back("PhaseIISpring17D");
 
   // Check if the selected MC Prodution is valid
   for( int i = 0 ; i < (int) mcProductions.size(); i++){
@@ -116,16 +119,26 @@ void Datasets::IsValidDatasetAlias(const string datasetName)
 
 
   // First create the tables for the known MC Productions
-  if (datasets_TTI2023Updg14D.size() < 1 ) CreateMcProductions_();
+  if (datasets_TTI2023Updg14D.size() < 1 )   CreateMcProductions_();
+  if (datasets_PhaseIISpring17D.size() < 1 ) CreateMcProductions_();
 
   // Check if the selected MC Prodution is valid
-  for( int iD = 0 ; iD < (int) datasets_TTI2023Updg14D.size(); iD++){
-    if ( datasetName.compare( datasets_TTI2023Updg14D.at(iD).alias_) == 0) return;
-  }
-  
+  for( int iD = 0 ; iD < (int) datasets_TTI2023Updg14D.size(); iD++)
+    {
+      if ( datasetName.compare( datasets_TTI2023Updg14D.at(iD).alias_) == 0) return;
+    }
+
+    // Check if the selected MC Prodution is valid
+  for( int iD = 0 ; iD < (int) datasets_PhaseIISpring17D.size(); iD++)
+    {
+      if ( datasetName.compare( datasets_PhaseIISpring17D.at(iD).alias_) == 0) return;
+    }
+
   // If this is reached then the dataset sample is invalid
   cout << "\nE R R O R ! Datasets::IsValidDatasetAlias(...) - Unknown dataset alias \"" << datasetName << "\". See below all available dataset aliases. EXIT" << endl;
   PrintDatasetsVector_(datasets_TTI2023Updg14D, "Text", true);
+  cout << "" << endl;
+  PrintDatasetsVector_(datasets_PhaseIISpring17D, "Text", true);
   cout << "EXIT" << endl;
   exit(1);
   
@@ -234,6 +247,51 @@ void Datasets::CreateMcProductions_(void)
   datasets_TTI2023Updg14D.push_back(SingleMuMinus_TTI2023);
   datasets_TTI2023Updg14D.push_back(SinglePhoton_TTI2023);
 
+
+  // PhaseIISpring17D
+  string path_NoPU  = "/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW";
+  string path_PU140 = "/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW";
+  string path_PU200 = "/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW";
+  string path_NoPU_pilot  = "/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW";
+  string path_PU140_pilot = "/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW";
+  string path_PU200_pilot = "/PhaseIISpring17D-PU200_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW";
+  cmssw    = "9_0_0";
+  geometry = "Phase2";
+  
+  Datasets SingleNeutrinoPU140_PhaseIISpring17D("SingleNeutrino-PU140", "/SingleNeutrino" + path_PU140, "", CP, cmssw, geometry, 140, 500000, 0, 0);
+  Datasets SingleNeutrinoPU200_PhaseIISpring17D("SingleNeutrino-PU200", "/SingleNeutrino" + path_PU200, "", CP, cmssw, geometry, 140, 500000, 0, 0);
+  
+  Datasets SinglePion0NoPU_PhaseIISpring17D("SinglePion0-NoPU"  , "/SinglePion0_FlatPt-8to100" + path_NoPU , "", CP, cmssw, geometry,   0, 500000, 0, 0);
+  Datasets SinglePion0PU140_PhaseIISpring17D("SinglePion0-PU140", "/SinglePion0_FlatPt-8to100" + path_PU140, "", CP, cmssw, geometry, 140, 500000, 0, 0);
+  Datasets SinglePion0PU200_PhaseIISpring17D("SinglePion0-PU200", "/SinglePion0_FlatPt-8to100" + path_PU200, "", CP, cmssw, geometry, 200, 499400, 0, 0);
+  
+  Datasets SinglePionNoPU_PhaseIISpring17D("SinglePion-NoPU"  , "/SinglePion_FlatPt-8to100" + path_NoPU , "", CP, cmssw, geometry,   0, 492588, 0, 0);
+  Datasets SinglePionPU140_PhaseIISpring17D("SinglePion-PU140", "/SinglePion_FlatPt-8to100" + path_PU140, "", CP, cmssw, geometry, 140, 499850, 0, 0);
+  Datasets SinglePionPU200_PhaseIISpring17D("SinglePion-PU200", "/SinglePion_FlatPt-8to100" + path_PU200, "", CP, cmssw, geometry, 200, 498400, 0, 0);
+  
+  Datasets SingleTauNoPU_PhaseIISpring17D("SingleTau-NoPU"  , "SingleTau_NoPU" , "/SingleTau_FlatPt-8to150" + path_NoPU , CP, cmssw, geometry, 0, 242578, 0, 1);
+  Datasets SingleTauPU140_PhaseIISpring17D("SingleTau-PU140", "SingleTau_PU140", "/SingleTau_FlatPt-8to150" + path_PU140, CP, cmssw, geometry, 0, 244605, 0, 1);
+  Datasets SingleTauPU200_PhaseIISpring17D("SingleTau-PU200", "SingleTau_PU200", "/SingleTau_FlatPt-8to150" + path_PU200, CP, cmssw, geometry, 0, 245355, 0, 1);
+  
+  Datasets TTNoPU_PhaseIISpring17D("TT-NoPU-pilot"  , "/TT_TuneCUETP8M1_14TeV-powheg-pythia8/" + path_NoPU , "", CP, cmssw, geometry, 0, 5000, 24, 2);
+  Datasets TTPU140_PhaseIISpring17D("TT-PU140-pilot", "/TT_TuneCUETP8M1_14TeV-powheg-pythia8/" + path_PU140, "", CP, cmssw, geometry, 0, 5000, 24, 2);
+  Datasets TTPU200_PhaseIISpring17D("TT-PU200-pilot", "/TT_TuneCUETP8M1_14TeV-powheg-pythia8/" + path_PU200, "", CP, cmssw, geometry, 0, 5000, 24, 2);
+  
+  datasets_PhaseIISpring17D.push_back(SingleNeutrinoPU140_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(SingleNeutrinoPU200_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(SinglePion0NoPU_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(SinglePion0PU140_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(SinglePion0PU200_PhaseIISpring17D);  
+  datasets_PhaseIISpring17D.push_back(SinglePionNoPU_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(SinglePionPU140_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(SinglePionPU200_PhaseIISpring17D);  
+  datasets_PhaseIISpring17D.push_back(SingleTauNoPU_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(SingleTauPU140_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(SingleTauPU200_PhaseIISpring17D);  
+  datasets_PhaseIISpring17D.push_back(TTNoPU_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(TTPU140_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(TTPU200_PhaseIISpring17D);
+  
   return;
 }
 
@@ -248,7 +306,8 @@ Datasets Datasets::GetDataset(const string datasetAlias)
 
   // First create the tables for the known MC Productions
   if (datasets_TTI2023Updg14D.size() < 1 ) CreateMcProductions_();
-
+  if (datasets_PhaseIISpring17D.size() < 1 ) CreateMcProductions_();
+  
   // Check if the selected MC Prodution is valid
   for( int iD = 0 ; iD < (int) datasets_TTI2023Updg14D.size(); iD++){
 
@@ -256,7 +315,15 @@ Datasets Datasets::GetDataset(const string datasetAlias)
     bSuccess = true;
     d = datasets_TTI2023Updg14D.at(iD);
   }
-  
+
+  // Check if the selected MC Prodution is valid
+  for( int iD = 0 ; iD < (int) datasets_PhaseIISpring17D.size(); iD++){
+
+    if ( datasetAlias.compare( datasets_PhaseIISpring17D.at(iD).alias_) != 0) continue;
+    bSuccess = true;
+    d = datasets_PhaseIISpring17D.at(iD);
+  }
+    
   if(!bSuccess){
     cout << "\nE R R O R ! Datasets::GetDataset(...) - Unexpected error! Could not find dataset alias \"" << datasetAlias << "\"." << endl;
     exit(1);
@@ -274,7 +341,8 @@ const string Datasets::GetDatasetPathFromAlias(const string datasetAlias)
   string datasetPath = "none";
 
   // First create the tables for the known MC Productions
-  if (datasets_TTI2023Updg14D.size() < 1 ) CreateMcProductions_();
+  if (datasets_TTI2023Updg14D.size() < 1 )   CreateMcProductions_();
+  if (datasets_PhaseIISpring17D.size() < 1 ) CreateMcProductions_();
 
   // Ensure that the supplied sample name is valids
   IsValidDatasetAlias(datasetAlias);  
@@ -282,10 +350,17 @@ const string Datasets::GetDatasetPathFromAlias(const string datasetAlias)
   // Check if the selected MC Prodution is valid
   for( int iD = 0 ; iD < (int) datasets_TTI2023Updg14D.size(); iD++){
 
-    if ( datasetAlias.compare( datasets_TTI2023Updg14D.at(iD).alias_) == 0){
+    if ( datasetAlias.compare( datasets_TTI2023Updg14D.at(iD).alias_) == 0)
+      {
       datasetPath = datasets_TTI2023Updg14D.at(iD).datasetPath_;
       return datasetPath;
     }
+
+    if ( datasetAlias.compare( datasets_PhaseIISpring17D.at(iD).alias_) == 0)
+      {
+	datasetPath = datasets_PhaseIISpring17D.at(iD).datasetPath_;
+	return datasetPath;
+      }
 
   }
   

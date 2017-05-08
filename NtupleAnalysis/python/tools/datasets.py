@@ -49,6 +49,67 @@ datasetsTauThreeProngs_UpgFall13d.append(Dataset('/TauThreeProngs/UpgFall13d-PU1
 
 
 #================================================================================================ 
+# PhaseIISpring17D
+#================================================================================================ 
+dasAll  = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset+dataset%3D%2F*%2F*PhaseIISpring17D*%2F*+status%3D*"
+dasDone = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset+dataset%3D%2F*%2F*PhaseIISpring17D*%2F*"
+das     = dasAll
+
+datasetsBs_PhaseIISpring17D = []
+datasetsBs_PhaseIISpring17D.append(Dataset('/BsToPhiPhi_SoftQCDnonD_TuneCUEP8M1_14TeV_Pythia8/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
+datasetsBs_PhaseIISpring17D.append(Dataset('/BsToPhiPhi_SoftQCDnonD_TuneCUEP8M1_14TeV_Pythia8/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
+datasetsBs_PhaseIISpring17D.append(Dataset('/BsToPhiPhi_SoftQCDnonD_TuneCUEP8M1_14TeV_Pythia8/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
+
+datasetsSingleE_PhaseIISpring17D = []
+datasetsSingleE_PhaseIISpring17D.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSingleE_PhaseIISpring17D.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSingleE_PhaseIISpring17D.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+
+datasetsSingleMu_PhaseIISpring17D = []
+datasetsSingleMu_PhaseIISpring17D.append(Dataset('/SingleMu_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSingleMu_PhaseIISpring17D.append(Dataset('/SingleMu_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSingleMu_PhaseIISpring17D.append(Dataset('/SingleMu_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+
+datasetsSingleNu_PhaseIISpring17D = []
+datasetsSingleNu_PhaseIISpring17D.append(Dataset('/SingleNeutrino/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
+datasetsSingleNu_PhaseIISpring17D.append(Dataset('/SingleNeutrino/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+
+datasetsSinglePhoton_PhaseIISpring17D = []
+datasetsSinglePhoton_PhaseIISpring17D.append(Dataset('/SinglePhoton_FlatPt-8to150/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSinglePhoton_PhaseIISpring17D.append(Dataset('/SinglePhoton_FlatPt-8to150/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSinglePhoton_PhaseIISpring17D.append(Dataset('/SinglePhoton_FlatPt-8to150/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+
+datasetsSinglePion0_PhaseIISpring17D = []
+datasetsSinglePion0_PhaseIISpring17D.append(Dataset('/SinglePion0_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSinglePion0_PhaseIISpring17D.append(Dataset('/SinglePion0_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSinglePion0_PhaseIISpring17D.append(Dataset('/SinglePion0_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+
+datasetsSinglePion_PhaseIISpring17D = []
+datasetsSinglePion_PhaseIISpring17D.append(Dataset('/SinglePion_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSinglePion_PhaseIISpring17D.append(Dataset('/SinglePion_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSinglePion_PhaseIISpring17D.append(Dataset('/SinglePion_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+
+datasetsSingleTau_PhaseIISpring17D = []
+datasetsSingleTau_PhaseIISpring17D.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
+datasetsSingleTau_PhaseIISpring17D.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
+datasetsSingleTau_PhaseIISpring17D.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
+
+datasetsTTJpsiFilter_PhaseIISpring17D = []
+datasetsTTJpsiFilter_PhaseIISpring17D.append(Dataset('/TT_JpsiFilter_TuneCUETP8M1_mtop166_5_14TeV-powheg-tauola-pythia8/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsTTJpsiFilter_PhaseIISpring17D.append(Dataset('/TT_JpsiFilter_TuneCUETP8M1_mtop166_5_14TeV-powheg-tauola-pythia8/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+
+datasetsTT_PhaseIISpring17D = []
+datasetsTT_PhaseIISpring17D.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsTT_PhaseIISpring17D.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
+datasetsTT_PhaseIISpring17D.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-PU200_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
+
+datasetsTTbar_PhaseIISpring17D = []
+datasetsTTbar_PhaseIISpring17D.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsTTbar_PhaseIISpring17D.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsTTbar_PhaseIISpring17D.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-PU200_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+
+
+#================================================================================================ 
 # Dataset Grouping
 #================================================================================================ 
 TP2015Datasets = []
@@ -58,6 +119,17 @@ TP2015Datasets.extend(datasetsTTbar_UpgFall13d)
 TP2015Datasets.extend(datasetsTauThreeProngs_UpgFall13d)
 
 TDR2019Datasets = []
+TDR2019Datasets.extend(datasetsBs_PhaseIISpring17D)
+TDR2019Datasets.extend(datasetsSingleE_PhaseIISpring17D)
+TDR2019Datasets.extend(datasetsSingleMu_PhaseIISpring17D)
+TDR2019Datasets.extend(datasetsSingleNu_PhaseIISpring17D)
+TDR2019Datasets.extend(datasetsSinglePhoton_PhaseIISpring17D)
+TDR2019Datasets.extend(datasetsSinglePion0_PhaseIISpring17D)
+TDR2019Datasets.extend(datasetsSinglePion_PhaseIISpring17D)
+TDR2019Datasets.extend(datasetsSingleTau_PhaseIISpring17D)
+TDR2019Datasets.extend(datasetsTTJpsiFilter_PhaseIISpring17D)
+TDR2019Datasets.extend(datasetsTT_PhaseIISpring17D)
+TDR2019Datasets.extend(datasetsTTbar_PhaseIISpring17D)
 
 
 #================================================================================================ 

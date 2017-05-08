@@ -38,7 +38,8 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
 // used to generate this class and read the Tree.
   if (tree == 0) {
    
-    TChain* chain = new TChain("TkTauFromCaloNTupleMaker/EvtTree");
+    // TChain* chain = new TChain("TkTauFromCaloNTupleMaker/EvtTree");
+    TChain* chain = new TChain("Raw2TTreeMaker/EvtTree");
     OpenFile(SamplePath, SampleName, chain);
     
      tree = chain;

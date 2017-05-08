@@ -26,8 +26,6 @@ class TTTrack{
 	  double aRInv,
 	  double aChi2,	    
 	  double aStubPtConsistency,
-	  double aSector,
-	  double aWedge,
 	  bool isGenuine,
 	  bool isUnknown,
 	  bool isCombinatoric,
@@ -58,8 +56,6 @@ class TTTrack{
   double getChi2(void) const {return theChi2;}
   double getChi2Red(void) const {return theChi2Red;}
   double getStubPtConsistency(void) const {return theStubPtConsistency;}
-  double getSector(void) const {return theSector;}
-  double getWedge(void) const {return theWedge;}
   bool getIsGenuine(void) const {return theIsGenuine;}
   bool getIsUnknown(void) const {return theIsUnknown;}
   bool getIsCombinatoric(void) const {return theIsCombinatoric;}
@@ -96,8 +92,6 @@ class TTTrack{
   double theChi2;
   double theChi2Red;
   double theStubPtConsistency;
-  double theSector;
-  double theWedge;
   bool theIsGenuine;
   bool theIsUnknown;
   bool theIsCombinatoric;

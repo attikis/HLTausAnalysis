@@ -29,7 +29,6 @@ void TTTrack::_InitVars(void)
   theMomentum.SetXYZ(0.0, 0.0, 0.0);
   thePOCA.SetXYZ(0.0, 0.0, 0.0);
   theRInv = 0.0;
-  theSector = 0.0;
   theStubPtConsistency = 0.0;
   theStubs_iDisk.clear();
   theStubs_iLayer.clear();
@@ -38,7 +37,6 @@ void TTTrack::_InitVars(void)
   theStubs_iSide.clear();
   theStubs_iZ.clear();
   theStubs_isPS.clear();
-  theWedge = 0.0;
   theZ0 = 0.0;
   theCharge = -9999;
   
@@ -60,8 +58,6 @@ TTTrack::TTTrack(unsigned short aIndex,
 		 double aRInv,
 		 double aChi2,	    
 		 double aStubPtConsistency,
-		 double aSector,
-		 double aWedge,
 		 bool isGenuine,
 		 bool isUnknown,
 		 bool isCombinatoric,
@@ -90,7 +86,6 @@ TTTrack::TTTrack(unsigned short aIndex,
   theD0                = getD0(); // after "thePOCA" and nFitParams are assigned
   theRInv              = aRInv;
   theCharge            = getCharge(); // after "theRInv" is assigned
-  theSector            = aSector;
   theStubPtConsistency = aStubPtConsistency;
   theStubs_iDisk       = stubs_iDisk;
   theStubs_iLayer      = stubs_iLayer;
@@ -99,7 +94,6 @@ TTTrack::TTTrack(unsigned short aIndex,
   theStubs_iSide       = stubs_iSide;
   theStubs_iZ          = stubs_iZ;
   theStubs_isPS        = stubs_isPS;
-  theWedge             = aWedge;
   theZ0                = getZ0();
   theStubs             = getNumOfStubs(); // after "theStubs_isPS" is assigned
   theStubsPS           = getNumOfStubsPS();
@@ -115,8 +109,7 @@ TTTrack::TTTrack(unsigned short aIndex,
 double TTTrack::getD0(void)
 //****************************************************************************
 {
-  // if (theFitParameters == 4) return 999.9; // Louise does this. Why? don't we know x0 and y0 for 4-param tracks?
-  std::cout << "Make sure this is correct for 4-param tracks" << std::endl;
+  if (theFitParameters == 4) return 1e6;
   theD0 = -thePOCA.X() * sin( theMomentum.Phi() ) + thePOCA.Y() * cos(theMomentum.Phi() );
   return theD0;
 }
@@ -223,7 +216,7 @@ void TTTrack::PrintAllProperties(void)
 //****************************************************************************
 {
   
-  Table info("Pt | Eta | Phi | x0 | y0 | z0 | d0 | Q | Chi2 | DOF | Chi2Red | Stubs (PS) | StubPtCons. | Sector | Wedge | Genuine | Unknown | Comb. | StubsIsPS | StubsDisk | StubsLayer | StubsPhi | StubsRing | StubsSide | StubsZ", "Text");  
+  Table info("Pt | Eta | Phi | x0 | y0 | z0 | d0 | Q | Chi2 | DOF | Chi2Red | Stubs (PS) | StubPtCons. | Genuine | Unknown | Comb. | StubsIsPS | StubsDisk | StubsLayer | StubsPhi | StubsRing | StubsSide | StubsZ", "Text");  
   info.AddRowColumn(0, auxTools.ToString( theMomentum.Perp(), 4) );
   info.AddRowColumn(0, auxTools.ToString( theMomentum.Eta() , 4) );
   info.AddRowColumn(0, auxTools.ToString( theMomentum.Phi() , 4) );
@@ -239,8 +232,6 @@ void TTTrack::PrintAllProperties(void)
   info.AddRowColumn(0, auxTools.ToString( getChi2Red()) );
   info.AddRowColumn(0, auxTools.ToString( getNumOfStubs()) + " (" + auxTools.ToString(getNumOfStubsPS()) + ")");
   info.AddRowColumn(0, auxTools.ToString( getStubPtConsistency()) );
-  info.AddRowColumn(0, auxTools.ToString( getSector())    );
-  info.AddRowColumn(0, auxTools.ToString( getWedge())     );
   info.AddRowColumn(0, auxTools.ToString( getIsGenuine()) );
   info.AddRowColumn(0, auxTools.ToString( getIsUnknown()) );
   info.AddRowColumn(0, auxTools.ToString( getIsCombinatoric()) );
