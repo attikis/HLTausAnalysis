@@ -86,7 +86,8 @@ TTTrack::TTTrack(unsigned short aIndex,
   theIsUnknown         = isUnknown;
   theMomentum          = aMomentum;
   thePOCA              = aPOCA;
-  theD0                = getD0(); // after "thePOCA" is assigned
+  theFitParameters     = nFitParams;
+  theD0                = getD0(); // after "thePOCA" and nFitParams are assigned
   theRInv              = aRInv;
   theCharge            = getCharge(); // after "theRInv" is assigned
   theSector            = aSector;
@@ -102,7 +103,6 @@ TTTrack::TTTrack(unsigned short aIndex,
   theZ0                = getZ0();
   theStubs             = getNumOfStubs(); // after "theStubs_isPS" is assigned
   theStubsPS           = getNumOfStubsPS();
-  theFitParameters     = nFitParams;
   theDOF               = getDOF(); // after "theStubs" and "theFitParameters" are assigned
   theChi2Red           = double(theChi2)/double(theDOF); // after "theDOF" is assigned
   if (0) PrintProperties();
@@ -115,6 +115,8 @@ TTTrack::TTTrack(unsigned short aIndex,
 double TTTrack::getD0(void)
 //****************************************************************************
 {
+  // if (theFitParameters == 4) return 999.9; // Louise does this. Why? don't we know x0 and y0 for 4-param tracks?
+  std::cout << "Make sure this is correct for 4-param tracks" << std::endl;
   theD0 = -thePOCA.X() * sin( theMomentum.Phi() ) + thePOCA.Y() * cos(theMomentum.Phi() );
   return theD0;
 }
