@@ -23,8 +23,11 @@ void TrackingParticle::_InitVars(void)
   theIndex = 0.0;
   theMomentum.SetXYZ(0,0,0);
   thePOCA.SetXYZ(0,0,0);
+  theD0propagated = 0.0;
+  theZ0propagated = 0.0;
   theCharge = 0.0;
   theQ = "N/A";
+  theDxy = 0.0;
   theD0 = 0.0;
   theD0Sign = 0.0;
   theD0Phi = 0.0;
@@ -32,6 +35,7 @@ void TrackingParticle::_InitVars(void)
   theTTTrackIndex = 0;
   theTTClusters = 0;
   theTTStubs = 0;
+  theEventId = 0;
   theTTTracks = 0;
   
   return;
@@ -49,13 +53,16 @@ TrackingParticle::~TrackingParticle()
 TrackingParticle::TrackingParticle(unsigned short index,
 				   TVector3 momentum,
 				   ROOT::Math::XYZVector poca, // ROOT::Math::XYZVector (https://root.cern.ch/doc/master/Vector3DPage.html)
+				   double d0_propagated,
+				   double z0_propagated,
 				   int charge,
 				   unsigned short pdgId,
 				   unsigned short nMatch,
 				   unsigned short ttTrackIndex,
 				   unsigned short ttClusters,
 				   unsigned short ttStubs,
-				   unsigned short ttTracks)
+				   unsigned short ttTracks,
+				   int eventId)
 //****************************************************************************
 {
 
@@ -63,6 +70,8 @@ TrackingParticle::TrackingParticle(unsigned short index,
   theIndex        = index;
   theMomentum     = momentum;
   thePOCA         = poca;
+  theD0propagated = d0_propagated;
+  theZ0propagated = z0_propagated;
   theCharge       = charge;
   theQ            = _getQ();
   thePdgId        = pdgId;
@@ -71,6 +80,7 @@ TrackingParticle::TrackingParticle(unsigned short index,
   theTTClusters   = ttClusters;
   theTTStubs      = ttStubs;
   theTTTracks     = ttTracks;
+  theDxy          = _getDxy();
   theD0           = _getD0();
   theD0Sign       = _getD0Sign();
   theD0Phi        = _getD0Phi();
@@ -79,6 +89,7 @@ TrackingParticle::TrackingParticle(unsigned short index,
   theTTClusters   = ttClusters;
   theTTStubs      = ttStubs;
   theTTTracks     = ttTracks;
+  theEventId      = eventId;
 
   if (0) PrintProperties();
 }
@@ -91,6 +102,16 @@ double TrackingParticle::_getD0(void)
   // Same as in TTTrack
   double d0 = -thePOCA.X() * sin( theMomentum.Phi() ) + thePOCA.Y() * cos(theMomentum.Phi() );
   return d0;
+}
+
+
+//****************************************************************************
+double TrackingParticle::_getDxy(void)
+//****************************************************************************
+{
+
+  double dxy = sqrt(thePOCA.X() * thePOCA.X() + thePOCA.Y() * thePOCA.Y() );
+  return dxy;
 }
 
 //****************************************************************************
@@ -174,7 +195,7 @@ void TrackingParticle::PrintProperties(bool bPrintTitleRow)
 //****************************************************************************
 {
   
-  Table info("Index | Pt | Eta | Phi | PdgId | Q | x0 | y0 | z0 | d0 | d0-sign | d0-phi | NMatch | TTTrackIndex | TTClusters | TTStubs | TTTracks", "Text");
+  Table info("Index | Pt | Eta | Phi | PdgId | Q | x0 | y0 | z0 | d0 | d0-sign | d0-phi | NMatch | TTTrackIndex | NClusters | NStubs | NTracks | Event-Id", "Text");
   info.AddRowColumn(0, auxTools.ToString( theIndex) );
   info.AddRowColumn(0, auxTools.ToString( theMomentum.Perp(), 3) );
   info.AddRowColumn(0, auxTools.ToString( theMomentum.Eta() , 3) );
@@ -193,6 +214,7 @@ void TrackingParticle::PrintProperties(bool bPrintTitleRow)
   info.AddRowColumn(0, auxTools.ToString( theTTClusters)   );
   info.AddRowColumn(0, auxTools.ToString( theTTStubs)      );
   info.AddRowColumn(0, auxTools.ToString( theTTTracks)     );
+  info.AddRowColumn(0, auxTools.ToString( theEventId)      );
   info.Print(bPrintTitleRow);
 
   return;

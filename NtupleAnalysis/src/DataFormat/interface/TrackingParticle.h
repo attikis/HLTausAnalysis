@@ -25,13 +25,16 @@ class TrackingParticle{
   TrackingParticle(unsigned short index,
 		   TVector3 momentum,
 		   ROOT::Math::XYZVector poca, // ROOT::Math::XYZVector (https://root.cern.ch/doc/master/Vector3DPage.html)
+		   double d0_propagated,
+		   double z0_propagated,
 		   int charge,
 		   unsigned short pdgId,
 		   unsigned short nMatch,
 		   unsigned short ttTrackIndex,
 		   unsigned short ttClusters,
 		   unsigned short ttStubs,
-		   unsigned short ttTracks);
+		   unsigned short ttTracks,
+  		   int eventId);
   ~TrackingParticle();
   
   unsigned short index(void) const {return theIndex;} 
@@ -47,9 +50,13 @@ class TrackingParticle{
   double getZ0(void) const {return thePOCA.Z();}
   int getCharge(void) const {return theCharge;}
   string getQ(void) const {return theQ;}
+  double getDxy(void)const {return theDxy;}
+  double getD0propagated(void)const {return theD0propagated;}
+  double getZ0propagated(void)const {return theZ0propagated;}
   double getD0(void)const {return theD0;}
   double getD0Sign(void)const {return theD0Sign;}
   double getD0Phi(void)const {return theD0Phi;}
+  int getEventId(void)const {return theEventId;}
   unsigned short getPdgId(void) const {return thePdgId;}
   unsigned short getNMatch(void) const {return theNMatch;}
   unsigned short getTTTrackIndex(void) const {return theTTTrackIndex;}
@@ -66,6 +73,7 @@ class TrackingParticle{
 
   // Functions
   string _getQ(void);
+  double _getDxy(void);
   double _getD0(void);
   double _getD0Sign(void);
   double _getD0Phi(void);
@@ -76,7 +84,10 @@ class TrackingParticle{
   ROOT::Math::XYZVector thePOCA;
   unsigned short thePdgId;
   int theCharge;
+  double theD0propagated;
+  double theZ0propagated;
   string theQ;
+  double theDxy;
   double theD0;
   double theD0Sign;
   double theD0Phi;
@@ -85,6 +96,7 @@ class TrackingParticle{
   unsigned int theTTClusters;
   unsigned int theTTStubs;
   unsigned int theTTTracks;
+  int theEventId;
   TTTrack theTTTrack;
   
 };
