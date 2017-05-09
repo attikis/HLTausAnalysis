@@ -10,9 +10,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   
   //Event tree
   std::vector<double>  *L1Tks_Pt;
-  std::vector<double>  *L1Tks_Px;
-  std::vector<double>  *L1Tks_Py;
-  std::vector<double>  *L1Tks_Pz;
   std::vector<double>  *L1Tks_Eta;
   std::vector<double>  *L1Tks_Phi;
   std::vector<int>     *L1Tks_Charge;
@@ -21,8 +18,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   std::vector<double>  *L1Tks_POCAz;
   std::vector<double>  *L1Tks_ChiSquared;
   std::vector<double>  *L1Tks_StubPtConsistency;
-  std::vector<double>  *L1Tks_Sector;
-  std::vector<double>  *L1Tks_Wedge;
   std::vector<double>  *L1Tks_RInv;
   std::vector<std::vector<unsigned int> > *L1Tks_Stubs_isPS;
   std::vector<std::vector<unsigned int> > *L1Tks_Stubs_iDisk;
@@ -85,9 +80,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   
   // TTTracks
   TBranch        *b_L1Tks_Pt;
-  TBranch        *b_L1Tks_Px;
-  TBranch        *b_L1Tks_Py;
-  TBranch        *b_L1Tks_Pz;
   TBranch        *b_L1Tks_Eta;
   TBranch        *b_L1Tks_Phi;
   TBranch        *b_L1Tks_Charge;
@@ -96,8 +88,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_L1Tks_POCAz;
   TBranch        *b_L1Tks_ChiSquared;
   TBranch        *b_L1Tks_StubPtConsistency;
-  TBranch        *b_L1Tks_Sector;
-  TBranch        *b_L1Tks_Wedge;
   TBranch        *b_L1Tks_RInv;
   TBranch        *b_L1Tks_Stubs_isPS;
   TBranch        *b_L1Tks_Stubs_iDisk;
@@ -177,9 +167,6 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   
   // Set object pointer
   L1Tks_Pt                = 0;
-  L1Tks_Px                = 0;
-  L1Tks_Py                = 0;
-  L1Tks_Pz                = 0;
   L1Tks_Eta               = 0;
   L1Tks_Phi               = 0;
   L1Tks_Charge            = 0;
@@ -188,8 +175,6 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   L1Tks_POCAz             = 0;
   L1Tks_ChiSquared        = 0;
   L1Tks_StubPtConsistency = 0;
-  L1Tks_Sector            = 0;
-  L1Tks_Wedge             = 0;
   L1Tks_RInv              = 0;
   L1Tks_Stubs_isPS        = 0;
   L1Tks_Stubs_iDisk       = 0;
@@ -258,9 +243,6 @@ void TreeDefinitionReco::InitReco(TTree *tree)
 					
   std::cout << "\tSetting L1 Tracks addresses." << std::endl;
   fChain->SetBranchAddress("L1Tks_Pt"               , &L1Tks_Pt               , &b_L1Tks_Pt);
-  fChain->SetBranchAddress("L1Tks_Px"               , &L1Tks_Px               , &b_L1Tks_Px);
-  fChain->SetBranchAddress("L1Tks_Py"               , &L1Tks_Py               , &b_L1Tks_Py);
-  fChain->SetBranchAddress("L1Tks_Pz"               , &L1Tks_Pz               , &b_L1Tks_Pz);
   fChain->SetBranchAddress("L1Tks_Eta"              , &L1Tks_Eta              , &b_L1Tks_Eta);
   fChain->SetBranchAddress("L1Tks_Phi"              , &L1Tks_Phi              , &b_L1Tks_Phi);
   fChain->SetBranchAddress("L1Tks_Charge"           , &L1Tks_Charge           , &b_L1Tks_Charge);

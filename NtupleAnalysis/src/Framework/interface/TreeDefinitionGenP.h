@@ -46,7 +46,7 @@ class TreeDefinitionGenP : public virtual TreeDefinitionBase
   std::vector<double>  *TP_y0_produced;
   std::vector<double>  *TP_z0_produced;
   std::vector<int>     *TP_EventId;
-
+  
   // List of branches
   TBranch *b_RunNumber;
   TBranch *b_EvtNumber;
@@ -86,7 +86,7 @@ class TreeDefinitionGenP : public virtual TreeDefinitionBase
   TBranch *b_TP_y0_produced;
   TBranch *b_TP_z0_produced;
   TBranch *b_TP_EventId;
-   
+
   virtual void InitGenP(TTree *tree);
 
 };
@@ -195,7 +195,6 @@ void TreeDefinitionGenP::InitGenP(TTree *tree)
       fChain->SetBranchAddress("TP_y0_produced"  , &TP_y0_produced  , &b_TP_y0_produced);
       fChain->SetBranchAddress("TP_z0_produced"  , &TP_z0_produced  , &b_TP_z0_produced);
       fChain->SetBranchAddress("TP_EventId"      , &TP_EventId      , &b_TP_EventId);
-
     }
 
 }

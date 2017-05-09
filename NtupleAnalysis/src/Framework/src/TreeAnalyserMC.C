@@ -11,12 +11,12 @@
 
 // User
 #include "../interface/TreeAnalyserMC.h"
-#include "../../Auxiliary/src/L1Tracks.C"
-// #include "../../DataFormat/src/TrackingParticles.C" // alex
+// #include "../../Auxiliary/src/L1Tracks.C"
+// #include "../../DataFormat/src/TrackingParticles.C"
 
 void TreeAnalyserMC::InitSelector()
 {
-  s  = new L1Tracks(this);
+  // s  = new L1Tracks(this);
   // tp = new TrackingParticles(this);
 }
 
