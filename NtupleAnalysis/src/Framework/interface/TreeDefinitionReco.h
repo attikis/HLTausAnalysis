@@ -261,17 +261,6 @@ void TreeDefinitionReco::InitReco(TTree *tree)
       fChain->SetBranchAddress("L1Tks_ChiSquared"       , &L1Tks_ChiSquared       , &b_L1Tks_ChiSquared);
       fChain->SetBranchAddress("L1Tks_StubPtConsistency", &L1Tks_StubPtConsistency, &b_L1Tks_StubPtConsistency);
       fChain->SetBranchAddress("L1Tks_RInv"             , &L1Tks_RInv             , &b_L1Tks_RInv);
-      
-      if (0)
-	{
-	  // fChain->SetBranchAddress("L1Tks_Stubs_isPS"       , &L1Tks_Stubs_isPS       , &b_L1Tks_Stubs_isPS);
-	  // fChain->SetBranchAddress("L1Tks_Stubs_iDisk"      , &L1Tks_Stubs_iDisk      , &b_L1Tks_Stubs_iDisk);
-	  // fChain->SetBranchAddress("L1Tks_Stubs_iLayer"     , &L1Tks_Stubs_iLayer     , &b_L1Tks_Stubs_iLayer);
-	  // fChain->SetBranchAddress("L1Tks_Stubs_iPhi"       , &L1Tks_Stubs_iPhi       , &b_L1Tks_Stubs_iPhi);
-	  // fChain->SetBranchAddress("L1Tks_Stubs_iRing"      , &L1Tks_Stubs_iRing      , &b_L1Tks_Stubs_iRing);
-	  // fChain->SetBranchAddress("L1Tks_Stubs_iSide"      , &L1Tks_Stubs_iSide      , &b_L1Tks_Stubs_iSide);
-	  // fChain->SetBranchAddress("L1Tks_Stubs_iZ"         , &L1Tks_Stubs_iZ         , &b_L1Tks_Stubs_iZ);
-	}
       fChain->SetBranchAddress("L1Tks_IsGenuine"     , &L1Tks_IsGenuine     , &b_L1Tks_IsGenuine);
       fChain->SetBranchAddress("L1Tks_IsUnknown"     , &L1Tks_IsUnknown     , &b_L1Tks_IsUnknown);
       fChain->SetBranchAddress("L1Tks_IsCombinatoric", &L1Tks_IsCombinatoric, &b_L1Tks_IsCombinatoric);

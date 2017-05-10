@@ -39,13 +39,6 @@ class TTTrack{
 	  unsigned int nStubsBarrel,
 	  unsigned int nStubsEndcap,
 	  int matchTP_index,
-	  vector<unsigned int> stubs_isPS,
-	  vector<unsigned int> stubs_iDisk,
-	  vector<unsigned int> stubs_iLayer,
-	  vector<unsigned int> stubs_iPhi,
-	  vector<unsigned int> stubs_iRing,
-	  vector<unsigned int> stubs_iSide,
-	  vector<unsigned int> stubs_iZ,
 	  unsigned int nFitParams=5);
   ~TTTrack();
   
@@ -76,21 +69,8 @@ class TTTrack{
   unsigned int getNumOfBarrelStubs(void) const {return theNStubsBarrel;}
   unsigned int getNumOfEndcapStubs(void) const {return theNStubsEndcap;}
   bool getTPIndex(void) const {return theTPIndex;}
-  vector<unsigned int> getStubsIsPS(void) const {return theStubs_isPS;}
-  vector<unsigned int> getStubsDisk(void) const {return theStubs_iDisk;}
-  vector<unsigned int> getStubsLayer(void) const {return theStubs_iLayer;}
-  vector<unsigned int> getStubsPhi(void) const {return theStubs_iPhi;}
-  vector<unsigned int> getStubsRing(void) const {return theStubs_iRing;}
-  vector<unsigned int> getStubsSide(void) const {return theStubs_iSide;}
-  vector<unsigned int> getStubsZ(void) const {return theStubs_iZ;}
   double getD0(void);
   int getDOF(void);
-  unsigned int getNumOfStubs(void);
-  unsigned int getNumOfStubsPS(void);
-  unsigned int getNumOfBarrelStubs(void);
-  unsigned int getNumOfEndcapStubs(void);
-
-
   void PrintProperties(void);
   void PrintAllProperties(void);
   // int getL1Track() const {return 0; } //TTPixelTrack
@@ -119,13 +99,6 @@ class TTTrack{
   unsigned int theNStubsBarrel;
   unsigned int theNStubsEndcap;
   int theTPIndex;
-  vector<unsigned int> theStubs_isPS;
-  vector<unsigned int> theStubs_iDisk;
-  vector<unsigned int> theStubs_iLayer;
-  vector<unsigned int> theStubs_iPhi;
-  vector<unsigned int> theStubs_iRing;
-  vector<unsigned int> theStubs_iSide;
-  vector<unsigned int> theStubs_iZ;
   int theFitParameters;
   double theD0;
   int theDOF;
