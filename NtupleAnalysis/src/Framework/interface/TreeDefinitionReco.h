@@ -4,150 +4,154 @@
 // User
 #include "TreeDefinitionBase.h"
 
+using namespace std;
+
 class TreeDefinitionReco : public virtual TreeDefinitionBase
 {
  public:
   
-  //Event tree
-  std::vector<double>  *L1Tks_Pt;
-  std::vector<double>  *L1Tks_Eta;
-  std::vector<double>  *L1Tks_Phi;
-  std::vector<int>     *L1Tks_Charge;
-  std::vector<double>  *L1Tks_POCAx;
-  std::vector<double>  *L1Tks_POCAy;
-  std::vector<double>  *L1Tks_POCAz;
-  std::vector<double>  *L1Tks_ChiSquared;
-  std::vector<double>  *L1Tks_StubPtConsistency;
-  std::vector<double>  *L1Tks_RInv;
-  std::vector<std::vector<unsigned int> > *L1Tks_Stubs_isPS;
-  std::vector<std::vector<unsigned int> > *L1Tks_Stubs_iDisk;
-  std::vector<std::vector<unsigned int> > *L1Tks_Stubs_iLayer;
-  std::vector<std::vector<unsigned int> > *L1Tks_Stubs_iPhi;
-  std::vector<std::vector<unsigned int> > *L1Tks_Stubs_iRing;
-  std::vector<std::vector<unsigned int> > *L1Tks_Stubs_iSide;
-  std::vector<std::vector<unsigned int> > *L1Tks_Stubs_iZ;
-  std::vector<bool> *L1Tks_IsGenuine;
-  std::vector<bool> *L1Tks_IsUnknown;
-  std::vector<bool> *L1Tks_IsCombinatoric;
-
-  std::vector<double> *L1PixTks_Pt;
-  std::vector<double> *L1PixTks_Px;
-  std::vector<double> *L1PixTks_Py;
-  std::vector<double> *L1PixTks_Pz;
-  std::vector<double> *L1PixTks_Eta;
-  std::vector<double> *L1PixTks_Phi;
-  std::vector<int>    *L1PixTks_Charge;
-  std::vector<double> *L1PixTks_POCAx;
-  std::vector<double> *L1PixTks_POCAy;
-  std::vector<double> *L1PixTks_POCAz;
-  std::vector<double> *L1PixTks_ChiSquared;
-  std::vector<double> *L1PixTks_RInv;
-  std::vector<double> *L1PixTks_SigmaRInv;
-  std::vector<double> *L1PixTks_SigmaPhi0;
-  std::vector<double> *L1PixTks_SigmaD0;
-  std::vector<double> *L1PixTks_SigmaT;
-  std::vector<double> *L1PixTks_SigmaZ0;
-  std::vector<int>    *L1PixTks_TTTrackIndex;
-  std::vector<int>    *L1PixTks_NPixHits;
-  std::vector<std::vector<double> > *L1PixTks_PixHits_X;
-  std::vector<std::vector<double> > *L1PixTks_PixHits_Y;
-  std::vector<std::vector<double> > *L1PixTks_PixHits_Z;
-  std::vector<std::vector<double> > *L1PixTks_PixHits_R;
-  std::vector<std::vector<double> > *L1PixTks_PixHits_Phi;
-  std::vector<std::vector<int> >    *L1PixTks_PixHits_Type;
-  std::vector<std::vector<double> > *L1PixTks_CandPixHits_X;
-  std::vector<std::vector<double> > *L1PixTks_CandPixHits_Y;
-  std::vector<std::vector<double> > *L1PixTks_CandPixHits_Z;
-  std::vector<std::vector<double> > *L1PixTks_CandPixHits_R;
-  std::vector<std::vector<double> > *L1PixTks_CandPixHits_Phi;
-  std::vector<std::vector<int> >    *L1PixTks_CandPixHits_Type;
+  // TTTracks
+  vector<double>  *L1Tks_Pt;
+  vector<double>  *L1Tks_Eta;
+  vector<double>  *L1Tks_Phi;
+  vector<int>     *L1Tks_Charge;
+  vector<double>  *L1Tks_POCAx;
+  vector<double>  *L1Tks_POCAy;
+  vector<double>  *L1Tks_POCAz;
+  vector<double>  *L1Tks_ChiSquared;
+  vector<double>  *L1Tks_StubPtConsistency;
+  vector<double>  *L1Tks_RInv;
+  vector<bool>    *L1Tks_IsGenuine;
+  vector<bool>    *L1Tks_IsUnknown;
+  vector<bool>    *L1Tks_IsCombinatoric;
+  vector<bool>    *L1Tks_IsLoose;
+  vector<bool>    *L1Tks_IsFake;
+  vector<int>     *L1Tks_NStubs;
+  vector<int>     *L1Tks_NStubsPS;
+  vector<int>     *L1Tks_NStubsBarrel;
+  vector<int>     *L1Tks_NStubsEndcap;
+  vector<int>     *L1Tks_TP_Index;
+  
+  // TTPixelTracks
+  vector<double> *L1PixTks_Pt;
+  vector<double> *L1PixTks_Px;
+  vector<double> *L1PixTks_Py;
+  vector<double> *L1PixTks_Pz;
+  vector<double> *L1PixTks_Eta;
+  vector<double> *L1PixTks_Phi;
+  vector<int>    *L1PixTks_Charge;
+  vector<double> *L1PixTks_POCAx;
+  vector<double> *L1PixTks_POCAy;
+  vector<double> *L1PixTks_POCAz;
+  vector<double> *L1PixTks_ChiSquared;
+  vector<double> *L1PixTks_RInv;
+  vector<double> *L1PixTks_SigmaRInv;
+  vector<double> *L1PixTks_SigmaPhi0;
+  vector<double> *L1PixTks_SigmaD0;
+  vector<double> *L1PixTks_SigmaT;
+  vector<double> *L1PixTks_SigmaZ0;
+  vector<int>    *L1PixTks_TTTrackIndex;
+  vector<int>    *L1PixTks_NPixHits;
+  vector<vector<double> > *L1PixTks_PixHits_X;
+  vector<vector<double> > *L1PixTks_PixHits_Y;
+  vector<vector<double> > *L1PixTks_PixHits_Z;
+  vector<vector<double> > *L1PixTks_PixHits_R;
+  vector<vector<double> > *L1PixTks_PixHits_Phi;
+  vector<vector<int> >    *L1PixTks_PixHits_Type;
+  vector<vector<double> > *L1PixTks_CandPixHits_X;
+  vector<vector<double> > *L1PixTks_CandPixHits_Y;
+  vector<vector<double> > *L1PixTks_CandPixHits_Z;
+  vector<vector<double> > *L1PixTks_CandPixHits_R;
+  vector<vector<double> > *L1PixTks_CandPixHits_Phi;
+  vector<vector<int> >    *L1PixTks_CandPixHits_Type;
 
   // L1CaloTaus
-  std::vector<double>  *L1CaloTau_E;
-  std::vector<double>  *L1CaloTau_Et;
-  std::vector<double>  *L1CaloTau_Eta;
-  std::vector<double>  *L1CaloTau_Phi;
-  std::vector<int>     *L1CaloTau_Bx;
-  std::vector<int>     *L1CaloTau_Type;
+  vector<double>  *L1CaloTau_E;
+  vector<double>  *L1CaloTau_Et;
+  vector<double>  *L1CaloTau_Eta;
+  vector<double>  *L1CaloTau_Phi;
+  vector<int>     *L1CaloTau_Bx;
+  vector<int>     *L1CaloTau_Type;
 
   // L1TkJets
-  std::vector< double > *L1TkJet_Pt;
-  std::vector< double > *L1TkJet_Eta;
-  std::vector< double > *L1TkJet_Phi;
-  std::vector< double > *L1TkJet_E;
-  std::vector< std::vector< int > > *L1TkJet_TTTrackIndex; 
-  std::vector< double > *L1TkJet_Vertex;
+  vector< double > *L1TkJet_Pt;
+  vector< double > *L1TkJet_Eta;
+  vector< double > *L1TkJet_Phi;
+  vector< double > *L1TkJet_E;
+  vector< vector< int > > *L1TkJet_TTTrackIndex; 
+  vector< double > *L1TkJet_Vertex;
   
+
   // TTTracks
-  TBranch        *b_L1Tks_Pt;
-  TBranch        *b_L1Tks_Eta;
-  TBranch        *b_L1Tks_Phi;
-  TBranch        *b_L1Tks_Charge;
-  TBranch        *b_L1Tks_POCAx;
-  TBranch        *b_L1Tks_POCAy;
-  TBranch        *b_L1Tks_POCAz;
-  TBranch        *b_L1Tks_ChiSquared;
-  TBranch        *b_L1Tks_StubPtConsistency;
-  TBranch        *b_L1Tks_RInv;
-  TBranch        *b_L1Tks_Stubs_isPS;
-  TBranch        *b_L1Tks_Stubs_iDisk;
-  TBranch        *b_L1Tks_Stubs_iLayer;
-  TBranch        *b_L1Tks_Stubs_iPhi;
-  TBranch        *b_L1Tks_Stubs_iRing;
-  TBranch        *b_L1Tks_Stubs_iSide;
-  TBranch        *b_L1Tks_Stubs_iZ;
-  TBranch        *b_L1Tks_IsGenuine;
-  TBranch        *b_L1Tks_IsUnknown;
-  TBranch        *b_L1Tks_IsCombinatoric;
+  TBranch *b_L1Tks_Pt;
+  TBranch *b_L1Tks_Eta;
+  TBranch *b_L1Tks_Phi;
+  TBranch *b_L1Tks_Charge;
+  TBranch *b_L1Tks_POCAx;
+  TBranch *b_L1Tks_POCAy;
+  TBranch *b_L1Tks_POCAz;
+  TBranch *b_L1Tks_ChiSquared;
+  TBranch *b_L1Tks_StubPtConsistency;
+  TBranch *b_L1Tks_RInv;
+  TBranch *b_L1Tks_IsGenuine;
+  TBranch *b_L1Tks_IsUnknown;
+  TBranch *b_L1Tks_IsCombinatoric;
+  TBranch *b_L1Tks_IsLoose;
+  TBranch *b_L1Tks_IsFake;
+  TBranch *b_L1Tks_NStubs;
+  TBranch *b_L1Tks_NStubsPS;
+  TBranch *b_L1Tks_NStubsBarrel;
+  TBranch *b_L1Tks_NStubsEndcap;
+  TBranch *b_L1Tks_TP_Index;
 
   // TTPixelTracks
-  TBranch        *b_L1PixTks_Pt;
-  TBranch        *b_L1PixTks_Px;
-  TBranch        *b_L1PixTks_Py;
-  TBranch        *b_L1PixTks_Pz;
-  TBranch        *b_L1PixTks_Eta;
-  TBranch        *b_L1PixTks_Phi;
-  TBranch        *b_L1PixTks_Charge;
-  TBranch        *b_L1PixTks_NPixHits;
-  TBranch        *b_L1PixTks_PixHits_X;
-  TBranch        *b_L1PixTks_PixHits_Y;
-  TBranch        *b_L1PixTks_PixHits_Z;
-  TBranch        *b_L1PixTks_PixHits_R;
-  TBranch        *b_L1PixTks_PixHits_Phi;
-  TBranch        *b_L1PixTks_PixHits_Type;
-  TBranch        *b_L1PixTks_CandPixHits_X;
-  TBranch        *b_L1PixTks_CandPixHits_Y;
-  TBranch        *b_L1PixTks_CandPixHits_Z;
-  TBranch        *b_L1PixTks_CandPixHits_R;
-  TBranch        *b_L1PixTks_CandPixHits_Phi;
-  TBranch        *b_L1PixTks_CandPixHits_Type;
-  TBranch        *b_L1PixTks_POCAx;
-  TBranch        *b_L1PixTks_POCAy;
-  TBranch        *b_L1PixTks_POCAz;
-  TBranch        *b_L1PixTks_ChiSquared;
-  TBranch        *b_L1PixTks_RInv;
-  TBranch        *b_L1PixTks_SigmaRInv;
-  TBranch        *b_L1PixTks_SigmaPhi0;
-  TBranch        *b_L1PixTks_SigmaD0;
-  TBranch        *b_L1PixTks_SigmaT;
-  TBranch        *b_L1PixTks_SigmaZ0;
-  TBranch        *b_L1PixTks_TTTrackIndex;
+  TBranch *b_L1PixTks_Pt;
+  TBranch *b_L1PixTks_Px;
+  TBranch *b_L1PixTks_Py;
+  TBranch *b_L1PixTks_Pz;
+  TBranch *b_L1PixTks_Eta;
+  TBranch *b_L1PixTks_Phi;
+  TBranch *b_L1PixTks_Charge;
+  TBranch *b_L1PixTks_NPixHits;
+  TBranch *b_L1PixTks_PixHits_X;
+  TBranch *b_L1PixTks_PixHits_Y;
+  TBranch *b_L1PixTks_PixHits_Z;
+  TBranch *b_L1PixTks_PixHits_R;
+  TBranch *b_L1PixTks_PixHits_Phi;
+  TBranch *b_L1PixTks_PixHits_Type;
+  TBranch *b_L1PixTks_CandPixHits_X;
+  TBranch *b_L1PixTks_CandPixHits_Y;
+  TBranch *b_L1PixTks_CandPixHits_Z;
+  TBranch *b_L1PixTks_CandPixHits_R;
+  TBranch *b_L1PixTks_CandPixHits_Phi;
+  TBranch *b_L1PixTks_CandPixHits_Type;
+  TBranch *b_L1PixTks_POCAx;
+  TBranch *b_L1PixTks_POCAy;
+  TBranch *b_L1PixTks_POCAz;
+  TBranch *b_L1PixTks_ChiSquared;
+  TBranch *b_L1PixTks_RInv;
+  TBranch *b_L1PixTks_SigmaRInv;
+  TBranch *b_L1PixTks_SigmaPhi0;
+  TBranch *b_L1PixTks_SigmaD0;
+  TBranch *b_L1PixTks_SigmaT;
+  TBranch *b_L1PixTks_SigmaZ0;
+  TBranch *b_L1PixTks_TTTrackIndex;
 
   // L1CaloTaus
-  TBranch        *b_L1CaloTau_E;
-  TBranch        *b_L1CaloTau_Et;
-  TBranch        *b_L1CaloTau_Eta;
-  TBranch        *b_L1CaloTau_Phi;
-  TBranch        *b_L1CaloTau_Bx;
-  TBranch        *b_L1CaloTau_Type;
+  TBranch *b_L1CaloTau_E;
+  TBranch *b_L1CaloTau_Et;
+  TBranch *b_L1CaloTau_Eta;
+  TBranch *b_L1CaloTau_Phi;
+  TBranch *b_L1CaloTau_Bx;
+  TBranch *b_L1CaloTau_Type;
 
   // L1TkJets
-  TBranch        *b_L1TkJet_Pt;
-  TBranch        *b_L1TkJet_Eta;
-  TBranch        *b_L1TkJet_Phi;
-  TBranch        *b_L1TkJet_E;
-  TBranch        *b_L1TkJet_TTTrackIndex; 
-  TBranch        *b_L1TkJet_Vertex;
+  TBranch *b_L1TkJet_Pt;
+  TBranch *b_L1TkJet_Eta;
+  TBranch *b_L1TkJet_Phi;
+  TBranch *b_L1TkJet_E;
+  TBranch *b_L1TkJet_TTTrackIndex; 
+  TBranch *b_L1TkJet_Vertex;
    
 
   virtual void InitReco(TTree *tree);
@@ -163,9 +167,9 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   // Init() will be called many times when running on PROOF
   // (once per file to be processed).
 
-  std::cout << "=== TreeDefinitionReco::InitReco()" << std::endl;
+  cout << "=== TreeDefinitionReco::InitReco()" << endl;
   
-  // Set object pointer
+  // TTTracks
   L1Tks_Pt                = 0;
   L1Tks_Eta               = 0;
   L1Tks_Phi               = 0;
@@ -176,17 +180,18 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   L1Tks_ChiSquared        = 0;
   L1Tks_StubPtConsistency = 0;
   L1Tks_RInv              = 0;
-  L1Tks_Stubs_isPS        = 0;
-  L1Tks_Stubs_iDisk       = 0;
-  L1Tks_Stubs_iLayer      = 0;
-  L1Tks_Stubs_iPhi        = 0;
-  L1Tks_Stubs_iRing       = 0;
-  L1Tks_Stubs_iSide       = 0;
-  L1Tks_Stubs_iZ          = 0;
   L1Tks_IsGenuine         = 0;
   L1Tks_IsUnknown         = 0;
   L1Tks_IsCombinatoric    = 0;
+  L1Tks_IsLoose           = 0;
+  L1Tks_IsFake            = 0;
+  L1Tks_NStubs            = 0;
+  L1Tks_NStubsPS          = 0;
+  L1Tks_NStubsBarrel      = 0;
+  L1Tks_NStubsEndcap      = 0;
+  L1Tks_TP_Index          = 0;
 
+  // TTPixelTracks
   L1PixTks_Pt                 = 0;
   L1PixTks_Px                 = 0;
   L1PixTks_Py                 = 0;
@@ -218,7 +223,8 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   L1PixTks_CandPixHits_R      = 0;
   L1PixTks_CandPixHits_Phi    = 0;
   L1PixTks_CandPixHits_Type   = 0;
-  
+
+  // L1CaloTaus
   L1CaloTau_E             = 0;
   L1CaloTau_Et            = 0;
   L1CaloTau_Eta           = 0;
@@ -226,6 +232,7 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   L1CaloTau_Bx            = 0;
   L1CaloTau_Type          = 0;
 
+  // L1TkJets
   L1TkJet_Pt              = 0;
   L1TkJet_Eta             = 0;
   L1TkJet_Phi             = 0;
@@ -234,41 +241,42 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   L1TkJet_Vertex          = 0;
 
 
-  std::cout << "\tSetting branch addresses and branch pointers." << std::endl;
-  // Set branch addresses and branch pointers
+  cout << "\tSetting branch addresses and branch pointers." << endl;
   if (!tree) return;
   fChain = tree;
   fCurrent = -1;
   fChain->SetMakeClass(1); 
-					
-  std::cout << "\tSetting L1 Tracks addresses." << std::endl;
-  fChain->SetBranchAddress("L1Tks_Pt"               , &L1Tks_Pt               , &b_L1Tks_Pt);
-  fChain->SetBranchAddress("L1Tks_Eta"              , &L1Tks_Eta              , &b_L1Tks_Eta);
-  fChain->SetBranchAddress("L1Tks_Phi"              , &L1Tks_Phi              , &b_L1Tks_Phi);
-  fChain->SetBranchAddress("L1Tks_Charge"           , &L1Tks_Charge           , &b_L1Tks_Charge);
-  fChain->SetBranchAddress("L1Tks_POCAx"            , &L1Tks_POCAx            , &b_L1Tks_POCAx);
-  fChain->SetBranchAddress("L1Tks_POCAy"            , &L1Tks_POCAy            , &b_L1Tks_POCAy);
-  fChain->SetBranchAddress("L1Tks_POCAz"            , &L1Tks_POCAz            , &b_L1Tks_POCAz);
-  fChain->SetBranchAddress("L1Tks_ChiSquared"       , &L1Tks_ChiSquared       , &b_L1Tks_ChiSquared);
-  fChain->SetBranchAddress("L1Tks_StubPtConsistency", &L1Tks_StubPtConsistency, &b_L1Tks_StubPtConsistency);
-  fChain->SetBranchAddress("L1Tks_RInv"             , &L1Tks_RInv             , &b_L1Tks_RInv);
-  if (0)
-    {
-      fChain->SetBranchAddress("L1Tks_Stubs_isPS"       , &L1Tks_Stubs_isPS       , &b_L1Tks_Stubs_isPS);
-      fChain->SetBranchAddress("L1Tks_Stubs_iDisk"      , &L1Tks_Stubs_iDisk      , &b_L1Tks_Stubs_iDisk);
-      fChain->SetBranchAddress("L1Tks_Stubs_iLayer"     , &L1Tks_Stubs_iLayer     , &b_L1Tks_Stubs_iLayer);
-      fChain->SetBranchAddress("L1Tks_Stubs_iPhi"       , &L1Tks_Stubs_iPhi       , &b_L1Tks_Stubs_iPhi);
-      fChain->SetBranchAddress("L1Tks_Stubs_iRing"      , &L1Tks_Stubs_iRing      , &b_L1Tks_Stubs_iRing);
-      fChain->SetBranchAddress("L1Tks_Stubs_iSide"      , &L1Tks_Stubs_iSide      , &b_L1Tks_Stubs_iSide);
-      fChain->SetBranchAddress("L1Tks_Stubs_iZ"         , &L1Tks_Stubs_iZ         , &b_L1Tks_Stubs_iZ);
-    }
-  fChain->SetBranchAddress("L1Tks_IsGenuine"        , &L1Tks_IsGenuine        , &b_L1Tks_IsGenuine);
-  fChain->SetBranchAddress("L1Tks_IsUnknown"        , &L1Tks_IsUnknown        , &b_L1Tks_IsUnknown);
-  fChain->SetBranchAddress("L1Tks_IsCombinatoric"   , &L1Tks_IsCombinatoric   , &b_L1Tks_IsCombinatoric);
 
+  // TTTracks
+  if(1)
+    {
+      cout << "\tSetting TTTracks addresses." << endl;
+      fChain->SetBranchAddress("L1Tks_Pt"               , &L1Tks_Pt               , &b_L1Tks_Pt);
+      fChain->SetBranchAddress("L1Tks_Eta"              , &L1Tks_Eta              , &b_L1Tks_Eta);
+      fChain->SetBranchAddress("L1Tks_Phi"              , &L1Tks_Phi              , &b_L1Tks_Phi);
+      fChain->SetBranchAddress("L1Tks_Charge"           , &L1Tks_Charge           , &b_L1Tks_Charge);
+      fChain->SetBranchAddress("L1Tks_POCAx"            , &L1Tks_POCAx            , &b_L1Tks_POCAx);
+      fChain->SetBranchAddress("L1Tks_POCAy"            , &L1Tks_POCAy            , &b_L1Tks_POCAy);
+      fChain->SetBranchAddress("L1Tks_POCAz"            , &L1Tks_POCAz            , &b_L1Tks_POCAz);
+      fChain->SetBranchAddress("L1Tks_ChiSquared"       , &L1Tks_ChiSquared       , &b_L1Tks_ChiSquared);
+      fChain->SetBranchAddress("L1Tks_StubPtConsistency", &L1Tks_StubPtConsistency, &b_L1Tks_StubPtConsistency);
+      fChain->SetBranchAddress("L1Tks_RInv"             , &L1Tks_RInv             , &b_L1Tks_RInv);
+      fChain->SetBranchAddress("L1Tks_IsGenuine"     , &L1Tks_IsGenuine     , &b_L1Tks_IsGenuine);
+      fChain->SetBranchAddress("L1Tks_IsUnknown"     , &L1Tks_IsUnknown     , &b_L1Tks_IsUnknown);
+      fChain->SetBranchAddress("L1Tks_IsCombinatoric", &L1Tks_IsCombinatoric, &b_L1Tks_IsCombinatoric);
+      fChain->SetBranchAddress("L1Tks_IsLoose"       , &L1Tks_IsLoose       , &b_L1Tks_IsLoose);
+      fChain->SetBranchAddress("L1Tks_IsFake"        , &L1Tks_IsFake        , &b_L1Tks_IsFake);
+      fChain->SetBranchAddress("L1Tks_NStubs"        , &L1Tks_NStubs        , &b_L1Tks_NStubs);
+      fChain->SetBranchAddress("L1Tks_NStubsPS"      , &L1Tks_NStubsPS      , &b_L1Tks_NStubsPS);
+      fChain->SetBranchAddress("L1Tks_NStubsBarrel"  , &L1Tks_NStubsBarrel  , &b_L1Tks_NStubsBarrel);
+      fChain->SetBranchAddress("L1Tks_NStubsEndcap"  , &L1Tks_NStubsEndcap  , &b_L1Tks_NStubsEndcap);
+      fChain->SetBranchAddress("L1Tks_TP_Index"      , &L1Tks_TP_Index      , &b_L1Tks_TP_Index);
+    }
+
+  // TTPixelTracks 
   if (0)
     {
-      std::cout << "\tSetting L1 Pixel Tracks addresses." << std::endl;
+      cout << "\tSetting L1 Pixel Tracks addresses." << endl;
       fChain->SetBranchAddress("L1PixTks_Pt"           , &L1PixTks_Pt           , &b_L1PixTks_Pt);
       fChain->SetBranchAddress("L1PixTks_Px"           , &L1PixTks_Px           , &b_L1PixTks_Px);
       fChain->SetBranchAddress("L1PixTks_Py"           , &L1PixTks_Py           , &b_L1PixTks_Py);
@@ -302,9 +310,10 @@ void TreeDefinitionReco::InitReco(TTree *tree)
       fChain->SetBranchAddress("L1PixTks_CandPixHits_Type" , &L1PixTks_CandPixHits_Type , &b_L1PixTks_CandPixHits_Type);
     }
 
+  // L1CaloTaus
   if (0)
     {
-      std::cout << "\tSetting L1 Calo Tau addresses." << std::endl;
+      cout << "\tSetting L1 Calo Tau addresses." << endl;
       fChain->SetBranchAddress("L1CaloTau_E"   , &L1CaloTau_E   , &b_L1CaloTau_E);
       fChain->SetBranchAddress("L1CaloTau_Et"  , &L1CaloTau_Et  , &b_L1CaloTau_Et);
       fChain->SetBranchAddress("L1CaloTau_Eta" , &L1CaloTau_Eta , &b_L1CaloTau_Eta);
@@ -313,9 +322,10 @@ void TreeDefinitionReco::InitReco(TTree *tree)
       fChain->SetBranchAddress("L1CaloTau_Type", &L1CaloTau_Type, &b_L1CaloTau_Type);
     }
 
+  // L1TkJets
   if (0)
     {
-      std::cout << "\tSetting L1 Jet addresses." << std::endl;
+      cout << "\tSetting L1 Jet addresses." << endl;
       fChain->SetBranchAddress("L1TkJet_Pt"          , &L1TkJet_Pt          , &b_L1TkJet_Pt);
       fChain->SetBranchAddress("L1TkJet_Eta"         , &L1TkJet_Eta         , &b_L1TkJet_Eta);
       fChain->SetBranchAddress("L1TkJet_Phi"         , &L1TkJet_Phi         , &b_L1TkJet_Phi);

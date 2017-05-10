@@ -17,21 +17,24 @@ TChain* FileOpener::OpenFile(const std::string SamplePath, const std::string Sam
   const string datasetPath = datasets_.GetDatasetPathFromAlias(SampleName);
   
   // Ensure file exists
+  std::string datasetDir       = SamplePath + "/" + datasetPath + "/";
   std::string FullFileName     = SamplePath + "/" + datasetPath + "/res/output-" + datasetPath + ".root"; 
   std::string FullFileName_alt = SamplePath + "/" + datasetPath + "/results/output-" + datasetPath + ".root";
   std::string name = FullFileName;
   std::ifstream GetFile(FullFileName.c_str());
+
+  cout << "=== FileOpener::OpenFile()\n\tOpening ROOT file in \"" << datasetDir << "\".\n\tWill look unders subdirectories \"res/\" and \"results/\"." << endl;
   if (!GetFile.good() )
     {
-      cout << "=== FileOpener::OpenFile()\n\tFile \"" << FullFileName << "\" does not exist. Trying alternative paths ..." << endl;
+      if (0) cout << "=== FileOpener::OpenFile()\n\tFile \"" << FullFileName << "\" does not exist. Trying alternative paths ..." << endl;
       name = FullFileName_alt;
 
       std::ifstream GetFile_alt(FullFileName_alt.c_str());
       if (!GetFile_alt.good() )
 	{
 	  std::ifstream GetFile_alt(FullFileName_alt.c_str());
-	cout << "=== FileOpener::OpenFile()\n\tFile \"" << FullFileName_alt << "\" also does not exist. EXIT" << endl;
-	exit(1);
+	  if(0) cout << "=== FileOpener::OpenFile()\n\tFile \"" << FullFileName_alt << "\" also does not exist. EXIT" << endl;
+	  exit(1);
 	}
     }
   
