@@ -110,7 +110,7 @@ void TTTracks::Loop()
   if (fChain == 0) return;
   const Long64_t nEntries = (MaxEvents == -1) ? fChain->GetEntries() : min((int)fChain->GetEntries(), MaxEvents);
   
-  cout << "=== TTTracks:\n\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
+  cout << "=== TTTracks::Loop()\n\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
 
   // Initialisations
   InitVars_();
@@ -125,7 +125,7 @@ void TTTracks::Loop()
   for (int jentry = 0; jentry < nEntries; jentry++, nEvts++)
     {
 
-      if(DEBUG) cout << "\tEntry = " << jentry << endl;
+      if(DEBUG) cout << "Entry = " << jentry << endl;
 
       // Load the tree && Get the entry
       Long64_t ientry = LoadTree(jentry);
@@ -134,16 +134,18 @@ void TTTracks::Loop()
       nbytes += nb;
 
       // GenParticles Collection
+      if (DEBUG) cout << "=== GenParticles (" << GenP_Pt->size() << ")" << endl;
       vector<GenParticle> GenParticles = GetGenParticles(false);
       if (DEBUG) PrintGenParticleCollection(GenParticles);
 
-      
       // Tracking Particle Collections
+      if (DEBUG) cout << "Tracking Particles (" << TP_Pt->size() << ")" << endl;
       vector<TrackingParticle> TPs  = GetTrackingParticles(false);
       sort( TPs.begin(), TPs.end(), PtComparatorTP() ); // not sorted by default
       if (DEBUG) PrintTrackingParticleCollection(TPs);
 
       // TTTracks Collections
+      if (DEBUG) cout << "TTracks (" << L1Tks_Pt->size() << ")" << endl;
       vector<TTTrack> TTTracks = GetTTTracks(tk_minPt, tk_minEta, tk_maxEta, tk_maxChiSqRed, tk_minStubs, tk_minStubsPS, tk_maxStubsPS, tk_nFitParams, false);
       sort( TTTracks.begin(), TTTracks.end(), PtComparatorTTTrack() ); // not sorted by default
       if (DEBUG) PrintTTTrackCollection(TTTracks);
@@ -492,30 +494,25 @@ TTTrack TTTracks::GetTTTrack(unsigned int Index,
   int  nStubsPS       = L1Tks_NStubsPS->at(Index);
   int  nStubsBarrel   = L1Tks_NStubsBarrel->at(Index);
   int  nStubsEndcap   = L1Tks_NStubsEndcap->at(Index);
-  vector<unsigned int> stubs_isPS   ; //= L1Tks_Stubs_isPS->at(Index);
-  vector<unsigned int> stubs_iDisk  ; //= L1Tks_Stubs_iDisk->at(Index);
-  vector<unsigned int> stubs_iLayer ; //= L1Tks_Stubs_iLayer->at(Index);
-  vector<unsigned int> stubs_iPhi   ; //= L1Tks_Stubs_iPhi->at(Index);
-  vector<unsigned int> stubs_iRing  ; //= L1Tks_Stubs_iRing->at(Index);
-  vector<unsigned int> stubs_iSide  ; //= L1Tks_Stubs_iSide->at(Index);
-  vector<unsigned int> stubs_iZ     ; //= L1Tks_Stubs_iZ->at(Index);
   int matchTP_index = L1Tks_TP_Index->at(Index);
   // auxTools_.PrintVector(stubs_isPS);
   
   // Construct the TTTrack
-  TTTrack theTTTrack(Index, p, aPOCA,  aRInv, aChi2, aStubPtCons, isGenuine, isUnknown, isCombinatoric, isLoose, isFake,
-   		     nStubs, nStubsPS, nStubsBarrel, nStubsEndcap, matchTP_index,
-   		     stubs_isPS, stubs_iDisk, stubs_iLayer, stubs_iPhi, stubs_iRing, stubs_iSide, stubs_iZ, nFitParams);
+  TTTrack theTTTrack(Index, p, aPOCA,  aRInv, aChi2, aStubPtCons, isGenuine, isUnknown, isCombinatoric,
+		     isLoose, isFake, nStubs, nStubsPS, nStubsBarrel, nStubsEndcap, matchTP_index, nFitParams);
   
-  // // Get the uniquely matched TP
-  // TrackingParticle theTP;
-  // if (matchTP_index >= 0) theTP= GetTrackingParticle(matchTP_index);
-  // theTTTrack.SetTP(theTP);
+  // Get the uniquely matched TP
+  TrackingParticle theTP;
+  if (matchTP_index >= 0) theTP= GetTrackingParticle(matchTP_index);
+  // theTTTrack.SetTP(theTP); // cannot implement. cyclic
   
-  // // if (DEBUG) theTTTrack.PrintProperties();
-  // // if (DEBUG) theTP.PrintProperties();
-  // theTTTrack.PrintProperties();
-  // theTP.PrintProperties();
+  if (DEBUG) theTTTrack.PrintProperties(); //alex
+  // if (DEBUG && matchTP_index >= 0) theTP.PrintProperties();
+  //if (matchTP_index >= 0) theTP.PrintProperties();
+
+  theTTTrack.PrintProperties();
+  if (matchTP_index >= 0) theTP.PrintProperties();
+  cout << "" << endl;
   
   return theTTTrack;
 }
@@ -563,22 +560,22 @@ TrackingParticle TTTracks::GetTrackingParticle(unsigned int Index)
   double y0            = TP_y0_produced->at(Index);
   double z0            = TP_z0_produced->at(Index);
   int eventId          = TP_EventId->at(Index);
-
+      
   // Construct higher-level variables
   TVector3 p;
   p.SetPtEtaPhi(pt, eta, phi);
   ROOT::Math::XYZVector poca(x0, y0, z0);
 
   // Construct the TP
-  TrackingParticle theTrackingParticle(Index, p, poca, d0_propagated, z0_propagated, charge, pdgId, nMatch, ttTrackIndex, ttClusters, ttStubs, ttTracks, eventId);
+  TrackingParticle theTrackingParticle(Index, p, poca, d0_propagated, z0_propagated, charge, pdgId, nMatch, ttTrackIndex, ttClusters, ttStubs, ttTracks, eventId);  
+  if (DEBUG) theTrackingParticle.PrintProperties();
 
   // Get the uniquely matched TTTrack
-  TTTrack theTrack;
-  if (ttTrackIndex >= 0) theTrack= GetTTTrack(ttTrackIndex, 4);
+  // TTTrack theTrack;
+  // if (ttTrackIndex >= 0) theTrack= GetTTTrack(ttTrackIndex, 4);
   // theTrackingParticle.SetTTTTrack(theTrack); // cannot use! cyclic problems 
-
-  if (DEBUG) theTrackingParticle.PrintProperties();
-  // if (DEBUG) theTrack.PrintProperties(); // cannot use! cyclic problems 
+  // if (DEBUG) theTrack.PrintProperties(); // cannot use! cyclic problems
+  
   return theTrackingParticle;
 }
 
