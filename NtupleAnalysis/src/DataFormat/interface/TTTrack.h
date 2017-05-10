@@ -7,6 +7,7 @@
 // User
 #include "../../Auxiliary/src/AuxTools.C"
 #include "../../Auxiliary/src/Table.C"
+// #include "../src/TrackingParticle.C"  cyclic/fwd-declaration errors
 
 // ROOT
 #include "Math/GenVector/VectorUtil.h"
@@ -16,19 +17,28 @@
 
 using namespace std;
 
+class TrackingParticle;
+
 class TTTrack{     
  public:
   // Constructors/Destructors
   TTTrack();
   TTTrack(unsigned short index,
 	  TVector3 aMomentum,
-	  ROOT::Math::XYZVector aPOCA, // ROOT::Math::XYZVector (https://root.cern.ch/doc/master/Vector3DPage.html)
+	  ROOT::Math::XYZVector aPOCA, // https://root.cern.ch/doc/master/Vector3DPage.html
 	  double aRInv,
 	  double aChi2,	    
 	  double aStubPtConsistency,
 	  bool isGenuine,
 	  bool isUnknown,
 	  bool isCombinatoric,
+	  bool isLoose,
+	  bool isFake,
+	  unsigned int nStubs,
+	  unsigned int nStubsPS,
+	  unsigned int nStubsBarrel,
+	  unsigned int nStubsEndcap,
+	  int matchTP_index,
 	  vector<unsigned int> stubs_isPS,
 	  vector<unsigned int> stubs_iDisk,
 	  vector<unsigned int> stubs_iLayer,
@@ -59,6 +69,13 @@ class TTTrack{
   bool getIsGenuine(void) const {return theIsGenuine;}
   bool getIsUnknown(void) const {return theIsUnknown;}
   bool getIsCombinatoric(void) const {return theIsCombinatoric;}
+  bool getIsLoose(void) const {return theIsLoose;}
+  bool getIsFake(void) const {return theIsFake;}
+  unsigned int getNumOfStubs(void) const {return theNStubs;}
+  unsigned int getNumOfStubsPS(void) const {return theNStubsPS;}
+  unsigned int getNumOfBarrelStubs(void) const {return theNStubsBarrel;}
+  unsigned int getNumOfEndcapStubs(void) const {return theNStubsEndcap;}
+  bool getTPIndex(void) const {return theTPIndex;}
   vector<unsigned int> getStubsIsPS(void) const {return theStubs_isPS;}
   vector<unsigned int> getStubsDisk(void) const {return theStubs_iDisk;}
   vector<unsigned int> getStubsLayer(void) const {return theStubs_iLayer;}
@@ -95,6 +112,13 @@ class TTTrack{
   bool theIsGenuine;
   bool theIsUnknown;
   bool theIsCombinatoric;
+  bool theIsLoose;
+  bool theIsFake;
+  unsigned int theNStubs;
+  unsigned int theNStubsPS;
+  unsigned int theNStubsBarrel;
+  unsigned int theNStubsEndcap;
+  int theTPIndex;
   vector<unsigned int> theStubs_isPS;
   vector<unsigned int> theStubs_iDisk;
   vector<unsigned int> theStubs_iLayer;

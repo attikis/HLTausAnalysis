@@ -26,6 +26,12 @@ void TTTrack::_InitVars(void)
   theIsCombinatoric = false;
   theIsGenuine = false;
   theIsUnknown = false;
+  theIsLoose = false;
+  theIsFake = false;
+  theNStubs = 0.0;
+  theNStubsPS = 0.0;
+  theNStubsBarrel = 0.0;
+  theNStubsEndcap = 0.0;
   theMomentum.SetXYZ(0.0, 0.0, 0.0);
   thePOCA.SetXYZ(0.0, 0.0, 0.0);
   theRInv = 0.0;
@@ -54,13 +60,20 @@ TTTrack::~TTTrack()
 //****************************************************************************
 TTTrack::TTTrack(unsigned short aIndex,
 		 TVector3 aMomentum,
-		 ROOT::Math::XYZVector aPOCA, // ROOT::Math::XYZVector (https://root.cern.ch/doc/master/Vector3DPage.html)
+		 ROOT::Math::XYZVector aPOCA, // https://root.cern.ch/doc/master/Vector3DPage.html
 		 double aRInv,
 		 double aChi2,	    
 		 double aStubPtConsistency,
 		 bool isGenuine,
 		 bool isUnknown,
 		 bool isCombinatoric,
+		 bool isLoose,
+		 bool isFake,
+		 unsigned int nStubs,
+		 unsigned int nStubsPS,
+		 unsigned int nStubsBarrel,
+		 unsigned int nStubsEndcap,
+		 int matchTP_index,
 		 vector<unsigned int> stubs_isPS,
 		 vector<unsigned int> stubs_iDisk,
 		 vector<unsigned int> stubs_iLayer,
@@ -80,6 +93,13 @@ TTTrack::TTTrack(unsigned short aIndex,
   theIsCombinatoric    = isCombinatoric;
   theIsGenuine         = isGenuine;
   theIsUnknown         = isUnknown;
+  theIsLoose           = isLoose;
+  theIsFake            = isFake;
+  theNStubs            = nStubs;
+  theNStubsPS          = nStubsPS;
+  theNStubsBarrel      = nStubsBarrel;
+  theNStubsEndcap      = nStubsEndcap;
+  theTPIndex           = matchTP_index;
   theMomentum          = aMomentum;
   thePOCA              = aPOCA;
   theFitParameters     = nFitParams;
