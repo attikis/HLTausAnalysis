@@ -18,6 +18,10 @@ class TreeAnalyserBase
     Initialize(MyName_, SamplePath_, SampleName_, Text_, MaxEvents_);
   };
   ~TreeAnalyserBase();
+  
+  // Variables
+  TFile* outFile;
+  int MaxEvents;
 
  private:
   void Initialize(const std::string MyName_, 
@@ -26,8 +30,9 @@ class TreeAnalyserBase
 		  const std::string Text_,
 		  const int MaxEvents_);
 
-  TFile* outFile;
-  int MaxEvents;
+  // Variables
+  // TFile* outFile;
+  // int MaxEvents;
   std::string SamplePath;
   std::string SampleName;
   std::string MyName;
