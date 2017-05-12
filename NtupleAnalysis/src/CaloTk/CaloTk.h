@@ -12,7 +12,7 @@
 #include "../Auxiliary/src/Table.C"
 #include "../Auxiliary/src/MCTools.C"
 #include "../Auxiliary/src/HistoTools.C"
-#include "../Auxiliary/src/L1Tracks.C" // needed?
+// #include "../Auxiliary/src/L1Tracks.C" // needed?
 #include "../Auxiliary/src/Datasets.C" 
 
 #include "../DataFormat/src/L1TkTauParticle.C"
@@ -22,7 +22,7 @@
 #include "../DataFormat/interface/TTPixelTrack.h"
 #include "../DataFormat/src/L1JetParticle.C"
 
-#include "../Plugins/src/L1TkPrimaryVertex.C"
+// #include "../Plugins/src/L1TkPrimaryVertex.C"
 #include "../Plugins/src/L1PixelTrackFit.C"
 
 // ROOT
@@ -259,7 +259,7 @@ class CaloTk : public TreeAnalyserMC{
 
   
   // Variable declaration
-  L1TkPrimaryVertex *pvProducer;
+  // L1TkPrimaryVertex *pvProducer;
   AuxTools auxTools_;
   MCTools mcTools_;
   Datasets datasets_;

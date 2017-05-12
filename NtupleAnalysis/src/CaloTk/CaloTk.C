@@ -18,7 +18,7 @@ void CaloTk::InitObjects(void)
 //============================================================================
 {
 
-  pvProducer = new L1TkPrimaryVertex(this->s);
+  // pvProducer = new L1TkPrimaryVertex(this->s);
 
   return; 
 }
@@ -407,17 +407,21 @@ void CaloTk::Loop()
     vector<GenParticle> GenTaus;
     vector<GenParticle> GenTausHadronic;
     vector<GenParticle> GenTausTrigger;
+
+    // Get the GenParticles
     if (mcSample.compare("MinBias") !=0 )
       {
-	// GenParticles = GetGenParticles(false); // time-consuming
+	if(DEBUG) cout << "\tGetting the GenParticles" << endl;
+	GenParticles = GetGenParticles(false); // time-consuming
 	GenTaus  = GetGenParticles(15, true);
 	GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
 	GenTausTrigger  = GetHadronicGenTaus(GenTaus, 20.0, 2.3);    
       }
     
     if (DEBUG)
-      {
-	// PrintGenParticleCollection(GenParticles);
+       {
+	cout << "\tPrinting all GenParticle Collections" << endl;
+	PrintGenParticleCollection(GenParticles);
 	PrintGenParticleCollection(GenTaus);
 	PrintGenParticleCollection(GenTausHadronic);    
 	PrintGenParticleCollection(GenTausTrigger);
@@ -434,16 +438,13 @@ void CaloTk::Loop()
     vector<TTTrack> isoTTTracks = GetTTTracks(isoConeTks_minPt , isoConeTks_minEta, isoConeTks_maxEta, isoConeTks_maxChiSqRed,
 					      isoConeTks_minStubs, isoConeTks_minStubsPS, isoConeTks_maxStubsPS, isoConeTks_nFitParams, false);
 
-    vector<TTTrack> pvTTTracks;
-    double pv_z = GetPVTTTracks(pvTTTracks, false); // fixme (empty)
     if (DEBUG)
       {
+	cout << "\tPrinting all TTrack Collections" << endl;
 	PrintTrackingParticleCollection(TPs);
 	PrintTTTrackCollection(matchTTTracks);
 	PrintTTTrackCollection(sigTTTracks);
 	PrintTTTrackCollection(isoTTTracks);
-	PrintTTTrackCollection(pvTTTracks);
-	// PrintTTPixelTrackCollection(TTPixelTracks);
       }
     
 
@@ -1592,7 +1593,9 @@ vector<GenParticle> CaloTk::GetGenParticles(bool bPrintList)
 {
   vector<GenParticle> theGenParticles;
   Table info("Index | PdgId | Status | Charge | Pt | Eta | Phi | E | Vertex (mm) | Mothers | Daughters |", "Text"); //LaTeX or Text    
-  	
+
+  cout << "ALEX-1" << endl;
+  // For-loop: All GenParticles
   for (Size_t genP_index = 0; genP_index < GenP_Pt->size(); genP_index++)
     {
       GenParticle p = GetGenParticle(genP_index);
@@ -1757,26 +1760,6 @@ void CaloTk::SetGenParticleFinalDaughters(GenParticle &p)
 }
 
 
-
-//============================================================================
-double CaloTk::GetPVTTTracks(vector<TTTrack> &pvTTTracks,
-				     bool bPrintList)
-//============================================================================
-{
-  // First get PV_z and pv-tracks indices
-  vector<int> pvTks_index; 
-  pv_z = 0.0;
-  pv_z = pvProducer->GetPrimaryVertexZ("default", pvTks_index);
-
-  // For-loop: All TTTracks fro PV
-  for (Size_t iTk = 0; iTk < pvTks_index.size(); iTk++) pvTTTracks.push_back( GetTTTrack(iTk) );
-
-  if (bPrintList) PrintTTTrackCollection(pvTTTracks);
-  return pv_z;
-}
-
-
-
 //============================================================================
 vector<TTTrack> CaloTk::GetTTTracks(const double minPt,
 				    const double minEta,
@@ -1829,32 +1812,42 @@ TTTrack CaloTk::GetTTTrack(unsigned int Index,
   double pt  = L1Tks_Pt->at(Index);
   double eta = L1Tks_Eta->at(Index);
   double phi = L1Tks_Phi->at(Index);
-  double x0  = L1Tks_POCAx->at(Index);
-  double y0  = L1Tks_POCAy->at(Index);
+  double x0  = L1Tks_POCAx->at(Index); // 1e6 if nFitParams == 4 
+  double y0  = L1Tks_POCAy->at(Index); // 1e6 if nFitParams == 4    
   double z0  = L1Tks_POCAz->at(Index);
   p.SetPtEtaPhi(pt, eta, phi);
   ROOT::Math::XYZVector aPOCA(x0, y0, z0);
-  double aRInv                      = L1Tks_RInv->at(Index);
-  double aChi2                      = L1Tks_ChiSquared->at(Index);
-  double aStubPtCons                = L1Tks_StubPtConsistency->at(Index);
-  double aSector                    = L1Tks_Sector->at(Index);
-  double aWedge                     = L1Tks_Wedge->at(Index);
-  bool isGenuine                    = L1Tks_IsGenuine->at(Index);
-  bool isUnknown                    = L1Tks_IsUnknown->at(Index);
-  bool isCombinatoric               = L1Tks_IsCombinatoric->at(Index);
-  vector<unsigned int> stubs_isPS   = L1Tks_Stubs_isPS->at(Index);
-  vector<unsigned int> stubs_iDisk  = L1Tks_Stubs_iDisk->at(Index);
-  vector<unsigned int> stubs_iLayer = L1Tks_Stubs_iLayer->at(Index);
-  vector<unsigned int> stubs_iPhi   = L1Tks_Stubs_iPhi->at(Index);
-  vector<unsigned int> stubs_iRing  = L1Tks_Stubs_iRing->at(Index);
-  vector<unsigned int> stubs_iSide  = L1Tks_Stubs_iSide->at(Index);
-  vector<unsigned int> stubs_iZ     = L1Tks_Stubs_iZ->at(Index);
+  double aRInv        = L1Tks_RInv->at(Index);
+  double aChi2        = L1Tks_ChiSquared->at(Index);
+  double aStubPtCons  = L1Tks_StubPtConsistency->at(Index);
+  bool isGenuine      = L1Tks_IsGenuine->at(Index);
+  bool isUnknown      = L1Tks_IsUnknown->at(Index);
+  bool isCombinatoric = L1Tks_IsCombinatoric->at(Index);
+  bool isLoose        = L1Tks_IsLoose->at(Index);
+  bool isFake         = L1Tks_IsFake->at(Index);
+  int  nStubs         = L1Tks_NStubs->at(Index);
+  int  nStubsPS       = L1Tks_NStubsPS->at(Index);
+  int  nStubsBarrel   = L1Tks_NStubsBarrel->at(Index);
+  int  nStubsEndcap   = L1Tks_NStubsEndcap->at(Index);
+  int matchTP_index = L1Tks_TP_Index->at(Index);
   // auxTools_.PrintVector(stubs_isPS);
   
   // Construct the TTTrack
-  TTTrack theTTTrack(Index, p, aPOCA,  aRInv, aChi2, aStubPtCons,
-		     aSector, aWedge, isGenuine, isUnknown, isCombinatoric,
-		     stubs_isPS, stubs_iDisk, stubs_iLayer, stubs_iPhi, stubs_iRing, stubs_iSide, stubs_iZ, nFitParams);
+  TTTrack theTTTrack(Index, p, aPOCA,  aRInv, aChi2, aStubPtCons, isGenuine, isUnknown, isCombinatoric,
+		     isLoose, isFake, nStubs, nStubsPS, nStubsBarrel, nStubsEndcap, matchTP_index, nFitParams);
+  
+  // Get the uniquely matched TP
+  TrackingParticle theTP;
+  if (matchTP_index >= 0) theTP= GetTrackingParticle(matchTP_index);
+  // theTTTrack.SetTP(theTP); // cannot implement. cyclic
+  
+  if (DEBUG) theTTTrack.PrintProperties(); //alex
+  // if (DEBUG && matchTP_index >= 0) theTP.PrintProperties();
+  //if (matchTP_index >= 0) theTP.PrintProperties();
+
+  theTTTrack.PrintProperties();
+  if (matchTP_index >= 0) theTP.PrintProperties();
+  cout << "" << endl;
 
   return theTTTrack;
 }
@@ -1885,128 +1878,40 @@ TrackingParticle CaloTk::GetTrackingParticle(unsigned int Index)
 //============================================================================
 {
 
-  // Initialise variables
-  TVector3 p;  
-
   // Get the track properties
-  double pt  = TP_Pt->at(Index);
-  double eta = TP_Eta->at(Index);
-  double phi = TP_Phi->at(Index);
-  double x0  = TP_POCAx->at(Index);
-  double y0  = TP_POCAy->at(Index);
-  double z0  = TP_POCAz->at(Index);
-  int pdgId  = TP_PdgId->at(Index);
-  int charge = TP_Charge->at(Index);
+  double pt            = TP_Pt->at(Index);
+  double eta           = TP_Eta->at(Index);
+  double phi           = TP_Phi->at(Index);
+  int charge           = TP_Charge->at(Index);
+  int pdgId            = TP_PdgId->at(Index);
+  double d0_propagated = TP_d0_propagated->at(Index);
+  double z0_propagated = TP_z0_propagated->at(Index);
+  int nMatch           = TP_NMatch->at(Index);
+  int ttTrackIndex     = TP_TTTrackIndex->at(Index);
+  int ttClusters       = TP_NClusters->at(Index);
+  int ttStubs          = TP_NStubs->at(Index);
+  int ttTracks         = TP_NTracks->at(Index);
+  double x0            = TP_x0_produced->at(Index);
+  double y0            = TP_y0_produced->at(Index);
+  double z0            = TP_z0_produced->at(Index);
+  int eventId          = TP_EventId->at(Index);
+      
+  // Construct higher-level variables
+  TVector3 p;
   p.SetPtEtaPhi(pt, eta, phi);
   ROOT::Math::XYZVector poca(x0, y0, z0);
-  unsigned short nMatch       = TP_NMatch->at(Index);
-  unsigned short ttTrackIndex = TP_TTTrackIndex->at(Index);
-  unsigned short ttClusters   = TP_TTClusters->at(Index);
-  unsigned short ttStubs      = TP_TTStubs->at(Index);
-  unsigned short ttTracks     = TP_TTTracks->at(Index);
 
-  // Construct the TTTrack
-  TrackingParticle theTrackingParticle(Index, p, poca,  charge, pdgId, nMatch, ttTrackIndex, ttClusters, ttStubs, ttTracks);
+  // Construct the TP
+  TrackingParticle theTrackingParticle(Index, p, poca, d0_propagated, z0_propagated, charge, pdgId, nMatch, ttTrackIndex, ttClusters, ttStubs, ttTracks, eventId);  
+  if (DEBUG) theTrackingParticle.PrintProperties();
+
+  // Get the uniquely matched TTTrack
+  // TTTrack theTrack;
+  // if (ttTrackIndex >= 0) theTrack= GetTTTrack(ttTrackIndex, 4);
+  // theTrackingParticle.SetTTTTrack(theTrack); // cannot use! cyclic problems 
+  // if (DEBUG) theTrack.PrintProperties(); // cannot use! cyclic problems
 
   return theTrackingParticle;
-}
-
-
-
-//============================================================================
-vector<TTPixelTrack> CaloTk::GetTTPixelTracks(const double minPt,
-						      const double maxEta,
-						      const double maxChiSqRed,
-						      const int minHits,
-						      bool bPrintList)
-//============================================================================
-{
-  vector<TTPixelTrack> theTTPixelTracks;
-
-  // For-loop: All TTPixelTracks
-  for (Size_t iTk = 0; iTk < L1PixTks_Pt->size(); iTk++)
-    {
-      TTPixelTrack pixTk  = GetTTPixelTrack(iTk);
-
-      // Apply selection criteria
-      if (pixTk.getPt() < minPt) continue;
-      if (abs(pixTk.getEta()) > maxEta) continue;
-      if (pixTk.getChi2Red() > maxChiSqRed) continue;
-      if (pixTk.getNcandidatehit() < minHits) continue;
-      
-      theTTPixelTracks.push_back( pixTk );
-    }
-  
-  if (bPrintList) PrintTTPixelTrackCollection(theTTPixelTracks);
-  
-  return theTTPixelTracks;
-}
-
-
-//============================================================================
-TTPixelTrack CaloTk::GetTTPixelTrack(unsigned int Index)
-//============================================================================
-{
-
-  // Initialise variables
-  TVector3 theMomentum;
-  ROOT::Math::XYZVector thePOCA;
-  
-  // Get the track properties
-  double pt           = L1PixTks_Pt->at(Index);
-  double eta          = L1PixTks_Eta->at(Index);
-  double phi          = L1PixTks_Phi->at(Index);
-  double x0           = L1PixTks_POCAx->at(Index);
-  double y0           = L1PixTks_POCAy->at(Index);
-  double z0           = L1PixTks_POCAz->at(Index);
-  double theRInv      = L1PixTks_RInv->at(Index);
-  double theChi2      = L1PixTks_ChiSquared->at(Index);
-  double theSigmaRInv = L1PixTks_SigmaRInv->at(Index);
-  double theSigmaPhi0 = L1PixTks_SigmaPhi0->at(Index);
-  double theSigmaD0   = L1PixTks_SigmaD0->at(Index);
-  double theSigmaT    = L1PixTks_SigmaT->at(Index);
-  double theSigmaZ0   = L1PixTks_SigmaZ0->at(Index);
-  int iTTTrack        = L1PixTks_TTTrackIndex->at(Index);
-  TTTrack theTTTrack  = GetTTTrack(iTTTrack, 5); // TTPixelTracks can only have 5 fit parameters
-  theMomentum.SetPtEtaPhi(pt, eta, phi);
-  thePOCA.SetXYZ(x0, y0, z0);
-
-  // Pixel Hits  
-  int nPixHits = L1PixTks_NPixHits->at(Index);
-  vector<ROOT::Math::XYZVector> thePixHits;
-  for(int iHit = 0; iHit < nPixHits; iHit++)
-    {
-      double hitX = L1PixTks_PixHits_X->at(Index).at(iHit);
-      double hitY = L1PixTks_PixHits_Y->at(Index).at(iHit);
-      double hitZ = L1PixTks_PixHits_Z->at(Index).at(iHit);
-      // double hitR    = L1PixTks_PixHits_R->at(Index).at(iHit);
-      // double hitPhi  = L1PixTks_PixHits_Phi->at(Index).at(iHit);
-      // double hitType = L1PixTks_PixHits_Type->at(Index).at(iHit);      
-
-      ROOT::Math::XYZVector pixHit_XYZ( hitX, hitY, hitZ);
-      thePixHits.push_back( pixHit_XYZ );
-    }
-
-  // Candidate Pixel Hits  
-  int nCandPixHits = L1PixTks_CandPixHits_X->at(Index).size();
-  vector<ROOT::Math::XYZVector> theCandPixHits;
-  for(int iHit = 0; iHit < nCandPixHits; iHit++)
-    {
-      double hitX    = L1PixTks_CandPixHits_X->at(Index).at(iHit);
-      double hitY    = L1PixTks_CandPixHits_Y->at(Index).at(iHit);
-      double hitZ    = L1PixTks_CandPixHits_Z->at(Index).at(iHit);
-      // double hitR    = L1PixTks_CandPixHits_R->at(Index).at(iHit);
-      // double hitPhi  = L1PixTks_CandPixHits_Phi->at(Index).at(iHit);
-      // double hitType = L1PixTks_CandPixHits_Type->at(Index).at(iHit);      
-
-      ROOT::Math::XYZVector candPixHit_XYZ( hitX, hitY, hitZ);
-      theCandPixHits.push_back( candPixHit_XYZ );
-    }
-
-  // Construct the TTPixelTrack
-  TTPixelTrack theTTPixelTrack(Index, theTTTrack, theMomentum, thePOCA, theRInv, theChi2, theSigmaRInv, theSigmaPhi0, theSigmaD0, theSigmaT, theSigmaZ0, thePixHits, theCandPixHits);
-
-  return theTTPixelTrack;
 }
 
 
@@ -2287,36 +2192,6 @@ void CaloTk::PrintTTTrackCollection(vector<TTTrack> collection)
 }
 
 
-//============================================================================
-void CaloTk::PrintTTPixelTrackCollection(vector<TTPixelTrack> collection)
-//============================================================================
-{
-  Table info("Index | Pt | Eta | Phi | z0 | d0 | Q | Chi2 | Hits | Hit-Pattern | Hit-R | Hit-Z", "Text");
-  
-  // For-loop: All TTPixelTracks
-  int row=0;
-  for (vector<TTPixelTrack>::iterator p = collection.begin(); p != collection.end(); p++)
-  {
-    // Construct table
-    info.AddRowColumn(row, auxTools_.ToString( p->index()) );
-    info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Perp(), 3) );
-    info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Eta() , 3) );
-    info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Phi() , 3) );
-    info.AddRowColumn(row, auxTools_.ToString( p->getZ0(), 3) );
-    info.AddRowColumn(row, auxTools_.ToString( p->getD0(), 3) );
-    info.AddRowColumn(row, p->getQ() );
-    info.AddRowColumn(row, auxTools_.ToString( p->getChi2(), 3 ) );
-    info.AddRowColumn(row, auxTools_.ToString( p->getNhit() ) + " (" + auxTools_.ToString(p->getNcandidatehit() ) + ")" );
-    info.AddRowColumn(row, auxTools_.ToString( p->getPixelHitsPattern() ) );
-    info.AddRowColumn(row, auxTools_.ConvertIntVectorToString( p->getPixHitsR()) );
-    info.AddRowColumn(row, auxTools_.ConvertIntVectorToString( p->getPixHitsZ()) );
-    row++;
-  }
-  
-  info.Print();
-  
-  return;
-}
 
 
 //============================================================================

@@ -260,7 +260,8 @@ vector<GenParticle> Tracking::GetGenParticles(bool bPrintList)
 {
   vector<GenParticle> theGenParticles;
   Table info("Index | PdgId | Status | Charge | Pt | Eta | Phi | E | Vertex (mm) | Mothers | Daughters |", "Text"); //LaTeX or Text    
-  	
+
+  // For-loop: All GenParticles
   for (Size_t genP_index = 0; genP_index < GenP_Pt->size(); genP_index++)
     {
       GenParticle p = GetGenParticle(genP_index);
@@ -506,13 +507,12 @@ TTTrack Tracking::GetTTTrack(unsigned int Index,
   if (matchTP_index >= 0) theTP= GetTrackingParticle(matchTP_index);
   // theTTTrack.SetTP(theTP); // cannot implement. cyclic
   
-  if (DEBUG) theTTTrack.PrintProperties(); //alex
-  // if (DEBUG && matchTP_index >= 0) theTP.PrintProperties();
-  //if (matchTP_index >= 0) theTP.PrintProperties();
-
-  theTTTrack.PrintProperties();
-  if (matchTP_index >= 0) theTP.PrintProperties();
-  cout << "" << endl;
+  if (DEBUG) theTTTrack.PrintProperties();
+  if (DEBUG && matchTP_index >= 0)
+    {
+      theTP.PrintProperties();
+      cout << "" << endl;
+    }
   
   return theTTTrack;
 }
