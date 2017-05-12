@@ -143,7 +143,7 @@ void Tracking::Loop()
       vector<TrackingParticle> TPs  = GetTrackingParticles(false);
       sort( TPs.begin(), TPs.end(), PtComparatorTP() ); // not sorted by default
       if (DEBUG) PrintTrackingParticleCollection(TPs);
-
+      
       // TTTracks Collections
       if (DEBUG) cout << "TTracks (" << L1Tks_Pt->size() << ")" << endl;
       vector<TTTrack> TTTracks = GetTTTracks(tk_minPt, tk_minEta, tk_maxEta, tk_maxChiSqRed, tk_minStubs, tk_minStubsPS, tk_maxStubsPS, tk_nFitParams, false);
