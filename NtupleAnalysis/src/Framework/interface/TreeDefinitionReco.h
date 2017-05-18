@@ -65,13 +65,24 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<vector<double> > *L1PixTks_CandPixHits_Phi;
   vector<vector<int> >    *L1PixTks_CandPixHits_Type;
 
-  // L1CaloTaus
-  vector<double>  *L1CaloTau_E;
-  vector<double>  *L1CaloTau_Et;
-  vector<double>  *L1CaloTau_Eta;
-  vector<double>  *L1CaloTau_Phi;
-  vector<int>     *L1CaloTau_Bx;
-  vector<int>     *L1CaloTau_Type;
+  // Phase-1 L1T Stage2: Taus
+  int       *nTaus;
+  vector<float> *tauEt;
+  vector<float> *tauEta;
+  vector<float> *tauPhi;
+  vector<float> *tauIEt;
+  vector<int>   *tauIEta;
+  vector<int>   *tauIPhi;
+  vector<int>   *tauIso;
+  vector<int>   *tauBx;
+  vector<int>   *tauTowerIPhi;
+  vector<int>   *tauTowerIEta;
+  vector<int>   *tauRawEt;
+  vector<int>   *tauIsoEt;
+  vector<int>   *tauNTT;
+  vector<int>   *tauHasEM;
+  vector<int>   *tauIsMerged;
+  vector<int>   *tauHwQual;
 
   // L1TkJets
   vector< double > *L1TkJet_Pt;
@@ -137,13 +148,24 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch *b_L1PixTks_SigmaZ0;
   TBranch *b_L1PixTks_TTTrackIndex;
 
-  // L1CaloTaus
-  TBranch *b_L1CaloTau_E;
-  TBranch *b_L1CaloTau_Et;
-  TBranch *b_L1CaloTau_Eta;
-  TBranch *b_L1CaloTau_Phi;
-  TBranch *b_L1CaloTau_Bx;
-  TBranch *b_L1CaloTau_Type;
+  // Phase-1 L1T Stage2: Taus
+  TBranch *b_nTaus;
+  TBranch *b_tauEt;
+  TBranch *b_tauEta;
+  TBranch *b_tauPhi;
+  TBranch *b_tauIEt;
+  TBranch *b_tauIEta;
+  TBranch *b_tauIPhi;
+  TBranch *b_tauIso;
+  TBranch *b_tauBx;
+  TBranch *b_tauTowerIPhi;
+  TBranch *b_tauTowerIEta;
+  TBranch *b_tauRawEt;
+  TBranch *b_tauIsoEt;
+  TBranch *b_tauNTT;
+  TBranch *b_tauHasEM;
+  TBranch *b_tauIsMerged;
+  TBranch *b_tauHwQual;
 
   // L1TkJets
   TBranch *b_L1TkJet_Pt;
@@ -224,13 +246,24 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   L1PixTks_CandPixHits_Phi    = 0;
   L1PixTks_CandPixHits_Type   = 0;
 
-  // L1CaloTaus
-  L1CaloTau_E             = 0;
-  L1CaloTau_Et            = 0;
-  L1CaloTau_Eta           = 0;
-  L1CaloTau_Phi           = 0;
-  L1CaloTau_Bx            = 0;
-  L1CaloTau_Type          = 0;
+  // Phase-1 L1T Stage2: Phase-1 L1T Stage2: Taus
+  nTaus         = 0;
+  tauEt         = 0;
+  tauEta        = 0;
+  tauPhi        = 0;
+  tauIEt        = 0;
+  tauIEta       = 0;
+  tauIPhi       = 0;
+  tauIso        = 0;
+  tauBx         = 0;
+  tauTowerIPhi  = 0;
+  tauTowerIEta  = 0;
+  tauRawEt      = 0;
+  tauIsoEt      = 0;
+  tauNTT        = 0;
+  tauHasEM      = 0;
+  tauIsMerged   = 0;
+  tauHwQual     = 0;
 
   // L1TkJets
   L1TkJet_Pt              = 0;
@@ -277,49 +310,60 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   if (0)
     {
       cout << "\tSetting L1 Pixel Tracks addresses." << endl;
-      fChain->SetBranchAddress("L1PixTks_Pt"           , &L1PixTks_Pt           , &b_L1PixTks_Pt);
-      fChain->SetBranchAddress("L1PixTks_Px"           , &L1PixTks_Px           , &b_L1PixTks_Px);
-      fChain->SetBranchAddress("L1PixTks_Py"           , &L1PixTks_Py           , &b_L1PixTks_Py);
-      fChain->SetBranchAddress("L1PixTks_Pz"           , &L1PixTks_Pz           , &b_L1PixTks_Pz);
-      fChain->SetBranchAddress("L1PixTks_Eta"          , &L1PixTks_Eta          , &b_L1PixTks_Eta);
-      fChain->SetBranchAddress("L1PixTks_Phi"          , &L1PixTks_Phi          , &b_L1PixTks_Phi);
-      fChain->SetBranchAddress("L1PixTks_Charge"       , &L1PixTks_Charge       , &b_L1PixTks_Charge);
-      fChain->SetBranchAddress("L1PixTks_POCAx"        , &L1PixTks_POCAx        , &b_L1PixTks_POCAx);
-      fChain->SetBranchAddress("L1PixTks_POCAy"        , &L1PixTks_POCAy        , &b_L1PixTks_POCAy);
-      fChain->SetBranchAddress("L1PixTks_POCAz"        , &L1PixTks_POCAz        , &b_L1PixTks_POCAz);
-      fChain->SetBranchAddress("L1PixTks_ChiSquared"   , &L1PixTks_ChiSquared   , &b_L1PixTks_ChiSquared);
-      fChain->SetBranchAddress("L1PixTks_RInv"         , &L1PixTks_RInv         , &b_L1PixTks_RInv);
-      fChain->SetBranchAddress("L1PixTks_SigmaRInv"    , &L1PixTks_SigmaRInv    , &b_L1PixTks_SigmaRInv);
-      fChain->SetBranchAddress("L1PixTks_SigmaPhi0"    , &L1PixTks_SigmaPhi0    , &b_L1PixTks_SigmaPhi0);
-      fChain->SetBranchAddress("L1PixTks_SigmaD0"      , &L1PixTks_SigmaD0      , &b_L1PixTks_SigmaD0);
-      fChain->SetBranchAddress("L1PixTks_SigmaT"       , &L1PixTks_SigmaT       , &b_L1PixTks_SigmaT);
-      fChain->SetBranchAddress("L1PixTks_SigmaZ0"      , &L1PixTks_SigmaZ0      , &b_L1PixTks_SigmaZ0);
-      fChain->SetBranchAddress("L1PixTks_TTTrackIndex" , &L1PixTks_TTTrackIndex , &b_L1PixTks_TTTrackIndex);
-      fChain->SetBranchAddress("L1PixTks_NPixHits"     , &L1PixTks_NPixHits     , &b_L1PixTks_NPixHits);
-      fChain->SetBranchAddress("L1PixTks_PixHits_X"    , &L1PixTks_PixHits_X    , &b_L1PixTks_PixHits_X);
-      fChain->SetBranchAddress("L1PixTks_PixHits_Y"    , &L1PixTks_PixHits_Y    , &b_L1PixTks_PixHits_Y);
-      fChain->SetBranchAddress("L1PixTks_PixHits_Z"    , &L1PixTks_PixHits_Z    , &b_L1PixTks_PixHits_Z);
-      fChain->SetBranchAddress("L1PixTks_PixHits_R"    , &L1PixTks_PixHits_R    , &b_L1PixTks_PixHits_R);
-      fChain->SetBranchAddress("L1PixTks_PixHits_Phi"  , &L1PixTks_PixHits_Phi  , &b_L1PixTks_PixHits_Phi);
-      fChain->SetBranchAddress("L1PixTks_PixHits_Type" , &L1PixTks_PixHits_Type , &b_L1PixTks_PixHits_Type);
-      fChain->SetBranchAddress("L1PixTks_CandPixHits_X"    , &L1PixTks_CandPixHits_X    , &b_L1PixTks_CandPixHits_X);
-      fChain->SetBranchAddress("L1PixTks_CandPixHits_Y"    , &L1PixTks_CandPixHits_Y    , &b_L1PixTks_CandPixHits_Y);
-      fChain->SetBranchAddress("L1PixTks_CandPixHits_Z"    , &L1PixTks_CandPixHits_Z    , &b_L1PixTks_CandPixHits_Z);
-      fChain->SetBranchAddress("L1PixTks_CandPixHits_R"    , &L1PixTks_CandPixHits_R    , &b_L1PixTks_CandPixHits_R);
-      fChain->SetBranchAddress("L1PixTks_CandPixHits_Phi"  , &L1PixTks_CandPixHits_Phi  , &b_L1PixTks_CandPixHits_Phi);
-      fChain->SetBranchAddress("L1PixTks_CandPixHits_Type" , &L1PixTks_CandPixHits_Type , &b_L1PixTks_CandPixHits_Type);
+      fChain->SetBranchAddress("L1PixTks_Pt"              , &L1PixTks_Pt              , &b_L1PixTks_Pt);
+      fChain->SetBranchAddress("L1PixTks_Px"              , &L1PixTks_Px              , &b_L1PixTks_Px);
+      fChain->SetBranchAddress("L1PixTks_Py"              , &L1PixTks_Py              , &b_L1PixTks_Py);
+      fChain->SetBranchAddress("L1PixTks_Pz"              , &L1PixTks_Pz              , &b_L1PixTks_Pz);
+      fChain->SetBranchAddress("L1PixTks_Eta"             , &L1PixTks_Eta             , &b_L1PixTks_Eta);
+      fChain->SetBranchAddress("L1PixTks_Phi"             , &L1PixTks_Phi             , &b_L1PixTks_Phi);
+      fChain->SetBranchAddress("L1PixTks_Charge"          , &L1PixTks_Charge          , &b_L1PixTks_Charge);
+      fChain->SetBranchAddress("L1PixTks_POCAx"           , &L1PixTks_POCAx           , &b_L1PixTks_POCAx);
+      fChain->SetBranchAddress("L1PixTks_POCAy"           , &L1PixTks_POCAy           , &b_L1PixTks_POCAy);
+      fChain->SetBranchAddress("L1PixTks_POCAz"           , &L1PixTks_POCAz           , &b_L1PixTks_POCAz);
+      fChain->SetBranchAddress("L1PixTks_ChiSquared"      , &L1PixTks_ChiSquared      , &b_L1PixTks_ChiSquared);
+      fChain->SetBranchAddress("L1PixTks_RInv"            , &L1PixTks_RInv            , &b_L1PixTks_RInv);
+      fChain->SetBranchAddress("L1PixTks_SigmaRInv"       , &L1PixTks_SigmaRInv       , &b_L1PixTks_SigmaRInv);
+      fChain->SetBranchAddress("L1PixTks_SigmaPhi0"       , &L1PixTks_SigmaPhi0       , &b_L1PixTks_SigmaPhi0);
+      fChain->SetBranchAddress("L1PixTks_SigmaD0"         , &L1PixTks_SigmaD0         , &b_L1PixTks_SigmaD0);
+      fChain->SetBranchAddress("L1PixTks_SigmaT"          , &L1PixTks_SigmaT          , &b_L1PixTks_SigmaT);
+      fChain->SetBranchAddress("L1PixTks_SigmaZ0"         , &L1PixTks_SigmaZ0         , &b_L1PixTks_SigmaZ0);
+      fChain->SetBranchAddress("L1PixTks_TTTrackIndex"    , &L1PixTks_TTTrackIndex    , &b_L1PixTks_TTTrackIndex);
+      fChain->SetBranchAddress("L1PixTks_NPixHits"        , &L1PixTks_NPixHits        , &b_L1PixTks_NPixHits);
+      fChain->SetBranchAddress("L1PixTks_PixHits_X"       , &L1PixTks_PixHits_X       , &b_L1PixTks_PixHits_X);
+      fChain->SetBranchAddress("L1PixTks_PixHits_Y"       , &L1PixTks_PixHits_Y       , &b_L1PixTks_PixHits_Y);
+      fChain->SetBranchAddress("L1PixTks_PixHits_Z"       , &L1PixTks_PixHits_Z       , &b_L1PixTks_PixHits_Z);
+      fChain->SetBranchAddress("L1PixTks_PixHits_R"       , &L1PixTks_PixHits_R       , &b_L1PixTks_PixHits_R);
+      fChain->SetBranchAddress("L1PixTks_PixHits_Phi"     , &L1PixTks_PixHits_Phi     , &b_L1PixTks_PixHits_Phi);
+      fChain->SetBranchAddress("L1PixTks_PixHits_Type"    , &L1PixTks_PixHits_Type    , &b_L1PixTks_PixHits_Type);
+      fChain->SetBranchAddress("L1PixTks_CandPixHits_X"   , &L1PixTks_CandPixHits_X   , &b_L1PixTks_CandPixHits_X);
+      fChain->SetBranchAddress("L1PixTks_CandPixHits_Y"   , &L1PixTks_CandPixHits_Y   , &b_L1PixTks_CandPixHits_Y);
+      fChain->SetBranchAddress("L1PixTks_CandPixHits_Z"   , &L1PixTks_CandPixHits_Z   , &b_L1PixTks_CandPixHits_Z);
+      fChain->SetBranchAddress("L1PixTks_CandPixHits_R"   , &L1PixTks_CandPixHits_R   , &b_L1PixTks_CandPixHits_R);
+      fChain->SetBranchAddress("L1PixTks_CandPixHits_Phi" , &L1PixTks_CandPixHits_Phi , &b_L1PixTks_CandPixHits_Phi);
+      fChain->SetBranchAddress("L1PixTks_CandPixHits_Type", &L1PixTks_CandPixHits_Type, &b_L1PixTks_CandPixHits_Type);
     }
 
-  // L1CaloTaus
-  if (0)
+  // Phase-1 L1T Stage2: Taus
+  if (1)
     {
-      cout << "\tSetting L1 Calo Tau addresses." << endl;
-      fChain->SetBranchAddress("L1CaloTau_E"   , &L1CaloTau_E   , &b_L1CaloTau_E);
-      fChain->SetBranchAddress("L1CaloTau_Et"  , &L1CaloTau_Et  , &b_L1CaloTau_Et);
-      fChain->SetBranchAddress("L1CaloTau_Eta" , &L1CaloTau_Eta , &b_L1CaloTau_Eta);
-      fChain->SetBranchAddress("L1CaloTau_Phi" , &L1CaloTau_Phi , &b_L1CaloTau_Phi);
-      fChain->SetBranchAddress("L1CaloTau_Bx"  , &L1CaloTau_Bx  , &b_L1CaloTau_Bx);
-      fChain->SetBranchAddress("L1CaloTau_Type", &L1CaloTau_Type, &b_L1CaloTau_Type);
+      cout << "\tSetting   // Phase-1 L1T Stage2 Tau addresses." << endl;
+      fChain->SetBranchAddress("nTaus"       , &nTaus        , &b_nTaus);
+      fChain->SetBranchAddress("tauEt"       , &tauEt        , &b_tauEt);
+      fChain->SetBranchAddress("tauEta"      , &tauEta       , &b_tauEta);
+      fChain->SetBranchAddress("tauPhi"      , &tauPhi       , &b_tauPhi);
+      fChain->SetBranchAddress("tauIEt"      , &tauIEt       , &b_tauIEt);
+      fChain->SetBranchAddress("tauIEta"     , &tauIEta      , &b_tauIEta);
+      fChain->SetBranchAddress("tauIPhi"     , &tauIPhi      , &b_tauIPhi);
+      fChain->SetBranchAddress("tauIso"      , &tauIso       , &b_tauIso);
+      fChain->SetBranchAddress("tauBx"       , &tauBx        , &b_tauBx);
+      fChain->SetBranchAddress("tauTowerIPhi", &tauTowerIPhi , &b_tauTowerIPhi);
+      fChain->SetBranchAddress("tauTowerIEta", &tauTowerIEta , &b_tauTowerIEta);
+      fChain->SetBranchAddress("tauRawEt"    , &tauRawEt     , &b_tauRawEt);
+      fChain->SetBranchAddress("tauIsoEt"    , &tauIsoEt     , &b_tauIsoEt);
+      fChain->SetBranchAddress("tauNTT"      , &tauNTT       , &b_tauNTT);
+      fChain->SetBranchAddress("tauHasEM"    , &tauHasEM     , &b_tauHasEM);
+      fChain->SetBranchAddress("tauIsMerged" , &tauIsMerged  , &b_tauIsMerged);
+      fChain->SetBranchAddress("tauHwQual"   , &tauHwQual    , &b_tauHwQual);
     }
 
   // L1TkJets

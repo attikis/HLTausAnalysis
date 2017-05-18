@@ -125,7 +125,7 @@ void Tracking::Loop()
   for (int jentry = 0; jentry < nEntries; jentry++, nEvts++)
     {
 
-      if(DEBUG) cout << "Entry = " << jentry << endl;
+      if(1) cout << "Entry = " << jentry << endl;
 
       // Load the tree && Get the entry
       Long64_t ientry = LoadTree(jentry);
@@ -149,6 +149,12 @@ void Tracking::Loop()
       vector<TTTrack> TTTracks = GetTTTracks(tk_minPt, tk_minEta, tk_maxEta, tk_maxChiSqRed, tk_minStubs, tk_minStubsPS, tk_maxStubsPS, tk_nFitParams, false);
       sort( TTTracks.begin(), TTTracks.end(), PtComparatorTTTrack() ); // not sorted by default
       if (DEBUG) PrintTTTrackCollection(TTTracks);
+
+      // GenParticles Collection
+      //if (1) cout << "=== Phase-1 Stage-2 Taus (" << nTaus->size() << ")" << endl;
+      if (1) cout << "=== Phase-1 Stage-2 Taus (" << tauEt->size() << ")" << endl;
+      //vector<GenParticle> GenParticles = GetGenParticles(false);
+      //if (DEBUG) PrintGenParticleCollection(GenParticles);
 
     }//eof: Entries
 
