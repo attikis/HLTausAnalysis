@@ -66,7 +66,7 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<vector<int> >    *L1PixTks_CandPixHits_Type;
 
   // Phase-1 L1T Stage2: Taus
-  int       *nTaus;
+  int           *nTaus;
   vector<float> *tauEt;
   vector<float> *tauEta;
   vector<float> *tauPhi;

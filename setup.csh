@@ -84,9 +84,9 @@ endif
 
 # Working locally?
 if ( $LOCATION == "mac" ) then
-    echo "=== Setting ROOT version 5-34-00-patches"
-    source /Users/$USER/ROOT/v5-34-00-patches/bin/thisroot.csh
-    setenv ROOTSYS /Users/$USER/ROOT/v5-34-00-patches/
+    echo "=== Using default ROOT version"
+    #source /Users/$USER/ROOT/v5-34-00-patches/bin/thisroot.csh
+    #setenv ROOTSYS /Users/$USER/ROOT/v5-34-00-patches/
     if ($?PYTHONPATH) then
     setenv PYTHONPATH "$ROOTSYS/lib:$PYTHONPATH"
     else
