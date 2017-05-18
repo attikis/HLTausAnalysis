@@ -4,9 +4,8 @@ Description:
 Once all the jobs have been successfully retrieved from a multicrab job two scripts must then be run:
 
 hltausMergeHistograms.py:
-Merges ROOT files into one (or more) files. It also reads TopPt.root and adds a "top-pt-correction-weigh" histogram in miniaod2tree.root files. 
+Merges ROOT files into one (or more) files.
 The maximum allowable size for a single ROOT file is limited to 2 GB (but can be overwritten).
-
 
 Usage: (from inside a multicrab_AnalysisType_vXYZ_TimeStamp directory)
 hltausMergeHistograms.py
@@ -339,7 +338,8 @@ def getHistogramFile(stdoutFile, opts):
             f = fIN.extractfile(member)
             match = log_re.search(f.name)
             if match:
-                histoFile = "raw2TTree_%s.root"%match.group("job")
+                #histoFile = "raw2TTree_%s.root"%match.group("job") #alex
+                histoFile = opts.input % ( match.group("job") )
                 """
                 for line in f:
 	            for r in re_histos:   
@@ -433,7 +433,8 @@ def getHistogramFileEOS(stdoutFile, opts):
     #match = log_re.search(f.name)
     if match:
         jobId     = match.group("job")
-        output    = "raw2TTree_%s.root" % (jobId)
+        #output    = "raw2TTree_%s.root" % (jobId) #alex
+        output    = opts.input % (jobId)
         histoFile = stdoutFileEOS.rsplit("/", 2)[0] + "/" + output
     else:
         Verbose("Could not determine the jobId of file %s. match = " % (stdoutFile, match) )
@@ -863,6 +864,7 @@ class SanityCheckException(Exception):
         super(SanityCheckException, self).__init__(message)
 
 
+
 def sanityCheck(mergedFile, inputFiles):
     '''
     '''
@@ -1093,7 +1095,7 @@ def CheckThatFilesExist(taskName, fileList, opts):
 
     if nExist != nFiles:
         msg  = "%s, found %s ROOT files but expected %s. Have you already run this script? " % (taskName, nExist, nFiles)
-        msg += "Would you like to proceed with the merging anyway? ALEX"
+        msg += "Would you like to proceed with the merging anyway?"
         if opts.linksToEOS:
             return False
         else:
@@ -1619,14 +1621,15 @@ def GetTaskLogFiles(taskName, opts):
         
 def GetTaskRootFiles(taskName, opts):
     '''
-    Get all the miniaod*.root files for the given CRAB task
+    Get all the ROOT files for the given CRAB task
     '''
     Verbose("GetTaskRootFiles()", True)
     if opts.filesInEOS:
         Verbose("Task %s, converting path to EOS to get log files" % (taskName) )
         tmp = ConvertPathToEOS(taskName, taskName, "log/", opts, isDir=True)
         Verbose("Obtaining stdout files for task %s from %s" % (taskName, tmp), True)
-        rootFiles = glob.glob(tmp + "miniaod*.root")
+        #rootFiles = glob.glob(tmp + opts.input"miniaod*.root") #alex
+        rootFiles = glob.glob(tmp + opts.input % "*")
 
         Verbose("Found %s root files" % (len(rootFiles) ) )
         # Sometimes glob doesn't work (for unknown reasons)
@@ -1639,10 +1642,12 @@ def GetTaskRootFiles(taskName, opts):
             Verbose(cmd)
             dirContents = Execute(cmd)
             stdoutFiles = dirContents
-            stdoutFiles = [tmp + f for f in dirContents if "miniaod*.root" in f]
+            #stdoutFiles = [tmp + f for f in dirContents if "miniaod*.root" in f] #alex
+            stdoutFiles = [tmp + f for f in dirContents if opts.input % "*" in f]         
             Verbose("Task %s, found the following root files:\n\t%s" % (taskName, "\n\t".join(rootFiles) ) )
     else:
-        rootFiles = glob.glob(os.path.join(taskName, "results", "miniaod*.root"))
+        #rootFiles = glob.glob(os.path.join(taskName, "results", "miniaod*.root")) #alex
+        rootFiles = glob.glob(os.path.join(taskName, "results", opts.input % "*")) 
 
     if len(rootFiles) < 1:
         #raise Exception("Task %s, could not obtain root files." % (taskName) )
@@ -1673,7 +1678,8 @@ def GetPreexistingMergedFiles(taskPath, opts):
         cmd = "ls"  + " " + taskPath
     Verbose(cmd)
     dirContents = Execute(cmd)
-    preMergedFiles = filter(lambda x: "histograms-" in x, dirContents)
+    #preMergedFiles = filter(lambda x: "histograms-" in x, dirContents) #alex
+    preMergedFiles = filter(lambda x: opts.output.split("-")[0] in x, dirContents) 
 
     # For-loop: All files
     mergeSizeMap = {}
@@ -1720,6 +1726,41 @@ def LinkFiles(taskName, fileList):
 
         # Update Progress bar
         PrintProgressBar(taskName + ", Links ", index, len(fileList), "[" + os.path.basename(destFile) + "]")
+    return
+
+
+def CombineTrees(inputFiles, opts): #ALEX-dev
+    Verbose("CombineTrees()", True)
+
+    # Init variables
+    fileMode    = "UPDATE"
+    nAttempts   = 1
+    maxAttempts = 10
+    fOUT        = None
+    
+    for filePath in inputFiles:
+        while nAttempts < maxAttempts:
+            try:
+                Print("Attempt #%s: Opening ROOT file %s in %s mode." % (nAttempts, filePath, fileMode), True)
+                fOUT = ROOT.TFile.Open(filePath, fileMode)
+                fOUT.cd()
+                break
+            except:
+                nAttempts += 1
+                Print("TFile::Open(\"%s\", \"%s\") failed (%s/%s). Retrying..." % (filePath, fileMode, nAttempts, maxAttempts), True)
+
+    # Safety clause
+    if fOUT == None:
+        raise Exception("TFile::Open(\"%s\", \"%s\") failed" % (filePath, fileMode) )
+    else:
+        Print("Successfully opened %s in %s mode (after %s attempts)" % (filePath, fileMode, nAttempts) )
+
+    # Definitions
+    tree = fOUT.Get("l1UpgradeTree")
+    print "type(tree) = ", type(tree)
+    tree.ls()
+    sys.exit()
+
     return
 
 
@@ -1883,6 +1924,9 @@ def main(opts, args):
             else:
                 Verbose("%s, merge file  %s does not already exist. Will create it" % (taskName, mergeName) )
 
+            # Combine the Trees inside a given ROOT file
+            # CombineTrees(inputFiles, opts) #ALEX-dev            
+                
             # Merge the ROOT files
             mergePath = "/".join(mergeName.split("/")[-1:]) #fits terminal, [-6:] is too big to fit
             PrintProgressBar(taskName + ", Merge ", index-1, len(filesSplit), "[" + mergePath + "]")
@@ -2017,14 +2061,16 @@ if __name__ == "__main__":
     FILESINEOS    = False
     SKIPVERIFY    = False
     MAXFILESIZE   = 2.0
+    INPUT         = "raw2TTree_%s.root" #"raw2TTree_.*?\.root"
+    OUTPUT        = "output-%s.root"
 
     parser = OptionParser(usage="Usage: %prog [options]")
     # multicrab.addOptions(parser)
-    parser.add_option("--input", dest="input", type="string", default="histograms_.*?\.root",
-                      help="Regex for input root files (note: remember to escape * and ? !) [default: 'histograms_.*?\.root']")
+    parser.add_option("--input", dest="input", type="string", default=INPUT,
+                      help="Regex for input root files (note: remember to escape * and ? !) [default: '%s]" % INPUT)
 
-    parser.add_option("--output", dest="output", type="string", default="histograms-%s.root",
-                      help="Pattern for merged output root files (use '%s' for crab directory name) [default: 'histograms-%s.root']")
+    parser.add_option("--output", dest="output", type="string", default=OUTPUT,
+                      help="Pattern for merged output root files [default: '%s']" % OUTPUT)
 
     parser.add_option("--test", dest="test", default=False, action="store_true",
                       help="Just test, do not do any merging or deleting. Useful for checking what would happen. [default: 'False']")
@@ -2050,11 +2096,11 @@ if __name__ == "__main__":
     parser.add_option("--allowJobExitCode", dest="allowJobExitCodes", default=[], action="append", type="int",
                       help="Allow merging files from this non-zero job exit code (zero exe exit code is still required). Can be given multiple times [default: '[]']")
 
-    parser.add_option("-v", "--verbose"    , dest="verbose"      , default=VERBOSE, action="store_true", 
+    parser.add_option("-v", "--verbose", dest="verbose", default=VERBOSE, action="store_true", 
                       help="Verbose mode for debugging purposes [default: %s]" % (VERBOSE))
 
     parser.add_option("--overwrite", dest="overwrite", default=False, action="store_true",
-                      help="Overwrite histograms-*.root files [default %s]" % (OVERWRITE))
+                      help="Overwrite pre-existing merged ROOT files [default %s]" % (OVERWRITE))
 
     parser.add_option("-d", "--dir", dest="dirName", default=DIRNAME, type="string",
                       help="Custom name for CRAB directory name [default: %s]" % (DIRNAME))   

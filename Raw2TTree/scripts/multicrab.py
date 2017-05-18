@@ -5,6 +5,9 @@ multicrab.py --create -s T2_CH_CERN -p raw2TTree_CaloTkSkim_cfg.py
 multicrab.py --create -s T3_US_FNALLPC -p raw2ttree_CaloTkSkim_cfg.py
 
 
+Compiling:
+cd /HLTausAnalysis/Raw2TTree/scripts/
+scram b -j 16
 
 Re-Create (for example, when you get "Cannot find .requestcache" for a given task):
 rm -rf <multicrab_dir>/<dataset>
@@ -397,7 +400,10 @@ def GetTaskStatus(datasetPath):
     # Variable Declaration
     crabLog      = os.path.join(datasetPath, "crab.log")
     grepFile     = os.path.join(datasetPath, "grep.tmp")
-    stringToGrep = "Task status:"
+    #stringToGrep = "Task status:"
+    #stringToGrep = "Status on the CRAB server:"
+    #stringToGrep = "Jobs status:"
+    stringToGrep  = "Status on the scheduler:"
     cmd          = "grep '%s' %s > %s" % (stringToGrep, crabLog, grepFile )
     status       = "UNKNOWN"
     
@@ -449,7 +455,6 @@ def GetTaskReports(datasetPath, opts):
         # Assess JOB success/failure for task
         Verbose("Retrieving files", True)
         idle, running, finished, transferring, failed, retrievedLog, retrievedOut, eosLog, eosOut = RetrievedFiles(datasetPath, result, dashboardURL, True, opts)
-        #idle, running, finished, transferring, failed, retrievedLog, retrievedOut, eosLog, eosOut = RetrievedFiles(datasetPath, result, dashboardURL, False, opts)
 
         # Get the task logs & output ?        
         Verbose("Getting task logs", True)
@@ -467,12 +472,9 @@ def GetTaskReports(datasetPath, opts):
         Verbose("Killing active tasks")
         KillTask(datasetPath)
             
-        # Assess JOB success/failure for task (again)
-        if 0: #fixme: Is this really needed? Or it just slows things down?
-            Verbose("Retrieving Files (again)") 
-            idle, running, finished, transferring, failed, retrievedLog, retrievedOut, eosLog, eosOut = RetrievedFiles(datasetPath, result, dashboardURL, True, opts)
+        # Coint retrieved/all jobs
         retrieved = min(finished, retrievedLog, retrievedOut)
-        alljobs   = len(result['jobList'])        
+        alljobs   = GetTotalJobsFromStatus(result)
 
         # Append the report
         Verbose("Appending Report")
@@ -492,6 +494,19 @@ def GetTaskReports(datasetPath, opts):
     return report
 
 
+def GetTotalJobsFromStatus(status):
+    '''
+    reads output of "crab status" command and determines
+    the total number of jobs for a given CRAB task
+    '''
+    Verbose("GetTotalJobsFromStatus()", True)
+
+    # dictKey = 'jobList'  # obsolete after May 2017
+    dictKey = 'jobs'
+    nJobs = len(status[dictKey])
+    return nJobs
+
+
 def CheckTaskReport(taskDir, jobId,  opts):
     '''
     Probes the log-file tarball for a given jobId to 
@@ -499,7 +514,7 @@ def CheckTaskReport(taskDir, jobId,  opts):
     '''
     Verbose("CheckTaskReport()", True)
 
-    filePath    = os.path.join(taskDir, "results", "cmsRun_%i.log.tar.gz" % jobId)
+    filePath    = os.path.join(taskDir, "results", "cmsRun_%s.log.tar.gz" % jobId)
     exitCode_re = re.compile("process\s+id\s+is\s+\d+\s+status\s+is\s+(?P<exitcode>\d+)")
 
     # Ensure file is indeed a tarfile 
@@ -1002,19 +1017,20 @@ def RetrievedFiles(taskDir, crabResults, dashboardURL, printTable, opts):
     idle         = 0
     unknown      = 0
     dataset      = taskDir.split("/")[-1]
-    nJobs        = len(crabResults['jobList'])
+    nJobs        = GetTotalJobsFromStatus(crabResults)
     missingOuts  = []
     missingLogs  = []
 
     # For-loop:All CRAB results
-    for index, r in enumerate(crabResults['jobList']):
+    for index, jobId in enumerate(crabResults['jobs']):
         
+        stateDict = crabResults['jobs'][jobId]
+
         # Inform user of progress (especially if opts.filesInEOS is enabled)
-        PrintProgressBar(os.path.basename(taskDir), index, len(crabResults['jobList']) )
+        PrintProgressBar(os.path.basename(taskDir), index, nJobs )
 
         # Get the job ID and status
-        jobStatus = r[0]
-        jobId     = r[1]
+        jobStatus = stateDict['State']
 
         Verbose("Investigating jobId=%s with status=%s" % (jobId, jobStatus))
         # Assess the jobs status individually
@@ -1024,8 +1040,8 @@ def RetrievedFiles(taskDir, crabResults, dashboardURL, printTable, opts):
             # Count Output & Logfiles (EOS)
             if opts.filesInEOS:
                 taskDirEOS  = GetEOSDir(taskDir, opts)    
-                foundLogEOS = ExistsEOS(taskDirEOS, "log", "cmsRun_%i.log.tar.gz" % jobId, opts)
-                foundOutEOS = ExistsEOS(taskDirEOS, ""   , "miniaod2tree_%i.root" % jobId, opts)
+                foundLogEOS = ExistsEOS(taskDirEOS, "log", "cmsRun_%s.log.tar.gz" % jobId, opts)
+                foundOutEOS = ExistsEOS(taskDirEOS, ""   , "miniaod2tree_%s.root" % jobId, opts)
                 Verbose("foundLogEOS=%s , foundOutEOS=%s" % (foundLogEOS, foundOutEOS))
                 if foundLogEOS:
                     eosLog += 1
@@ -1037,8 +1053,8 @@ def RetrievedFiles(taskDir, crabResults, dashboardURL, printTable, opts):
                 pass
                 
             # Count Output & Logfiles (local)
-            foundLog = Exists(taskDir, "cmsRun_%i.log.tar.gz" % jobId) 
-            foundOut = Exists(taskDir, "miniaod2tree_%i.root" % jobId)
+            foundLog = Exists(taskDir, "cmsRun_%s.log.tar.gz" % jobId) 
+            foundOut = Exists(taskDir, "miniaod2tree_%s.root" % jobId)
             if foundLog:
                 retrievedLog += 1
                 exitCode = CheckTaskReport(taskDir, jobId, opts)
