@@ -12,6 +12,7 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
+#include <TTree.h>
 
 class TreeReaderReco : public virtual TREEDEFINITIONRECO, public FileOpener 
 {
@@ -39,10 +40,14 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
   if (tree == 0) {
    
     // TChain* chain = new TChain("TkTauFromCaloNTupleMaker/EvtTree");
-    TChain* chain = new TChain("Raw2TTreeMaker/EvtTree");
+    TChain* chain = new TChain("Raw2TTreeMaker/EvtTree");  // tree with tracks etc.
+    TChain* friendChain = new TChain("l1UpgradeTree/L1UpgradeTree"); // tree with calo taus
+
     OpenFile(SamplePath, SampleName, chain);
-    
-     tree = chain;
+    OpenFile(SamplePath, SampleName, friendChain);    
+    tree = chain;
+    tree->AddFriend(friendChain); // tree can access all data of its friend just like its own data
+    std::cout << "	Adding the principal tree" << tree->GetName() << " a friend called " << chain->GetListOfFriends()->Last()->GetName() << std::endl;
   }
 
   Init(tree);
