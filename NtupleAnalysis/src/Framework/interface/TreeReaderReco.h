@@ -46,9 +46,11 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
     OpenFile(SamplePath, SampleName, chain);
     OpenFile(SamplePath, SampleName, friendChain);    
     tree = chain;
-    tree->AddFriend(friendChain); // tree can access all data of its friend just like its own data
-    
-    std::cout << "=== TreeReaderReco::TreeReaderReco():\n\tAdding the principal tree" << tree->GetName() << " a friend called " << chain->GetListOfFriends()->Last()->GetName() << std::endl;
+    std::cout << "=== TreeReaderReco::TreeReaderReco():\n\tSetting tree with name \"" << tree->GetName() << "\" as the principal tree." << std::endl;
+
+    // Tree can access all data of its friend just like its own data
+    tree->AddFriend(friendChain);
+    std::cout << "\tAdding tree \"" << chain->GetListOfFriends()->Last()->GetName() << "\" as a friend to the principal tree" << std::endl;
   }
 
   Init(tree);

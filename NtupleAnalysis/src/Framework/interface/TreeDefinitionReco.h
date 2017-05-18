@@ -346,7 +346,7 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   // Phase-1 L1T Stage2: Taus
   if (1)
     {
-      cout << "\tSetting   // Phase-1 L1T Stage2 Tau addresses." << endl;
+      cout << "\tSetting Phase-1 L1T Stage2 Tau addresses." << endl;
       fChain->SetBranchAddress("nTaus"       , &nTaus        , &b_nTaus);
       fChain->SetBranchAddress("tauEt"       , &tauEt        , &b_tauEt);
       fChain->SetBranchAddress("tauEta"      , &tauEta       , &b_tauEta);
