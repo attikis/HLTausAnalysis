@@ -3,6 +3,7 @@
 
 // User
 #include "TreeDefinitionBase.h"
+#include <TFriendElement.h>
 
 using namespace std;
 
@@ -278,9 +279,11 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   if (!tree) return;
   fChain = tree;
   fCurrent = -1;
-  fChain->SetMakeClass(1); 
 
-  // TTTracks
+  fChain->SetMakeClass(1);
+  //TFriendElement *friendTreeElement = (TFriendElement*)tree->GetListOfFriends()->Last();
+  //friendTreeElement->GetTree()->SetMakeClass(1); //for some reason, friendChain->SetMakeClass(1); does not do the trick
+
   if(1)
     {
       cout << "\tSetting TTTracks addresses." << endl;
@@ -347,23 +350,23 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   if (1)
     {
       cout << "\tSetting Phase-1 L1T Stage2 Tau addresses." << endl;
-      fChain->SetBranchAddress("nTaus"       , &nTaus        , &b_nTaus);
-      fChain->SetBranchAddress("tauEt"       , &tauEt        , &b_tauEt);
-      fChain->SetBranchAddress("tauEta"      , &tauEta       , &b_tauEta);
-      fChain->SetBranchAddress("tauPhi"      , &tauPhi       , &b_tauPhi);
-      fChain->SetBranchAddress("tauIEt"      , &tauIEt       , &b_tauIEt);
-      fChain->SetBranchAddress("tauIEta"     , &tauIEta      , &b_tauIEta);
-      fChain->SetBranchAddress("tauIPhi"     , &tauIPhi      , &b_tauIPhi);
-      fChain->SetBranchAddress("tauIso"      , &tauIso       , &b_tauIso);
-      fChain->SetBranchAddress("tauBx"       , &tauBx        , &b_tauBx);
-      fChain->SetBranchAddress("tauTowerIPhi", &tauTowerIPhi , &b_tauTowerIPhi);
-      fChain->SetBranchAddress("tauTowerIEta", &tauTowerIEta , &b_tauTowerIEta);
-      fChain->SetBranchAddress("tauRawEt"    , &tauRawEt     , &b_tauRawEt);
-      fChain->SetBranchAddress("tauIsoEt"    , &tauIsoEt     , &b_tauIsoEt);
-      fChain->SetBranchAddress("tauNTT"      , &tauNTT       , &b_tauNTT);
-      fChain->SetBranchAddress("tauHasEM"    , &tauHasEM     , &b_tauHasEM);
-      fChain->SetBranchAddress("tauIsMerged" , &tauIsMerged  , &b_tauIsMerged);
-      fChain->SetBranchAddress("tauHwQual"   , &tauHwQual    , &b_tauHwQual);
+      fChain->SetBranchAddress("L1Tau_nTaus"       , &nTaus        , &b_nTaus);
+      fChain->SetBranchAddress("L1Tau_Et"       , &tauEt        , &b_tauEt);
+      fChain->SetBranchAddress("L1Tau_Eta"      , &tauEta       , &b_tauEta);
+      fChain->SetBranchAddress("L1Tau_Phi"      , &tauPhi       , &b_tauPhi);
+      fChain->SetBranchAddress("L1Tau_IEt"      , &tauIEt       , &b_tauIEt);
+      fChain->SetBranchAddress("L1Tau_IEta"     , &tauIEta      , &b_tauIEta);
+      fChain->SetBranchAddress("L1Tau_IPhi"     , &tauIPhi      , &b_tauIPhi);
+      fChain->SetBranchAddress("L1Tau_Iso"      , &tauIso       , &b_tauIso);
+      fChain->SetBranchAddress("L1Tau_Bx"       , &tauBx        , &b_tauBx);
+      fChain->SetBranchAddress("L1Tau_TowerIPhi", &tauTowerIPhi , &b_tauTowerIPhi);
+      fChain->SetBranchAddress("L1Tau_TowerIEta", &tauTowerIEta , &b_tauTowerIEta);
+      fChain->SetBranchAddress("L1Tau_RawEt"    , &tauRawEt     , &b_tauRawEt);
+      fChain->SetBranchAddress("L1Tau_IsoEt"    , &tauIsoEt     , &b_tauIsoEt);
+      fChain->SetBranchAddress("L1Tau_NTT"      , &tauNTT       , &b_tauNTT);
+      fChain->SetBranchAddress("L1Tau_HasEM"    , &tauHasEM     , &b_tauHasEM);
+      fChain->SetBranchAddress("L1Tau_IsMerged" , &tauIsMerged  , &b_tauIsMerged);
+      fChain->SetBranchAddress("L1Tau_HwQual"   , &tauHwQual    , &b_tauHwQual);
     }
 
   // L1TkJets

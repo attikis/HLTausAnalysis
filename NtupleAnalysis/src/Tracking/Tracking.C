@@ -157,7 +157,7 @@ void Tracking::Loop()
       sort( TTTracks.begin(), TTTracks.end(), PtComparatorTTTrack() ); // not sorted by default
       if (DEBUG) PrintTTTrackCollection(TTTracks);
 
-      // GenParticles Collection
+      // Tau Collection
       if (1) cout << "=== Taus (" << tauEt->size() << ")" << endl;
       // vector<GenParticle> GenParticles = GetGenParticles(false);
       // if (DEBUG) PrintGenParticleCollection(GenParticles);

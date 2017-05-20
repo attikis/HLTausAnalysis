@@ -13,6 +13,7 @@
 #include <TChain.h>
 #include <TFile.h>
 #include <TTree.h>
+#include <TFriendElement.h>
 
 class TreeReaderReco : public virtual TREEDEFINITIONRECO, public FileOpener 
 {
@@ -43,19 +44,22 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
    
     // TChain* chain = new TChain("TkTauFromCaloNTupleMaker/EvtTree");
     TChain* chain = new TChain("Raw2TTreeMaker/EvtTree");  // tree with tracks etc.
-    TChain* friendChain = new TChain("l1UpgradeTree/L1UpgradeTree"); // tree with calo taus
+    //TChain* friendChain = new TChain("l1UpgradeTree/L1UpgradeTree"); // tree with calo taus
 
     OpenFile(SamplePath, SampleName, chain);
-    OpenFile(SamplePath, SampleName, friendChain);    
+    //OpenFile(SamplePath, SampleName, friendChain);    
 
     // Set the Tree
     tree = chain;
-    std::cout << "\tSet tree with name \"" << tree->GetName() << "\" as the principal tree." << std::endl;
+    //std::cout << "\tSet tree with name \"" << tree->GetName() << "\" as the principal tree." << std::endl;
 
     // Add Friend Tree. Then the Tree can access all data of its friend just like its own data
-    tree->AddFriend(friendChain);
-    std::cout << "\tAdded tree \"" << chain->GetListOfFriends()->Last()->GetName() << "\" as a friend to the principal tree." << std::endl;
-
+   // chain->SetMakeClass(1);
+    //friendChain->SetMakeClass(1);
+    //tree->AddFriend(friendChain);
+    //TFriendElement *friendTreeElement = (TFriendElement*)tree->GetListOfFriends()->Last();
+    //friendTreeElement->GetTree()->SetMakeClass(1); //in case that, for some reason, friendChain->SetMakeClass(1); does not do the trick    
+    //std::cout << "\tAdded tree \"" << friendTreeElement->GetTreeName() << "\" as a friend to the principal tree." << std::endl;
   }
 
   Init(tree);
