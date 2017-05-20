@@ -102,7 +102,6 @@ void TreeDefinitionGenP::InitGenP(TTree *tree)
   // (once per file to be processed).
   std::cout << "=== TreeDefinitionGenP::InitGenP()" << std::endl;
    
-   
   // GenParticles
   GenP_Pt         = 0;
   GenP_Eta        = 0;
@@ -197,6 +196,7 @@ void TreeDefinitionGenP::InitGenP(TTree *tree)
       fChain->SetBranchAddress("TP_EventId"      , &TP_EventId      , &b_TP_EventId);
     }
 
+  return;
 }
 
 #endif  // TreeDefinitionGenP_h

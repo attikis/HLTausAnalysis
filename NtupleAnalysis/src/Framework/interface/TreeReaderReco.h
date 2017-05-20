@@ -35,8 +35,10 @@ class TreeReaderReco : public virtual TREEDEFINITIONRECO, public FileOpener
 
 TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string SampleName, TTree *tree)
 {
-// if parameter tree is not specified (or zero), connect the file
-// used to generate this class and read the Tree.
+  std::cout << "=== TreeReaderReco::TreeReaderReco()" << std::endl;
+  
+  // if parameter tree is not specified (or zero), connect the file
+  // used to generate this class and read the Tree.
   if (tree == 0) {
    
     // TChain* chain = new TChain("TkTauFromCaloNTupleMaker/EvtTree");
@@ -45,12 +47,15 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
 
     OpenFile(SamplePath, SampleName, chain);
     OpenFile(SamplePath, SampleName, friendChain);    
-    tree = chain;
-    std::cout << "=== TreeReaderReco::TreeReaderReco():\n\tSetting tree with name \"" << tree->GetName() << "\" as the principal tree." << std::endl;
 
-    // Tree can access all data of its friend just like its own data
+    // Set the Tree
+    tree = chain;
+    std::cout << "\tSet tree with name \"" << tree->GetName() << "\" as the principal tree." << std::endl;
+
+    // Add Friend Tree. Then the Tree can access all data of its friend just like its own data
     tree->AddFriend(friendChain);
-    std::cout << "\tAdding tree \"" << chain->GetListOfFriends()->Last()->GetName() << "\" as a friend to the principal tree" << std::endl;
+    std::cout << "\tAdded tree \"" << chain->GetListOfFriends()->Last()->GetName() << "\" as a friend to the principal tree." << std::endl;
+
   }
 
   Init(tree);

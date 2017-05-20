@@ -11,9 +11,10 @@ void Tracking::InitVars_()
 //============================================================================
 {
 
-  DEBUG     = false;
-  datasets_ = datasets_.GetDataset(mcSample);
-
+  DEBUG = false;
+  if (DEBUG) std::cout << "=== Tracking::InitVars_()" << std::endl;
+  
+  datasets_      = datasets_.GetDataset(mcSample);
   tk_Collection  =  "TTTracks"; // Default: Only "TTTracks" available (not "TTPixelTracks")
   tk_nFitParams  = 4;           // Default: 4
   tk_minPt       = 2.00;        // Default: 2.0
@@ -24,8 +25,6 @@ void Tracking::InitVars_()
   tk_minStubsPS  =   0;         // Default: 0
   tk_maxStubsPS  = 1e6;         // Default: 1e6
 
-  PrintSettings();
-
   return;
 }
 
@@ -34,7 +33,8 @@ void Tracking::InitVars_()
 void Tracking::PrintSettings(void)
 //============================================================================
 {
-
+  if (DEBUG) std::cout << "=== Tracking::PrintSettings()" << std::endl;
+  
   // Inform user of settings
   Table settings("Variable | Cut | Value | Default | Units", "Text");  // Table settingsTable("Variable & Value & Units", "LaTeX", "l l l");
   settings.AddRowColumn(0, "MC Sample");
@@ -96,6 +96,8 @@ void Tracking::PrintSettings(void)
   settings.AddRowColumn(9, auxTools_.ToString(6) );
   settings.AddRowColumn(9, "" );
 
+  settings.AddRowColumn(10, "" );
+  
   settings.Print();
   
   return;
@@ -106,12 +108,13 @@ void Tracking::Loop()
 //============================================================================
 {
 
+  if (1) std::cout << "=== Tracking::Loop()" << std::endl;
+  
   // Sanity check
   if (fChain == 0) return;
+  cout << "\tGetting Tree Entries ..." << endl;
   const Long64_t nEntries = (MaxEvents == -1) ? fChain->GetEntries() : min((int)fChain->GetEntries(), MaxEvents);
   
-  cout << "=== Tracking::Loop()\n\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
-
   // Initialisations
   InitVars_();
   BookHistos_();
@@ -120,12 +123,16 @@ void Tracking::Loop()
   unsigned int nAllEvts = fChain->GetEntries();
   unsigned int nEvts    = 0;
 
+  // Print User Settings
+  cout << "\tPrinting user settings:" << endl;
+  PrintSettings();
 
+  cout << "\tAnalyzing " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
   // For-loop: All TTree Entries
   for (int jentry = 0; jentry < nEntries; jentry++, nEvts++)
     {
 
-      if(1) cout << "Entry = " << jentry << endl;
+      if(1) cout << "\tEntry = " << jentry << endl;
 
       // Load the tree && Get the entry
       Long64_t ientry = LoadTree(jentry);
@@ -139,22 +146,21 @@ void Tracking::Loop()
       if (DEBUG) PrintGenParticleCollection(GenParticles);
 
       // Tracking Particle Collections
-      if (DEBUG) cout << "Tracking Particles (" << TP_Pt->size() << ")" << endl;
+      if (DEBUG) cout << "=== Tracking Particles (" << TP_Pt->size() << ")" << endl;
       vector<TrackingParticle> TPs  = GetTrackingParticles(false);
       sort( TPs.begin(), TPs.end(), PtComparatorTP() ); // not sorted by default
       if (DEBUG) PrintTrackingParticleCollection(TPs);
       
       // TTTracks Collections
-      if (DEBUG) cout << "TTracks (" << L1Tks_Pt->size() << ")" << endl;
+      if (DEBUG) cout << "=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
       vector<TTTrack> TTTracks = GetTTTracks(tk_minPt, tk_minEta, tk_maxEta, tk_maxChiSqRed, tk_minStubs, tk_minStubsPS, tk_maxStubsPS, tk_nFitParams, false);
       sort( TTTracks.begin(), TTTracks.end(), PtComparatorTTTrack() ); // not sorted by default
       if (DEBUG) PrintTTTrackCollection(TTTracks);
 
       // GenParticles Collection
-      //if (1) cout << "=== Phase-1 Stage-2 Taus (" << nTaus->size() << ")" << endl;
-      if (1) cout << "=== Phase-1 Stage-2 Taus (" << tauEt->size() << ")" << endl;
-      //vector<GenParticle> GenParticles = GetGenParticles(false);
-      //if (DEBUG) PrintGenParticleCollection(GenParticles);
+      if (1) cout << "=== Taus (" << tauEt->size() << ")" << endl;
+      // vector<GenParticle> GenParticles = GetGenParticles(false);
+      // if (DEBUG) PrintGenParticleCollection(GenParticles);
 
     }//eof: Entries
 
@@ -187,6 +193,7 @@ void Tracking::Loop()
 void Tracking::BookHistos_(void)
 //============================================================================
 {
+  if (DEBUG) std::cout << "=== Tracking::BookHistos_()" << std::endl;
   
   // Event-Type Histograms
   histoTools_.BookHisto_1D(hCounters, "Counters",  "", 2, 0.0, +2.0);
@@ -203,6 +210,8 @@ void Tracking::GetHadronicTauFinalDaughters(GenParticle p,
 					    vector<unsigned short> &Daug)
 //============================================================================
 {
+
+  if (DEBUG) std::cout << "=== Tracking::GetHadronicTauFinalDaughters()" << std::endl;
   //
   // Description:
   // Keep only the detector-related particles (tracker/calo)
@@ -264,6 +273,8 @@ void Tracking::GetHadronicTauFinalDaughters(GenParticle p,
 vector<GenParticle> Tracking::GetGenParticles(bool bPrintList)
 //============================================================================
 {
+  if (DEBUG) std::cout << "=== Tracking::GetGenParticles()" << std::endl;
+    
   vector<GenParticle> theGenParticles;
   Table info("Index | PdgId | Status | Charge | Pt | Eta | Phi | E | Vertex (mm) | Mothers | Daughters |", "Text"); //LaTeX or Text    
 
@@ -312,7 +323,8 @@ vector<GenParticle> Tracking::GetGenParticles(bool bPrintList)
 vector<GenParticle> Tracking::GetGenParticles(int pdgId, bool isLastCopy)
 //============================================================================
 {
-
+  if (DEBUG) std::cout << "=== Tracking::GetGenParticles()" << std::endl;
+  
   // Initialise variables
   vector<GenParticle> myGenParticles;
 
@@ -362,6 +374,7 @@ vector<GenParticle> Tracking::GetGenParticles(int pdgId, bool isLastCopy)
 GenParticle Tracking::GetGenParticle(unsigned int Index)
 //============================================================================
 {
+  if (DEBUG) std::cout << "=== Tracking::GetGenParticle()" << std::endl;
 
   // Get the GenParticle properties
   double Pt      = GenP_Pt->at(Index);
@@ -389,7 +402,8 @@ GenParticle Tracking::GetGenParticle(unsigned int Index)
 void Tracking::SetGenParticleMomsAndDaus(GenParticle &p)
 //============================================================================
 {
-
+  if (DEBUG) std::cout << "=== Tracking::SetGenParticleMomsAndDaus()" << std::endl;
+  
   // Variable declaration
   vector<GenParticle> Mothers;
   vector<GenParticle> Daughters;
@@ -410,6 +424,8 @@ void Tracking::SetGenParticleFinalDaughters(GenParticle &p)
 //============================================================================
 {
 
+  if (DEBUG) std::cout << "=== Tracking::SetGenParticleFinalDaughters()" << std::endl;
+  
   // Variable declaration
   vector<GenParticle> finalDaughters;
   vector<unsigned short> finalDaughtersIndex;
@@ -444,6 +460,8 @@ vector<TTTrack> Tracking::GetTTTracks(const double minPt,
 				      bool bPrintList)
 //============================================================================
 {
+  if (DEBUG) std::cout << "=== Tracking::GetTTTracks()" << std::endl;
+
   vector<TTTrack> theTTTracks;
 
   // For-loop: All TTTracsk
@@ -476,6 +494,7 @@ TTTrack Tracking::GetTTTrack(unsigned int Index,
 			     const unsigned int nFitParams)
 //============================================================================
 {
+  if (DEBUG) std::cout << "=== Tracking::GetTTTrack()" << std::endl;
   
   // Initialise variables
   TVector3 p;  
@@ -529,6 +548,8 @@ TTTrack Tracking::GetTTTrack(unsigned int Index,
 vector<TrackingParticle> Tracking::GetTrackingParticles(bool bPrintList)
 //============================================================================
 {
+  if (DEBUG) std::cout << "=== Tracking::GetTrackingParticles()" << std::endl;
+  
   vector<TrackingParticle> theTrackingParticles;
 
   // For-loop: Tracking Particles
@@ -548,7 +569,8 @@ vector<TrackingParticle> Tracking::GetTrackingParticles(bool bPrintList)
 TrackingParticle Tracking::GetTrackingParticle(unsigned int Index)
 //============================================================================
 {
-
+  if (DEBUG) std::cout << "=== Tracking::GetTrackingParticle()" << std::endl;
+  
   // Get the track properties
   double pt            = TP_Pt->at(Index);
   double eta           = TP_Eta->at(Index);
@@ -590,7 +612,8 @@ TrackingParticle Tracking::GetTrackingParticle(unsigned int Index)
 void Tracking::PrintTrackingParticleCollection(vector<TrackingParticle> collection)
 //============================================================================
 {
-
+  if (DEBUG) std::cout << "=== Tracking::PrintTrackingParticleCollection()" << std::endl;
+  
   Table info("Index | Pt | Eta | Phi | PdgId | Q | x0 | y0 | z0 | d0 | d0-phi | NMatch | TTTrackIndex | TTClusters | TTStubs | TTTracks | Event-Id", "Text");
 
   // For-loop: Tracking Particles
@@ -629,6 +652,7 @@ void Tracking::PrintTrackingParticleCollection(vector<TrackingParticle> collecti
 void Tracking::PrintTTTrackCollection(vector<TTTrack> collection)
 //============================================================================
 {
+  if (DEBUG) std::cout << "=== Tracking::PrintTTTrackCollection()" << std::endl;
 
   Table info("Index | Pt | Eta | Phi | x0 | y0 | z0 | d0 | Q | Chi2 | DOF | Chi2Red | Stubs (PS) | StubPtCons. | Genuine | Unknown | Comb.", "Text");
       
@@ -666,7 +690,8 @@ void Tracking::PrintTTTrackCollection(vector<TTTrack> collection)
 void Tracking::PrintGenParticleCollection(vector<GenParticle> collection)
 //============================================================================
 {
-
+  if (DEBUG) std::cout << "=== Tracking::PrintGenParticleCollection()" << std::endl;
+  
   for (vector<GenParticle>::iterator p = collection.begin(); p != collection.end(); p++)
     {
       std::cout << "\nGenParticle:" << endl;
