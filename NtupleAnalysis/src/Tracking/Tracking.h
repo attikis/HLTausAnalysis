@@ -120,6 +120,19 @@ class Tracking : public TreeAnalyserMC{
   TH1D* hCounters;
   TH1D* hHepMCEvt_VtxZ;
   TH2D* hHepMCEvt_VtxX_VtxY;
+
+  // TTTracks resolution histograms
+  TH1D* hL1Tks_Pt;
+  TH1D* hL1Tks_Eta;
+  TH1D* hL1Tks_Phi;
+  TH1D* hL1Tks_Pt_Res;
+  TH1D* hL1Tks_Eta_Res;
+  TH1D* hL1Tks_Phi_Res;
+  TH1D* hTP_Pt;
+  TH1D* hTP_Eta;
+  TH1D* hTP_Phi;
+
+
 };
 
 #endif
