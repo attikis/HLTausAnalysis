@@ -350,11 +350,11 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   if (1)
     {
       cout << "\tSetting Phase-1 L1T Stage2 Tau addresses." << endl;
-      fChain->SetBranchAddress("L1Tau_nTaus"       , &nTaus        , &b_nTaus);
+      fChain->SetBranchAddress("L1Tau_nTaus"    , &nTaus        , &b_nTaus);
       fChain->SetBranchAddress("L1Tau_Et"       , &tauEt        , &b_tauEt);
       fChain->SetBranchAddress("L1Tau_Eta"      , &tauEta       , &b_tauEta);
       fChain->SetBranchAddress("L1Tau_Phi"      , &tauPhi       , &b_tauPhi);
-      fChain->SetBranchAddress("L1Tau_IEt"      , &tauIEt       , &b_tauIEt);
+      fChain->SetBranchAddress("L1Tau_IET"      , &tauIEt       , &b_tauIEt);
       fChain->SetBranchAddress("L1Tau_IEta"     , &tauIEta      , &b_tauIEta);
       fChain->SetBranchAddress("L1Tau_IPhi"     , &tauIPhi      , &b_tauIPhi);
       fChain->SetBranchAddress("L1Tau_Iso"      , &tauIso       , &b_tauIso);

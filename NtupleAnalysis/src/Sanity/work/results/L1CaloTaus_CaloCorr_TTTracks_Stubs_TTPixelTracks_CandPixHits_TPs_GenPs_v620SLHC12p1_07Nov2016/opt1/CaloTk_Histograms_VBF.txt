@@ -1,0 +1,59 @@
+=== FileOpener::OpenFile()
+	Adding file /Users/attikis/hltaus/rootFiles/TTrees/CMSSW_6_2_0_SLHC12_patch1/TkTauFromCaloAnalyzer_v7/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/VBF_HToTauTau_125_14TeV_powheg_pythia6_TTI2023Upg14D-PU140bx25/res/output-VBF_HToTauTau_125_14TeV_powheg_pythia6_TTI2023Upg14D-PU140bx25.root to the chain
+=== TreeDefinitionReco::InitReco()
+	Setting branch addresses and branch pointers.
+	Setting L1 Tracks addresses.
+	Setting L1 Pixel Tracks addresses.
+	Setting L1 Calo Tau addresses.
+	Setting L1 Jet addresses.
+=== TreeDefinitionGenP::InitGenP()
+	Setting HepMC addresses.
+	Setting GenP addresses.
+	Setting TP addresses.
+=== CaloTk:
+	Analyzing: 24977/24977 events
+======================================================================================================
+ Variable                           | Cut | Value    | TP 2015                          | Units      
+======================================================================================================
+ MC Sample                          | ==  | VBF      |                                  |            
+ Matching Tracks: Collection        | ==  | TTTracks | TTTracks                         |            
+ Matching Tracks: Fit Parameters    | ==  | 5        | 5                                |            
+ Matching Tracks: Pt                | >=  | 5        | 2                                | GeV/c      
+ Matching Tracks: |Eta|             | <=  | 1e+03    | 1e+03                            |            
+ Matching Tracks: ChiSqRed          | <=  | 2        | 200/DOF                          |            
+ Matching Tracks: Stubs             | >=  | 4        | 4                                |            
+ Matching Tracks: PS-Stubs (min)    | >=  | 0        | 0                                |            
+ Matching Tracks: PS-Stubs (max)    | <=  | 999      | N/A                              |            
+ Matching Tracks: DeltaR            | <=  | 0.1      | 0.10                             |            
+ Signal Cone Tks: Collection        | ==  | TTTracks | TTTracks                         |            
+ Signal Cone Tks: Fit Parameters    | ==  | 5        | 5                                |            
+ Signal Cone Tks: Pt                | >=  | 2        | 2                                | GeV/c      
+ Signal Cone Tks: |Eta|             | <=  | 1e+03    | 1e+03                            |            
+ Signal Cone Tks: ChiSqRed          | <=  | 200      | 200 (but on ChiSq, not ChiSqRed) |            
+ Signal Cone Tks: Stubs             | >=  | 0        | 4                                |            
+ Signal Cone Tks: PS-Stubs (min)    | >=  | 0        | 0                                |            
+ Signal Cone Tks: PS-Stubs (max)    | <=  | 999      | N/A                              |            
+ Isolation Cone Tks: Collection     | ==  | TTTracks | TTTracks                         |            
+ Isolation Cone Tks: Fit Parameters | ==  | 5        | 5                                |            
+ Isolation Cone Tks: Pt             | >=  | 2        | 2                                | GeV/c      
+ Isolation Cone Tks: |Eta|          | <=  | 1e+03    | 1e+03                            |            
+ Isolation Cone Tks: ChiSqRed       | <=  | 200      | 200 (but on ChiSq, not ChiSqRed) |            
+ Isolation Cone Tks: Stubs          | >=  | 0        | 4                                |            
+ Isolation Cone Tks: PS-Stubs (min) | >=  | 0        | 0                                |            
+ Isolation Cone Tks: PS-Stubs (max) | <=  | 999      | N/A                              |            
+ Signal Cone: Shrink Constant       | ==  | 0        | 0                                | GeV        
+ Signal Cone: DeltaR                | >=  | 0        | 0.0                              |            
+ Signal Cone: DeltaR                | <=  | 0.12     | 0.15                             |            
+ Signal Cone:-3pr InvMass           | <=  | 1.77     | N/A                              | GeV/c^{-2} 
+ Signal Cone:-3pr maxTkDeltaPOCAz   | <=  | 0.2      | N/A                              | cm         
+ Isolation Cone: Shrink Constant    | ==  | 5        | 3.5                              | GeV        
+ Isolation Cone: DeltaR             | >=  | 0.12     | 0.15                             |            
+ Isolation Cone: DeltaR             | =<  | 0.3      | 0.30                             |            
+ Isolation Cone: VtxIso             | <=  | 0.5      | 1.0                              | cm         
+ Di-Tau |Delta z0|                  | <   | 0.5      | 1.0                              | cm         
+ MC-Matching DeltaR                 | <=  | 0.1      | 0.05                             |            
+ MC-Matching IsUnique               | ==  | 1        | 1                                |            
+ MC-Taus: Mom PdgId                 | ==  | 25       | N/A                              |            
+ MC-Taus: Number Expected           | >=  | 2        | N/A                              |            
+                                    |     |          |                                  |            
+Progress: 1.99 %  (498/24977)                                                                                                     

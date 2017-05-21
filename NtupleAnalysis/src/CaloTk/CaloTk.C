@@ -447,24 +447,28 @@ void CaloTk::Loop()
 	PrintTTTrackCollection(isoTTTracks);
       }
     
-
+    cout << "-------> ALEX-1" << endl;
+    
     // Tau Collections
-    vector<L1JetParticle> L1CaloTaus = GetL1CaloTaus(false);
+    vector<L1JetParticle> L1Taus = GetL1Taus(false);
     vector<L1TkTauParticle> L1TkTauCandidates;
     vector<L1TkTauParticle> L1TkTaus_Calo;
     vector<L1TkTauParticle> L1TkTaus_Tk;
     vector<L1TkTauParticle> L1TkTaus_VtxIso;    
 
+
     // Ensure that all taus are found
     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
     if (bFoundAllTaus_) nEvtsWithMaxHTaus++;
+
+    cout << "-------> ALEX-1b" << endl;
     
     ////////////////////////////////////////////////
-    // For-loop: L1CaloTaus
+    // For-loop: L1Taus
     ////////////////////////////////////////////////
-    for (vector<L1JetParticle>::iterator calo = L1CaloTaus.begin(); calo != L1CaloTaus.end(); calo++)
+    cout << "-------> ALEX-2" << endl;
+    for (vector<L1JetParticle>::iterator calo = L1Taus.begin(); calo != L1Taus.end(); calo++)
       {
-
 	// Calculate the Et-dependent signal & isolation cone sizes
 	GetShrinkingConeSizes(calo->et(), sigCone_Constant, isoCone_Constant, sigCone_cutoffDeltaR,
 			      sigCone_dRMin, sigCone_dRMax, isoCone_dRMin, isoCone_dRMax);
@@ -494,6 +498,7 @@ void CaloTk::Loop()
     ////////////////////////////////////////////////
     /// Create L1TkTaus Collections
     ////////////////////////////////////////////////
+    cout << "-------> ALEX-3" << endl;
     for(vector<L1TkTauParticle>::iterator L1TkTau = L1TkTauCandidates.begin(); L1TkTau != L1TkTauCandidates.end(); L1TkTau++)
       {
 	// Calo
@@ -510,14 +515,14 @@ void CaloTk::Loop()
 
     if (DEBUG)
       {
-	PrintL1JetParticleCollection(L1CaloTaus);
+	PrintL1JetParticleCollection(L1Taus);
 	PrintL1TkTauParticleCollection(L1TkTauCandidates);
 	PrintL1TkTauParticleCollection(L1TkTaus_Calo);
 	PrintL1TkTauParticleCollection(L1TkTaus_Tk);
 	PrintL1TkTauParticleCollection(L1TkTaus_VtxIso);
       }
 
-    
+    cout << "-------> ALEX-4" << endl;	
     ////////////////////////////////////////////////
     // Event-Type Histograms
     ////////////////////////////////////////////////
@@ -536,9 +541,9 @@ void CaloTk::Loop()
 
 	// L1TkTau Resolution
 	GenParticle p = tau->GetMatchingGenParticle();	
-	hL1CaloTau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().eta() - p.p4vis().Pt() )/p.p4vis().Pt()  );
-	hL1CaloTau_ResolutionCaloEta->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
-	hL1CaloTau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().eta() - p.p4vis().Phi())/p.p4vis().Phi() );
+	hL1Tau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().eta() - p.p4vis().Pt() )/p.p4vis().Pt()  );
+	hL1Tau_ResolutionCaloEta->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
+	hL1Tau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().eta() - p.p4vis().Phi())/p.p4vis().Phi() );
 
       }
     
@@ -979,9 +984,9 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1TkTau_MatchTk_PtMinusCaloEt , "L1TkTau_MatchTk_PtMinusCaloEt" , "",  100, -100.0, +100.0);
 
   // Resolutions 
-  histoTools_.BookHisto_1D(hL1CaloTau_ResolutionCaloEt , "L1CaloTau_ResolutionCaloEt" , ";E_{T} (GeV);Events / %.0f GeV", 100,  -5.0,  +5.0);
-  histoTools_.BookHisto_1D(hL1CaloTau_ResolutionCaloEta, "L1CaloTau_ResolutionCaloEta", ";#eta;Events / %.2f", 100,  -5.0,  +5.0);
-  histoTools_.BookHisto_1D(hL1CaloTau_ResolutionCaloPhi, "L1CaloTau_ResolutionCaloPhi", ";#phi (rads);Events / %.2f rads", 200,  -10.0,  +10.0);
+  histoTools_.BookHisto_1D(hL1Tau_ResolutionCaloEt , "L1Tau_ResolutionCaloEt" , ";E_{T} (GeV);Events / %.0f GeV", 100,  -5.0,  +5.0);
+  histoTools_.BookHisto_1D(hL1Tau_ResolutionCaloEta, "L1Tau_ResolutionCaloEta", ";#eta;Events / %.2f", 100,  -5.0,  +5.0);
+  histoTools_.BookHisto_1D(hL1Tau_ResolutionCaloPhi, "L1Tau_ResolutionCaloPhi", ";#phi (rads);Events / %.2f rads", 200,  -10.0,  +10.0);
 
   histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEt , "L1TkTau_ResolutionCaloEt" , ";E_{T} (GeV);Events / %.0f GeV", 100,  -5.0,  +5.0);
   histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEta, "L1TkTau_ResolutionCaloEta", ";#eta;Events / %.2f", 100,  -5.0,  +5.0);
@@ -1488,7 +1493,7 @@ void CaloTk::FillTurnOn_Numerator_(vector<L1TkTauParticle> L1TkTaus,
 
 //============================================================================
 void CaloTk::GetMatchingTrack(L1TkTauParticle &L1TkTau,
-			      L1JetParticle L1CaloTau,
+			      L1JetParticle L1Tau,
 			      vector<TTTrack> TTTracks)
 
 //============================================================================
@@ -1501,7 +1506,7 @@ void CaloTk::GetMatchingTrack(L1TkTauParticle &L1TkTau,
   // For-loop: All Tracks
   for (vector<TTTrack>::iterator tk = TTTracks.begin(); tk != TTTracks.end(); tk++)
     {
-      double dR = auxTools_.DeltaR(tk->getEta(), tk->getPhi(), L1CaloTau.eta(), L1CaloTau.phi());
+      double dR = auxTools_.DeltaR(tk->getEta(), tk->getPhi(), L1Tau.eta(), L1Tau.phi());
 
       // Only consider tracks within matching cone (0 <= DeltaR < matchTk_dR_max)
       if (dR > L1TkTau.GetMatchConeMax()) continue;
@@ -1515,7 +1520,7 @@ void CaloTk::GetMatchingTrack(L1TkTauParticle &L1TkTau,
     }
 
   // Assign values to the L1TkTau
-  L1TkTau.SetCaloTau(L1CaloTau);
+  L1TkTau.SetCaloTau(L1Tau);
   L1TkTau.SetMatchingTk(matchTk);
   L1TkTau.SetMatchTkDeltaRNew(matchTk_dR);
   if (0) L1TkTau.PrintProperties(false, false, true, false);
@@ -1594,7 +1599,6 @@ vector<GenParticle> CaloTk::GetGenParticles(bool bPrintList)
   vector<GenParticle> theGenParticles;
   Table info("Index | PdgId | Status | Charge | Pt | Eta | Phi | E | Vertex (mm) | Mothers | Daughters |", "Text"); //LaTeX or Text    
 
-  cout << "ALEX-1" << endl;
   // For-loop: All GenParticles
   for (Size_t genP_index = 0; genP_index < GenP_Pt->size(); genP_index++)
     {
@@ -1841,13 +1845,8 @@ TTTrack CaloTk::GetTTTrack(unsigned int Index,
   if (matchTP_index >= 0) theTP= GetTrackingParticle(matchTP_index);
   // theTTTrack.SetTP(theTP); // cannot implement. cyclic
   
-  if (DEBUG) theTTTrack.PrintProperties(); //alex
-  // if (DEBUG && matchTP_index >= 0) theTP.PrintProperties();
-  //if (matchTP_index >= 0) theTP.PrintProperties();
-
-  theTTTrack.PrintProperties();
-  if (matchTP_index >= 0) theTP.PrintProperties();
-  cout << "" << endl;
+  if (DEBUG) theTTTrack.PrintProperties();
+  if (DEBUG && matchTP_index >= 0) theTP.PrintProperties();
 
   return theTTTrack;
 }
@@ -1916,33 +1915,34 @@ TrackingParticle CaloTk::GetTrackingParticle(unsigned int Index)
 
 
 //============================================================================
-vector<L1JetParticle> CaloTk::GetL1CaloTaus(bool bPrintList)
+vector<L1JetParticle> CaloTk::GetL1Taus(bool bPrintList)
 //============================================================================
 {
-  vector<L1JetParticle> theL1CaloTaus;
-  for (Size_t iCalo = 0; iCalo < L1CaloTau_E->size(); iCalo++)
+  vector<L1JetParticle> theL1Taus;
+  for (Size_t iCalo = 0; iCalo < tauEt->size(); iCalo++)
     {
-    theL1CaloTaus.push_back( GetL1CaloTau(iCalo) );
+      cout << "iCalo = " << iCalo << endl;
+    theL1Taus.push_back( GetL1Tau(iCalo) );
     }
   
-  if (bPrintList) PrintL1JetParticleCollection(theL1CaloTaus);
-  return theL1CaloTaus;
+  if (bPrintList) PrintL1JetParticleCollection(theL1Taus);
+  return theL1Taus;
 }
 
 
 //============================================================================
-L1JetParticle CaloTk::GetL1CaloTau(unsigned int Index)
+L1JetParticle CaloTk::GetL1Tau(unsigned int Index)
 //============================================================================
 {
 
-  double E    = L1CaloTau_E->at(Index);
-  double Et   = L1CaloTau_Et->at(Index);
-  double Eta  = L1CaloTau_Eta->at(Index);
-  double Phi  = L1CaloTau_Phi->at(Index);
-  double Bx   = L1CaloTau_Bx->at(Index);
-  double Type = L1CaloTau_Type->at(Index);
-  L1JetParticle theL1CaloTau(Index, E, Et, Eta, Phi, Bx, Type); 
-  return theL1CaloTau;
+  //double E    = tau_E->at(Index);
+  double Et   = tauEt->at(Index);
+  double Eta  = tauEta->at(Index);
+  double Phi  = tauPhi->at(Index);
+  double Bx   = tauBx->at(Index);
+  // double Type = L1Tau_Type->at(Index);
+  L1JetParticle theL1Tau(Index, Et, Et, Eta, Phi, Bx, -1); 
+  return theL1Tau;
 }
 
 

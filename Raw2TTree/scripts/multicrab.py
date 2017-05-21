@@ -1041,7 +1041,7 @@ def RetrievedFiles(taskDir, crabResults, dashboardURL, printTable, opts):
             if opts.filesInEOS:
                 taskDirEOS  = GetEOSDir(taskDir, opts)    
                 foundLogEOS = ExistsEOS(taskDirEOS, "log", "cmsRun_%s.log.tar.gz" % jobId, opts)
-                foundOutEOS = ExistsEOS(taskDirEOS, ""   , "miniaod2tree_%s.root" % jobId, opts)
+                foundOutEOS = ExistsEOS(taskDirEOS, ""   , "raw2TTree_%s.root" % jobId, opts)
                 Verbose("foundLogEOS=%s , foundOutEOS=%s" % (foundLogEOS, foundOutEOS))
                 if foundLogEOS:
                     eosLog += 1
@@ -1054,7 +1054,7 @@ def RetrievedFiles(taskDir, crabResults, dashboardURL, printTable, opts):
                 
             # Count Output & Logfiles (local)
             foundLog = Exists(taskDir, "cmsRun_%s.log.tar.gz" % jobId) 
-            foundOut = Exists(taskDir, "miniaod2tree_%s.root" % jobId)
+            foundOut = Exists(taskDir, "raw2TTree_%s.root" % jobId)
             if foundLog:
                 retrievedLog += 1
                 exitCode = CheckTaskReport(taskDir, jobId, opts)
