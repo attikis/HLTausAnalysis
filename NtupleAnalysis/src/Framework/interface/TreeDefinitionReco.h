@@ -76,8 +76,8 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<int>   *tauIPhi;
   vector<int>   *tauIso;
   vector<int>   *tauBx;
-  vector<int>   *tauTowerIPhi;
-  vector<int>   *tauTowerIEta;
+//  vector<int>   *tauTowerIPhi;
+//  vector<int>   *tauTowerIEta;
   vector<int>   *tauRawEt;
   vector<int>   *tauIsoEt;
   vector<int>   *tauNTT;
@@ -257,8 +257,8 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   tauIPhi       = 0;
   tauIso        = 0;
   tauBx         = 0;
-  tauTowerIPhi  = 0;
-  tauTowerIEta  = 0;
+//  tauTowerIPhi  = 0;
+//  tauTowerIEta  = 0;
   tauRawEt      = 0;
   tauIsoEt      = 0;
   tauNTT        = 0;
@@ -359,8 +359,8 @@ void TreeDefinitionReco::InitReco(TTree *tree)
       fChain->SetBranchAddress("L1Tau_IPhi"     , &tauIPhi      , &b_tauIPhi);
       fChain->SetBranchAddress("L1Tau_Iso"      , &tauIso       , &b_tauIso);
       fChain->SetBranchAddress("L1Tau_Bx"       , &tauBx        , &b_tauBx);
-      fChain->SetBranchAddress("L1Tau_TowerIPhi", &tauTowerIPhi , &b_tauTowerIPhi);
-      fChain->SetBranchAddress("L1Tau_TowerIEta", &tauTowerIEta , &b_tauTowerIEta);
+//      fChain->SetBranchAddress("L1Tau_TowerIPhi", &tauTowerIPhi , &b_tauTowerIPhi);
+//      fChain->SetBranchAddress("L1Tau_TowerIEta", &tauTowerIEta , &b_tauTowerIEta);
       fChain->SetBranchAddress("L1Tau_RawEt"    , &tauRawEt     , &b_tauRawEt);
       fChain->SetBranchAddress("L1Tau_IsoEt"    , &tauIsoEt     , &b_tauIsoEt);
       fChain->SetBranchAddress("L1Tau_NTT"      , &tauNTT       , &b_tauNTT);
