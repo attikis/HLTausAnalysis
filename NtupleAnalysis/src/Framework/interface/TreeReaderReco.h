@@ -51,7 +51,7 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
 
     // Set the Tree
     tree = chain;
-    //std::cout << "\tSet tree with name \"" << tree->GetName() << "\" as the principal tree." << std::endl;
+    std::cout << "\tSet tree with name \"" << tree->GetName() << "\" as the principal tree." << std::endl;
 
     // Add Friend Tree. Then the Tree can access all data of its friend just like its own data
    // chain->SetMakeClass(1);
