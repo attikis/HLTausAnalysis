@@ -15,9 +15,12 @@ void run(const std::string MulticrabDir = "",
 	 const int maxEvents = -1)
 {
 
-  const std::string absolutePath = "/Users/attikis/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X";
+// Alexandro's files
+   const std::string absolutePath = "/Users/attikis/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X";
   // const std::string absolutePath = "/afs/cern.ch/user/a/attikis/workspace/multicrab/";
   // const std::string absolutePath = "/Users/attikis/disk/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X/";
+// Santeri's files
+  // const std::string absolutePath = "/afs/cern.ch/work/s/slaurila/public/HLTaus/CMSSW_9_1_0_pre2/src/HLTausAnalysis/NtupleAnalysis/src/Tracking/work";
   
   Tracking macro(absolutePath + "/" + MulticrabDir, SampleName, text, maxEvents);
   macro.Loop();
