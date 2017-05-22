@@ -131,7 +131,19 @@ class Tracking : public TreeAnalyserMC{
   TH1D* hTP_Pt;
   TH1D* hTP_Eta;
   TH1D* hTP_Phi;
+  
+  // L1Taus resolutions histograms
+  TH1D* hL1Tau_CaloEt;
+  TH1D* hL1Tau_CaloEta;
+  TH1D* hL1Tau_CaloPhi;
 
+  TH1D* hL1Tau_CaloEt_Res;
+  TH1D* hL1Tau_CaloEta_Res;
+  TH1D* hL1Tau_CaloPhi_Res;
+
+  TH1D* hL1TauGenMatch_VisEt;
+  TH1D* hL1TauGenMatch_Eta;
+  TH1D* hL1TauGenMatch_Phi;  
 
 };
 
