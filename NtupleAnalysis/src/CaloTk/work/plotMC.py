@@ -9,8 +9,7 @@ Usage (multiple plots):
 ./plotMC.py -m <pseudo_mcrab_directory> json/*.json json/L1TkTau/*.json
 
 Last Used:
-./plotMC.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/L1TkTau/Multiplicity.json -i "VBF|Neutrino"
-./plotMC.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/*/*.json -i "VBF|Neutrino"
+./plotMC.py -m multicrab_CaloTkSkim_v910pre2_20170522T1611/ json/L1TkTau/Multiplicity.json -i 'PU140'
 '''
 
 #================================================================================================
