@@ -1,0 +1,4259 @@
+diff --git a/NtupleAnalysis/python/tools/plots.py b/NtupleAnalysis/python/tools/plots.py
+index 2e1590ccafb..9aa6b7580c9 100644
+--- a/NtupleAnalysis/python/tools/plots.py
++++ b/NtupleAnalysis/python/tools/plots.py
+@@ -3205,7 +3205,7 @@ class PlotDrawer:
+                 ylabel = ylabel % p.binWidth()
+             elif nformats == 2:
+                 binWidths = p.binWidths()
+-                ylabel = ylabel % (min(binWidths), max(binWidths))
++                ylabel    = ylabel % (min(binWidths), max(binWidths))
+             else:
+                 raise Exception("Got %d '%%' formats in y label ('%s'), only 0-2 are supported" % (nformats, ylabel))
+         p.frame.GetYaxis().SetTitle(ylabel)
+diff --git a/NtupleAnalysis/src/Auxiliary/src/AuxTools.C b/NtupleAnalysis/src/Auxiliary/src/AuxTools.C
+index 9e6dee9fb26..897c4db02c0 100644
+--- a/NtupleAnalysis/src/Auxiliary/src/AuxTools.C
++++ b/NtupleAnalysis/src/Auxiliary/src/AuxTools.C
+@@ -384,7 +384,7 @@ void AuxTools::StopwatchStop(const int myPrecision,
+   double elapsed_time_secs  = double(stopwatch_stop - stopwatch_start) / CLOCKS_PER_SEC;
+   double elapsed_time_units = elapsed_time_secs/double(units);
+   
+-  cout << myTitle << ": " << setprecision(myPrecision) << elapsed_time_units << " (" << myUnits << ")" << endl;
++  cout << "\n" << myTitle << ": " << setprecision(myPrecision) << elapsed_time_units << " " << myUnits << endl;
+   return;
+ 
+ }  
+diff --git a/NtupleAnalysis/src/Auxiliary/src/Datasets.C b/NtupleAnalysis/src/Auxiliary/src/Datasets.C
+index ac8fcd63c7d..c7846c93fa8 100644
+--- a/NtupleAnalysis/src/Auxiliary/src/Datasets.C
++++ b/NtupleAnalysis/src/Auxiliary/src/Datasets.C
+@@ -258,8 +258,8 @@ void Datasets::CreateMcProductions_(void)
+   cmssw    = "9_0_0";
+   geometry = "Phase2";
+   
+-  Datasets SingleNeutrinoPU140_PhaseIISpring17D("SingleNeutrino_PU140", "/SingleNeutrino" + path_PU140, "", CP, cmssw, geometry, 140, 500000, 0, 0);
+-  Datasets SingleNeutrinoPU200_PhaseIISpring17D("SingleNeutrino_PU200", "/SingleNeutrino" + path_PU200, "", CP, cmssw, geometry, 140, 500000, 0, 0);
++  Datasets SingleNeutrinoPU140_PhaseIISpring17D("SingleNeutrino_PU140", "SingleNeutrino_PU140", "/SingleNeutrino" + path_PU140, CP, cmssw, geometry, 140, 500000, 0, 0);
++  Datasets SingleNeutrinoPU200_PhaseIISpring17D("SingleNeutrino_PU200", "SingleNeutrino_PU200", "/SingleNeutrino" + path_PU200, CP, cmssw, geometry, 140, 500000, 0, 0);
+   
+   Datasets SinglePion0NoPU_PhaseIISpring17D("SinglePion0_NoPU"  , "/SinglePion0_FlatPt-8to100" + path_NoPU , "", CP, cmssw, geometry,   0, 500000, 0, 0);
+   Datasets SinglePion0PU140_PhaseIISpring17D("SinglePion0_PU140", "/SinglePion0_FlatPt-8to100" + path_PU140, "", CP, cmssw, geometry, 140, 500000, 0, 0);
+diff --git a/NtupleAnalysis/src/CaloTk/CaloTk.C b/NtupleAnalysis/src/CaloTk/CaloTk.C
+index 74a1f541237..66c02742aec 100644
+--- a/NtupleAnalysis/src/CaloTk/CaloTk.C
++++ b/NtupleAnalysis/src/CaloTk/CaloTk.C
+@@ -447,8 +447,6 @@ void CaloTk::Loop()
+ 	PrintTTTrackCollection(isoTTTracks);
+       }
+     
+-    cout << "-------> ALEX-1" << endl;
+-    
+     // Tau Collections
+     vector<L1JetParticle> L1Taus = GetL1Taus(false);
+     vector<L1TkTauParticle> L1TkTauCandidates;
+@@ -461,12 +459,9 @@ void CaloTk::Loop()
+     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
+     if (bFoundAllTaus_) nEvtsWithMaxHTaus++;
+ 
+-    cout << "-------> ALEX-1b" << endl;
+-    
+     ////////////////////////////////////////////////
+     // For-loop: L1Taus
+     ////////////////////////////////////////////////
+-    cout << "-------> ALEX-2" << endl;
+     for (vector<L1JetParticle>::iterator calo = L1Taus.begin(); calo != L1Taus.end(); calo++)
+       {
+ 	// Calculate the Et-dependent signal & isolation cone sizes
+@@ -498,7 +493,6 @@ void CaloTk::Loop()
+     ////////////////////////////////////////////////
+     /// Create L1TkTaus Collections
+     ////////////////////////////////////////////////
+-    cout << "-------> ALEX-3" << endl;
+     for(vector<L1TkTauParticle>::iterator L1TkTau = L1TkTauCandidates.begin(); L1TkTau != L1TkTauCandidates.end(); L1TkTau++)
+       {
+ 	// Calo
+@@ -522,7 +516,6 @@ void CaloTk::Loop()
+ 	PrintL1TkTauParticleCollection(L1TkTaus_VtxIso);
+       }
+ 
+-    cout << "-------> ALEX-4" << endl;	
+     ////////////////////////////////////////////////
+     // Event-Type Histograms
+     ////////////////////////////////////////////////
+@@ -1919,24 +1912,13 @@ vector<L1JetParticle> CaloTk::GetL1Taus(bool bPrintList)
+ //============================================================================
+ {
+   vector<L1JetParticle> theL1Taus;
+-  L1JetParticle particleToBeAdded;
+-  cout << "tauEt->size()=" << tauEt->size() << endl;
+-  //DEBUG
+-  cout << "Values of tauEt for all taus:" << endl;
+-  for (Size_t iCalo = 0; iCalo < tauEt->size(); iCalo++){
+-    cout << "Index=" << iCalo << ", tauEt=" << tauEt->at(iCalo) << endl; // this works fine
+-    cout << "Index=" << iCalo << ", tauEta=" << tauEta->at(iCalo) << endl; // this works fine
+-    cout << "Index=" << iCalo << ", tauPhi=" << tauPhi->at(iCalo) << endl; // this works fine
+-    cout << "Index=" << iCalo << ", tauBx=" << tauBx->at(iCalo) << endl; // this crashes after 6 taus (indexes 0...5), why???
+-
+-
+-    }
+-  
++  L1JetParticle theL1Tau;
++  // For-loop: All L1Taus
+   for (Size_t iCalo = 0; iCalo < tauEt->size(); iCalo++)
+     {
+-    cout << "iCalo = " << iCalo << endl;
+-    particleToBeAdded = GetL1Tau(iCalo); // this causes a problem after 6 taus (indexes 0...5), because of Bx vector!
+-    theL1Taus.push_back( particleToBeAdded );
++      // cout << "iCalo = " << iCalo << endl;
++      theL1Tau = GetL1Tau(iCalo); 
++      theL1Taus.push_back( theL1Tau );
+     }
+   
+   if (bPrintList) PrintL1JetParticleCollection(theL1Taus); 
+@@ -1953,10 +1935,10 @@ L1JetParticle CaloTk::GetL1Tau(unsigned int Index)
+   double Et   = tauEt->at(Index);
+   double Eta  = tauEta->at(Index);
+   double Phi  = tauPhi->at(Index);
+-  double Bx   = tauBx->at(Index);
+-  // double Type = L1Tau_Type->at(Index);
+-  cout << "GeL1Tau returns theL1Tau(" << Index << ", " << Et << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << " , -1)" << endl;
+-  L1JetParticle theL1Tau(Index, Et, Et, Eta, Phi, Bx, -1); 
++  double Bx   = -1.0; // tauBx->at(Index);   // tauBx->size()=6, while tauEt->size()=12
++  double Type = -1.0; // tauType->at(Index); // missing from tree
++  // cout << "GeL1Tau returns theL1Tau(" << Index << ", " << Et << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << " , -1)" << endl;
++  L1JetParticle theL1Tau(Index, Et, Et, Eta, Phi, Bx, Type);
+ 
+   return theL1Tau;
+ }
+diff --git a/NtupleAnalysis/src/CaloTk/CaloTk.h b/NtupleAnalysis/src/CaloTk/CaloTk.h
+index ba0c83eab7f..7e91e469033 100644
+--- a/NtupleAnalysis/src/CaloTk/CaloTk.h
++++ b/NtupleAnalysis/src/CaloTk/CaloTk.h
+@@ -45,7 +45,7 @@ class CaloTk : public TreeAnalyserMC{
+ 		const int maxEvents_ = -1, 
+ 		TTree* tree=0) : 
+   
+-  TreeAnalyserMC("CaloTk", SamplePath, SampleName, text_, maxEvents_, tree) 
++  TreeAnalyserMC("", SamplePath, SampleName, text_, maxEvents_, tree) 
+     { 
+       auxTools_.StopwatchStart();
+       mcSample = SampleName;
+diff --git a/NtupleAnalysis/src/CaloTk/work/run.cc b/NtupleAnalysis/src/CaloTk/work/run.cc
+index bfb1100d31b..3032bf2ed7c 100755
+--- a/NtupleAnalysis/src/CaloTk/work/run.cc
++++ b/NtupleAnalysis/src/CaloTk/work/run.cc
+@@ -3,7 +3,8 @@
+ // .x run.cc(<multicrab_dir>, <sample_alias>, <text_to_append_to_output>, <numberOfEvents>);
+ //
+ // Example:
+-// root[0] .x run.cc("multicrab_CaloTk_v910p2_test", "SingleTau-PU140", "", -1);
++// root -l
++// root[0] .x run.cc("multicrab_CaloTk_v910p2_20170520T1958", "SingleTau-PU140", "", -1);
+ //
+ //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ #include "../CaloTk.C+" // how to compile macro in ROOT6 (compatible with ROOT5 as well)
+@@ -13,11 +14,15 @@ void run(const std::string MulticrabDir = "",
+ 	 const std::string text = "", 
+ 	 const int maxEvents = -1)
+ {
+-  
+-  // const std::string absolutePath = "/Users/attikis/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X";
+-  const std::string absolutePath = "/afs/cern.ch/user/a/attikis/workspace/multicrab/";
+-  // const std::string absolutePath = "/Users/attikis/disk/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X/";
+ 
++  // Alexandros' files
++  const std::string absolutePath = "/Users/attikis/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X";
++  // const std::string absolutePath = "/afs/cern.ch/user/a/attikis/workspace/multicrab/";
++  // const std::string absolutePath = "/Users/attikis/disk/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X/";
++  
++  // Santeri's files
++  // const std::string absolutePath = "/afs/cern.ch/work/s/slaurila/public/HLTaus/CMSSW_9_1_0_pre2/src/HLTausAnalysis/NtupleAnalysis/src/Tracking/work";
++  
+   CaloTk macro(absolutePath + "/" + MulticrabDir, SampleName, text, maxEvents);
+   macro.Loop();
+ }
+diff --git a/NtupleAnalysis/src/Framework/interface/FileOpener.h b/NtupleAnalysis/src/Framework/interface/FileOpener.h
+index a2758e0f7ed..ea412ba23d1 100644
+--- a/NtupleAnalysis/src/Framework/interface/FileOpener.h
++++ b/NtupleAnalysis/src/Framework/interface/FileOpener.h
+@@ -8,7 +8,8 @@ class FileOpener
+ {
+ 
+  public:
+-  TChain* OpenFile(const std::string SamplePath, const std::string SampleName, TChain* tree = 0);
++  TChain* OpenFiles(const std::string multicrabPath, const std::string dataset, TChain* tree = 0);
++  vector<string> GetListOfFiles(const string inDir);
+     
+  private:
+   Datasets datasets_;
+diff --git a/NtupleAnalysis/src/Framework/interface/TreeReaderReco.h b/NtupleAnalysis/src/Framework/interface/TreeReaderReco.h
+index 29864d9e5e1..0aaa4edaeb7 100644
+--- a/NtupleAnalysis/src/Framework/interface/TreeReaderReco.h
++++ b/NtupleAnalysis/src/Framework/interface/TreeReaderReco.h
+@@ -41,25 +41,19 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
+   // if parameter tree is not specified (or zero), connect the file
+   // used to generate this class and read the Tree.
+   if (tree == 0) {
+-   
+-    // TChain* chain = new TChain("TkTauFromCaloNTupleMaker/EvtTree");
+-    TChain* chain = new TChain("Raw2TTreeMaker/EvtTree");  // tree with tracks etc.
+-    //TChain* friendChain = new TChain("l1UpgradeTree/L1UpgradeTree"); // tree with calo taus
+ 
+-    OpenFile(SamplePath, SampleName, chain);
+-    //OpenFile(SamplePath, SampleName, friendChain);    
++    // Creat a new TChain pointer with the TTree name
++    TChain* chain = new TChain("Raw2TTreeMaker/EvtTree");
++
++    // Associated the ROOT files to the TChain
++    std::cout << "\tGetting ROOT files for dataset " << SampleName << " and adding them to the chain." << std::endl;
++    OpenFiles(SamplePath, SampleName, chain);
+ 
+     // Set the Tree
+     tree = chain;
++    std::cout << "=== TreeReaderReco::TreeReaderReco()" << std::endl;
+     std::cout << "\tSet tree with name \"" << tree->GetName() << "\" as the principal tree." << std::endl;
+ 
+-    // Add Friend Tree. Then the Tree can access all data of its friend just like its own data
+-   // chain->SetMakeClass(1);
+-    //friendChain->SetMakeClass(1);
+-    //tree->AddFriend(friendChain);
+-    //TFriendElement *friendTreeElement = (TFriendElement*)tree->GetListOfFriends()->Last();
+-    //friendTreeElement->GetTree()->SetMakeClass(1); //in case that, for some reason, friendChain->SetMakeClass(1); does not do the trick    
+-    //std::cout << "\tAdded tree \"" << friendTreeElement->GetTreeName() << "\" as a friend to the principal tree." << std::endl;
+   }
+ 
+   Init(tree);
+diff --git a/NtupleAnalysis/src/Framework/src/FileOpener.C b/NtupleAnalysis/src/Framework/src/FileOpener.C
+index 5218cac43ec..bb4c0d30774 100644
+--- a/NtupleAnalysis/src/Framework/src/FileOpener.C
++++ b/NtupleAnalysis/src/Framework/src/FileOpener.C
+@@ -3,46 +3,82 @@
+ 
+ // System
+ #include <fstream>
++#include <vector>
+ 
+ // User 
+ #include "../interface/FileOpener.h"
+ 
+ // ROOT
+ #include "TChain.h"
++#include "TSystem.h"
+ 
+-TChain* FileOpener::OpenFile(const std::string SamplePath, const std::string SampleName, TChain* mychain)
++TChain* FileOpener::OpenFiles(const string multicrabPath, const string dataset, TChain* mychain)
+ {
+ 
++  cout << "=== FileOpener::OpenFile()" << endl;
++
+   // Get the dataset attributes
+-  const string datasetPath = datasets_.GetDatasetPathFromAlias(SampleName);
+-  
+-  // Ensure file exists
+-  std::string datasetDir       = SamplePath + "/" + datasetPath + "/";
+-  std::string FullFileName     = SamplePath + "/" + datasetPath + "/res/output-" + datasetPath + ".root"; 
+-  std::string FullFileName_alt = SamplePath + "/" + datasetPath + "/results/output-" + datasetPath + ".root";
+-  std::string name = FullFileName;
+-  std::ifstream GetFile(FullFileName.c_str());
+-
+-  cout << "=== FileOpener::OpenFile()\n\tOpening ROOT file in \"" << datasetDir << "\".\n\tWill look unders subdirectories \"res/\" and \"results/\"." << endl;
+-  if (!GetFile.good() )
++  string rootFileName;
++  const string datasetPath = datasets_.GetDatasetPathFromAlias(dataset);
++  const string fullPath    = multicrabPath + "/" + datasetPath + "/results/";
++  vector<string> dirs = GetListOfFiles(fullPath);
++
++  // For-loop: All ROOT files
++  for (vector<string>::iterator f = dirs.begin(); f != dirs.end(); f++)
+     {
+-      if (0) cout << "=== FileOpener::OpenFile()\n\tFile \"" << FullFileName << "\" does not exist. Trying alternative paths ..." << endl;
+-      name = FullFileName_alt;
++      rootFileName = *f;
++      cout << "\tAdding file " << rootFileName << " to the chain" << endl;
++      
+ 
+-      std::ifstream GetFile_alt(FullFileName_alt.c_str());
+-      if (!GetFile_alt.good() )
++      ifstream file(rootFileName);
++      
++      if (!file.good() )
+ 	{
+-	  std::ifstream GetFile_alt(FullFileName_alt.c_str());
+-	  if(0) cout << "=== FileOpener::OpenFile()\n\tFile \"" << FullFileName_alt << "\" also does not exist. EXIT" << endl;
+-	  exit(1);
+-	}
++   	  if(0) cout << "\tFile \"" << rootFileName << "\" also does not exist. EXIT" << endl;
++   	  exit(1);
++   	}
++      else mychain -> Add(rootFileName.c_str());
+     }
+   
+-  /// Inform user of ROOT file added to the TChain
+-  cout << "=== FileOpener::OpenFile()\n\tAdding file " << name << " to the chain" << endl;
+-  mychain -> Add(name.c_str());
+-
+   return mychain; 
+ }
+ 
++
++vector<string> FileOpener::GetListOfFiles(const string fullPath)
++{
++
++  // Declare variables
++  const char* entry;
++  std::vector<string> dirs;
++  
++  Int_t n = 0;
++  const char* ext = ".root";
++  
++  char* dir  = gSystem->ExpandPathName(fullPath.c_str()); // cast a "std::string" to a "char*" with c_str()
++  void* dirp = gSystem->OpenDirectory(dir);
++  const char* filename[100];
++  TString str;
++
++  // Get all files in the dir fullPath
++  while((entry = (char*)gSystem->GetDirEntry(dirp)))
++    {
++      str = entry;
++      if(str.EndsWith(ext)) filename[n++] = gSystem->ConcatFileName(dir, entry);
++    }
++
++  // For-loop: All files
++  for (Int_t i = 0; i < n; i++)
++    {
++      // Printf("file -> %s", filename[i]);
++      string fileName = string(filename[i]);
++      size_t found    = fileName.find("output-");
++      if (found!=std::string::npos) dirs.push_back(fileName);
++      else {} //cout << "\tSkipping " << fileName << endl;
++
++    }
++  
++  return dirs;
++}
++
++
+ #endif // FileOpener_cxx
+diff --git a/NtupleAnalysis/src/Tracking/work/json/GenInfo/2d/VtxXY.json b/NtupleAnalysis/src/Tracking/work/json/GenInfo/2d/VtxXY.json
+deleted file mode 100644
+index a6c7ef0868b..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/GenInfo/2d/VtxXY.json
++++ /dev/null
+@@ -1,36 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histogram": "HepMCEvt_VtxX_VtxY",
+-    "title": "HepMCEvt_VtxX_VtxY",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "rebinY": 1,
+-    "xlabel": "x_{vtx} (cm)",
+-    "ylabel": "y_{vtx} (cm)",
+-    "zlabel": "Entries",
+-    "zmin"  : 0.0,
+-    "zmax"  : 0.0,
+-    "zlog"  : "False",
+-    "drawStyle": "COLZ",
+-    "legendStyle": "L",
+-    "opts": {"xmin": -0.004, "xmax": 0.004, "ymin": -0.005, "ymax": 0.005},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "True",
+-    "moveLegend": {"dx": -0.05, "dy": -0.05, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.18, "y": 0.89, "size": 17},
+-    "cutValue": 20.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/GenInfo/McHadronicTau_VisEt.json b/NtupleAnalysis/src/Tracking/work/json/GenInfo/McHadronicTau_VisEt.json
+deleted file mode 100644
+index 59b200fb069..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/GenInfo/McHadronicTau_VisEt.json
++++ /dev/null
+@@ -1,38 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histogram": "McHadronicTau_VisEt",
+-    "title": "McHadronicTau_VisEt",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF_HToTauTau", "TauThreeProngs"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": 1,
+-    "xlabel": "#tau_{h} E_{T} (GeV)",
+-    "ylabel": "Entries / %.0f GeV",
+-    "drawStyle": "LP",
+-    "legendStyle": "LP",
+-    "opts": {"xmin": 0.0, "xmax": 150.0, "ymin": 0.00, "ymaxfactor": 1.2},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "errorBarsX": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "ratio": "False",
+-    "ratioInvert": "False",
+-    "ratioYlabel": "Ratio",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": -0.05, "dh": -0.20},
+-    "extraText": {"text": "", "x": 0.72, "y": 0.89, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/GenInfo/PrimaryVertex_AbsDeltaZ.json b/NtupleAnalysis/src/Tracking/work/json/GenInfo/PrimaryVertex_AbsDeltaZ.json
+deleted file mode 100644
+index fdf486ab120..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/GenInfo/PrimaryVertex_AbsDeltaZ.json
++++ /dev/null
+@@ -1,38 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histogram": "PrimaryVertex_AbsDeltaZ",
+-    "title": "PrimaryVertex_AbsDeltaZ",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF_HToTauTau", "TauThreeProngs"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 2,
+-    "rebinY": 1,
+-    "xlabel": "|z_{vtx}^{L1} - z_{vtx}^{MC}| (cm)",
+-    "ylabel": "Entries / %.2f cm",
+-    "drawStyle": "LP",
+-    "legendStyle": "LP",
+-    "opts": {"xmin": 0.0, "xmax": 15.0, "ymin": 0.00, "ymaxfactor": 1.2},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "errorBarsX": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "ratio": "False",
+-    "ratioInvert": "False",
+-    "ratioYlabel": "Ratio",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": -0.05, "dh": -0.20},
+-    "extraText": {"text": "", "x": 0.72, "y": 0.89, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/GenInfo/PrimaryVertex_DeltaZ.json b/NtupleAnalysis/src/Tracking/work/json/GenInfo/PrimaryVertex_DeltaZ.json
+deleted file mode 100644
+index 83e68dc13b6..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/GenInfo/PrimaryVertex_DeltaZ.json
++++ /dev/null
+@@ -1,38 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histogram": "PrimaryVertex_DeltaZ",
+-    "title": "PrimaryVertex_DeltaZ",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF_HToTauTau", "TauThreeProngs"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 2,
+-    "rebinY": 1,
+-    "xlabel": "z_{vtx}^{L1} - z_{vtx}^{MC} (cm)",
+-    "ylabel": "Entries / %.2f cm",
+-    "drawStyle": "LP",
+-    "legendStyle": "LP",
+-    "opts": {"xmin": -15.0, "xmax": 15.0, "ymin": 0.00, "ymaxfactor": 1.2},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "errorBarsX": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "ratio": "False",
+-    "ratioInvert": "False",
+-    "ratioYlabel": "Ratio",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": -0.05, "dh": -0.20},
+-    "extraText": {"text": "", "x": 0.72, "y": 0.89, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/GenInfo/Vtxz.json b/NtupleAnalysis/src/Tracking/work/json/GenInfo/Vtxz.json
+deleted file mode 100644
+index db51a764ccd..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/GenInfo/Vtxz.json
++++ /dev/null
+@@ -1,38 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histogram": "HepMCEvt_VtxZ",
+-    "title": "HepMCEvt_VtxZ",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF_HToTauTau", "TauThreeProngs"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": 1,
+-    "xlabel": "z_{vtx} (cm)",
+-    "ylabel": "Entries / %.1f cm",
+-    "drawStyle": "LP",
+-    "legendStyle": "LP",
+-    "opts": {"xmin": -15.0, "xmax": 15.0, "ymin": 0.00, "ymaxfactor": 1.2},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "errorBarsX": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "ratio": "False",
+-    "ratioInvert": "False",
+-    "ratioYlabel": "Ratio",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": -0.05, "dh": -0.20},
+-    "extraText": {"text": "", "x": 0.72, "y": 0.89, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/CHF.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/CHF.json
+deleted file mode 100644
+index 1aa5b6d73fb..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/CHF.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_CHF",
+-    "title": "L1TkTau_CHF",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 10,
+-    "rebinY": "None",
+-    "xlabel": "CHF = #Sigma_{i}^{sig} p_{T}^{i}/E_{T}^{calo}",
+-    "ylabel": "Events / %.1f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 10.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/Charge.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/Charge.json
+deleted file mode 100644
+index e8eb257e5e0..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/Charge.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_Charge",
+-    "title": "L1TkTau_Charge",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "Charge (e)",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -8.0, "xmax": 8.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/DeltaRGenP.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/DeltaRGenP.json
+deleted file mode 100644
+index e281d53a1fe..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/DeltaRGenP.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_DeltaRGenP",
+-    "title": "L1TkTau_DeltaRGenP",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "#DeltaR(calo, #tau_{h})",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 0.25, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/InvMass.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/InvMass.json
+deleted file mode 100644
+index 5bfd4d0e8fe..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/InvMass.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_InvMass",
+-    "title": "L1TkTau_InvMass",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 10,
+-    "rebinY": "None",
+-    "xlabel": "mass(tks) (GeV/c^{2})",
+-    "ylabel": "Events / %.1f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 5.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/InvMassIncl.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/InvMassIncl.json
+deleted file mode 100644
+index 71fef6c8c64..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/InvMassIncl.json
++++ /dev/null
+@@ -1,42 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_InvMassIncl",
+-    "title": "L1TkTau_InvMassIncl",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 10,
+-    "rebinY": "None",
+-    "xlabel": "inclusive mass(tks) (GeV/c^{2})",
+-    "ylabel": "Events / %.1f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "HIST",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 0.0, "xmax": 5.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/IsoConeRMax.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/IsoConeRMax.json
+deleted file mode 100644
+index e9ac8456096..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/IsoConeRMax.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_IsoConeRMax",
+-    "title": "L1TkTau_IsoConeRMax",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "DeltaR_{iso}^{max}",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 0.5, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/IsoConeRMin.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/IsoConeRMin.json
+deleted file mode 100644
+index 8b57478a46b..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/IsoConeRMin.json
++++ /dev/null
+@@ -1,42 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_IsoConeRMin",
+-    "title": "L1TkTau_IsoConeRMin",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "#DeltaR_{iso}^{min}",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "HIST",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 0.0, "xmax": 0.5, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/Multiplicity.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/Multiplicity.json
+deleted file mode 100644
+index 3b8b356e468..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/Multiplicity.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_Multiplicity",
+-    "title": "L1TkTau_Multiplicity",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 2,
+-    "rebinY": "None",
+-    "xlabel": "Multiplicity",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -0.5, "xmax": 11.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"emacs ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/NHF.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/NHF.json
+deleted file mode 100644
+index c603e305f7a..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/NHF.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_NHF",
+-    "title": "L1TkTau_NHF",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 10,
+-    "rebinY": "None",
+-    "xlabel": "NHF",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -10.5, "xmax": 1.0, "ymin": 1e-05, "ymaxfactor": 10.0},
+-    "ratioOpts": {"emacs ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/NHFAbs.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/NHFAbs.json
+deleted file mode 100644
+index 351b02b80c7..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/NHFAbs.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_NHFAbs",
+-    "title": "L1TkTau_NHFAbs",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 10,
+-    "rebinY": "None",
+-    "xlabel": "|NHF|",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 10.0, "ymin": 1e-05, "ymaxfactor": 10.0},
+-    "ratioOpts": {"emacs ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/NIsoTks.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/NIsoTks.json
+deleted file mode 100644
+index 0e0b7142430..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/NIsoTks.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_NIsoTks",
+-    "title": "L1TkTau_NIsoTks",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "IsoTks Multiplicity",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"ymin": 1e-05, "ymaxfactor": 10.0},
+-    "ratioOpts": {"emacs ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/NSigTks.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/NSigTks.json
+deleted file mode 100644
+index 14c027902eb..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/NSigTks.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_NSigTks",
+-    "title": "L1TkTau_NSigTks",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "SigTks Multiplicity",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"ymin": 1e-05, "ymaxfactor": 10.0},
+-    "ratioOpts": {"emacs ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/RelIso.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/RelIso.json
+deleted file mode 100644
+index 8ef22949c94..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/RelIso.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_RelIso",
+-    "title": "L1TkTau_RelIso",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "#Sigma_{i}^{iso} p_{T}^{i}/p_{T}^{m}",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 5, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/ResolutionCaloEt.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/ResolutionCaloEt.json
+deleted file mode 100644
+index 64e48c92003..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/ResolutionCaloEt.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_ResolutionCaloEt",
+-    "title": "L1TkTau_ResolutionCaloEt",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "(E_{T}^{gen}-E_{T}^{calo})/E_{T}^{gen}",
+-    "ylabel": "Events / %.1f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -2.0, "xmax": 2.0, "ymin": 1e-05, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/ResolutionCaloEta.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/ResolutionCaloEta.json
+deleted file mode 100644
+index fed3d1c71f3..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/ResolutionCaloEta.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_ResolutionCaloEta",
+-    "title": "L1TkTau_ResolutionCaloEta",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "(#eta^{gen}-#eta^{calo})/#eta^{gen}",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -3.0, "xmax": 3.0, "ymin": 1e-05, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/ResolutionCaloPhi.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/ResolutionCaloPhi.json
+deleted file mode 100644
+index 70a9c238971..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/ResolutionCaloPhi.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_ResolutionCaloPhi",
+-    "title": "L1TkTau_ResolutionCaloPhi",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "(#phi^{gen}-#phi^{calo})/#phi^{gen}",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -3.0, "xmax": 3.0, "ymin": 1e-05, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/Rtau.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/Rtau.json
+deleted file mode 100644
+index 59c26920453..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/Rtau.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_Rtau",
+-    "title": "L1TkTau_Rtau",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "R_{#tau}",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 5.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 1.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/SigConeRMax.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/SigConeRMax.json
+deleted file mode 100644
+index 66452566e90..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/SigConeRMax.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_SigConeRMax",
+-    "title": "L1TkTau_SigConeRMax",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "signal cone size (#DeltaR)",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 0.3, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 1.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/SigConeRMin.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/SigConeRMin.json
+deleted file mode 100644
+index 1dce7283ed3..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/SigConeRMin.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_SigConeRMin",
+-    "title": "L1TkTau_SigConeRMin",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "signal cone min size (#DeltaR)",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 0.3, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 1.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/VtxIso.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/VtxIso.json
+deleted file mode 100644
+index 50b0d3e97f4..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/VtxIso.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_VtxIso",
+-    "title": "L1TkTau_VtxIso",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 2,
+-    "rebinY": "None",
+-    "xlabel": "min(|z_{0}^{tk_{m}} - z_{0}^{tk_{i}}|)",
+-    "ylabel": "Events / %.1f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 20.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/VtxIsoAbs.json.obsolete b/NtupleAnalysis/src/Tracking/work/json/L1TkTau/VtxIsoAbs.json.obsolete
+deleted file mode 100644
+index e7fd0a36265..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau/VtxIsoAbs.json.obsolete
++++ /dev/null
+@@ -1,42 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_VtxIsoAbs",
+-    "title": "L1TkTau_VtxIsoAbs",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 2,
+-    "rebinY": "None",
+-    "xlabel": "min(|z_{0}^{tk_{m}} - z_{0}^{tk_{i}}|)",
+-    "ylabel": "Events / %.1f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "HIST",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 0.0, "xmax": 20.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/DeltaPOCAz.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/DeltaPOCAz.json
+deleted file mode 100644
+index b010864cfce..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/DeltaPOCAz.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_IsoTks_DeltaPOCAz",
+-    "title": "L1TkTau_IsoTks_DeltaPOCAz",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 2,
+-    "rebinY": "None",
+-    "xlabel": "|#Deltaz_{0}| (cm)",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 15.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/POCAz.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/POCAz.json
+deleted file mode 100644
+index 79cc6d3ed62..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/POCAz.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_IsoTks_POCAz",
+-    "title": "L1TkTau_IsoTks_POCAz",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "z_{0} (cm)",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -20.0, "xmax": 20.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/Pt.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/Pt.json
+deleted file mode 100644
+index 551b42d306b..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/Pt.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_IsoTks_Pt",
+-    "title": "L1TkTau_IsoTks_Pt",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "p_{T} (GeV/c)",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 200.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/PtRel.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/PtRel.json
+deleted file mode 100644
+index b82c5959f47..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/PtRel.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_IsoTks_PtRel",
+-    "title": "L1TkTau_IsoTks_PtRel",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "p_{T}^{tk}/E_{T}^{calo}",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 3.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/StubPtCons.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/StubPtCons.json
+deleted file mode 100644
+index c2d5205a977..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/StubPtCons.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_IsoTks_StubPtCons",
+-    "title": "L1TkTau_IsoTks_StubPtCons",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "stub p_{T} consistency",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 100.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/d0.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/d0.json
+deleted file mode 100644
+index 7bc6165f0be..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/d0.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_IsoTks_d0",
+-    "title": "L1TkTau_IsoTks_d0",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "d_{0} (cm)",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -0.8, "xmax": 0.8, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/d0Abs.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/d0Abs.json
+deleted file mode 100644
+index 20305a24887..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/d0Abs.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_IsoTks_d0Abs",
+-    "title": "L1TkTau_IsoTks_d0Abs",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "|d_{0}| (cm)",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 0.8, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/d0Sig.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/d0Sig.json
+deleted file mode 100644
+index dbe6144e045..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/d0Sig.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_IsoTks_d0Sig",
+-    "title": "L1TkTau_IsoTks_d0Sig",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "d_{0}/#sigma(d_{0})",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -5.0, "xmax": 5.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/d0SigAbs.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/d0SigAbs.json
+deleted file mode 100644
+index 7057b2b8a29..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_IsoTks/d0SigAbs.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_IsoTks_d0SigAbs",
+-    "title": "L1TkTau_IsoTks_d0SigAbs",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "|d_{0}/#sigma(d_{0})|",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 5.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/ChiSquared.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/ChiSquared.json
+deleted file mode 100644
+index afdf09a71a9..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/ChiSquared.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_ChiSquared",
+-    "title": "L1TkTau_MatchTk_ChiSquared",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "#chi^{2}",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 100.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/DeltaR.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/DeltaR.json
+deleted file mode 100644
+index 56ed1429faa..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/DeltaR.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_DeltaR",
+-    "title": "L1TkTau_MatchTk_DeltaR",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "#DeltaR(calo, tk)",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 0.15, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/Eta.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/Eta.json
+deleted file mode 100644
+index 999c75602ca..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/Eta.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_Eta",
+-    "title": "L1TkTau_MatchTk_Eta",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "#eta",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -3.0, "xmax": 3.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/IsCombinatoric.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/IsCombinatoric.json
+deleted file mode 100644
+index c2c2ba27980..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/IsCombinatoric.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_IsCombinatoric",
+-    "title": "L1TkTau_MatchTk_IsCombinatoric",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "Is Combinatoric",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -0.5, "xmax": 2.5, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/IsGenuine.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/IsGenuine.json
+deleted file mode 100644
+index 68bdd1674d7..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/IsGenuine.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_IsGenuine",
+-    "title": "L1TkTau_MatchTk_IsGenuine",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "IsGenuine",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -0.5, "xmax": 2.5, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/IsUnknown.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/IsUnknown.json
+deleted file mode 100644
+index 68df930c5b2..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/IsUnknown.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_IsUnknown",
+-    "title": "L1TkTau_MatchTk_IsUnknown",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "IsUnknown",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -0.5, "xmax": 2.5, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/NBarrelStubs.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/NBarrelStubs.json
+deleted file mode 100644
+index 00c8b821f1e..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/NBarrelStubs.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_NBarrelStubs",
+-    "title": "L1TkTau_MatchTk_NBarrelStubs",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 2,
+-    "rebinY": "None",
+-    "xlabel": "Stub Multiplicity (Barrel)",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 10.5, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/NEndcapStubs.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/NEndcapStubs.json
+deleted file mode 100644
+index d15ae8e38d1..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/NEndcapStubs.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_NEndcapStubs",
+-    "title": "L1TkTau_MatchTk_NEndcapStubs",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 2,
+-    "rebinY": "None",
+-    "xlabel": "Stub Multiplicity (Endcap)",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 10.5, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/NPsStubs.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/NPsStubs.json
+deleted file mode 100644
+index 2194b778cd4..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/NPsStubs.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_NPsStubs",
+-    "title": "L1TkTau_MatchTk_NPsStubs",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 2,
+-    "rebinY": "None",
+-    "xlabel": "Stub Multiplicity (PS)",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 10.5, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/NStubs.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/NStubs.json
+deleted file mode 100644
+index c3761859f0c..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/NStubs.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_NStubs",
+-    "title": "L1TkTau_MatchTk_NStubs",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 2,
+-    "rebinY": "None",
+-    "xlabel": "Stub Multiplicity",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 10.5, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/POCAz.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/POCAz.json
+deleted file mode 100644
+index f4927ba0c5c..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/POCAz.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_POCAz",
+-    "title": "L1TkTau_MatchTk_POCAz",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "z_{0} (cm)",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -20.0, "xmax": 20.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/Pt.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/Pt.json
+deleted file mode 100644
+index 37db1382293..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/Pt.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_Pt",
+-    "title": "L1TkTau_MatchTk_Pt",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "p_{T} (GeV/c)",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 200.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/PtMinusCaloEt.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/PtMinusCaloEt.json
+deleted file mode 100644
+index e547c7a0f24..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/PtMinusCaloEt.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_PtMinusCaloEt",
+-    "title": "L1TkTau_MatchTk_PtPtMinusCaloEt",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "p_{T}^{tk} - E_{T}",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -100.0, "xmax": 100.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/PtRel.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/PtRel.json
+deleted file mode 100644
+index 592b9c1e3e6..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/PtRel.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_PtRel",
+-    "title": "L1TkTau_MatchTk_PtRel",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "p_{T}^{tk}/E_{T}^{calo}",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 3.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/RedChiSquared.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/RedChiSquared.json
+deleted file mode 100644
+index 679ba0481e3..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/RedChiSquared.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_RedChiSquared",
+-    "title": "L1TkTau_MatchTk_RedChiSquared",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "#chi^{2}_{N}",
+-    "ylabel": "Events / %.1f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 10.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/StubPtCons.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/StubPtCons.json
+deleted file mode 100644
+index 1a17643ebc8..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/StubPtCons.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_StubPtCons",
+-    "title": "L1TkTau_MatchTk_StubPtCons",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "stub p_{T} consistency",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 100.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/d0.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/d0.json
+deleted file mode 100644
+index 0283e65ac40..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/d0.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_d0",
+-    "title": "L1TkTau_MatchTk_d0",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "d_{0} (cm)",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -0.8, "xmax": 0.8, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/d0Abs.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/d0Abs.json
+deleted file mode 100644
+index 72efb753e3c..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_MatchTk/d0Abs.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_d0Abs",
+-    "title": "L1TkTau_MatchTk_d0Abs",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "|d_{0}| (cm)",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 0.8, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/DeltaPOCAz.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/DeltaPOCAz.json
+deleted file mode 100644
+index 0b31aaf3aef..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/DeltaPOCAz.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_SigTks_DeltaPOCAz",
+-    "title": "L1TkTau_SigTks_DeltaPOCAz",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 2,
+-    "rebinY": "None",
+-    "xlabel": "|#Deltaz_{0}| (cm)",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 15.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/Eta.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/Eta.json
+deleted file mode 100644
+index fc06f44cf1f..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/Eta.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_SigTks_Eta",
+-    "title": "L1TkTau_SigTks_Eta",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "#eta",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 3.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/POCAz.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/POCAz.json
+deleted file mode 100644
+index d385d8b3011..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/POCAz.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_SigTks_POCAz",
+-    "title": "L1TkTau_SigTks_POCAz",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "z_{0} (cm)",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -20.0, "xmax": 20.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/Pt.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/Pt.json
+deleted file mode 100644
+index a0c2ff853cc..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/Pt.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_SigTks_Pt",
+-    "title": "L1TkTau_SigTks_Pt",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "p_{T} (GeV/c)",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 200.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/PtRel.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/PtRel.json
+deleted file mode 100644
+index 3dc8731c4fa..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/PtRel.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_SigTks_PtRel",
+-    "title": "L1TkTau_SigTks_PtRel",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "p_{T}^{tk}/E_{T}^{calo}",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 3.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/StubPtCons.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/StubPtCons.json
+deleted file mode 100644
+index 1a86ed4bb1c..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/StubPtCons.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_SigTks_StubPtCons",
+-    "title": "L1TkTau_SigTks_StubPtCons",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "stub p_{T} consistency",
+-    "ylabel": "Events / %.0f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 100.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/d0.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/d0.json
+deleted file mode 100644
+index 10a789e4eb8..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/d0.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_SigTks_d0",
+-    "title": "L1TkTau_SigTks_d0",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "d_{0} (cm)",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -0.8, "xmax": 0.8, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/d0Abs.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/d0Abs.json
+deleted file mode 100644
+index 2e2ec41bfea..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/d0Abs.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_SigTks_d0Abs",
+-    "title": "L1TkTau_SigTks_d0Abs",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "|d_{0}| (cm)",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmax": 0.8, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/d0Sig.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/d0Sig.json
+deleted file mode 100644
+index 7e009c7fb3a..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/d0Sig.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_SigTks_d0Sig",
+-    "title": "L1TkTau_SigTks_d0Sig",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "d_{0}/#sigma(d_{0})",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -5.0, "xmax": 5.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/d0SigAbs.json b/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/d0SigAbs.json
+deleted file mode 100644
+index 4fad935f7cc..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/L1TkTau_SigTks/d0SigAbs.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_SigTks_d0SigAbs",
+-    "title": "L1TkTau_SigTks_d0SigAbs",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 1,
+-    "rebinY": "None",
+-    "xlabel": "|d_{0}/#sigma(d_{0})|",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": 0.0, "xmax": 5.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Eff_Calo_Tk.json b/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Eff_Calo_Tk.json
+deleted file mode 100644
+index 814191a80d0..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Eff_Calo_Tk.json
++++ /dev/null
+@@ -1,36 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histogram": "DiTau_Eff_Calo_Tk",
+-    "title": "DiTau_Eff_Calo_Tk",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "rebinY": 1,
+-    "xlabel": "Calo E_{T} (GeV)",
+-    "ylabel": "Calo E_{T} (GeV)",
+-    "zlabel": "Efficiency",
+-    "zmin"  : 0.0,
+-    "zmax"  : 1.0,
+-    "zlog"  : "False",
+-    "drawStyle": "COLZ",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 0.0, "xmax": 100.0, "ymin": 1e-04, "ymax": 100.0},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "True",
+-    "moveLegend": {"dx": -0.05, "dy": -0.05, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.18, "y": 0.89, "size": 17},
+-    "cutValue": 20.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Eff_Calo_Tk_VtxIso.json b/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Eff_Calo_Tk_VtxIso.json
+deleted file mode 100644
+index 45e54195149..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Eff_Calo_Tk_VtxIso.json
++++ /dev/null
+@@ -1,36 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histogram": "DiTau_Eff_Tk_VtxIso",
+-    "title": "DiTau_Eff_Tk_VtxIso",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "rebinY": 1,
+-    "xlabel": "Calo E_{T} (GeV)",
+-    "ylabel": "Calo E_{T} (GeV)",
+-    "zlabel": "Efficiency",
+-    "zmin"  : 0.0,
+-    "zmax"  : 1.0,
+-    "zlog"  : "False",
+-    "drawStyle": "COLZ",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 0.0, "xmax": 100.0, "ymin": 1e-04, "ymax": 100.0},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "True",
+-    "moveLegend": {"dx": -0.05, "dy": -0.05, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.18, "y": 0.89, "size": 17},
+-    "cutValue": 20.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Eff_Calo_VtxIso.json b/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Eff_Calo_VtxIso.json
+deleted file mode 100644
+index 236e819724b..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Eff_Calo_VtxIso.json
++++ /dev/null
+@@ -1,36 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histogram": "DiTau_Eff_Calo_VtxIso",
+-    "title": "DiTau_Eff_Calo_VtxIso",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "rebinY": 1,
+-    "xlabel": "Calo E_{T} (GeV)",
+-    "ylabel": "Calo E_{T} (GeV)",
+-    "zlabel": "Efficiency",
+-    "zmin"  : 0.0,
+-    "zmax"  : 1.0,
+-    "zlog"  : "False",
+-    "drawStyle": "COLZ",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 0.0, "xmax": 100.0, "ymin": 1e-04, "ymax": 100.0},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "True",
+-    "moveLegend": {"dx": -0.05, "dy": -0.05, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.18, "y": 0.89, "size": 17},
+-    "cutValue": 20.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Rate_Calo_Tk.json b/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Rate_Calo_Tk.json
+deleted file mode 100644
+index eccb669d146..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Rate_Calo_Tk.json
++++ /dev/null
+@@ -1,36 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histogram": "DiTau_Rate_Calo_Tk",
+-    "title": "DiTau_Rate_Calo_Tk",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "rebinY": 1,
+-    "xlabel": "Calo E_{T} (GeV)",
+-    "ylabel": "Calo E_{T} (GeV)",
+-    "zlabel": "Rate (kHz)",
+-    "zmin"  : 1E+01,
+-    "zmax"  : 5.5E+04,
+-    "zlog"  : "True",
+-    "drawStyle": "COLZ",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 0.0, "xmax": 100.0, "ymin": 1e-04, "ymax": 100.0},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "True",
+-    "moveLegend": {"dx": -0.05, "dy": -0.05, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.18, "y": 0.89, "size": 17},
+-    "cutValue": 20.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Rate_Calo_VtxIso.json b/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Rate_Calo_VtxIso.json
+deleted file mode 100644
+index aa8def4d35b..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Rate_Calo_VtxIso.json
++++ /dev/null
+@@ -1,36 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histogram": "DiTau_Rate_Calo_VtxIso",
+-    "title": "DiTau_Rate_Calo_VtxIso",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "rebinY": 1,
+-    "xlabel": "Calo E_{T} (GeV)",
+-    "ylabel": "Calo E_{T} (GeV)",
+-    "zlabel": "Rate (kHz)",
+-    "zmin"  : 1E+01,
+-    "zmax"  : 5.5E+04,
+-    "zlog"  : "True",
+-    "drawStyle": "COLZ",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 0.0, "xmax": 100.0, "ymin": 1e-04, "ymax": 100.0},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "True",
+-    "moveLegend": {"dx": -0.05, "dy": -0.05, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.18, "y": 0.89, "size": 17},
+-    "cutValue": 20.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Rate_Tk_VtxIso.json b/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Rate_Tk_VtxIso.json
+deleted file mode 100644
+index c60591da2c1..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/2d/DiTau_Rate_Tk_VtxIso.json
++++ /dev/null
+@@ -1,36 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histogram": "DiTau_Rate_Tk_VtxIso",
+-    "title": "DiTau_Rate_Tk_VtxIso",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "rebinY": 1,
+-    "xlabel": "Calo E_{T} (GeV)",
+-    "ylabel": "Calo E_{T} (GeV)",
+-    "zlabel": "Rate (kHz)",
+-    "zmin"  : 1E+01,
+-    "zmax"  : 5.5E+04,
+-    "zlog"  : "True",
+-    "drawStyle": "COLZ",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 0.0, "xmax": 100.0, "ymin": 1e-04, "ymax": 100.0},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "True",
+-    "moveLegend": {"dx": -0.05, "dy": -0.05, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.18, "y": 0.89, "size": 17},
+-    "cutValue": 20.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/DiTau_Eff.json b/NtupleAnalysis/src/Tracking/work/json/Performance/DiTau_Eff.json
+deleted file mode 100644
+index 38747d97bc7..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/DiTau_Eff.json
++++ /dev/null
+@@ -1,34 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histograms": ["DiTau_Eff_Calo", "DiTau_Eff_Tk", "DiTau_Eff_VtxIso"],
+-    "title": "Calo_Eff",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "xlabel": "Calo E_{T} (GeV)",
+-    "ylabel": "Efficiency / %.0f GeV",
+-    "drawStyle": "HIST",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 0.0, "xmax": 100.0, "ymin": 1e-04, "ymaxfactor": 1.15},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "ratio": "False",
+-    "ratioInvert": "False",
+-    "ratioYlabel": "Ratio",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": -0.05, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.72, "y": 0.89, "size": 17},
+-    "cutValue": 20.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/DiTau_Eff_Calo.json b/NtupleAnalysis/src/Tracking/work/json/Performance/DiTau_Eff_Calo.json
+deleted file mode 100644
+index 7c9815e1450..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/DiTau_Eff_Calo.json
++++ /dev/null
+@@ -1,35 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histogram": "DiTau_Eff_Calo",
+-    "title": "DiTau_Eff_Calo",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "rebinY": 1,
+-    "xlabel": "Calo E_{T} (GeV)",
+-    "ylabel": "Calo E_{T} (GeV)",
+-    "zlabel": "Efficiency",
+-    "zmin"  : 0.0,
+-    "zmax"  : 1.0,
+-    "drawStyle": "COLZ",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 0.0, "xmax": 100.0, "ymin": 1e-04, "ymax": 100.0},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "True",
+-    "moveLegend": {"dx": -0.05, "dy": -0.05, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.18, "y": 0.89, "size": 17},
+-    "cutValue": 20.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/DiTau_Eff_Tk.json b/NtupleAnalysis/src/Tracking/work/json/Performance/DiTau_Eff_Tk.json
+deleted file mode 100644
+index b875f61bd42..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/DiTau_Eff_Tk.json
++++ /dev/null
+@@ -1,35 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histogram": "DiTau_Eff_Tk",
+-    "title": "DiTau_Eff_Tk",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "rebinY": 1,
+-    "xlabel": "Calo E_{T} (GeV)",
+-    "ylabel": "Calo E_{T} (GeV)",
+-    "zlabel": "Efficiency",
+-    "zmin"  : 0.0,
+-    "zmax"  : 1.0,
+-    "drawStyle": "COLZ",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 0.0, "xmax": 100.0, "ymin": 1e-04, "ymax": 100.0},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "True",
+-    "moveLegend": {"dx": -0.05, "dy": -0.05, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.18, "y": 0.89, "size": 17},
+-    "cutValue": 20.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/DiTau_Eff_VtxIso.json b/NtupleAnalysis/src/Tracking/work/json/Performance/DiTau_Eff_VtxIso.json
+deleted file mode 100644
+index c87926b5ef0..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/DiTau_Eff_VtxIso.json
++++ /dev/null
+@@ -1,35 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histogram": "DiTau_Eff_VtxIso",
+-    "title": "DiTau_Eff_VtxIso",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "rebinY": 1,
+-    "xlabel": "Calo E_{T} (GeV)",
+-    "ylabel": "Calo E_{T} (GeV)",
+-    "zlabel": "Efficiency",
+-    "zmin"  : 0.0,
+-    "zmax"  : 1.0,
+-    "drawStyle": "COLZ",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 0.0, "xmax": 100.0, "ymin": 1e-04, "ymax": 100.0},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "True",
+-    "moveLegend": {"dx": -0.05, "dy": -0.05, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.18, "y": 0.89, "size": 17},
+-    "cutValue": 20.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/DiTau_Rate.json b/NtupleAnalysis/src/Tracking/work/json/Performance/DiTau_Rate.json
+deleted file mode 100644
+index f22a01bf280..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/DiTau_Rate.json
++++ /dev/null
+@@ -1,34 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histograms": ["DiTau_Rate_Calo", "DiTau_Rate_Tk", "DiTau_Rate_VtxIso"],
+-    "title": "DiTau_Rate",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "MinBias",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "xlabel": "Calo E_{T} (GeV)",
+-    "ylabel": "Rate (kHz) / %.0f GeV",    
+-    "drawStyle": "HIST",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 2.0, "xmax": 120.0, "ymin": 1E+0, "ymax": 5E+04, "ymaxfactor": 1.00},
+-    "opts2": {"ymin": 0.0, "ymax": 1.5E+1},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "True",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "ratio": "False",
+-    "ratioInvert": "True",
+-    "ratioYlabel": "1/Ratio",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": -0.05, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.72, "y": 0.89, "size": 17},
+-    "cutValue": 10.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "True"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/Eff.json b/NtupleAnalysis/src/Tracking/work/json/Performance/Eff.json
+deleted file mode 100644
+index 9cfc9be4332..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/Eff.json
++++ /dev/null
+@@ -1,34 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histograms": ["Calo_Eff", "Tk_Eff", "VtxIso_Eff"],
+-    "title": "Calo_Eff",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "xlabel": "Calo E_{T} (GeV)",
+-    "ylabel": "Efficiency / %.0f GeV",
+-    "drawStyle": "HIST",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 0.0, "xmax": 100.0, "ymin": 1e-04, "ymaxfactor": 1.15},
+-    "opts2": {"ymin": 0.6, "ymax": 1.4},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "ratio": "False",
+-    "ratioInvert": "False",
+-    "ratioYlabel": "Ratio",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": -0.05, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.72, "y": 0.89, "size": 17},
+-    "cutValue": 20.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/Rate.json b/NtupleAnalysis/src/Tracking/work/json/Performance/Rate.json
+deleted file mode 100644
+index 465eb69eaaf..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/Rate.json
++++ /dev/null
+@@ -1,34 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histograms": ["Calo_Rate", "Tk_Rate", "VtxIso_Rate"],
+-    "title": "Calo_Rate",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "MinBias",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "xlabel": "Calo E_{T} (GeV)",
+-    "ylabel": "Rate (kHz) / %.0f GeV",    
+-    "drawStyle": "HIST",
+-    "legendStyle": "L",
+-    "opts": {"xmin": 2.0, "xmax": 120.0, "ymin": 1E+0, "ymax": 5E+04, "ymaxfactor": 1.00},
+-    "opts2": {"ymin": 0.0, "ymax": 1.5E+1},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "True",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "ratio": "False",
+-    "ratioInvert": "True",
+-    "ratioYlabel": "1/Ratio",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": -0.05, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.72, "y": 0.89, "size": 17},
+-    "cutValue": 10.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "True"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/TurnOn25.json b/NtupleAnalysis/src/Tracking/work/json/Performance/TurnOn25.json
+deleted file mode 100644
+index a9506612696..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/TurnOn25.json
++++ /dev/null
+@@ -1,34 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histograms": ["Calo_TurnOn25", "Tk_TurnOn25", "VtxIso_TurnOn25"],
+-    "title": "TurnOn25",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "xlabel": "#tau_{h} E_{T} (GeV)",
+-    "ylabel": "Efficiency / %.0f GeV",    
+-    "drawStyle": "P",
+-    "legendStyle": "LP",
+-    "opts": {"xmin": 0.0, "xmax": 200.0, "ymin": 0.0, "ymax": 1.2},
+-    "opts2": {"ymin": 0.0, "ymax": 1.5E+1},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "ratio": "False",
+-    "ratioInvert": "True",
+-    "ratioYlabel": "1/Ratio",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": -0.45, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.72, "y": 0.49, "size": 17},
+-    "cutValue": 25.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "True"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/TurnOn50.json b/NtupleAnalysis/src/Tracking/work/json/Performance/TurnOn50.json
+deleted file mode 100644
+index 4953209ffe8..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/TurnOn50.json
++++ /dev/null
+@@ -1,34 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histograms": ["Calo_TurnOn50", "Tk_TurnOn50", "VtxIso_TurnOn50"],
+-    "title": "TurnOn50",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "xlabel": "#tau_{h} E_{T} (GeV)",
+-    "ylabel": "Efficiency / %.0f GeV",    
+-    "drawStyle": "P",
+-    "legendStyle": "LP",
+-    "opts": {"xmin": 0.0, "xmax": 200.0, "ymin": 0.0, "ymax": 1.2},
+-    "opts2": {"ymin": 0.0, "ymax": 1.5E+1},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "ratio": "False",
+-    "ratioInvert": "True",
+-    "ratioYlabel": "1/Ratio",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": -0.45, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.72, "y": 0.49, "size": 17},
+-    "cutValue": 50.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "True"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/TurnOn_DiTau50kHz.json b/NtupleAnalysis/src/Tracking/work/json/Performance/TurnOn_DiTau50kHz.json
+deleted file mode 100644
+index cc9020d74f8..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/TurnOn_DiTau50kHz.json
++++ /dev/null
+@@ -1,34 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histograms": ["Calo_TurnOn_DiTau50KHz", "Tk_TurnOn_DiTau50KHz", "VtxIso_TurnOn_DiTau50KHz"],
+-    "title": "TurnOn_DiTau50KHz",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "xlabel": "#tau_{h} E_{T} (GeV)",
+-    "ylabel": "Efficiency / %.0f GeV",    
+-    "drawStyle": "P",
+-    "legendStyle": "LP",
+-    "opts": {"xmin": 0.0, "xmax": 200.0, "ymin": 0.0, "ymax": 1.2},
+-    "opts2": {"ymin": 0.0, "ymax": 1.5E+1},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "ratio": "False",
+-    "ratioInvert": "True",
+-    "ratioYlabel": "1/Ratio",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": -0.45, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.72, "y": 0.49, "size": 17},
+-    "cutValue": 50.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "True"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Performance/TurnOn_SingleTau50kHz.json b/NtupleAnalysis/src/Tracking/work/json/Performance/TurnOn_SingleTau50kHz.json
+deleted file mode 100644
+index bbf54e94fb6..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Performance/TurnOn_SingleTau50kHz.json
++++ /dev/null
+@@ -1,34 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "dataEra": "TP2015",
+-    "histograms": ["Calo_TurnOn_SingleTau50KHz", "Tk_TurnOn_SingleTau50KHz", "VtxIso_TurnOn_SingleTau50KHz"],
+-    "title": "TurnOn_SingleTau50KHz",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "sample": "VBF_HToTauTau",
+-    "normalizationToOne": "False",
+-    "rebinX": 1,
+-    "xlabel": "#tau_{h} E_{T} (GeV)",
+-    "ylabel": "Efficiency / %.0f GeV",    
+-    "drawStyle": "P",
+-    "legendStyle": "LP",
+-    "opts": {"xmin": 0.0, "xmax": 200.0, "ymin": 0.0, "ymax": 1.2},
+-    "opts2": {"ymin": 0.0, "ymax": 1.5E+1},
+-    "stackMCHistograms": "False",
+-    "addCmsText": "True",
+-    "logY": "False",
+-    "gridX": "True",
+-    "gridY": "True",
+-    "ratio": "False",
+-    "ratioInvert": "True",
+-    "ratioYlabel": "1/Ratio",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": -0.45, "dh": -0.16},
+-    "extraText": {"text": "VBF H^{0}#rightarrow#tau#tau", "x": 0.72, "y": 0.49, "size": 17},
+-    "cutValue": 50.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "False",
+-    "cutGreaterThan": "True"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Resolution/Eta.json b/NtupleAnalysis/src/Tracking/work/json/Resolution/Eta.json
+deleted file mode 100644
+index 999c75602ca..00000000000
+--- a/NtupleAnalysis/src/Tracking/work/json/Resolution/Eta.json
++++ /dev/null
+@@ -1,41 +0,0 @@
+-{
+-    "analysis": "HLTausAnalysis",
+-    "searchMode": "",
+-    "dataEra": "TP2015",
+-    "optMode": "",
+-    "histogram": "L1TkTau_MatchTk_Eta",
+-    "title": "L1TkTau_MatchTk_Eta",
+-    "saveFormats": [".png", ".pdf", ".C"],
+-    "saveDir": "plots",
+-    "samples": ["VBF", "Neutrino"],
+-    "normalization": "normalizeToOne",
+-    "rebinX": 5,
+-    "rebinY": "None",
+-    "xlabel": "#eta",
+-    "ylabel": "Events / %.2f",
+-    "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -3.0, "xmax": 3.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+-    "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+-    "ratio": "True",
+-    "ratioYlabel": "Ratio",
+-    "ratioInvert": "False",
+-    "stackMCHistograms": "False",
+-    "addMCUncertainty": "False",
+-    "addLuminosityText": "False",
+-    "addCmsText": "True",
+-    "errorBarsX": "True",
+-    "logX": "False",
+-    "logY": "True",
+-    "gridX": "False",
+-    "gridY": "True",
+-    "cmsExtraText": "Phase-2 Simulation",
+-    "removeLegend": "False",
+-    "moveLegend": {"dx": -0.02, "dy": 0.0, "dh": -0.2},
+-    "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+-    "cutValue": 0.0,
+-    "cutFillColour": 16,
+-    "cutBox": "False",
+-    "cutLine": "True",
+-    "cutGreaterThan": "False"
+-}
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Resolution/L1Tks_Eta_Res.json b/NtupleAnalysis/src/Tracking/work/json/Resolution/L1Tks_Eta_Res.json
+index 89de82e6e9e..66d45f1136a 100644
+--- a/NtupleAnalysis/src/Tracking/work/json/Resolution/L1Tks_Eta_Res.json
++++ b/NtupleAnalysis/src/Tracking/work/json/Resolution/L1Tks_Eta_Res.json
+@@ -1,21 +1,21 @@
+ {
+     "analysis": "HLTausAnalysis",
+     "searchMode": "",
+-    "dataEra": "TP2015",
++    "dataEra": "ID2017",
+     "optMode": "",
+     "histogram": "L1Tks_MatchedToTP_Eta_Res",
+     "title": "L1_Tracks_Eta_Resolution",
+     "saveFormats": [".png", ".pdf", ".C"],
+     "saveDir": "plots",
+-    "samples": ["VBF"],
++    "samples": ["SingleTau"],
+     "normalization": "normalizeToOne",
+     "rebinX": 1,
+     "rebinY": "None",
+     "xlabel": "(#eta^{track}-#eta^{particle})/#eta^{particle}",
+-    "ylabel": "Events",
++    "ylabel": "Events / %.3f",
+     "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -0.1, "xmax": 0.1, "ymin": 0.0, "ymaxfactor": 1.5},
++    "drawStyle": "AP",
++    "opts": {"xmin": -0.015, "xmax": 0.015, "ymin": 0.0, "ymaxfactor": 1.5},
+     "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+     "ratio": "True",
+     "ratioYlabel": "Ratio",
+@@ -31,11 +31,11 @@
+     "gridY": "True",
+     "cmsExtraText": "Phase-2 Simulation",
+     "removeLegend": "False",
+-    "moveLegend": {"dx": -0.2, "dy": 0.0, "dh": -0.2},
++    "moveLegend": {"dx": -0.28, "dy": 0.0, "dh": -0.2},
+     "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+     "cutValue": 0.0,
+     "cutFillColour": 16,
+     "cutBox": "False",
+-    "cutLine": "False",
++    "cutLine": "True",
+     "cutGreaterThan": "False"
+ }
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Resolution/L1Tks_Phi_Res.json b/NtupleAnalysis/src/Tracking/work/json/Resolution/L1Tks_Phi_Res.json
+index 87cdb352cac..8f427837bc0 100644
+--- a/NtupleAnalysis/src/Tracking/work/json/Resolution/L1Tks_Phi_Res.json
++++ b/NtupleAnalysis/src/Tracking/work/json/Resolution/L1Tks_Phi_Res.json
+@@ -1,21 +1,21 @@
+ {
+     "analysis": "HLTausAnalysis",
+     "searchMode": "",
+-    "dataEra": "TP2015",
++    "dataEra": "ID2017",
+     "optMode": "",
+     "histogram": "L1Tks_MatchedToTP_Phi_Res",
+     "title": "L1_Tracks_Phi_Resolution",
+     "saveFormats": [".png", ".pdf", ".C"],
+     "saveDir": "plots",
+-    "samples": ["VBF"],
++    "samples": ["SingleTau"],
+     "normalization": "normalizeToOne",
+     "rebinX": 1,
+     "rebinY": "None",
+     "xlabel": "(#phi^{track}-#phi^{particle})/#phi^{particle}",
+-    "ylabel": "Events",
++    "ylabel": "Events / %.3f",
+     "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
+-    "opts": {"xmin": -0.1, "xmax": 0.1, "ymin": 0.0, "ymaxfactor": 1.5},
++    "drawStyle": "AP",
++    "opts": {"xmin": -0.01, "xmax": 0.01, "ymin": 0.0, "ymaxfactor": 1.5},
+     "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+     "ratio": "True",
+     "ratioYlabel": "Ratio",
+@@ -31,11 +31,11 @@
+     "gridY": "True",
+     "cmsExtraText": "Phase-2 Simulation",
+     "removeLegend": "False",
+-    "moveLegend": {"dx": -0.2, "dy": 0.0, "dh": -0.2},
++    "moveLegend": {"dx": -0.28, "dy": 0.0, "dh": -0.2},
+     "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+     "cutValue": 0.0,
+     "cutFillColour": 16,
+     "cutBox": "False",
+-    "cutLine": "False",
++    "cutLine": "True",
+     "cutGreaterThan": "False"
+ }
+diff --git a/NtupleAnalysis/src/Tracking/work/json/Resolution/L1Tks_Pt_Res.json b/NtupleAnalysis/src/Tracking/work/json/Resolution/L1Tks_Pt_Res.json
+index 59c65670b2e..4a9a953f244 100644
+--- a/NtupleAnalysis/src/Tracking/work/json/Resolution/L1Tks_Pt_Res.json
++++ b/NtupleAnalysis/src/Tracking/work/json/Resolution/L1Tks_Pt_Res.json
+@@ -1,20 +1,20 @@
+ {
+     "analysis": "HLTausAnalysis",
+     "searchMode": "",
+-    "dataEra": "TP2015",
++    "dataEra": "ID2017",
+     "optMode": "",
+     "histogram": "L1Tks_MatchedToTP_Pt_Res",
+     "title": "L1_Tracks_Pt_Resolution",
+     "saveFormats": [".png", ".pdf", ".C"],
+     "saveDir": "plots",
+-    "samples": ["VBF"],
++    "samples": ["SingleTau"],
+     "normalization": "normalizeToOne",
+     "rebinX": 1,
+     "rebinY": "None",
+     "xlabel": "(p_{T}^{track}-p_{T}^{particle})/p_{T}^{particle}",
+-    "ylabel": "Events",
++    "ylabel": "Events / %.3f",
+     "divideByBinWidth": "False",
+-    "drawStyle": "COLZ",
++    "drawStyle": "AP",
+     "opts": {"xmin": -0.1, "xmax": 0.1, "ymin": 0.0, "ymaxfactor": 1.5},
+     "ratioOpts": {"ymin": 0.0, "ymax": 2.0},
+     "ratio": "True",
+@@ -31,11 +31,11 @@
+     "gridY": "True",
+     "cmsExtraText": "Phase-2 Simulation",
+     "removeLegend": "False",
+-    "moveLegend": {"dx": -0.2, "dy": 0.0, "dh": -0.2},
++    "moveLegend": {"dx": -0.15, "dy": 0.0, "dh": -0.2},
+     "extraText": {"text": "", "x": 0.18, "y": 0.92, "size": 17},
+     "cutValue": 0.0,
+     "cutFillColour": 16,
+     "cutBox": "False",
+-    "cutLine": "False",
++    "cutLine": "True",
+     "cutGreaterThan": "False"
+ }
+diff --git a/NtupleAnalysis/src/Tracking/work/plotComparison.py b/NtupleAnalysis/src/Tracking/work/plotComparison.py
+index 1052229601c..22f790e9dd4 100755
+--- a/NtupleAnalysis/src/Tracking/work/plotComparison.py
++++ b/NtupleAnalysis/src/Tracking/work/plotComparison.py
+@@ -176,13 +176,25 @@ def ComparisonPlot(datasetsMgr, json):
+     cutBox_    = {"cutValue": json["cutValue"] , "fillColor": json["cutFillColour"],
+                   "box": json["cutBox"]=="True", "line": json["cutLine"]=="True",
+                   "greaterThan": json["cutGreaterThan"]=="True"}
+-    normToOne_ = json["normalizationToOne"]=="True"
++    if("normalization" in json):
++        normToOne_ = json["normalization"]=="normalizationToOne"
++    elif("normalizationToOne" in json):
++        normToOne_ = json["normalizationToOne"]=="True"
++    else:
++        raise Exception("This should never be reached")
++
+     if normToOne_:
+         ylabel_ = ylabel_.replace(json["ylabel"].split(" /")[0], "Arbitrary Units")
+ 
+     # Get the reference histo and the list of histos to compare
+-    histoReference = getHisto(datasetsMgr, json['sample'], json['histograms'][0])
+-    histoCompares  = getHistos(datasetsMgr, json['sample'], json['histograms'])
++    refSample = ""
++    if('sample' in json):        
++        refSample = json['sample']
++    else:
++        refSample = datasetsMgr.getAllDatasets()[0]
++        
++    histoReference = getHisto(datasetsMgr, refSample, json['histograms'][0])
++    histoCompares  = getHistos(datasetsMgr, refSample, json['histograms'])
+     p = plots.ComparisonManyPlot(histoReference, histoCompares, saveFormats=[])
+     
+     # Set universal histo styles
+@@ -191,7 +203,7 @@ def ComparisonPlot(datasetsMgr, json):
+ 
+     # Set individual styles
+     for i in range(0, len(histoCompares)+1):
+-        hName = "h%s-%s" % (i, json["sample"])
++        hName = "h%s-%s" % (i, refSample)
+         legendDict[hName] = styles.getCaloLegend(i)
+         p.histoMgr.forHisto(hName, styles.getCaloStyle(i) )
+         if 0:
+diff --git a/NtupleAnalysis/src/Tracking/work/plotMC.py b/NtupleAnalysis/src/Tracking/work/plotMC.py
+index b6474e53ca4..0d55cb1f3f6 100755
+--- a/NtupleAnalysis/src/Tracking/work/plotMC.py
++++ b/NtupleAnalysis/src/Tracking/work/plotMC.py
+@@ -10,7 +10,7 @@ Usage (multiple plots):
+ 
+ Last Used:
+ ./plotMC.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/L1TkTau/Multiplicity.json -i "VBF|Neutrino"
+-./plotMC.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/*/*.json -i "VBF|Neutrino"
++./plotMC.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/*/*.json -i "SingleTau_P140|SingleTau_P200|"
+ '''
+ 
+ #================================================================================================
+@@ -162,7 +162,12 @@ def MCPlot(datasetsMgr, json):
+         p.histoMgr.setHistoDrawStyleAll(json["drawStyle"])
+     if("legendStyle" in json):
+         p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
+-    
++    else:
++        if json["drawStyle"] == "HIST":
++            p.histoMgr.setHistoLegendStyleAll("F")
++        else:
++            p.histoMgr.setHistoLegendStyleAll("LP")
++        
+     # Draw a customised plot
+     saveName = os.path.join(json["saveDir"], json["title"])
+     plots.drawPlot(p, 
+diff --git a/NtupleAnalysis/src/Tracking/work/run.cc b/NtupleAnalysis/src/Tracking/work/run.cc
+index 314ea50fcce..2ef4c31f94c 100755
+--- a/NtupleAnalysis/src/Tracking/work/run.cc
++++ b/NtupleAnalysis/src/Tracking/work/run.cc
+@@ -4,7 +4,7 @@
+ //
+ // Example:
+ // root -l
+-// root[0] .x run.cc("multicrab_CaloTk_v910p2_test", "SingleTau-PU140", "", -1);
++// root[0] .x run.cc("multicrab_CaloTk_v910p2_20170520T1958", "SingleTau-PU140", "", -1);
+ //
+ //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ #include "../Tracking.C+" // how to compile macro in ROOT6 (compatible with ROOT5 as well)
+@@ -15,11 +15,12 @@ void run(const std::string MulticrabDir = "",
+ 	 const int maxEvents = -1)
+ {
+ 
+-// Alexandro's files
+-  // const std::string absolutePath = "/Users/attikis/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X";
+-     const std::string absolutePath = "/afs/cern.ch/user/a/attikis/workspace/multicrab/";
++  // Alexandros' files
++  const std::string absolutePath = "/Users/attikis/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X";
++  // const std::string absolutePath = "/afs/cern.ch/user/a/attikis/workspace/multicrab/";
+   // const std::string absolutePath = "/Users/attikis/disk/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X/";
+-// Santeri's files
++  
++  // Santeri's files
+   // const std::string absolutePath = "/afs/cern.ch/work/s/slaurila/public/HLTaus/CMSSW_9_1_0_pre2/src/HLTausAnalysis/NtupleAnalysis/src/Tracking/work";
+   
+   Tracking macro(absolutePath + "/" + MulticrabDir, SampleName, text, maxEvents);
+
