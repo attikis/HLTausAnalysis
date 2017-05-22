@@ -114,10 +114,11 @@ _physicalMcAdd = {
     "TauThreeProngs"                        : "TauThreeProngs",
 
     # ID 2017
-    "SingleTau_NoPU" : "SingleTau_NoPU",
-    "SingleTau_PU140": "SingleTau_PU140",
-    "SingleTau_PU200": "SingleTau_PU200",
-    
+    "SingleTau_NoPU"      : "SingleTau_NoPU",
+    "SingleTau_PU140"     : "SingleTau_PU140",
+    "SingleTau_PU200"     : "SingleTau_PU200",
+    "SingleNeutrino_PU140": "SingleNeutrino_PU140",
+    "SingleNeutrino_PU200": "SingleNeutrino_PU200",    
 }
 
 '''
@@ -221,9 +222,11 @@ _physicalToLogical.update({
     "ZZ": "ZZ",
     
     # ID2017
-    "SingleTau_NoPU" : "SingleTau_NoPU",
-    "SingleTau_PU140": "SingleTau_PU140",
-    "SingleTau_PU200": "SingleTau_PU200",
+    "SingleTau_NoPU"      : "SingleTau_NoPU",
+    "SingleTau_PU140"     : "SingleTau_PU140",
+    "SingleTau_PU200"     : "SingleTau_PU200",
+    "SingleNeutrino_PU140": "SingleNeutrino_PU140",
+    "SingleNeutrino_PU200": "SingleNeutrino_PU200",    
 
 })
 
@@ -390,6 +393,8 @@ _datasetOrder.extend([
     "SingleTau_NoPU",
     "SingleTau_PU140"
     "SingleTau_PU200",
+    "SingleNeutrino_PU140",
+    "SingleNeutrino_PU200",
 
     ]) 
 
@@ -507,6 +512,8 @@ _legendLabels = {
     "SingleTau_NoPU" : "Single #tau (PU=0)",
     "SingleTau_PU140": "Single #tau (PU=140)",
     "SingleTau_PU200": "Single #tau (PU=200)",
+    "SingleNeutrino_PU140": "MB (PU=140)",
+    "SingleNeutrino_PU200": "MB (PU=200)",
 
     # Ratio uncertainties
     "BackgroundStatError"    : "Stat. unc.",
@@ -574,9 +581,12 @@ _plotStyles = {
     "TauThreeProngs": styles.Tau3prStyle,
 
     # ID2017
-    "SingleTau_NoPU" : styles.SingleTauNoPU,
-    "SingleTau_PU140": styles.SingleTauPU140,
-    "SingleTau_PU200": styles.SingleTauPU200,
+    "SingleTau_NoPU"      : styles.SingleTauNoPU,
+    "SingleTau_PU140"     : styles.SingleTauPU140,
+    "SingleTau_PU200"     : styles.SingleTauPU200,
+    "SingleNeutrino_PU140": styles.SingleNeutrinoPU140,
+    "SingleNeutrino_PU200": styles.SingleNeutrinoPU200,
+
 
     "WJets_0bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+1),
     "WJets_1bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+4),

@@ -161,6 +161,15 @@ def MCPlot(datasetsMgr, json):
         p.histoMgr.setHistoDrawStyleAll(json["drawStyle"])
     if("legendStyle" in json):
         p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
+
+    # For-loop: All histos
+    for index, h in enumerate(p.histoMgr.getHistos()):
+        if index == 0:
+            continue
+        else:
+            p.histoMgr.setHistoDrawStyle(h.getName(), "AP")
+            p.histoMgr.setHistoLegendStyle(h.getName(), "AP")
+
     
     # Draw a customised plot
     saveName = os.path.join(json["saveDir"], json["title"])
