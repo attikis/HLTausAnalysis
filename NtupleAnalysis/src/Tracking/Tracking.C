@@ -259,9 +259,9 @@ void Tracking::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1Tks_Pt, "L1Tks_MatchedToTP_Pt", "; p_{T} (GeV/c); Entries", 200,  +0.0,  +200.0);
   histoTools_.BookHisto_1D(hL1Tks_Eta, "L1Tks_MatchedToTP_Eta", "; #eta; Entries", 130,  -2.6,  +2.6);
   histoTools_.BookHisto_1D(hL1Tks_Phi, "L1Tks_MatchedToTP_Phi", "; #phi (rads); Entries", 128,  -3.2,  +3.2);
-  histoTools_.BookHisto_1D(hL1Tks_Pt_Res, "L1Tks_MatchedToTP_Pt_Res", "; (p_{T}^{track}-p_{T}^{particle})/p_{T}^{particle}; Entries", 20,  -5.0,  +5.0);
-  histoTools_.BookHisto_1D(hL1Tks_Eta_Res, "L1Tks_MatchedToTP_Eta_Res", "; (#eta^{track}-#eta^{particle})/#eta^{particle}; Entries", 40,  -0.2,  +0.2);
-  histoTools_.BookHisto_1D(hL1Tks_Phi_Res, "L1Tks_MatchedToTP_Phi_Res", "; (#phi^{track}-#phi^{particle})/#phi}^{particle} ; Entries", 40,  -0.2,  +0.2);
+  histoTools_.BookHisto_1D(hL1Tks_Pt_Res, "L1Tks_MatchedToTP_Pt_Res", "; (p_{T}^{track}-p_{T}^{particle})/p_{T}^{particle}; Entries", 200,  -1.0,  +1.0);
+  histoTools_.BookHisto_1D(hL1Tks_Eta_Res, "L1Tks_MatchedToTP_Eta_Res", "; (#eta^{track}-#eta^{particle})/#eta^{particle}; Entries", 160,  -0.2,  +0.2);
+  histoTools_.BookHisto_1D(hL1Tks_Phi_Res, "L1Tks_MatchedToTP_Phi_Res", "; (#phi^{track}-#phi^{particle})/#phi}^{particle} ; Entries", 160,  -0.2,  +0.2);
   histoTools_.BookHisto_1D(hTP_Pt, "TP_MatchedToL1Tk_Pt", "; p_{T} (GeV/c); Entries", 200,  +0.0,  +200.0);
   histoTools_.BookHisto_1D(hTP_Eta, "TP_MatchedToL1Tk_Eta", "; #eta; Entries", 130,  -2.6,  +2.6);
   histoTools_.BookHisto_1D(hTP_Phi, "TP_MatchedToL1Tk_Phi", "; #phi (rads); Entries", 128,  -3.2,  +3.2);  
@@ -270,9 +270,9 @@ void Tracking::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1Tau_CaloEt, "L1Tau_CaloEt", "; E_{T}^{vis} (GeV/c); Entries", 200,  +0.0,  +200.0);
   histoTools_.BookHisto_1D(hL1Tau_CaloEta, "L1Tau_CaloEta", "; #eta^{vis}; Entries", 130,  -2.6,  +2.6);
   histoTools_.BookHisto_1D(hL1Tau_CaloPhi,  "L1Tau_CaloPhi", "; #phi^{vis} (rads); Entries", 128,  -3.2,  +3.2);
-  histoTools_.BookHisto_1D(hL1Tau_CaloEt_Res, "L1Tau_CaloEt_Res", "; (E_{T}^{vis} - E_{T}^{vis,gen})/E_{T}^{vis,gen}; Entries", 20,  -5.0,  +5.0);
-  histoTools_.BookHisto_1D(hL1Tau_CaloEta_Res, "L1Tau_CaloEta_Res", "; (#eta^{vis} - #eta^{vis,gen})/#eta^{vis,gen}; Entries", 40,  -0.2,  +0.2);
-  histoTools_.BookHisto_1D(hL1Tau_CaloPhi_Res,  "L1Tau_CaloPhi_Res", "; (#phi^{vis} - #phi^{vis,gen})/#phi^{vis,gen}; Entries", 40,  -0.2,  +0.2);
+  histoTools_.BookHisto_1D(hL1Tau_CaloEt_Res, "L1Tau_CaloEt_Res", "; (E_{T}^{vis} - E_{T}^{vis,gen})/E_{T}^{vis,gen}; Entries", 200,  -1.0,  +1.0);
+  histoTools_.BookHisto_1D(hL1Tau_CaloEta_Res, "L1Tau_CaloEta_Res", "; (#eta^{vis} - #eta^{vis,gen})/#eta^{vis,gen}; Entries", 80,  -0.2,  +0.2);
+  histoTools_.BookHisto_1D(hL1Tau_CaloPhi_Res,  "L1Tau_CaloPhi_Res", "; (#phi^{vis} - #phi^{vis,gen})/#phi^{vis,gen}; Entries", 80,  -0.2,  +0.2);
   histoTools_.BookHisto_1D(hL1TauGenMatch_VisEt, "L1TauGenMatch_VisEt", "; E_{T}^{vis} (GeV/c); Entries", 200,  +0.0,  +200.0);
   histoTools_.BookHisto_1D(hL1TauGenMatch_Eta, "L1TauGenMatch_VisEta", "; #eta^{vis}; Entries", 130,  -2.6,  +2.6);
   histoTools_.BookHisto_1D(hL1TauGenMatch_Phi, "L1TauGenMatch_VisPhi", "; #phi^{vis} (rads); Entries", 128,  -3.2,  +3.2);
