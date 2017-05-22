@@ -21,11 +21,19 @@ TChain* FileOpener::OpenFiles(const string multicrabPath, const string dataset, 
   string rootFileName;
   const string datasetPath = datasets_.GetDatasetPathFromAlias(dataset);
   const string fullPath    = multicrabPath + "/" + datasetPath + "/results/";
-  vector<string> dirs = GetListOfFiles(fullPath);
+  vector<string> dirs      = GetListOfFiles(fullPath);
+
+  // Sanity check
+  if (dirs.size() < 1)
+    {
+      cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << "! EXIT" << endl;
+      exit(1);      
+    }
+  else cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << endl;
 
   // For-loop: All ROOT files
   for (vector<string>::iterator f = dirs.begin(); f != dirs.end(); f++)
-    {
+    {     
       rootFileName = *f;
       cout << "\tAdding file " << rootFileName << " to the chain" << endl;
       

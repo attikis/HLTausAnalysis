@@ -412,7 +412,7 @@ void CaloTk::Loop()
     if (mcSample.compare("MinBias") !=0 )
       {
 	if(DEBUG) cout << "\tGetting the GenParticles" << endl;
-	GenParticles = GetGenParticles(false); // time-consuming
+	if (0) GenParticles = GetGenParticles(false); // time-consuming
 	GenTaus  = GetGenParticles(15, true);
 	GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
 	GenTausTrigger  = GetHadronicGenTaus(GenTaus, 20.0, 2.3);    
@@ -421,7 +421,7 @@ void CaloTk::Loop()
     if (DEBUG)
        {
 	cout << "\tPrinting all GenParticle Collections" << endl;
-	PrintGenParticleCollection(GenParticles);
+	if (0) PrintGenParticleCollection(GenParticles);
 	PrintGenParticleCollection(GenTaus);
 	PrintGenParticleCollection(GenTausHadronic);    
 	PrintGenParticleCollection(GenTausTrigger);
@@ -485,9 +485,7 @@ void CaloTk::Loop()
 	GetIsoConeTracks(L1TkTauCandidate, isoTTTracks);
 	GetIsolationValues(L1TkTauCandidate);
 	GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic);
-	cout << "sigTTTracks.size() = " << sigTTTracks.size() << ", isoTTTracks.size() = " << isoTTTracks.size() << endl;
-	if (1) L1TkTauCandidate.PrintProperties(false, false, true, true);
-	cout << "" << endl;
+	if (DEBUG) L1TkTauCandidate.PrintProperties(false, false, true, true);
 	
 	// Save L1TkTau Candidate
 	L1TkTauCandidates.push_back(L1TkTauCandidate);
@@ -1569,16 +1567,15 @@ void CaloTk::GetIsoConeTracks(L1TkTauParticle &L1TkTau,
 {
   if (!L1TkTau.HasMatchingTk()) return; 
   vector<TTTrack> isoConeTks;
+
   
   // For-loop: All Tracks
   for (vector<TTTrack>::iterator tk = TTTracks.begin(); tk != TTTracks.end(); tk++)
     {
       double dR = auxTools_.DeltaR(tk->getEta(), tk->getPhi(), L1TkTau.GetMatchingTk().getEta(), L1TkTau.GetMatchingTk().getPhi());
-
       // Only consider tracks within singal cone
       if (dR < L1TkTau.GetIsoConeMin()) continue;
       if (dR > L1TkTau.GetIsoConeMax()) continue;
-
       isoConeTks.push_back(*tk);
     }
   

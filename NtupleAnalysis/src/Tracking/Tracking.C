@@ -147,8 +147,9 @@ void Tracking::Loop()
       
       if (DEBUG) cout << "=== GenParticles (" << GenP_Pt->size() << ")" << endl;
       vector<GenParticle> GenParticles = GetGenParticles(false);
-      if (DEBUG) PrintGenParticleCollection(GenParticles);
-
+      cout << "===================================" << endl;
+      if (1) PrintGenParticleCollection(GenParticles);
+      cout << "===================================\n" << endl;
 
       
       // =============================================================================
@@ -786,21 +787,34 @@ void Tracking::PrintGenParticleCollection(vector<GenParticle> collection)
 //============================================================================
 {
   if (DEBUG) std::cout << "=== Tracking::PrintGenParticleCollection()" << std::endl;
-  
+
+  int index = -1;
   for (vector<GenParticle>::iterator p = collection.begin(); p != collection.end(); p++)
     {
-      std::cout << "\nGenParticle:" << endl;
-      p->PrintProperties();
-      std::cout << "\nDaughters:" << endl;
-      p->PrintDaughters();
-      std::cout << "\nFinal Daughters:" << endl;
-      p->PrintFinalDaughters();
-      std::cout << "\nFinal Daughters (Charged):" << endl;
-      p->PrintFinalDaughtersCharged();
-      std::cout << "\nFinal Daughters (Neutral):" << endl;
-      p->PrintFinalDaughtersNeutral();
-      std::cout << "\nMothers:" << endl;
-      p->PrintMothers();
+      if (1)
+	{
+	  index++;
+	  p->PrintProperties(index==0);
+	}
+      else
+	{
+	  std::cout << "\nGenParticle:" << endl;
+	  p->PrintProperties();
+	  std::cout << "\nDaughters:" << endl;
+	  p->PrintDaughters();
+	  
+	  std::cout << "\nFinal Daughters:" << endl;
+	  p->PrintFinalDaughters();
+	  
+	  std::cout << "\nFinal Daughters (Charged):" << endl;
+	  p->PrintFinalDaughtersCharged();
+	  
+	  std::cout << "\nFinal Daughters (Neutral):" << endl;
+	  p->PrintFinalDaughtersNeutral();
+	  
+	  std::cout << "\nMothers:" << endl;
+	  p->PrintMothers();
+	}
     }
   
   return;
