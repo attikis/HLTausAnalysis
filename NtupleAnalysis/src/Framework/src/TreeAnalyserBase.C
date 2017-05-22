@@ -28,10 +28,9 @@ void TreeAnalyserBase::Initialize(const std::string MyName_,
   else prefix = MyName + "_";
 
   if (Text_ == "") postfix = "";
-  else prefix = "_" + Text_;
+  else postfix = "_" + Text_;
 
-  // if (Text == "") outFileName = MyName + "_Histograms_" + SampleName + ".root";
-  // else outFileName = MyName + "_Histograms_" + SampleName + "_" + Text + ".root";
+  // Create the output file name
   outFileName = prefix + "histograms-" + SampleName_ + postfix + ".root";
   outFile     = new TFile(outFileName.c_str(),"Recreate");
 

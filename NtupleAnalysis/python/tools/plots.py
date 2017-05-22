@@ -112,35 +112,21 @@ _physicalMcAdd = {
     "Neutrino_Pt2to20_gun"                  : "MinBias",
     "VBF_HToTauTau_125_14TeV_powheg_pythia6": "VBF_HToTauTau",
     "TauThreeProngs"                        : "TauThreeProngs",
+
+    # ID 2017
+    "SingleTau_NoPU" : "SingleTau_NoPU",
+    "SingleTau_PU140": "SingleTau_PU140",
+    "SingleTau_PU200": "SingleTau_PU200",
     
-    "ChargedHiggs_HplusTB_HplusToTauNu_M_500_ext1" : "ChargedHiggs_HplusTB_HplusToTauNu_M_500",
-    "ChargedHiggs_HplusTB_HplusToTauNu_M_750_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_750",
-    "ChargedHiggs_HplusTB_HplusToTauNu_M_800_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_800",
-    "ChargedHiggs_HplusTB_HplusToTauNu_M_1000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_1000",
-    "ChargedHiggs_HplusTB_HplusToTauNu_M_2000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_2000",
-    "ChargedHiggs_HplusTB_HplusToTauNu_M_3000_reHLT" : "ChargedHiggs_HplusTB_HplusToTauNu_M_3000",
 }
 
-#for mass in _lightHplusMasses:
-    #_physicalMcAdd["TTToHplusBWB_M%d_Summer12"%mass] = "TTToHplusBWB_M%d_Summer12"%mass
-    #_physicalMcAdd["TTToHplusBWB_M%d_ext_Summer12"%mass] = "TTToHplusBWB_M%d_Summer12"%mass
-    #if mass != 90:
-        #_physicalMcAdd["TTToHplusBHminusB_M%d_Summer12"%mass] = "TTToHplusBHminusB_M%d_Summer12"%mass
-        #_physicalMcAdd["TTToHplusBHminusB_M%d_ext_Summer12"%mass] = "TTToHplusBHminusB_M%d_Summer12"%mass
-#for mass in [180, 190, 200, 220, 250, 300]:
-    #_physicalMcAdd["HplusTB_M%d_Summer12"%mass] = "HplusTB_M%d_Summer12"%mass
-    #_physicalMcAdd["HplusTB_M%d_ext_Summer12"%mass] = "HplusTB_M%d_Summer12"%mass
-#for bquark in [0, 1, 2, 3, 4]:
-    #_physicalMcAdd["WJets_%dbquark_TuneZ2star_v1_Summer12"%bquark] = "WJets_%dbquark_TuneZ2star_Summer12"%bquark
-    #_physicalMcAdd["WJets_%dbquark_TuneZ2star_v2_Summer12"%bquark] = "WJets_%dbquark_TuneZ2star_Summer12"%bquark
-#for mass in _heavyHplusToTBbarMasses:
-    #_physicalMcAdd["HplusToTBbar_M%d_Summer12"%mass] = "HplusToTBbar_M%d_Summer12"%mass
+'''
+ Map the physical dataset names to logical names
 
-## Map the physical dataset names to logical names
-#
-# Map the physical dataset names (in multicrab.cfg) to logical names
-# used in plots._legendLabels and plots._plotStyles. The mapping is
-# used in the mergeRenameReorderForDataMC() function.
+ Map the physical dataset names (in multicrab.cfg) to logical names
+ used in plots._legendLabels and plots._plotStyles. The mapping is
+ used in the mergeRenameReorderForDataMC() function.
+'''
 _physicalToLogical = {
     #"TT_TuneZ2_Summer11": "TT",
 
@@ -150,97 +136,96 @@ _physicalToLogical = {
 
     #"W3Jets_TuneZ2_v2_Fall11": "W3Jets",
 }
-for mass in _lightHplusMasses:
-    _physicalToLogical["ChargedHiggs_TTToHplusBWB_HplusToTauNu_M_%d"%(mass)] = "TTToHplusBWB_M%d"%mass
-
 for mass in _heavyHplusMasses:
     _physicalToLogical["ChargedHiggs_HplusTB_HplusToTauNu_M_%d"%(mass)] = "HplusTB_M%d"%mass
 
-#for mass in _heavyHplusToTBbarMasses:
-    #_physicalToLogical["HplusToTBbar_M%d_%s"%(mass, mcEra)] = "HplusToTBbar_M%d" % mass
-
 _physicalToLogical.update({
-        "TTJets"         : "TTJets",
-        "TTJets_FullLept": "TTJets_FullLept",
-        "TTJets_SemiLept": "TTJets_SemiLept",
-        "TTJets_Hadronic".replace("_", "_ext_"): "TTJets_Hadronic",
+    "TTJets"         : "TTJets",
+    "TTJets_FullLept": "TTJets_FullLept",
+    "TTJets_SemiLept": "TTJets_SemiLept",
+    "TTJets_Hadronic".replace("_", "_ext_"): "TTJets_Hadronic",
+    
+    # powheg ttbar
+    "TT": "TT",
+    
+    "WJetsToLNu": "WJetsToLNu",
+    # "W1Jets"    : "W1Jets",
+    # "W2Jets"    : "W2Jets",
+    # "W3Jets"    : "W3Jets",
+    # "W4Jets"    : "W4Jets",
+    "WJetsToLNu_HT_100To200"  : "WJetsToLNu_HT_100To200",
+    "WJetsToLNu_HT_200To400"  : "WJetsToLNu_HT_200To400",
+    "WJetsToLNu_HT_400To600"  : "WJetsToLNu_HT_400To600",
+    "WJetsToLNu_HT_600To800"  : "WJetsToLNu_HT_600To800",
+    "WJetsToLNu_HT_800To1200" : "WJetsToLNu_HT_800To1200",
+    "WJetsToLNu_HT_1200To2500": "WJetsToLNu_HT_1200To2500",
+    "WJetsToLNu_HT_2500ToInf" : "WJetsToLNu_HT_2500ToInf",
         
-        # powheg ttbar
-        "TT": "TT",
-        
-        "WJetsToLNu": "WJetsToLNu",
-        # "W1Jets"    : "W1Jets",
-        # "W2Jets"    : "W2Jets",
-        # "W3Jets"    : "W3Jets",
-        # "W4Jets"    : "W4Jets",
-        "WJetsToLNu_HT_100To200"  : "WJetsToLNu_HT_100To200",
-        "WJetsToLNu_HT_200To400"  : "WJetsToLNu_HT_200To400",
-        "WJetsToLNu_HT_400To600"  : "WJetsToLNu_HT_400To600",
-        "WJetsToLNu_HT_600To800"  : "WJetsToLNu_HT_600To800",
-        "WJetsToLNu_HT_800To1200" : "WJetsToLNu_HT_800To1200",
-        "WJetsToLNu_HT_1200To2500": "WJetsToLNu_HT_1200To2500",
-        "WJetsToLNu_HT_2500ToInf" : "WJetsToLNu_HT_2500ToInf",
-        
-        "DYJetsToLL_M_50"            : "DYJetsToLL_M_50",
-        "DYJetsToLL_M_10to50"        : "DYJetsToLL_M_10to50",
-        "DYJetsToLL_M_50_HT_100to200": "DYJetsToLL_M_50_HT_100to200",
-        "DYJetsToLL_M_50_HT_200to400": "DYJetsToLL_M_50_HT_200to400",
-        "DYJetsToLL_M_50_HT_400to600": "DYJetsToLL_M_50_HT_400to600",
-        "DYJetsToLL_M_50_HT_600toInf": "DYJetsToLL_M_50_HT_600toInf",
-        "DYJetsToQQ_HT180"           : "DYJetsToQQ_HT180",
-        
-        "QCD_Pt_15to30"    : "QCD_Pt_15to30",
-        "QCD_Pt_30to50"    : "QCD_Pt_30to50",
-        "QCD_Pt_50to80"    : "QCD_Pt_50to80",
-        "QCD_Pt_80to120"   : "QCD_Pt_80to120",
-        "QCD_Pt_120to170"  : "QCD_Pt_120to170",
-        "QCD_Pt_170to300"  : "QCD_Pt_170to300",
-        "QCD_Pt_300to470"  : "QCD_Pt_300to470",
-        "QCD_Pt_470to600"  : "QCD_Pt_470to600",
-        "QCD_Pt_600to800"  : "QCD_Pt_600to800",
-        "QCD_Pt_800to1000" : "QCD_Pt_800to1000",
-        "QCD_Pt_1000to1400": "QCD_Pt_1000to1400",
-        "QCD_Pt_1400to1800": "QCD_Pt_1400to1800",
-        "QCD_Pt_1800to2400": "QCD_Pt_1800to2400",
-        "QCD_Pt_2400to3200": "QCD_Pt_2400to3200",
-        "QCD_Pt_3200toInf" : "QCD_Pt_3200toInf",
-        
-        "QCD_bEnriched_HT100to200"  : "QCD_bEnriched_HT100to200",
-        "QCD_bEnriched_HT200to300"  : "QCD_bEnriched_HT200to300",
-        "QCD_bEnriched_HT300to500"  : "QCD_bEnriched_HT300to500",
-        "QCD_bEnriched_HT500to700"  : "QCD_bEnriched_HT500to700",
-        "QCD_bEnriched_HT700to1000" : "QCD_bEnriched_HT700to1000",
-        "QCD_bEnriched_HT1000to1500": "QCD_bEnriched_HT1000to1500",
-        "QCD_bEnriched_HT1500to2000": "QCD_bEnriched_HT1500to2000",
-        "QCD_bEnriched_HT2000toInf" : "QCD_bEnriched_HT2000toInf",
- 
-        "QCD_HT50to100"   : "QCD_HT50to100",
-        "QCD_HT100to200"  : "QCD_HT100to200",
-        "QCD_HT200to300"  : "QCD_HT200to300",
-        "QCD_HT300to500"  : "QCD_HT300to500",
-        "QCD_HT500to700"  : "QCD_HT500to700",
-        "QCD_HT700to1000" : "QCD_HT700to1000",
-        "QCD_HT1000to1500": "QCD_HT1000to1500",
-        "QCD_HT1500to2000": "QCD_HT1500to2000",
-        "QCD_HT2000toInf" : "QCD_HT2000toInf",
-       
-        "QCD_Pt20_MuEnriched"          : "QCD_Pt20_MuEnriched",
-        "QCD_Pt_50to80_MuEnrichedPt5"  : "QCD_Pt_50to80_MuEnrichedPt5",
-        "QCD_Pt_80to120_MuEnrichedPt5" : "QCD_Pt_80to120_MuEnrichedPt5",
-        "QCD_Pt_120to170_MuEnrichedPt5": "QCD_Pt_120to170_MuEnrichedPt5",
-        "QCD_Pt_170to300_MuEnrichedPt5": "QCD_Pt_170to300_MuEnrichedPt5",
-        "QCD_Pt_300to470_MuEnrichedPt5": "QCD_Pt_300to470_MuEnrichedPt5",
-        
-        "ST_tW_top_5f_inclusiveDecays"             : "ST_tW_top_5f_inclusiveDecays",
-        "ST_tW_antitop_5f_inclusiveDecays"         : "ST_tW_antitop_5f_inclusiveDecays",
-        "ST_t_channel_antitop_4f_inclusiveDecays"  : "ST_t_channel_antitop_4f_inclusiveDecays",
-        "ST_t_channel_top_4f_inclusiveDecays"         : "ST_t_channel_top_4f_inclusiveDecays",
+    "DYJetsToLL_M_50"            : "DYJetsToLL_M_50",
+    "DYJetsToLL_M_10to50"        : "DYJetsToLL_M_10to50",
+    "DYJetsToLL_M_50_HT_100to200": "DYJetsToLL_M_50_HT_100to200",
+    "DYJetsToLL_M_50_HT_200to400": "DYJetsToLL_M_50_HT_200to400",
+    "DYJetsToLL_M_50_HT_400to600": "DYJetsToLL_M_50_HT_400to600",
+    "DYJetsToLL_M_50_HT_600toInf": "DYJetsToLL_M_50_HT_600toInf",
+    "DYJetsToQQ_HT180"           : "DYJetsToQQ_HT180",
+    
+    "QCD_Pt_15to30"    : "QCD_Pt_15to30",
+    "QCD_Pt_30to50"    : "QCD_Pt_30to50",
+    "QCD_Pt_50to80"    : "QCD_Pt_50to80",
+    "QCD_Pt_80to120"   : "QCD_Pt_80to120",
+    "QCD_Pt_120to170"  : "QCD_Pt_120to170",
+    "QCD_Pt_170to300"  : "QCD_Pt_170to300",
+    "QCD_Pt_300to470"  : "QCD_Pt_300to470",
+    "QCD_Pt_470to600"  : "QCD_Pt_470to600",
+    "QCD_Pt_600to800"  : "QCD_Pt_600to800",
+    "QCD_Pt_800to1000" : "QCD_Pt_800to1000",
+    "QCD_Pt_1000to1400": "QCD_Pt_1000to1400",
+    "QCD_Pt_1400to1800": "QCD_Pt_1400to1800",
+    "QCD_Pt_1800to2400": "QCD_Pt_1800to2400",
+    "QCD_Pt_2400to3200": "QCD_Pt_2400to3200",
+    "QCD_Pt_3200toInf" : "QCD_Pt_3200toInf",
+    
+    "QCD_bEnriched_HT100to200"  : "QCD_bEnriched_HT100to200",
+    "QCD_bEnriched_HT200to300"  : "QCD_bEnriched_HT200to300",
+    "QCD_bEnriched_HT300to500"  : "QCD_bEnriched_HT300to500",
+    "QCD_bEnriched_HT500to700"  : "QCD_bEnriched_HT500to700",
+    "QCD_bEnriched_HT700to1000" : "QCD_bEnriched_HT700to1000",
+    "QCD_bEnriched_HT1000to1500": "QCD_bEnriched_HT1000to1500",
+    "QCD_bEnriched_HT1500to2000": "QCD_bEnriched_HT1500to2000",
+    "QCD_bEnriched_HT2000toInf" : "QCD_bEnriched_HT2000toInf",
+    
+    "QCD_HT50to100"   : "QCD_HT50to100",
+    "QCD_HT100to200"  : "QCD_HT100to200",
+    "QCD_HT200to300"  : "QCD_HT200to300",
+    "QCD_HT300to500"  : "QCD_HT300to500",
+    "QCD_HT500to700"  : "QCD_HT500to700",
+    "QCD_HT700to1000" : "QCD_HT700to1000",
+    "QCD_HT1000to1500": "QCD_HT1000to1500",
+    "QCD_HT1500to2000": "QCD_HT1500to2000",
+    "QCD_HT2000toInf" : "QCD_HT2000toInf",
+    
+    "QCD_Pt20_MuEnriched"          : "QCD_Pt20_MuEnriched",
+    "QCD_Pt_50to80_MuEnrichedPt5"  : "QCD_Pt_50to80_MuEnrichedPt5",
+    "QCD_Pt_80to120_MuEnrichedPt5" : "QCD_Pt_80to120_MuEnrichedPt5",
+    "QCD_Pt_120to170_MuEnrichedPt5": "QCD_Pt_120to170_MuEnrichedPt5",
+    "QCD_Pt_170to300_MuEnrichedPt5": "QCD_Pt_170to300_MuEnrichedPt5",
+    "QCD_Pt_300to470_MuEnrichedPt5": "QCD_Pt_300to470_MuEnrichedPt5",
+    
+    "ST_tW_top_5f_inclusiveDecays"             : "ST_tW_top_5f_inclusiveDecays",
+    "ST_tW_antitop_5f_inclusiveDecays"         : "ST_tW_antitop_5f_inclusiveDecays",
+    "ST_t_channel_antitop_4f_inclusiveDecays"  : "ST_t_channel_antitop_4f_inclusiveDecays",
+    "ST_t_channel_top_4f_inclusiveDecays"      : "ST_t_channel_top_4f_inclusiveDecays",
+    
+    "WW": "WW",
+    "WZ": "WZ",
+    "ZZ": "ZZ",
+    
+    # ID2017
+    "SingleTau_NoPU" : "SingleTau_NoPU",
+    "SingleTau_PU140": "SingleTau_PU140",
+    "SingleTau_PU200": "SingleTau_PU200",
 
-        "WW": "WW",
-        "WZ": "WZ",
-        "ZZ": "ZZ",
-
-        })
+})
 
 ## Map the datasets to be merged to the name of the merged dataset.
 _ttSignalMerge    = {}
@@ -400,6 +385,12 @@ _datasetOrder.extend([
     "MinBias",
     "VBF_HToTauTau",
     "TauThreeProngs"
+
+    # ID2017
+    "SingleTau_NoPU",
+    "SingleTau_PU140"
+    "SingleTau_PU200",
+
     ]) 
 
 ## Map the logical dataset names to legend labels
@@ -512,6 +503,11 @@ _legendLabels = {
     "T_s-channel"       : "Single t (s channel)",
     "Tbar_s-channel"    : "Single #bar{t} (s channel)",
 
+    # ID2017
+    "SingleTau_NoPU" : "Single #tau (PU=0)",
+    "SingleTau_PU140": "Single #tau (PU=140)",
+    "SingleTau_PU200": "Single #tau (PU=200)",
+
     # Ratio uncertainties
     "BackgroundStatError"    : "Stat. unc.",
     "BackgroundSystError"    : "Syst. unc.",
@@ -577,6 +573,10 @@ _plotStyles = {
     "VBF_HToTauTau" : styles.HToTauTauStyle,
     "TauThreeProngs": styles.Tau3prStyle,
 
+    # ID2017
+    "SingleTau_NoPU" : styles.SingleTauNoPU,
+    "SingleTau_PU140": styles.SingleTauPU140,
+    "SingleTau_PU200": styles.SingleTauPU200,
 
     "WJets_0bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+1),
     "WJets_1bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+4),

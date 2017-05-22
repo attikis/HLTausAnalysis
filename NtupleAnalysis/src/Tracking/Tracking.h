@@ -38,7 +38,7 @@ class Tracking : public TreeAnalyserMC{
 	  const int maxEvents_ = -1, 
 	  TTree* tree=0) : 
   
-  TreeAnalyserMC("TTTracks", SamplePath, SampleName, text_, maxEvents_, tree) 
+  TreeAnalyserMC("", SamplePath, SampleName, text_, maxEvents_, tree) 
     { 
       auxTools_.StopwatchStart();
       mcSample = SampleName;

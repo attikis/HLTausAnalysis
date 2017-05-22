@@ -354,6 +354,16 @@ pfTauStyle        = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.
                                    StyleLine(lineColor=ROOT.kBlue, lineStyle=ROOT.kSolid, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kBlue, fillStyle=3001)])
 
+SingleTauNoPU     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kGray, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+                                   StyleLine(lineColor=ROOT.kGray, lineStyle=ROOT.kSolid, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kGray, fillStyle=3001)])
+SingleTauPU140     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kRed-3, markerSizes=None, markerStyle=ROOT.kFullCircle),
+                                   StyleLine(lineColor=ROOT.kRed-3, lineStyle=ROOT.kDotted, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kRed-3, fillStyle=3001)])
+SingleTauPU200     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlue-2, markerSizes=None, markerStyle=ROOT.kOpenSquare),
+                                   StyleLine(lineColor=ROOT.kBlue-2, lineStyle=ROOT.kDashed, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kBlue-2, fillStyle=3001)])
+
 styles = [ 
     Style(26, ROOT.kBlue),
     Style(27, ROOT.kRed),

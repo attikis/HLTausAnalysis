@@ -132,7 +132,7 @@ void Tracking::Loop()
   for (int jentry = 0; jentry < nEntries; jentry++, nEvts++)
     {
 
-      if(1) cout << "\tEntry = " << jentry << endl;
+      if(DEBUG) cout << "\tEntry = " << jentry << endl;
 
       // Load the tree && Get the entry
       Long64_t ientry = LoadTree(jentry);
@@ -140,67 +140,85 @@ void Tracking::Loop()
       nb = fChain->GetEntry(jentry);
       nbytes += nb;
 
+
+      // =============================================================================
       // GenParticles Collection
+      // =============================================================================
+      
       if (DEBUG) cout << "=== GenParticles (" << GenP_Pt->size() << ")" << endl;
       vector<GenParticle> GenParticles = GetGenParticles(false);
       if (DEBUG) PrintGenParticleCollection(GenParticles);
 
+
+      
+      // =============================================================================
       // Tracking Particle Collections
+      // =============================================================================
       if (DEBUG) cout << "=== Tracking Particles (" << TP_Pt->size() << ")" << endl;
       vector<TrackingParticle> TPs  = GetTrackingParticles(false);
       sort( TPs.begin(), TPs.end(), PtComparatorTP() ); // not sorted by default
       if (DEBUG) PrintTrackingParticleCollection(TPs);
       
+
+
+      // =============================================================================
       // TTTracks Collections
+      // =============================================================================
       if (DEBUG) cout << "=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
       vector<TTTrack> TTTracks = GetTTTracks(tk_minPt, tk_minEta, tk_maxEta, tk_maxChiSqRed, tk_minStubs, tk_minStubsPS, tk_maxStubsPS, tk_nFitParams, false);
       sort( TTTracks.begin(), TTTracks.end(), PtComparatorTTTrack() ); // not sorted by default
       if (DEBUG) PrintTTTrackCollection(TTTracks);
 
-      // Tau Collection
-      if (1) cout << "=== Taus (" << tauEt->size() << ")" << endl;
+      // For-loop: TTTracks
+      for (vector<TTTrack>::iterator tk = TTTracks.begin(); tk != TTTracks.end(); tk++)
+	{
+	  double tk_pt     = tk->getPt();
+	  double tk_eta    = tk->getEta();
+	  double tk_phi    = tk->getPhi();
+	  
+	  double tp_pt     = 0;
+	  double tp_eta    = 0;
+	  double tp_phi    = 0;	    
+	  
+	  int tp_index = 0;
+	  tp_index = tk->getTPIndex();
+
+	  // If there is a TP matching to TTTrack
+	  if(tp_index >= 0)
+	    {
+	      
+	      TrackingParticle tp = GetTrackingParticle(tp_index);
+	      
+	      tp_pt  = tp.getPt();
+	      tp_eta = tp.getEta();
+	      tp_phi = tp.getPhi();
+
+	      // Fill resolution histograms (only for cases where there is a matching TP)	      
+	      hL1Tks_Pt->Fill(tk_pt);
+	      hL1Tks_Eta->Fill(tk_eta);
+	      hL1Tks_Phi->Fill(tk_phi);
+	      
+	      hL1Tks_Pt_Res->Fill( (tk_pt-tp_pt)/tp_pt );
+	      hL1Tks_Eta_Res->Fill( (tk_eta-tp_eta)/tp_eta );
+	      hL1Tks_Phi_Res->Fill( (tk_phi-tp_phi)/tp_phi );
+	      
+	      hTP_Pt->Fill(tp_pt);
+	      hTP_Eta->Fill(tp_eta);
+	      hTP_Phi->Fill(tp_phi);
+	      
+	    }//tp_index >= 0
+	  
+	}//for-loop: TTTracks
+      
+
+      // =============================================================================
+      // L1Taus Collection
+      // =============================================================================
+      if (DEBUG) cout << "=== Taus (" << tauEt->size() << ")" << endl;
       //vector<L1JetParticle> L1Taus = GetL1Taus(false);
       // FIXME: From L1Taus, we should construct L1TkTaus_Calo, see CaloTk.C for details
       // if (DEBUG) PrintGenParticleCollection(GenParticles); //FIXME
 
-      // Fill TTTracks resolution histograms (only for cases where there is a matching TP)
-      for (vector<TTTrack>::iterator tk = TTTracks.begin(); tk != TTTracks.end(); tk++)
-	  {
-	    double tk_pt     = tk->getPt();
-	    double tk_eta    = tk->getEta();
-	    double tk_phi    = tk->getPhi();
-	    
-	    double tp_pt     = 0;
-	    double tp_eta    = 0;
-	    double tp_phi    = 0;	    
-	    
-	    int tp_index = 0;
-	    tp_index = tk->getTPIndex();
-
-        // If there is a TP matching to TTTrack, fill histograms
-	    if(tp_index >= 0){
-
-          TrackingParticle tp = GetTrackingParticle(tp_index);
-
-          tp_pt          = tp.getPt();
-          tp_eta         = tp.getEta();
-          tp_phi         = tp.getPhi();
-
-    	  hL1Tks_Pt->Fill(tk_pt);
-	      hL1Tks_Eta->Fill(tk_eta);
-	      hL1Tks_Phi->Fill(tk_phi);
-
-          hL1Tks_Pt_Res->Fill( (tk_pt-tp_pt)/tp_pt );
-          hL1Tks_Eta_Res->Fill( (tk_eta-tp_eta)/tp_eta );
-          hL1Tks_Phi_Res->Fill( (tk_phi-tp_phi)/tp_phi );
-
-	      hTP_Pt->Fill(tp_pt);
-	      hTP_Eta->Fill(tp_eta);
-	      hTP_Phi->Fill(tp_phi);
-          
-	    }
-	    
-	  }
 
     // Fill L1TkTaus_Calo resoltion histograms 
 /*    for (vector<L1TkTauParticle>::iterator tau = L1TkTaus_Calo.begin(); tau != L1TkTaus_Calo.end(); tau++) //FIXME: construct L1TkTaus_Calo
@@ -260,8 +278,8 @@ void Tracking::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1Tks_Eta, "L1Tks_MatchedToTP_Eta", "; #eta; Entries", 130,  -2.6,  +2.6);
   histoTools_.BookHisto_1D(hL1Tks_Phi, "L1Tks_MatchedToTP_Phi", "; #phi (rads); Entries", 128,  -3.2,  +3.2);
   histoTools_.BookHisto_1D(hL1Tks_Pt_Res, "L1Tks_MatchedToTP_Pt_Res", "; (p_{T}^{track}-p_{T}^{particle})/p_{T}^{particle}; Entries", 200,  -1.0,  +1.0);
-  histoTools_.BookHisto_1D(hL1Tks_Eta_Res, "L1Tks_MatchedToTP_Eta_Res", "; (#eta^{track}-#eta^{particle})/#eta^{particle}; Entries", 160,  -0.2,  +0.2);
-  histoTools_.BookHisto_1D(hL1Tks_Phi_Res, "L1Tks_MatchedToTP_Phi_Res", "; (#phi^{track}-#phi^{particle})/#phi}^{particle} ; Entries", 160,  -0.2,  +0.2);
+  histoTools_.BookHisto_1D(hL1Tks_Eta_Res, "L1Tks_MatchedToTP_Eta_Res", "; (#eta^{track}-#eta^{particle})/#eta^{particle}; Entries", 400,  -0.2,  +0.2);
+  histoTools_.BookHisto_1D(hL1Tks_Phi_Res, "L1Tks_MatchedToTP_Phi_Res", "; (#phi^{track}-#phi^{particle})/#phi}^{particle} ; Entries", 400,  -0.2,  +0.2);
   histoTools_.BookHisto_1D(hTP_Pt, "TP_MatchedToL1Tk_Pt", "; p_{T} (GeV/c); Entries", 200,  +0.0,  +200.0);
   histoTools_.BookHisto_1D(hTP_Eta, "TP_MatchedToL1Tk_Eta", "; #eta; Entries", 130,  -2.6,  +2.6);
   histoTools_.BookHisto_1D(hTP_Phi, "TP_MatchedToL1Tk_Phi", "; #phi (rads); Entries", 128,  -3.2,  +3.2);  
