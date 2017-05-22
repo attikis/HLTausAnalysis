@@ -10,7 +10,7 @@
     "rebinX"           : 1,
     "xlabel"           : "Charge (e)",
     "ylabel"           : "Events / %.0f",
-    "drawStyle"        : "COLZ",
+    "drawStyle"        : "HIST",
     "legendStyle"      : "LF",
     "opts"             : {"xmin": -8.0, "xmax": 8.0, "ymin": 1e-04, "ymaxfactor": 10.0},
     "ratio"            : "True",

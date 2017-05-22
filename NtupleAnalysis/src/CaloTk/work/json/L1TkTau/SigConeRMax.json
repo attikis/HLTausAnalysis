@@ -10,7 +10,7 @@
     "rebinX"           : 5,
     "xlabel"           : "signal cone size (#DeltaR)",
     "ylabel"           : "Events / %.2f",
-    "drawStyle"        : "COLZ",
+    "drawStyle"        : "HIST",
     "legendStyle"      : "LF",
     "opts"             : {"xmax": 0.3, "ymin": 1e-04, "ymaxfactor": 10.0},
     "ratio"            : "True",

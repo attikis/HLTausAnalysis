@@ -24,7 +24,7 @@
     "errorBarsX"       : "True",
     "logX"             : "False",
     "logY"             : "True",
-    "gridX"            : "False",
+    "gridX"            : "True",
     "gridY"            : "True",
     "cmsExtraText"     : "Phase-2 Simulation",
     "removeLegend"     : "False",

@@ -8,7 +8,7 @@
     "datasets"         : ["SingleNeutrino_PU140|SingleTau_PU140"],
     "normalization"    : "normalizeToOne",
     "rebinX"           : 10,
-    "xlabel"           : "mass(tks) (GeV/c^{2})",
+    "xlabel"           : "Invariant mass of tracks (GeV/c^{2})",
     "ylabel"           : "Events / %.1f",
     "drawStyle"        : "CLOSZ",
     "legendStyle"      : "LF",

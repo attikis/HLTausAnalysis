@@ -9,7 +9,7 @@
     "normalization"    : "normalizeToOne",
     "rebinX"           : 10,
     "xlabel"           : "CHF = #Sigma_{i}^{sig} p_{T}^{i}/E_{T}^{calo}",
-    "ylabel"           : "Events / %.1f",
+    "ylabel"           : "Events / %.0f",
     "drawStyle"        : "COLZ",
     "legendStyle"      : "LF",
     "opts"             : {"xmin": 0.0, "xmax": 10.0, "ymin": 1e-04, "ymaxfactor": 10.0},
