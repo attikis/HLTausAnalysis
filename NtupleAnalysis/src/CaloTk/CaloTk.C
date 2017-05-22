@@ -1919,13 +1919,27 @@ vector<L1JetParticle> CaloTk::GetL1Taus(bool bPrintList)
 //============================================================================
 {
   vector<L1JetParticle> theL1Taus;
-  for (Size_t iCalo = 0; iCalo < tauEt->size(); iCalo++)
-    {
-      cout << "iCalo = " << iCalo << endl;
-    theL1Taus.push_back( GetL1Tau(iCalo) );
+  L1JetParticle particleToBeAdded;
+  cout << "tauEt->size()=" << tauEt->size() << endl;
+  //DEBUG
+  cout << "Values of tauEt for all taus:" << endl;
+  for (Size_t iCalo = 0; iCalo < tauEt->size(); iCalo++){
+    cout << "Index=" << iCalo << ", tauEt=" << tauEt->at(iCalo) << endl; // this works fine
+    cout << "Index=" << iCalo << ", tauEta=" << tauEta->at(iCalo) << endl; // this works fine
+    cout << "Index=" << iCalo << ", tauPhi=" << tauPhi->at(iCalo) << endl; // this works fine
+    cout << "Index=" << iCalo << ", tauBx=" << tauBx->at(iCalo) << endl; // this crashes after 6 taus (indexes 0...5), why???
+
+
     }
   
-  if (bPrintList) PrintL1JetParticleCollection(theL1Taus);
+  for (Size_t iCalo = 0; iCalo < tauEt->size(); iCalo++)
+    {
+    cout << "iCalo = " << iCalo << endl;
+    particleToBeAdded = GetL1Tau(iCalo); // this causes a problem after 6 taus (indexes 0...5), because of Bx vector!
+    theL1Taus.push_back( particleToBeAdded );
+    }
+  
+  if (bPrintList) PrintL1JetParticleCollection(theL1Taus); 
   return theL1Taus;
 }
 
@@ -1941,7 +1955,9 @@ L1JetParticle CaloTk::GetL1Tau(unsigned int Index)
   double Phi  = tauPhi->at(Index);
   double Bx   = tauBx->at(Index);
   // double Type = L1Tau_Type->at(Index);
+  cout << "GeL1Tau returns theL1Tau(" << Index << ", " << Et << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << " , -1)" << endl;
   L1JetParticle theL1Tau(Index, Et, Et, Eta, Phi, Bx, -1); 
+
   return theL1Tau;
 }
 
