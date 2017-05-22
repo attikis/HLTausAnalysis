@@ -8,7 +8,7 @@
     "datasets"         : ["SingleNeutrino_PU140|SingleTau_PU140"],
     "normalization"    : "normalizeToOne",
     "rebinX"           : 2,
-    "xlabel"           : "Multiplicity",
+    "xlabel"           : "multiplicity",
     "ylabel"           : "Events / %.0f",
     "drawStyle"        : "HIST",
     "legendStyle"      : "LF",

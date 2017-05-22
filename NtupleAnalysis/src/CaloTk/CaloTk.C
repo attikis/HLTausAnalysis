@@ -441,11 +441,13 @@ void CaloTk::Loop()
     if (DEBUG)
       {
 	cout << "\tPrinting all TTrack Collections" << endl;
+	// cout << "sigTTTracks.size() = " << sigTTTracks.size() << ", isoTTTracks.size() = " << isoTTTracks.size() << endl;
 	PrintTrackingParticleCollection(TPs);
 	PrintTTTrackCollection(matchTTTracks);
 	PrintTTTrackCollection(sigTTTracks);
 	PrintTTTrackCollection(isoTTTracks);
       }
+
     
     // Tau Collections
     vector<L1JetParticle> L1Taus = GetL1Taus(false);
@@ -459,9 +461,9 @@ void CaloTk::Loop()
     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
     if (bFoundAllTaus_) nEvtsWithMaxHTaus++;
 
-    ////////////////////////////////////////////////
+    // ======================================================================================
     // For-loop: L1Taus
-    ////////////////////////////////////////////////
+    // ======================================================================================
     for (vector<L1JetParticle>::iterator calo = L1Taus.begin(); calo != L1Taus.end(); calo++)
       {
 	// Calculate the Et-dependent signal & isolation cone sizes
@@ -474,7 +476,6 @@ void CaloTk::Loop()
 
 	if ( matchTk_Collection.compare("TTTracks") != 0 )
 	  {
-	    
 	    cout << "=== ERROR: Invalid Track Collection Type \"" << matchTk_Collection << "\". EXIT" << endl;
 	    exit(1);
 	  }
@@ -484,7 +485,9 @@ void CaloTk::Loop()
 	GetIsoConeTracks(L1TkTauCandidate, isoTTTracks);
 	GetIsolationValues(L1TkTauCandidate);
 	GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic);
-	if (DEBUG) L1TkTauCandidate.PrintProperties(false, false, true, true);
+	cout << "sigTTTracks.size() = " << sigTTTracks.size() << ", isoTTTracks.size() = " << isoTTTracks.size() << endl;
+	if (1) L1TkTauCandidate.PrintProperties(false, false, true, true);
+	cout << "" << endl;
 	
 	// Save L1TkTau Candidate
 	L1TkTauCandidates.push_back(L1TkTauCandidate);

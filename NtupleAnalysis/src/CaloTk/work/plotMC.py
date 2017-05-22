@@ -71,7 +71,7 @@ def GetDatasetsFromDir(opts, json):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
                                                         dataEra=json["dataEra"],
                                                         searchMode=None,
-                                                        includeOnlyTasks="|".join(json["samples"]),
+                                                        includeOnlyTasks="|".join(json["datasets"]),
                                                         analysisName=json["analysis"])
     elif (opts.includeOnlyTasks):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
@@ -96,7 +96,7 @@ def Plot(jsonfile, opts):
     with open(os.path.abspath(jsonfile)) as jfile:
         j = json.load(jfile)
 
-        Verbose("Plotting %s. Will save under \"%s\"" % (j["title"], j["saveDir"]), True)
+        Verbose("Plotting %s. Will save under \"%s\"" % (j["saveName"], j["saveDir"]), True)
 
         # Setup the style
         style = tdrstyle.TDRStyle()
@@ -172,13 +172,13 @@ def MCPlot(datasetsMgr, json):
 
     
     # Draw a customised plot
-    saveName = os.path.join(json["saveDir"], json["title"])
+    saveName = os.path.join(json["saveDir"], json["saveName"])
     plots.drawPlot(p, 
                    saveName,                  
                    xlabel            = json["xlabel"], 
                    ylabel            = ylabel_,
                    rebinX            = json["rebinX"],
-                   rebinY            = json["rebinY"], 
+                   #rebinY            = json["rebinY"], 
                    stackMCHistograms = json["stackMCHistograms"]=="True", 
                    addMCUncertainty  = json["addMCUncertainty"]=="True" and json["normalization"]!="normalizeToOne",
                    addLuminosityText = json["addLuminosityText"]=="True",
