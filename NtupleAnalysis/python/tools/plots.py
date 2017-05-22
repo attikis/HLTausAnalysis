@@ -3205,7 +3205,7 @@ class PlotDrawer:
                 ylabel = ylabel % p.binWidth()
             elif nformats == 2:
                 binWidths = p.binWidths()
-                ylabel = ylabel % (min(binWidths), max(binWidths))
+                ylabel    = ylabel % (min(binWidths), max(binWidths))
             else:
                 raise Exception("Got %d '%%' formats in y label ('%s'), only 0-2 are supported" % (nformats, ylabel))
         p.frame.GetYaxis().SetTitle(ylabel)

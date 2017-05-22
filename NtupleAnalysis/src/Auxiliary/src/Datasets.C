@@ -258,8 +258,8 @@ void Datasets::CreateMcProductions_(void)
   cmssw    = "9_0_0";
   geometry = "Phase2";
   
-  Datasets SingleNeutrinoPU140_PhaseIISpring17D("SingleNeutrino_PU140", "/SingleNeutrino" + path_PU140, "", CP, cmssw, geometry, 140, 500000, 0, 0);
-  Datasets SingleNeutrinoPU200_PhaseIISpring17D("SingleNeutrino_PU200", "/SingleNeutrino" + path_PU200, "", CP, cmssw, geometry, 140, 500000, 0, 0);
+  Datasets SingleNeutrinoPU140_PhaseIISpring17D("SingleNeutrino_PU140", "SingleNeutrino_PU140", "/SingleNeutrino" + path_PU140, CP, cmssw, geometry, 140, 500000, 0, 0);
+  Datasets SingleNeutrinoPU200_PhaseIISpring17D("SingleNeutrino_PU200", "SingleNeutrino_PU200", "/SingleNeutrino" + path_PU200, CP, cmssw, geometry, 140, 500000, 0, 0);
   
   Datasets SinglePion0NoPU_PhaseIISpring17D("SinglePion0_NoPU"  , "/SinglePion0_FlatPt-8to100" + path_NoPU , "", CP, cmssw, geometry,   0, 500000, 0, 0);
   Datasets SinglePion0PU140_PhaseIISpring17D("SinglePion0_PU140", "/SinglePion0_FlatPt-8to100" + path_PU140, "", CP, cmssw, geometry, 140, 500000, 0, 0);

@@ -447,8 +447,6 @@ void CaloTk::Loop()
 	PrintTTTrackCollection(isoTTTracks);
       }
     
-    cout << "-------> ALEX-1" << endl;
-    
     // Tau Collections
     vector<L1JetParticle> L1Taus = GetL1Taus(false);
     vector<L1TkTauParticle> L1TkTauCandidates;
@@ -461,12 +459,9 @@ void CaloTk::Loop()
     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
     if (bFoundAllTaus_) nEvtsWithMaxHTaus++;
 
-    cout << "-------> ALEX-1b" << endl;
-    
     ////////////////////////////////////////////////
     // For-loop: L1Taus
     ////////////////////////////////////////////////
-    cout << "-------> ALEX-2" << endl;
     for (vector<L1JetParticle>::iterator calo = L1Taus.begin(); calo != L1Taus.end(); calo++)
       {
 	// Calculate the Et-dependent signal & isolation cone sizes
@@ -498,7 +493,6 @@ void CaloTk::Loop()
     ////////////////////////////////////////////////
     /// Create L1TkTaus Collections
     ////////////////////////////////////////////////
-    cout << "-------> ALEX-3" << endl;
     for(vector<L1TkTauParticle>::iterator L1TkTau = L1TkTauCandidates.begin(); L1TkTau != L1TkTauCandidates.end(); L1TkTau++)
       {
 	// Calo
@@ -522,7 +516,6 @@ void CaloTk::Loop()
 	PrintL1TkTauParticleCollection(L1TkTaus_VtxIso);
       }
 
-    cout << "-------> ALEX-4" << endl;	
     ////////////////////////////////////////////////
     // Event-Type Histograms
     ////////////////////////////////////////////////
@@ -1919,24 +1912,13 @@ vector<L1JetParticle> CaloTk::GetL1Taus(bool bPrintList)
 //============================================================================
 {
   vector<L1JetParticle> theL1Taus;
-  L1JetParticle particleToBeAdded;
-  cout << "tauEt->size()=" << tauEt->size() << endl;
-  //DEBUG
-  cout << "Values of tauEt for all taus:" << endl;
-  for (Size_t iCalo = 0; iCalo < tauEt->size(); iCalo++){
-    cout << "Index=" << iCalo << ", tauEt=" << tauEt->at(iCalo) << endl; // this works fine
-    cout << "Index=" << iCalo << ", tauEta=" << tauEta->at(iCalo) << endl; // this works fine
-    cout << "Index=" << iCalo << ", tauPhi=" << tauPhi->at(iCalo) << endl; // this works fine
-    cout << "Index=" << iCalo << ", tauBx=" << tauBx->at(iCalo) << endl; // this crashes after 6 taus (indexes 0...5), why???
-
-
-    }
-  
+  L1JetParticle theL1Tau;
+  // For-loop: All L1Taus
   for (Size_t iCalo = 0; iCalo < tauEt->size(); iCalo++)
     {
-    cout << "iCalo = " << iCalo << endl;
-    particleToBeAdded = GetL1Tau(iCalo); // this causes a problem after 6 taus (indexes 0...5), because of Bx vector!
-    theL1Taus.push_back( particleToBeAdded );
+      // cout << "iCalo = " << iCalo << endl;
+      theL1Tau = GetL1Tau(iCalo); 
+      theL1Taus.push_back( theL1Tau );
     }
   
   if (bPrintList) PrintL1JetParticleCollection(theL1Taus); 
@@ -1953,10 +1935,10 @@ L1JetParticle CaloTk::GetL1Tau(unsigned int Index)
   double Et   = tauEt->at(Index);
   double Eta  = tauEta->at(Index);
   double Phi  = tauPhi->at(Index);
-  double Bx   = tauBx->at(Index);
-  // double Type = L1Tau_Type->at(Index);
-  cout << "GeL1Tau returns theL1Tau(" << Index << ", " << Et << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << " , -1)" << endl;
-  L1JetParticle theL1Tau(Index, Et, Et, Eta, Phi, Bx, -1); 
+  double Bx   = -1.0; // tauBx->at(Index);   // tauBx->size()=6, while tauEt->size()=12
+  double Type = -1.0; // tauType->at(Index); // missing from tree
+  // cout << "GeL1Tau returns theL1Tau(" << Index << ", " << Et << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << " , -1)" << endl;
+  L1JetParticle theL1Tau(Index, Et, Et, Eta, Phi, Bx, Type);
 
   return theL1Tau;
 }

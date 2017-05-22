@@ -1,0 +1,23 @@
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   ../../../python/tools/datasets.py
+	modified:   ../../../scripts/hltausPseudoMulticrab.py
+	modified:   ../../Auxiliary/src/Datasets.C
+	modified:   ../../Framework/src/TreeAnalyserBase.C
+	modified:   ../Tracking.C
+	modified:   ../Tracking.h
+	modified:   plotMC.py
+	modified:   run.cc
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	../../CaloTk/CaloTk_C_ACLiC_dict_rdict.pcm
+	../Tracking_C_ACLiC_dict_rdict.pcm
+	multicrab_CaloTkSkim_v910pre2_20170522T1043/
+
+no changes added to commit (use "git add" and/or "git commit -a")
+

@@ -2,15 +2,15 @@
 '''
 
 Usage (single plot):
-./plotComparison.py.py -m <multicrab_directory> <jsonfile> [opts]
+./plotComparison.py -m <multicrab_directory> <jsonfile> [opts]
 
 Usage (multiple plots):
-./plotComparison.py.py -m <pseudo_mcrab_directory> json/*.json
-./plotComparison.py.py -m <pseudo_mcrab_directory> json/*.json json/L1TkTau/*.json
+./plotComparison.py -m <pseudo_mcrab_directory> json/*.json
+./plotComparison.py -m <pseudo_mcrab_directory> json/*.json json/L1TkTau/*.json
 
 Last Used:
-./plotComparison.py.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/L1TkTau/Multiplicity.json -i "VBF|Neutrino"
-./plotComparison.py.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/*/*.json -i "VBF|Neutrino"
+./plotComparison.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/L1TkTau/Multiplicity.json -i "VBF|Neutrino"
+./plotComparison.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/*/*.json -i "VBF|Neutrino"
 '''
 
 #================================================================================================
@@ -72,7 +72,7 @@ def GetDatasetsFromDir(opts, json):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
                                                         dataEra=json["dataEra"],
                                                         searchMode=None, 
-                                                        includeOnlyTasks="|".join(json["sample"]),
+                                                        includeOnlyTasks="|".join(json["samples"]),
                                                         analysisName=json["analysis"])
     elif (opts.includeOnlyTasks):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
@@ -176,13 +176,23 @@ def ComparisonPlot(datasetsMgr, json):
     cutBox_    = {"cutValue": json["cutValue"] , "fillColor": json["cutFillColour"],
                   "box": json["cutBox"]=="True", "line": json["cutLine"]=="True",
                   "greaterThan": json["cutGreaterThan"]=="True"}
-    normToOne_ = json["normalizationToOne"]=="True"
+
+    if ("normalization" in json):
+        if json["normalization"]=="normalization":
+            normToOne_ = True
+        else:
+            normToOne_ = False
+    elif ("normalizationToOne" in json):
+        normToOne_ = json["normalizationToOne"]=="True"
+    else:
+        raise Exception("This should never be reached")
+        
     if normToOne_:
         ylabel_ = ylabel_.replace(json["ylabel"].split(" /")[0], "Arbitrary Units")
 
     # Get the reference histo and the list of histos to compare
-    histoReference = getHisto(datasetsMgr, json['sample'], json['histograms'][0])
-    histoCompares  = getHistos(datasetsMgr, json['sample'], json['histograms'])
+    histoReference = getHisto(datasetsMgr, json['samples'], json['histograms'][0])
+    histoCompares  = getHistos(datasetsMgr, json['samples'], json['histograms'])
     p = plots.ComparisonManyPlot(histoReference, histoCompares, saveFormats=[])
     
     # Set universal histo styles
@@ -318,4 +328,4 @@ if __name__ == "__main__":
     main(opts)
 
     if not opts.batchMode:
-        raw_input("=== plotComparison.py.py: Press any key to quit ROOT ...")
+        raw_input("=== plotComparison.py: Press any key to quit ROOT ...")
