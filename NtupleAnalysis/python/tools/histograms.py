@@ -418,14 +418,14 @@ def addStandardTexts(lumi=None, sqrts=None, addCmsText=True, cmsTextPosition=Non
             lumiText = lumi
         else:
             lumiText = formatLuminosityInFb(lumi)
-        lumiText += " fb^{-1} ("
+        lumiText += " fb^{-1}"
 
     # Disable automatic addition of PU=140 text
     #lumiText += pileupText + ", "
     if sqrts is not None:
-        lumiText += sqrts
+        lumiText += " (" + sqrts + ")"
     else:
-        lumiText += energyText
+        lumiText += " (" + energyText + ")"
 
     
     lumiTextOffset = 0.2
