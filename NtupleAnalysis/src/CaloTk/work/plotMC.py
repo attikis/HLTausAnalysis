@@ -121,11 +121,14 @@ def Plot(jsonfile, opts):
         for d in datasetsMgr.getAllDatasets():
             if "ChargedHiggs" in d.getName():
                 datasetsMgr.getDataset(d.getName()).setCrossSection(1.0)
-
+                
+        ## Print dataset information (before merge)        
+        #datasetsMgr.PrintInfo()
+        
         # Merge histograms (see NtupleAnalysis/python/tools/plots.py)    
         plots.mergeRenameReorderForDataMC(datasetsMgr)
 
-        # Print dataset information
+        # Print dataset information (after merge)
         datasetsMgr.PrintInfo()
 
         # Plot the histogram

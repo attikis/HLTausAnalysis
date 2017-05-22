@@ -3987,7 +3987,8 @@ class DatasetManager:
 
             if allowMissingDatasets:
                 if not silent:
-                    print >> sys.stderr, message
+                    if 0:
+                        print >> sys.stderr, message
                     #Print(message, True)
             else:
                 raise Exception(message)
@@ -3995,7 +3996,8 @@ class DatasetManager:
         elif len(selected) == 1 and not keepSources:
             if not silent:
                 message = "Dataset merge, one dataset '" + selected[0].getName() + "' found from list '" + ", ".join(nameList)+"'. Renaming it to '%s'" % newName
-                print >> sys.stderr, message
+                if 0:
+                    print >> sys.stderr, message
                 #Print(message, True)
             self.rename(selected[0].getName(), newName)
             return

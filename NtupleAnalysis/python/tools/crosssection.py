@@ -258,6 +258,24 @@ backgroundCrossSections = CrossSectionList(
             "13": 831.76, # [18]
             "14": 984.50, # [18] 
             }),
+    CrossSection("TT_TuneCUETP8M1_14TeV_NoPU", {
+             "7": 172.0,  # [10]
+             "8": 245.8,  # [10]
+            "13": 831.76, # [18]
+            "14": 984.50, # [18] 
+            }),
+    CrossSection("TT_TuneCUETP8M1_14TeV_PU140", {
+             "7": 172.0,  # [10]
+             "8": 245.8,  # [10]
+            "13": 831.76, # [18]
+            "14": 984.50, # [18] 
+            }),
+    CrossSection("TT_TuneCUETP8M1_14TeV_PU200", {
+             "7": 172.0,  # [10]
+             "8": 245.8,  # [10]
+            "13": 831.76, # [18]
+            "14": 984.50, # [18] 
+            }),
     CrossSection("TTJets_HT600to800", {
             "13": 0.0, 
             }),

@@ -364,6 +364,19 @@ SingleTauPU200     = StyleCompound([StyleMarker(markerSize=1.3, markerColor=ROOT
                                    StyleLine(lineColor=ROOT.kBlue-2, lineStyle=ROOT.kDashed, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kBlue-2, fillStyle=3001)])
 
+TTBarNoPU         = StyleCompound([StyleMarker(markerSize=1.3, markerColor=ROOT.kMagenta-2, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+                                   StyleLine(lineColor=ROOT.kMagenta-2, lineStyle=ROOT.kDashed, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kMagenta-2, fillStyle=3001)])
+
+TTBarPU140        = StyleCompound([StyleMarker(markerSize=1.3, markerColor=ROOT.kMagenta-4, markerSizes=None, markerStyle=ROOT.kFullCircle),
+                                   StyleLine(lineColor=ROOT.kMagenta-4, lineStyle=ROOT.kDashed, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kMagenta-4, fillStyle=3001)])
+
+TTBarPU200        = StyleCompound([StyleMarker(markerSize=1.3, markerColor=ROOT.kMagenta-6, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+                                   StyleLine(lineColor=ROOT.kMagenta-6, lineStyle=ROOT.kDashed, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kMagenta-6, fillStyle=3001)])
+
+
 SingleNeutrinoPU140 = MinBiasStyle
 SingleNeutrinoPU200 = MinBiasStyle
 
