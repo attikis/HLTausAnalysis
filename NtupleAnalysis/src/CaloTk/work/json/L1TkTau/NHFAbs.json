@@ -5,7 +5,7 @@
     "saveName"         : "L1TkTau_NHFAbs",
     "saveFormats"      : [".png", ".pdf", ".C"],
     "saveDir"          : "plots",
-    "datasets"         : ["SingleNeutrino_PU140|SingleTau_PU140"],
+    "datasets"         : ["SingleNeutrino_PU140|TT_TuneCUETP8M1_14TeV_PU140"],
     "normalization"    : "normalizeToOne",
     "rebinX"           : 10,
     "xlabel"           : "|NHF|",

@@ -72,7 +72,7 @@ void CaloTk::InitVars_()
   
   // Signal cone parameters
   sigCone_Constant        = +0.00; // TP: 0.00
-  sigCone_dRMin           = +0.00; // WARNING! If > 0 the matching Track will NOT be added in sigCone_TTTracks.
+  sigCone_dRMin           = +0.00; // WARNING! If > 0 the matching Track will NOT be added in sigCone_TTTracks
   sigCone_dRMax           = +0.15; // TP: 0.15
   sigCone_cutoffDeltaR    = +0.15; // TP: 0.15
   sigCone_maxTkInvMass    = +1.77; // TP: Unused (3-pr)
@@ -386,8 +386,21 @@ void CaloTk::Loop()
   int nEvtsWithMaxHTaus = 0; 
   unsigned int nEvts    = 0;
   unsigned int nAllEvts = fChain->GetEntries();
+  bool isMinBias        = false;  
   // L1PixelTrackFit f(3.8112); // Bz in Tesla (for pixel re-fitting)
 
+  // Determine what sample this is
+  std::size_t found = mcSample.find("SingleNeutrino");
+    if (found!=std::string::npos)
+      {
+	isMinBias = true;
+	std::cout << "Minimum Bias sample" << std::endl;
+      }
+    else
+      {
+	std::cout << "Not a Minimum Bias sample." << std::endl;
+      }
+    
   
   ////////////////////////////////////////////////
   // For-loop: Entries
@@ -409,13 +422,13 @@ void CaloTk::Loop()
     vector<GenParticle> GenTausTrigger;
 
     // Get the GenParticles
-    if (mcSample.compare("MinBias") !=0 )
+    if (!isMinBias)
       {
 	if(DEBUG) cout << "\tGetting the GenParticles" << endl;
 	if (0) GenParticles = GetGenParticles(false); // time-consuming
-	GenTaus  = GetGenParticles(15, true);
-	GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
-	GenTausTrigger  = GetHadronicGenTaus(GenTaus, 20.0, 2.3);    
+	GenTaus             = GetGenParticles(15, true);
+	GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
+	GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 2.3);    
       }
     
     if (DEBUG)
@@ -556,7 +569,7 @@ void CaloTk::Loop()
 	TLorentzVector isoTks_p4 = tau->GetIsoConeTTTracksP4();
 
 	// Do not skip if using MinBias sample as no real taus exist!
-	if (!tau->HasMatchingGenParticle() && ( mcSample.compare("MinBias") !=0 ) ) continue;
+	if (!tau->HasMatchingGenParticle() && (isMinBias == false) ) continue;
 	
 	// L1TkTau Resolution
 	GenParticle p = tau->GetMatchingGenParticle(); //fixme: more plots from MC info
@@ -566,9 +579,11 @@ void CaloTk::Loop()
 	hL1TkTau_ResolutionCaloEta->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
 	hL1TkTau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().eta() - p.p4vis().Phi())/p.p4vis().Phi() );
 
-	// Apply isolation?
-	// if (L1TkTau->GetVtxIsolation() > isoCone_VtxIsoWP) continue;
 
+	// Apply isolation?
+	if (0) if (tau->GetVtxIsolation() > isoCone_VtxIsoWP) continue;
+
+	
 	// Matching Track Variables
 	TTTrack matchTk   = tau->GetMatchingTk();
 	double matchTk_dR = auxTools_.DeltaR(matchTk.getEta(), matchTk.getPhi(), tau->GetCaloTau().eta(), tau->GetCaloTau().phi() );

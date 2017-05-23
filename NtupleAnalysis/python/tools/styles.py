@@ -372,7 +372,7 @@ TTBarPU140        = StyleCompound([StyleMarker(markerSize=1.3, markerColor=ROOT.
                                    StyleLine(lineColor=ROOT.kMagenta-4, lineStyle=ROOT.kDashed, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kMagenta-4, fillStyle=3001)])
 
-TTBarPU200        = StyleCompound([StyleMarker(markerSize=1.3, markerColor=ROOT.kMagenta-6, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+TTBarPU200        = StyleCompound([StyleMarker(markerSize=1.3, markerColor=ROOT.kMagenta-6, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
                                    StyleLine(lineColor=ROOT.kMagenta-6, lineStyle=ROOT.kDashed, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kMagenta-6, fillStyle=3001)])
 

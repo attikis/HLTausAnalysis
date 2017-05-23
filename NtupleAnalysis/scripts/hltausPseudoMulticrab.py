@@ -544,7 +544,8 @@ def CreateJob(opts, args):
         taskDirName = opts.dirName
 
     # Give user last chance to abort
-    AskToContinue(taskDirName, analysis, opts)
+    if 0:
+        AskToContinue(taskDirName, analysis, opts)
     
     # Create CRAB task diractory
     if opts.dirName == "":
