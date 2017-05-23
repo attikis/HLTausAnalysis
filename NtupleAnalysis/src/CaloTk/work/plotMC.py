@@ -173,6 +173,8 @@ def MCPlot(datasetsMgr, json):
             p.histoMgr.setHistoDrawStyle(h.getName(), "AP")
             p.histoMgr.setHistoLegendStyle(h.getName(), "AP")
 
+    # Additional text
+    histograms.addText(json["extraText"].get("x"), json["extraText"].get("y"), json["extraText"].get("text"), json["extraText"].get("size") )
     
     # Draw a customised plot
     saveName = os.path.join(json["saveDir"], json["saveName"])
@@ -200,9 +202,6 @@ def MCPlot(datasetsMgr, json):
     # Remove legend?
     if json["removeLegend"] == "True":
         p.removeLegend()
-
-    # Additional text
-    histograms.addText(json["extraText"].get("x"), json["extraText"].get("y"), json["extraText"].get("text"), json["extraText"].get("size") )
 
     # Save in all formats chosen by user
     saveFormats = json["saveFormats"]

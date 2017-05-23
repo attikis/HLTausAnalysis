@@ -354,25 +354,25 @@ pfTauStyle        = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.
                                    StyleLine(lineColor=ROOT.kBlue, lineStyle=ROOT.kSolid, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kBlue, fillStyle=3001)])
 
-SingleTauNoPU     = StyleCompound([StyleMarker(markerSize=1.3, markerColor=ROOT.kGray, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+SingleTauNoPU     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kGray, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
                                    StyleLine(lineColor=ROOT.kGray, lineStyle=ROOT.kSolid, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kGray, fillStyle=3001)])
-SingleTauPU140     = StyleCompound([StyleMarker(markerSize=1.3, markerColor=ROOT.kRed-3, markerSizes=None, markerStyle=ROOT.kFullCircle),
+SingleTauPU140     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kRed-3, markerSizes=None, markerStyle=ROOT.kFullCircle),
                                    StyleLine(lineColor=ROOT.kRed-3, lineStyle=ROOT.kDotted, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kRed-3, fillStyle=3001)])
-SingleTauPU200     = StyleCompound([StyleMarker(markerSize=1.3, markerColor=ROOT.kBlue-2, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+SingleTauPU200     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlue-2, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
                                    StyleLine(lineColor=ROOT.kBlue-2, lineStyle=ROOT.kDashed, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kBlue-2, fillStyle=3001)])
 
-TTBarNoPU         = StyleCompound([StyleMarker(markerSize=1.3, markerColor=ROOT.kMagenta-2, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+TTBarNoPU         = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta-2, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
                                    StyleLine(lineColor=ROOT.kMagenta-2, lineStyle=ROOT.kDashed, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kMagenta-2, fillStyle=3001)])
 
-TTBarPU140        = StyleCompound([StyleMarker(markerSize=1.3, markerColor=ROOT.kMagenta-4, markerSizes=None, markerStyle=ROOT.kFullCircle),
+TTBarPU140        = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta-4, markerSizes=None, markerStyle=ROOT.kFullCircle),
                                    StyleLine(lineColor=ROOT.kMagenta-4, lineStyle=ROOT.kDashed, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kMagenta-4, fillStyle=3001)])
 
-TTBarPU200        = StyleCompound([StyleMarker(markerSize=1.3, markerColor=ROOT.kMagenta-6, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+TTBarPU200        = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta-6, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
                                    StyleLine(lineColor=ROOT.kMagenta-6, lineStyle=ROOT.kDashed, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kMagenta-6, fillStyle=3001)])
 

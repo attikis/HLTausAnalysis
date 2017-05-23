@@ -426,7 +426,8 @@ def addStandardTexts(lumi=None, sqrts=None, addCmsText=True, cmsTextPosition=Non
         #lumiText += " (" + sqrts + ")"
         lumiText += "  " + sqrts + " "
     else:
-        lumiText += " (" + energyText + ")"
+        #lumiText += " (" + energyText + ")"
+        lumiText += " " + energyText + " "
 
     
     lumiTextOffset = 0.2
