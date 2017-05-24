@@ -2,15 +2,15 @@
 '''
 
 Usage (single plot):
-./plotComparison.py -m <multicrab_directory> <jsonfile> [opts]
+./plotPerformance.py -m <multicrab_directory> <jsonfile> [opts]
 
 Usage (multiple plots):
-./plotComparison.py -m <pseudo_mcrab_directory> json/*.json
-./plotComparison.py -m <pseudo_mcrab_directory> json/*.json json/L1TkTau/*.json
+./plotPerformance.py -m <pseudo_mcrab_directory> json/*.json
+./plotPerformance.py -m <pseudo_mcrab_directory> json/*.json json/L1TkTau/*.json
 
 Last Used:
-./plotComparison.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/L1TkTau/Multiplicity.json -i "VBF|Neutrino"
-./plotComparison.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/*/*.json -i "VBF|Neutrino"
+./plotPerformance.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/L1TkTau/Multiplicity.json -i "VBF|Neutrino"
+./plotPerformance.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/*/*.json -i "VBF|Neutrino"
 '''
 
 #================================================================================================
@@ -72,7 +72,7 @@ def GetDatasetsFromDir(opts, json):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
                                                         dataEra=json["dataEra"],
                                                         searchMode=None, 
-                                                        includeOnlyTasks="|".join(json["samples"]),
+                                                        includeOnlyTasks="|".join(json["datasets"]),
                                                         analysisName=json["analysis"])
     elif (opts.includeOnlyTasks):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
@@ -97,7 +97,7 @@ def Plot(jsonfile, opts):
     with open(os.path.abspath(jsonfile)) as jfile:
         j = json.load(jfile)
 
-        Verbose("Plotting %s. Will save under \"%s\"" % (j["title"], j["saveDir"]), True)
+        Verbose("Plotting %s. Will save under \"%s\"" % (j["saveName"], j["saveDir"]), True)
 
         # Setup the style
         style = tdrstyle.TDRStyle()
@@ -172,27 +172,25 @@ def ComparisonPlot(datasetsMgr, json):
     # Create the MC Plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
     legendDict = {}
     kwargs     = {}
+    normToOne_ = json["normalizationToOne"]=="True"
     ylabel_    = json["ylabel"]
-    cutBox_    = {"cutValue": json["cutValue"] , "fillColor": json["cutFillColour"],
+    cutBox_    = {}
+    cutBoxY_   = {}
+    if "cutValueY" in json:
+        cutBox_    = {"cutValue": json["cutValue"] , "fillColor": json["cutFillColour"],
                   "box": json["cutBox"]=="True", "line": json["cutLine"]=="True",
                   "greaterThan": json["cutGreaterThan"]=="True"}
-
-    if ("normalization" in json):
-        if json["normalization"]=="normalization":
-            normToOne_ = True
-        else:
-            normToOne_ = False
-    elif ("normalizationToOne" in json):
-        normToOne_ = json["normalizationToOne"]=="True"
-    else:
-        raise Exception("This should never be reached")
+    if "cutValueY" in json:
+        cutBoxY_   = {"cutValue": json["cutValueY"] , "fillColor": json["cutFillColourY"], "fillStyle": json["cutFillStyleY"],
+                      "box": json["cutBoxY"]=="True", "line": json["cutLineY"]=="True",
+                      "greaterThan": json["cutGreaterThanY"]=="True"}
         
     if normToOne_:
         ylabel_ = ylabel_.replace(json["ylabel"].split(" /")[0], "Arbitrary Units")
 
     # Get the reference histo and the list of histos to compare
-    histoReference = getHisto(datasetsMgr, json['samples'][0], json['histograms'][0])
-    histoCompares  = getHistos(datasetsMgr, json['samples'][0], json['histograms'])
+    histoReference = getHisto(datasetsMgr, json['datasets'][0], json['histograms'][0])
+    histoCompares  = getHistos(datasetsMgr, json['datasets'][0], json['histograms'])
     p = plots.ComparisonManyPlot(histoReference, histoCompares, saveFormats=[])
     
     # Set universal histo styles
@@ -201,7 +199,7 @@ def ComparisonPlot(datasetsMgr, json):
 
     # Set individual styles
     for i in range(0, len(histoCompares)+1):
-        hName = "h%s-%s" % (i, json["samples"][0])
+        hName = "h%s-%s" % (i, json["datasets"][0])
         legendDict[hName] = styles.getCaloLegend(i)
         p.histoMgr.forHisto(hName, styles.getCaloStyle(i) )
         if 0:
@@ -215,7 +213,7 @@ def ComparisonPlot(datasetsMgr, json):
     p.histoMgr.setHistoLegendLabelMany(legendDict)
     
     # Draw a customised plot
-    saveName = os.path.join(json["saveDir"], json["title"])    
+    saveName = os.path.join(json["saveDir"], json["saveName"])    
 
     # Create the customised plot
     plots.drawPlot(p, 
@@ -231,7 +229,8 @@ def ComparisonPlot(datasetsMgr, json):
                    log               = json["logY"]=="True", 
                    moveLegend        = json["moveLegend"],
                    cutBox            = cutBox_,
-                   ratio             = False,
+                   cutBoxY           = cutBoxY_,
+                   ratio             = json["ratio"]=="True",
                    ratioInvert       = json["ratioInvert"]=="True",
                    ratioYlabel       = json["ratioYlabel"],
                    )
@@ -239,6 +238,7 @@ def ComparisonPlot(datasetsMgr, json):
     # Remove legend?
     if json["removeLegend"] == "True":
         p.removeLegend()
+ 
 
     # Additional text
     histograms.addText(json["extraText"].get("x"), json["extraText"].get("y"), json["extraText"].get("text"), json["extraText"].get("size") )
@@ -328,4 +328,4 @@ if __name__ == "__main__":
     main(opts)
 
     if not opts.batchMode:
-        raw_input("=== plotComparison.py: Press any key to quit ROOT ...")
+        raw_input("=== plotPerformance.py: Press any key to quit ROOT ...")

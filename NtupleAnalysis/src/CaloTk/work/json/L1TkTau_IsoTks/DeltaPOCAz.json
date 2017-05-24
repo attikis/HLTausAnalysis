@@ -12,7 +12,7 @@
     "ylabel"           : "Events / %.2f",
     "drawStyle"        : "HIST",
     "legendStyle"      : "LF",    
-    "opts"             : {"xmax": 15.0, "ymin": 1e-04, "ymaxfactor": 10.0},
+    "opts"             : {"xmax": 15.0, "ymin": 1e-04, "ymaxfactor": 2.0},
     "ratio"            : "True",
     "ratioYlabel"      : "Ratio",
     "ratioInvert"      : "False",

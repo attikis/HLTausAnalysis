@@ -30,9 +30,9 @@
     "removeLegend"     : "False",
     "moveLegend"       : {"dx": -0.13, "dy": 0.0, "dh": -0.15},
     "extraText"        : {"text": "", "x": 0.18, "y": 0.92, "size": 17},
-    "cutValue"         : 0.0,
+    "cutValue"         : 0.5,
     "cutFillColour"    : 16,
     "cutBox"           : "False",
-    "cutLine"          : "False",
+    "cutLine"          : "True",
     "cutGreaterThan"   : "False"
 }

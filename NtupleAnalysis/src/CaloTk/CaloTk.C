@@ -428,7 +428,7 @@ void CaloTk::Loop()
 	if (0) GenParticles = GetGenParticles(false); // time-consuming
 	GenTaus             = GetGenParticles(15, true);
 	GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
-	GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 2.3);    
+	GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 2.4);
       }
     
     if (DEBUG)
@@ -736,7 +736,7 @@ void CaloTk::Loop()
     
     ////////////////////////////////////////////////
     // SingleTau
-    ////////////////////////////////////////////////
+  ////////////////////////////////////////////////
     FillSingleTau_(L1TkTaus_Calo, hCalo_Rate  , hCalo_Eff);
     FillSingleTau_(L1TkTaus_Calo, hCalo_Rate_C, hCalo_Eff_C, 0.0, 1.0);
     FillSingleTau_(L1TkTaus_Calo, hCalo_Rate_I, hCalo_Eff_I, 1.0, 1.6);
@@ -1361,7 +1361,7 @@ void CaloTk::FillRate_(TH2D *hRate,
 
 //============================================================================
 void CaloTk::FillEfficiency_(TH1D *hEfficiency,
-				 const double ldgEt)
+			     const double ldgEt)
 //============================================================================
 {
   
@@ -1472,8 +1472,8 @@ void CaloTk::GetHadronicTauFinalDaughters(GenParticle p,
 
 //============================================================================
 void CaloTk::FillTurnOn_Numerator_(vector<L1TkTauParticle> L1TkTaus, 
-					   const double minEt,
-					   TH1D *hTurnOn)
+				   const double minEt,
+				   TH1D *hTurnOn)
 //============================================================================
 {
   

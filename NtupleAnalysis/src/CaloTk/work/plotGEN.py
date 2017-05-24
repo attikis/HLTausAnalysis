@@ -2,14 +2,13 @@
 '''
 
 Usage (single plot):
-./plotMC.py -m <multicrab_directory> <jsonfile> [opts]
+./plotGEN.py -m <multicrab_directory> <jsonfile> [opts]
 
 Usage (multiple plots):
-./plotMC.py -m <pseudo_mcrab_directory> json/*.json
-./plotMC.py -m <pseudo_mcrab_directory> json/*.json json/L1TkTau/*.json
+./plotGEN.py -m <pseudo_mcrab_directory> json/*.json json/GEN/*.json
 
 Last Used:
-./plotMC.py -m multicrab_CaloTkSkim_v910pre2_20170522T1611/ json/L1TkTau/Multiplicity.json -i 'PU140'
+./plotGEN.py -m multicrab_CaloTkSkim_v910pre2_20170522T1611/ json/GEN/*.json -i 'PU140'
 '''
 
 #================================================================================================
@@ -292,4 +291,4 @@ if __name__ == "__main__":
     main(opts)
 
     if not opts.batchMode:
-        raw_input("=== plotMC.py: Press any key to quit ROOT ...")
+        raw_input("=== plotGEN.py: Press any key to quit ROOT ...")

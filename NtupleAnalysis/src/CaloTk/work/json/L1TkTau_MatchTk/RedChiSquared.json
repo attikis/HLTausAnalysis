@@ -7,7 +7,7 @@
     "saveDir"          : "plots",
     "datasets"         : ["SingleNeutrino_PU140|TT_TuneCUETP8M1_14TeV_PU140"],
     "normalization"    : "normalizeToOne",
-    "rebinX"           : 1,
+    "rebinX"           : 2,
     "xlabel"           : "#chi^{2}/dof",
     "ylabel"           : "Events / %.1f",
     "drawStyle"        : "HIST",

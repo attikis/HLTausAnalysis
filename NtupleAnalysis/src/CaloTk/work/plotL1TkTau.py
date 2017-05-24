@@ -2,15 +2,15 @@
 '''
 
 Usage (single plot):
-./plotComparison.py.py -m <multicrab_directory> <jsonfile> [opts]
+./plotL1TkTau.py -m <multicrab_directory> <jsonfile> [opts]
 
 Usage (multiple plots):
-./plotComparison.py.py -m <pseudo_mcrab_directory> json/*.json
-./plotComparison.py.py -m <pseudo_mcrab_directory> json/*.json json/L1TkTau/*.json
+./plotL1TkTau.py -m <pseudo_mcrab_directory> json/*.json
+./plotL1TkTau.py -m <pseudo_mcrab_directory> json/*.json json/L1TkTau/*.json
 
 Last Used:
-./plotComparison.py.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/L1TkTau/Multiplicity.json -i "VBF|Neutrino"
-./plotComparison.py.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/*/*.json -i "VBF|Neutrino"
+./plotL1TkTau.py -m multicrab_CaloTkSkim_v910pre2_20170522T1611/ json/L1TkTau*/* -i "SingleNeutrino_PU140|TT_TuneCUETP8M1_14TeV_PU140"
+./plotL1TkTau.py -m multicrab_CaloTkSkim_v910pre2_20170522T1611/ json/L1TkTau*/* -i "SingleNeutrino_PU200|TT_TuneCUETP8M1_14TeV_PU200"
 '''
 
 #================================================================================================
@@ -71,7 +71,7 @@ def GetDatasetsFromDir(opts, json):
     if (not opts.includeOnlyTasks and not opts.excludeTasks):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
                                                         dataEra=json["dataEra"],
-                                                        searchMode=None, 
+                                                        searchMode=None,
                                                         includeOnlyTasks="|".join(json["datasets"]),
                                                         analysisName=json["analysis"])
     elif (opts.includeOnlyTasks):
@@ -109,8 +109,9 @@ def Plot(jsonfile, opts):
 
         # Setup & configure the dataset manager
         datasetsMgr = GetDatasetsFromDir(opts, j)
-        # datasetsMgr.loadLuminosities()
-        # datasetsMgr.updateNAllEventsToPUWeighted()
+        if 0:
+            datasetsMgr.loadLuminosities()
+        #datasetsMgr.updateNAllEventsToPUWeighted()
 
         # Print information
         if opts.verbose:
@@ -121,127 +122,87 @@ def Plot(jsonfile, opts):
         for d in datasetsMgr.getAllDatasets():
             if "ChargedHiggs" in d.getName():
                 datasetsMgr.getDataset(d.getName()).setCrossSection(1.0)
-
+                
+        ## Print dataset information (before merge)        
+        #datasetsMgr.PrintInfo()
+        
         # Merge histograms (see NtupleAnalysis/python/tools/plots.py)    
         plots.mergeRenameReorderForDataMC(datasetsMgr)
 
-        # Print dataset information
+        # Print dataset information (after merge)
         datasetsMgr.PrintInfo()
 
         # Plot the histogram
-        ComparisonPlot(datasetsMgr, j)
+        MCPlot(datasetsMgr, j)
         return
 
 
-def getHisto(datasetsMgr, datasetName, name):
-
-    h1 = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(name)
-    h1.setName("h0" + "-" + datasetName)
-    return h1
-
-
-def getHistos3(datasetsMgr, datasetName, name1, name2, name3):
-
-    h1 = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(name1)
-    h1.setName("h1" + "-" + datasetName)
-
-    h2 = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(name2)
-    h2.setName("h2" + "-" + datasetName)
-
-    h3 = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(name3)
-    h3.setName("h3" + "-" + datasetName)
-    return [h1, h2, h3]
-
-
-def getHistos(datasetsMgr, datasetName, histoNames, skipIndex=0):
-
-    histos = []
-    for i, name in enumerate(histoNames):
-        if i==skipIndex:
-            continue
-        h = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(name)
-        hName ="h%s-%s" % (i, datasetName)
-        h.setName(hName)
-        histos.append(h)
-    return histos
-
-
-def ComparisonPlot(datasetsMgr, json):
+def MCPlot(datasetsMgr, json):
     Verbose("Creating MC plot")
         
     # Create the MC Plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
-    legendDict = {}
-    kwargs     = {}
-    normToOne_ = json["normalizationToOne"]=="True"
-    ylabel_    = json["ylabel"]
-    cutBox_    = {}
-    cutBoxY_   = {}
-    if "cutValueY" in json:
-        cutBox_    = {"cutValue": json["cutValue"] , "fillColor": json["cutFillColour"],
-                  "box": json["cutBox"]=="True", "line": json["cutLine"]=="True",
-                  "greaterThan": json["cutGreaterThan"]=="True"}
-    if "cutValueY" in json:
-        cutBoxY_   = {"cutValue": json["cutValueY"] , "fillColor": json["cutFillColourY"], "fillStyle": json["cutFillStyleY"],
-                      "box": json["cutBoxY"]=="True", "line": json["cutLineY"]=="True",
-                      "greaterThan": json["cutGreaterThanY"]=="True"}
-        
-    if normToOne_:
+    ylabel_ = json["ylabel"]
+    if json["normalization"]=="normalizeToLumi":
+        kwargs = {}
+        p = plots.MCPlot(datasetsMgr, json["histograms"][0], normalizeToLumi=opts.intLumi, **kwargs)
+    elif json["normalization"]=="normalizeToOne":
         ylabel_ = ylabel_.replace(json["ylabel"].split(" /")[0], "Arbitrary Units")
-
-    # Get the reference histo and the list of histos to compare
-    histoReference = getHisto(datasetsMgr, json['datasets'][0], json['histograms'][0])
-    histoCompares  = getHistos(datasetsMgr, json['datasets'][0], json['histograms'])
-    p = plots.ComparisonManyPlot(histoReference, histoCompares, saveFormats=[])
+        kwargs  = {json["normalization"]: True}
+        p = plots.MCPlot(datasetsMgr, json["histograms"][0], **kwargs)
+    else:
+        raise Exception("Invalid normalization \"%s\"" % (json["normalization"]) )
     
+    # Label size (optional. Commonly Used in counters)
+    xlabelSize = None
+    if "xlabelsize" in json:
+        xlabelSize = json["xlabelsize"]
+    ylabelSize = None
+    if "ylabelsize" in json:
+        ylabelSize = json["ylabelsize"]
+
     # Set universal histo styles
-    p.histoMgr.setHistoDrawStyleAll(json["drawStyle"])
-    p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
+    if("drawStyle" in json):
+        p.histoMgr.setHistoDrawStyleAll(json["drawStyle"])
+    if("legendStyle" in json):
+        p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
 
-    # Set individual styles
-    for i in range(0, len(histoCompares)+1):
-        hName = "h%s-%s" % (i, json["datasets"][0])
-        legendDict[hName] = styles.getCaloLegend(i)
-        p.histoMgr.forHisto(hName, styles.getCaloStyle(i) )
-        if 0:
-            p.histoMgr.setHistoDrawStyle(hName, "L")
-            p.histoMgr.setHistoLegendStyle(hName, "LP")
-        if json["drawStyle"]=="HIST":
-            p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetFillStyle(0))
-            #p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerSize(0.0))
+    # For-loop: All histos
+    for index, h in enumerate(p.histoMgr.getHistos()):
+        if index == 0:
+            continue
+        else:
+            p.histoMgr.setHistoDrawStyle(h.getName(), "AP")
+            p.histoMgr.setHistoLegendStyle(h.getName(), "AP")
 
-    # Set legend labels
-    p.histoMgr.setHistoLegendLabelMany(legendDict)
+    # Additional text
+    histograms.addText(json["extraText"].get("x"), json["extraText"].get("y"), json["extraText"].get("text"), json["extraText"].get("size") )
     
     # Draw a customised plot
-    saveName = os.path.join(json["saveDir"], json["saveName"])    
-
-    # Create the customised plot
+    saveName = os.path.join(json["saveDir"], json["saveName"])
     plots.drawPlot(p, 
                    saveName,                  
                    xlabel            = json["xlabel"], 
                    ylabel            = ylabel_,
                    rebinX            = json["rebinX"],
+                   #rebinY            = json["rebinY"], 
                    stackMCHistograms = json["stackMCHistograms"]=="True", 
+                   addMCUncertainty  = json["addMCUncertainty"]=="True" and json["normalization"]!="normalizeToOne",
+                   addLuminosityText = json["addLuminosityText"]=="True",
                    addCmsText        = json["addCmsText"]=="True",
                    cmsExtraText      = json["cmsExtraText"],
                    opts              = json["opts"],
-                   opts2             = json["ratioOpts"],
                    log               = json["logY"]=="True", 
+                   errorBarsX        = json["errorBarsX"]=="True", 
                    moveLegend        = json["moveLegend"],
-                   cutBox            = cutBox_,
-                   cutBoxY           = cutBoxY_,
-                   ratio             = json["ratio"]=="True",
-                   ratioInvert       = json["ratioInvert"]=="True",
-                   ratioYlabel       = json["ratioYlabel"],
+                   # cutLine           = json["cutValue"], #cannot have this and "cutBox" defined
+                   cutBox            = {"cutValue": json["cutValue"], "fillColor": json["cutFillColour"], "box": json["cutBox"]=="True", "line": json["cutLine"]=="True", "greaterThan": json["cutGreaterThan"]=="True"},
+                   xlabelsize        = xlabelSize,
+                   ylabelsize        = ylabelSize,
                    )
     
     # Remove legend?
     if json["removeLegend"] == "True":
         p.removeLegend()
- 
-
-    # Additional text
-    histograms.addText(json["extraText"].get("x"), json["extraText"].get("y"), json["extraText"].get("text"), json["extraText"].get("size") )
 
     # Save in all formats chosen by user
     saveFormats = json["saveFormats"]
@@ -275,7 +236,7 @@ def main(opts):
             except ValueError, e:
                 Print("Problem loading JSON file %s. Please check the file" % (arg))
                 sys.exit()
-            
+
     # Sanity check - At least 1 json file found
     if len(jsonFiles) == 0:
         Print("No JSON files found. Please read the script instructions. Exit", True)
@@ -285,7 +246,7 @@ def main(opts):
     # For-loop: All json files
     for j in jsonFiles:
         Print("Processing JSON file \"%s\"" % (j), True)
-        Plot(j, opts)
+        Plot(j, opts)    
     return
 
 
@@ -298,6 +259,7 @@ if __name__ == "__main__":
     global opts
     BATCHMODE = True
     VERBOSE   = False
+    INTLUMI   = 1.0
 
     parser = OptionParser(usage="Usage: %prog [options]" , add_help_option=False,conflict_handler="resolve")
 
@@ -309,6 +271,9 @@ if __name__ == "__main__":
 
     parser.add_option("-m", "--mcrab", dest="mcrab", action="store", 
                       help="Path to the multicrab directory for input")
+
+    parser.add_option("--intLumi", dest="intLumi", type=float, default=INTLUMI,
+                      help="Override the integrated lumi [default: %s]" % INTLUMI)
 
     parser.add_option("-i", "--includeOnlyTasks", dest="includeOnlyTasks", action="store", 
                       help="List of datasets in mcrab to include")
@@ -328,4 +293,4 @@ if __name__ == "__main__":
     main(opts)
 
     if not opts.batchMode:
-        raw_input("=== plotComparison.py.py: Press any key to quit ROOT ...")
+        raw_input("=== plotL1TkTau.py: Press any key to quit ROOT ...")
