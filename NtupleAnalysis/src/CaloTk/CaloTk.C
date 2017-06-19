@@ -470,6 +470,12 @@ void CaloTk::Loop()
     vector<L1TkTauParticle> L1TkTaus_VtxIso;    
 
 
+    // alex: new-start
+    vector<L1JetParticle> L1Jets = GetL1Jets(true);
+    GetL1EGs(true);
+    GetL1Sums(true);
+    // alex: new-end
+
     // Ensure that all taus are found
     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
     if (bFoundAllTaus_) nEvtsWithMaxHTaus++;
@@ -1959,15 +1965,179 @@ L1JetParticle CaloTk::GetL1Tau(unsigned int Index)
 }
 
 
+
+//============================================================================
+vector<L1JetParticle> CaloTk::GetL1Jets(bool bPrintList)
+//============================================================================
+{
+
+  vector<L1JetParticle> theL1Jets;
+  L1JetParticle theL1Jet;
+  
+  // For-loop: All L1 Jets
+  for (Size_t i = 0; i < jetEt->size(); i++)
+    {
+      theL1Jet = GetL1Jet(i); 
+      theL1Jets.push_back(theL1Jet);
+    }
+  
+  if (bPrintList) PrintL1JetParticleCollection(theL1Jets); 
+  return theL1Jets;
+}
+
+
+//============================================================================
+L1JetParticle CaloTk::GetL1Jet(unsigned int Index)
+//============================================================================
+{
+
+
+  // jetIEt       
+  // jetIEta      
+  // jetIPhi      
+  // jetBx        
+  // jetRawEt     
+  // jetSeedEt    
+  // jetTowerIEta 
+  // jetTowerIPhi 
+  // jetPUEt      
+  // jetPUDonutEt0
+  // jetPUDonutEt1
+  // jetPUDonutEt2
+  // jetPUDonutEt3
+
+  // int nJets = nJets->at(Index);
+  double Et   = jetEt->at(Index);
+  double Eta  = jetEta->at(Index);
+  double Phi  = jetPhi->at(Index);
+  double Bx   = -1.0; // jetBx->at(Index);
+  double Type = -1.0;
+
+  // cout << "GeL1Jet returns theL1Jet(" << Index << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << "," << Type << ")" << endl;
+  L1JetParticle theL1Jet(Index, Et, Et, Eta, Phi, Bx, Type);
+
+  return theL1Jet;
+}
+
+
+//============================================================================
+void CaloTk::GetL1EGs(bool bPrintList)
+//============================================================================
+{
+
+  // For-loop: All L1 EGs
+  for (Size_t i = 0; i < egEt->size(); i++)
+    {
+      cout << "L1EG " << i << "/" << egEt->size() << endl;
+      if (bPrintList) GetL1EG(i);
+    }
+  
+  return;
+}
+
+
+//============================================================================
+void CaloTk::GetL1EG(unsigned int Index)
+//============================================================================
+{
+  
+  // int nEGammas   = *nEGs;
+  cout << "egEt->size() = " << egEt->size() << endl;
+  cout << "egEta->size() = " << egEta->size() << endl;
+  cout << "egPhi->size() = " << egPhi->size() << endl;
+  cout << "egIEt->size() = " << egIEt->size() << endl;
+  cout << "egIEta->size() = " << egIEta->size() << endl;
+  cout << "egIPhi->size() = " << egIPhi->size() << endl;
+  cout << "egIso->size() = " << egIso->size() << endl;
+  cout << "egBx->size() = " << egBx->size() << endl;
+  cout << "egRawEt->size() = " << egRawEt->size() << endl;
+  cout << "egIsoEt->size() = " << egIsoEt->size() << endl;
+  cout << "egFootprintEt->size() = " << egFootprintEt->size() << endl;
+  cout << "egNTT->size() = " << egNTT->size() << endl;
+  cout << "egShape->size() = " << egShape->size() << endl;
+  cout << "egTowerHoE->size() = " << egTowerHoE->size() << endl;
+
+  double Et      = egEt->at(Index);
+  double Eta     = egEta->at(Index);
+  double Phi     = egPhi->at(Index);
+  int IEt        = egIEt->at(Index);
+  int IEta       = egIEta->at(Index);
+  int IPhi       = egIPhi->at(Index);
+  int Iso        = egIso->at(Index);
+  int Bx         = egBx->at(Index);
+  // int TowerIPhi  = egTowerIPhi->at(Index); 
+  // int TowerIEta  = egTowerIEta->at(Index); 
+  int RawEt      = egRawEt->at(Index);
+  int IsoEt      = egIsoEt->at(Index); 
+  int FootprintEt= egFootprintEt->at(Index);
+  int NTT        = egNTT->at(Index);
+  int Shape      = egShape->at(Index);
+  int TowerHoE   = egTowerHoE->at(Index);
+  
+  cout << "nEGs = " << egEt->size()
+       << ", Et   = " << Et
+       << ", Eta  = " << Eta
+       << ", Phi  = " << Phi
+       << ", IEt  = " << IEt
+       << ", IEta = " << IEta
+       << ", IPhi = " << IPhi
+       << ", Iso  = " << Iso
+       << ", Bx   = " << Bx
+    // << ", TowerIPhi   = " << TowerIPhi
+    // << ", TowerIEta   = " << TowerIEta
+       << ", RawEt       = " << RawEt
+       << ", IsoEt       = " << IsoEt
+       << ", FootprintEt = " << FootprintEt
+       << ", NTT         = " << NTT
+       << ", Shape       = " << Shape
+       << ", TowerHoE    = " << TowerHoE
+       << "\n" << endl;
+  
+  return;
+}
+
+
+//============================================================================
+void CaloTk::GetL1Sums(bool bPrintList)
+//============================================================================
+{
+
+  // For-loop: All L1 Sums
+  for (Size_t i = 0; i < sumEt->size(); i++)
+    {
+      cout << "L1Sum(" << i << ")" << endl;
+      if (bPrintList) GetL1EG(i);
+    }
+  
+  return;
+}
+
+//============================================================================
+void CaloTk::GetL1Sum(unsigned int Index)
+//============================================================================
+{
+
+  cout << "nSums   = " << nSums
+       << "sumType = " << sumType->at(Index)
+       << "sumEt   = " << sumEt->at(Index)
+       << "sumPhi  = " << sumPhi->at(Index)
+       << "sumIEt  = " << sumIEt->at(Index)
+       << "sumIPhi = " << sumIPhi->at(Index)
+       << "sumBx   = " << sumBx->at(Index)
+       << "\n" << endl;
+  
+  return;
+}
+
 //============================================================================
 void CaloTk::GetShrinkingConeSizes(double calo_et,
-					   double sigCone_Constant,
-					   double isoCone_Constant,
-					   const double sigCone_dRCutoff,
-					   double &sigCone_dRMin,
-					   double &sigCone_dRMax,
-					   double &isoCone_dRMin,
-					   double &isoCone_dRMax)
+				   double sigCone_Constant,
+				   double isoCone_Constant,
+				   const double sigCone_dRCutoff,
+				   double &sigCone_dRMin,
+				   double &sigCone_dRMax,
+				   double &isoCone_dRMin,
+				   double &isoCone_dRMax)
 //============================================================================
 {
   
@@ -2216,7 +2386,7 @@ void CaloTk::PrintL1JetParticleCollection(vector<L1JetParticle> collection)
 
   // For-loop: All L1JetParticles
   int row=0;
-  for (vector<L1JetParticle>::iterator p = collection.begin(); p != collection.end(); p++)
+  for (auto p = collection.begin(); p != collection.end(); p++)
   {
     // Construct table
     info.AddRowColumn(row, auxTools_.ToString( p->index() , 4) );

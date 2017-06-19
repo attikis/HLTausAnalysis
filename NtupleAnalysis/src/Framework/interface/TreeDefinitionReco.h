@@ -66,6 +66,26 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<vector<double> > *L1PixTks_CandPixHits_Phi;
   vector<vector<int> >    *L1PixTks_CandPixHits_Type;
 
+  // Phase-1 L1T Stage2: Jets
+  int *nJets;
+  vector<float> *jetEt;
+  vector<float> *jetEta;
+  vector<float> *jetPhi;
+  vector<int> *jetIEt;
+  vector<int> *jetIEta;
+  vector<int> *jetIPhi;
+  vector<int> *jetBx;
+  vector<int> *jetRawEt;
+  vector<int> *jetSeedEt;
+  vector<int> *jetTowerIEta;
+  vector<int> *jetTowerIPhi;
+  vector<int> *jetPUEt;
+  vector<int> *jetPUDonutEt0;
+  vector<int> *jetPUDonutEt1;
+  vector<int> *jetPUDonutEt2;
+  vector<int> *jetPUDonutEt3;
+
+  
   // Phase-1 L1T Stage2: Taus
   int           *nTaus;
   vector<float> *tauEt;
@@ -76,14 +96,60 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<int>   *tauIPhi;
   vector<int>   *tauIso;
   vector<int>   *tauBx;
-//  vector<int>   *tauTowerIPhi;
-//  vector<int>   *tauTowerIEta;
+  vector<int>   *tauTowerIPhi;
+  vector<int>   *tauTowerIEta;
   vector<int>   *tauRawEt;
   vector<int>   *tauIsoEt;
   vector<int>   *tauNTT;
   vector<int>   *tauHasEM;
   vector<int>   *tauIsMerged;
   vector<int>   *tauHwQual;
+
+  // Phase-1 L1T Stage2: EGamma
+  int *nEGs;
+  vector<float> *egEt;
+  vector<float> *egEta;
+  vector<float> *egPhi;
+  vector<int> *egIEt;
+  vector<int> *egIEta;
+  vector<int> *egIPhi;
+  vector<int> *egIso;
+  vector<int> *egBx;
+  vector<int> *egTowerIPhi;
+  vector<int> *egTowerIEta;
+  vector<int> *egRawEt;
+  vector<int> *egIsoEt;
+  vector<int> *egFootprintEt;
+  vector<int> *egNTT;
+  vector<int> *egShape;
+  vector<int> *egTowerHoE;
+
+  // Phase-1 L1T Stage2: Muons
+  int *nMuons;
+  vector<float> *muonEt;
+  vector<float> *muonEta;
+  vector<float> *muonPhi;
+  vector<float> *muonEtaAtVtx;
+  vector<float> *muonPhiAtVtx;
+  vector<int> *muonIEt;
+  vector<int> *muonIEta;
+  vector<int> *muonIPhi;
+  vector<int> *muonIDEta;
+  vector<int> *muonIDPhi;
+  vector<int> *muonChg;
+  vector<int> *muonIso;
+  vector<int> *muonHwQual;
+  vector<int> *muonTfMuonIdx;
+  vector<int> *muonBx;
+
+  // L1 Sums
+  int *nSums;
+  vector<int> *sumType;
+  vector<float> *sumEt;
+  vector<float> *sumPhi;
+  vector<int> *sumIEt;
+  vector<int> *sumIPhi;
+  vector<int> *sumBx;
 
   // L1TkJets
   vector< double > *L1TkJet_Pt;
@@ -149,6 +215,25 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch *b_L1PixTks_SigmaZ0;
   TBranch *b_L1PixTks_TTTrackIndex;
 
+  // Phase-1 L1T Stage2: Jets
+  TBranch *b_nJets;
+  TBranch *b_jetEt;
+  TBranch *b_jetEta;
+  TBranch *b_jetPhi;
+  TBranch *b_jetIEt;
+  TBranch *b_jetIEta;
+  TBranch *b_jetIPhi;
+  TBranch *b_jetBx;
+  TBranch *b_jetTowerIPhi;
+  TBranch *b_jetTowerIEta;
+  TBranch *b_jetRawEt;
+  TBranch *b_jetSeedEt;
+  TBranch *b_jetPUEt;
+  TBranch *b_jetPUDonutEt0;
+  TBranch *b_jetPUDonutEt1;
+  TBranch *b_jetPUDonutEt2;
+  TBranch *b_jetPUDonutEt3;
+
   // Phase-1 L1T Stage2: Taus
   TBranch *b_nTaus;
   TBranch *b_tauEt;
@@ -168,6 +253,52 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch *b_tauIsMerged;
   TBranch *b_tauHwQual;
 
+  // Phase-1 L1T Stage2: EG (E-electron, G=Gamma)
+  TBranch *b_nEGs;
+  TBranch *b_egEt;
+  TBranch *b_egEta;
+  TBranch *b_egPhi;
+  TBranch *b_egIEt;
+  TBranch *b_egIEta;
+  TBranch *b_egIPhi;
+  TBranch *b_egIso;
+  TBranch *b_egBx;
+  TBranch *b_egTowerIPhi;
+  TBranch *b_egTowerIEta;
+  TBranch *b_egRawEt;
+  TBranch *b_egIsoEt;
+  TBranch *b_egFootprintEt;
+  TBranch *b_egNTT;
+  TBranch *b_egShape;
+  TBranch *b_egTowerHoE;
+
+  // Phase-1 L1T Stage2: Muons
+  TBranch *b_nMuons;
+  TBranch *b_muonEt;
+  TBranch *b_muonEta;
+  TBranch *b_muonPhi;
+  TBranch *b_muonEtaAtVtx;
+  TBranch *b_muonPhiAtVtx;
+  TBranch *b_muonIEt;
+  TBranch *b_muonIEta;
+  TBranch *b_muonIPhi;
+  TBranch *b_muonIDEta;
+  TBranch *b_muonIDPhi;
+  TBranch *b_muonChg;
+  TBranch *b_muonIso;
+  TBranch *b_muonHwQual;
+  TBranch *b_muonTfMuonIdx;
+  TBranch *b_muonBx;
+
+  // L1 Sums
+  TBranch *b_nSums;
+  TBranch *b_sumType;
+  TBranch *b_sumEt;
+  TBranch *b_sumPhi;
+  TBranch *b_sumIEt;
+  TBranch *b_sumIPhi;
+  TBranch *b_sumBx;
+  
   // L1TkJets
   TBranch *b_L1TkJet_Pt;
   TBranch *b_L1TkJet_Eta;
@@ -247,6 +378,25 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   L1PixTks_CandPixHits_Phi    = 0;
   L1PixTks_CandPixHits_Type   = 0;
 
+  // Phase-1 L1T Stage2: Jets
+  nJets         = 0;
+  jetEt         = 0;
+  jetEta        = 0;
+  jetPhi        = 0;
+  jetIEt        = 0;
+  jetIEta       = 0;
+  jetIPhi       = 0;
+  jetBx         = 0;
+  jetTowerIPhi  = 0;
+  jetTowerIEta  = 0;
+  jetRawEt      = 0;
+  jetSeedEt     = 0;
+  jetPUEt       = 0;
+  jetPUDonutEt0 = 0;
+  jetPUDonutEt1 = 0;
+  jetPUDonutEt2 = 0;
+  jetPUDonutEt3 = 0;
+
   // Phase-1 L1T Stage2: Phase-1 L1T Stage2: Taus
   nTaus         = 0;
   tauEt         = 0;
@@ -257,8 +407,8 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   tauIPhi       = 0;
   tauIso        = 0;
   tauBx         = 0;
-//  tauTowerIPhi  = 0;
-//  tauTowerIEta  = 0;
+  tauTowerIPhi  = 0;
+  tauTowerIEta  = 0;
   tauRawEt      = 0;
   tauIsoEt      = 0;
   tauNTT        = 0;
@@ -266,13 +416,59 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   tauIsMerged   = 0;
   tauHwQual     = 0;
 
+  // Phase-1 L1T Stage2: EG (E-electron, G=Gamma)
+  nEGs          = 0;
+  egEt          = 0;
+  egEta         = 0;
+  egPhi         = 0;
+  egIEt         = 0;
+  egIEta        = 0;
+  egIPhi        = 0;
+  egIso         = 0;
+  egBx          = 0;
+  egTowerIPhi   = 0;
+  egTowerIEta   = 0;
+  egRawEt       = 0;
+  egIsoEt       = 0;
+  egFootprintEt = 0;
+  egNTT         = 0;
+  egShape       = 0;
+  egTowerHoE    = 0;
+
+  // Phase-1 L1T Stage2: Muons
+  nMuons        = 0;
+  muonEt        = 0;
+  muonEta       = 0;
+  muonPhi       = 0;
+  muonEtaAtVtx  = 0;
+  muonPhiAtVtx  = 0;
+  muonIEt       = 0;
+  muonIEta      = 0;
+  muonIPhi      = 0;
+  muonIDEta     = 0;
+  muonIDPhi     = 0;
+  muonChg       = 0;
+  muonIso       = 0;
+  muonHwQual    = 0;
+  muonTfMuonIdx = 0;
+  muonBx        = 0;
+
+  // L1 Sums
+  nSums   = 0;
+  sumType = 0;
+  sumEt   = 0;
+  sumPhi  = 0;
+  sumIEt  = 0;
+  sumIPhi = 0;
+  sumBx   = 0;
+  
   // L1TkJets
-  L1TkJet_Pt              = 0;
-  L1TkJet_Eta             = 0;
-  L1TkJet_Phi             = 0;
-  L1TkJet_E               = 0;
-  L1TkJet_TTTrackIndex    = 0;
-  L1TkJet_Vertex          = 0;
+  L1TkJet_Pt           = 0;
+  L1TkJet_Eta          = 0;
+  L1TkJet_Phi          = 0;
+  L1TkJet_E            = 0;
+  L1TkJet_TTTrackIndex = 0;
+  L1TkJet_Vertex       = 0;
 
 
   cout << "\tSetting branch addresses and branch pointers." << endl;
@@ -297,16 +493,16 @@ void TreeDefinitionReco::InitReco(TTree *tree)
       fChain->SetBranchAddress("L1Tks_ChiSquared"       , &L1Tks_ChiSquared       , &b_L1Tks_ChiSquared);
       fChain->SetBranchAddress("L1Tks_StubPtConsistency", &L1Tks_StubPtConsistency, &b_L1Tks_StubPtConsistency);
       fChain->SetBranchAddress("L1Tks_RInv"             , &L1Tks_RInv             , &b_L1Tks_RInv);
-      fChain->SetBranchAddress("L1Tks_IsGenuine"     , &L1Tks_IsGenuine     , &b_L1Tks_IsGenuine);
-      fChain->SetBranchAddress("L1Tks_IsUnknown"     , &L1Tks_IsUnknown     , &b_L1Tks_IsUnknown);
-      fChain->SetBranchAddress("L1Tks_IsCombinatoric", &L1Tks_IsCombinatoric, &b_L1Tks_IsCombinatoric);
-      fChain->SetBranchAddress("L1Tks_IsLoose"       , &L1Tks_IsLoose       , &b_L1Tks_IsLoose);
-      fChain->SetBranchAddress("L1Tks_IsFake"        , &L1Tks_IsFake        , &b_L1Tks_IsFake);
-      fChain->SetBranchAddress("L1Tks_NStubs"        , &L1Tks_NStubs        , &b_L1Tks_NStubs);
-      fChain->SetBranchAddress("L1Tks_NStubsPS"      , &L1Tks_NStubsPS      , &b_L1Tks_NStubsPS);
-      fChain->SetBranchAddress("L1Tks_NStubsBarrel"  , &L1Tks_NStubsBarrel  , &b_L1Tks_NStubsBarrel);
-      fChain->SetBranchAddress("L1Tks_NStubsEndcap"  , &L1Tks_NStubsEndcap  , &b_L1Tks_NStubsEndcap);
-      fChain->SetBranchAddress("L1Tks_TP_Index"      , &L1Tks_TP_Index      , &b_L1Tks_TP_Index);
+      fChain->SetBranchAddress("L1Tks_IsGenuine"        , &L1Tks_IsGenuine        , &b_L1Tks_IsGenuine);
+      fChain->SetBranchAddress("L1Tks_IsUnknown"        , &L1Tks_IsUnknown        , &b_L1Tks_IsUnknown);
+      fChain->SetBranchAddress("L1Tks_IsCombinatoric"   , &L1Tks_IsCombinatoric   , &b_L1Tks_IsCombinatoric);
+      fChain->SetBranchAddress("L1Tks_IsLoose"          , &L1Tks_IsLoose          , &b_L1Tks_IsLoose);
+      fChain->SetBranchAddress("L1Tks_IsFake"           , &L1Tks_IsFake           , &b_L1Tks_IsFake);
+      fChain->SetBranchAddress("L1Tks_NStubs"           , &L1Tks_NStubs           , &b_L1Tks_NStubs);
+      fChain->SetBranchAddress("L1Tks_NStubsPS"         , &L1Tks_NStubsPS         , &b_L1Tks_NStubsPS);
+      fChain->SetBranchAddress("L1Tks_NStubsBarrel"     , &L1Tks_NStubsBarrel     , &b_L1Tks_NStubsBarrel);
+      fChain->SetBranchAddress("L1Tks_NStubsEndcap"     , &L1Tks_NStubsEndcap     , &b_L1Tks_NStubsEndcap);
+      fChain->SetBranchAddress("L1Tks_TP_Index"         , &L1Tks_TP_Index         , &b_L1Tks_TP_Index);
     }
 
   // TTPixelTracks 
@@ -346,6 +542,28 @@ void TreeDefinitionReco::InitReco(TTree *tree)
       fChain->SetBranchAddress("L1PixTks_CandPixHits_Type", &L1PixTks_CandPixHits_Type, &b_L1PixTks_CandPixHits_Type);
     }
 
+  // Phase-1 L1T Stage2: Jets
+  if (1)
+    {
+      fChain->SetBranchAddress("L1Jet_nJets"     , &nJets        , &b_nJets);
+      fChain->SetBranchAddress("L1Jet_Et"        , &jetEt        , &b_jetEt);
+      fChain->SetBranchAddress("L1Jet_Eta"       , &jetEta       , &b_jetEta);
+      fChain->SetBranchAddress("L1Jet_Phi"       , &jetPhi       , &b_jetPhi);
+      fChain->SetBranchAddress("L1Jet_IET"       , &jetIEt       , &b_jetIEt);
+      fChain->SetBranchAddress("L1Jet_IEta"      , &jetIEta      , &b_jetIEta);
+      fChain->SetBranchAddress("L1Jet_IPhi"      , &jetIPhi      , &b_jetIPhi);
+      fChain->SetBranchAddress("L1Jet_Bx"        , &jetBx        , &b_jetBx);
+      fChain->SetBranchAddress("L1Jet_RawEt"     , &jetRawEt     , &b_jetRawEt);
+      fChain->SetBranchAddress("L1Jet_SeedEt"    , &jetSeedEt    , &b_jetSeedEt);
+      // fChain->SetBranchAddress("L1Jet_TowerIEta" , &jetTowerIEta , &b_jetTowerIEta);
+      // fChain->SetBranchAddress("L1Jet_TowerIPhi" , &jetTowerIPhi , &b_jetTowerIPhi);
+      fChain->SetBranchAddress("L1Jet_PUEt"      , &jetPUEt      , &b_jetPUEt);
+      fChain->SetBranchAddress("L1Jet_PUDonutEt0", &jetPUDonutEt0, &b_jetPUDonutEt0);
+      fChain->SetBranchAddress("L1Jet_PUDonutEt1", &jetPUDonutEt1, &b_jetPUDonutEt1);
+      fChain->SetBranchAddress("L1Jet_PUDonutEt2", &jetPUDonutEt2, &b_jetPUDonutEt2);
+      fChain->SetBranchAddress("L1Jet_PUDonutEt3", &jetPUDonutEt3, &b_jetPUDonutEt3);
+    }
+			   
   // Phase-1 L1T Stage2: Taus
   if (1)
     {
@@ -359,8 +577,8 @@ void TreeDefinitionReco::InitReco(TTree *tree)
       fChain->SetBranchAddress("L1Tau_IPhi"     , &tauIPhi      , &b_tauIPhi);
       fChain->SetBranchAddress("L1Tau_Iso"      , &tauIso       , &b_tauIso);
       fChain->SetBranchAddress("L1Tau_Bx"       , &tauBx        , &b_tauBx);
-//      fChain->SetBranchAddress("L1Tau_TowerIPhi", &tauTowerIPhi , &b_tauTowerIPhi);
-//      fChain->SetBranchAddress("L1Tau_TowerIEta", &tauTowerIEta , &b_tauTowerIEta);
+      // fChain->SetBranchAddress("L1Tau_TowerIPhi", &tauTowerIPhi , &b_tauTowerIPhi);
+      // fChain->SetBranchAddress("L1Tau_TowerIEta", &tauTowerIEta , &b_tauTowerIEta);
       fChain->SetBranchAddress("L1Tau_RawEt"    , &tauRawEt     , &b_tauRawEt);
       fChain->SetBranchAddress("L1Tau_IsoEt"    , &tauIsoEt     , &b_tauIsoEt);
       fChain->SetBranchAddress("L1Tau_NTT"      , &tauNTT       , &b_tauNTT);
@@ -369,6 +587,63 @@ void TreeDefinitionReco::InitReco(TTree *tree)
       fChain->SetBranchAddress("L1Tau_HwQual"   , &tauHwQual    , &b_tauHwQual);
     }
 
+  // L1EG
+  if (1)
+    {
+      cout << "\tSetting Phase-1 L1T Stage2 L1EG addresses." << endl;
+      fChain->SetBranchAddress("L1EG_Et"         , &egEt         , &b_egEt);
+      fChain->SetBranchAddress("L1EG_Eta"        , &egEta        , &b_egEta);
+      fChain->SetBranchAddress("L1EG_Phi"        , &egPhi        , &b_egPhi);
+      fChain->SetBranchAddress("L1EG_IET"        , &egIEt        , &b_egIEt);
+      fChain->SetBranchAddress("L1EG_IEta"       , &egIEta       , &b_egIEta);
+      fChain->SetBranchAddress("L1EG_IPhi"       , &egIPhi       , &b_egIPhi);
+      fChain->SetBranchAddress("L1EG_Iso"        , &egIso        , &b_egIso);
+      fChain->SetBranchAddress("L1EG_Bx"         , &egBx         , &b_egBx);
+      // fChain->SetBranchAddress("L1EG_TowerIPhi"  , &egTowerIPhi  , &b_egTowerIPhi);
+      // fChain->SetBranchAddress("L1EG_TowerIEta"  , &egTowerIEta  , &b_egTowerIEta);
+      fChain->SetBranchAddress("L1EG_RawEt"      , &egRawEt      , &b_egRawEt);
+      fChain->SetBranchAddress("L1EG_IsoEt"      , &egIsoEt      , &b_egIsoEt);
+      fChain->SetBranchAddress("L1EG_FootprintEt", &egFootprintEt, &b_egFootprintEt);
+      fChain->SetBranchAddress("L1EG_NTT"        , &egNTT        , &b_egNTT);
+      fChain->SetBranchAddress("L1EG_Shape"      , &egShape      , &b_egShape);
+      fChain->SetBranchAddress("L1EG_TowerHoE"   , &egTowerHoE   , &b_egTowerHoE);
+      fChain->SetBranchAddress("L1EG_nEGs"       , &nEGs         , &b_nEGs);
+    }
+  
+  // Muons
+  if (0)
+    {
+      fChain->SetBranchAddress("L1Muon_Et"       , &muonEt       , &b_muonEt);
+      fChain->SetBranchAddress("L1Muon_Eta"      , &muonEta      , &b_muonEta);
+      fChain->SetBranchAddress("L1Muon_Phi"      , &muonPhi      , &b_muonPhi);
+      fChain->SetBranchAddress("L1Muon_EtaAtVtx" , &muonEtaAtVtx , &b_muonEtaAtVtx);
+      fChain->SetBranchAddress("L1Muon_PhiAtVtx" , &muonPhiAtVtx , &b_muonPhiAtVtx);
+      fChain->SetBranchAddress("L1Muon_IET"      , &muonIEt      , &b_muonIEt);
+      fChain->SetBranchAddress("L1Muon_IEta"     , &muonIEta     , &b_muonIEta);
+      fChain->SetBranchAddress("L1Muon_IPhi"     , &muonIPhi     , &b_muonIPhi);
+      fChain->SetBranchAddress("L1Muon_IDEta"    , &muonIDEta    , &b_muonIDEta);
+      fChain->SetBranchAddress("L1Muon_IDPhi"    , &muonIDPhi    , &b_muonIDPhi);
+      fChain->SetBranchAddress("L1Muon_Chg"      , &muonChg      , &b_muonChg);
+      fChain->SetBranchAddress("L1Muon_Iso"      , &muonIso      , &b_muonIso);
+      fChain->SetBranchAddress("L1Muon_HwQual"   , &muonHwQual   , &b_muonHwQual);
+      fChain->SetBranchAddress("L1Muon_TfMuonIdx", &muonTfMuonIdx, &b_muonTfMuonIdx);
+      fChain->SetBranchAddress("L1Muon_Bx"       , &muonBx       , &b_muonBx);
+      fChain->SetBranchAddress("L1Muon_nMuons"   , &nMuons       , &b_nMuons);
+    }
+
+  // L1 Sums
+  if (1)
+    {
+      fChain->SetBranchAddress("L1Sum_Type" , &sumType, &b_sumType);
+      fChain->SetBranchAddress("L1Sum_Et"   , &sumEt  , &b_sumEt);
+      fChain->SetBranchAddress("L1Sum_Phi"  , &sumPhi , &b_sumPhi);
+      fChain->SetBranchAddress("L1Sum_IET"  , &sumIEt , &b_sumIEt);
+      fChain->SetBranchAddress("L1Sum_IPhi" , &sumIPhi, &b_sumIPhi);
+      fChain->SetBranchAddress("L1Sum_Bx"   , &sumBx  , &b_sumBx);
+      fChain->SetBranchAddress("L1Sum_nSums", &nSums  , &b_nSums);
+    }
+
+  
   // L1TkJets
   if (0)
     {

@@ -237,10 +237,18 @@ class CaloTk : public TreeAnalyserMC{
 					const int minHits = 0.0,
 					bool bPrintList=false);
 
+  void GetL1EG(unsigned int Index);
+  void GetL1Muon(unsigned int Index);
+  L1JetParticle GetL1Jet(unsigned int Index);
   L1JetParticle GetL1Tau(unsigned int Index);
-  
-  vector<L1JetParticle> GetL1Taus(bool bPrintList=false);
+  void GetL1Sum(unsigned int Index);
 
+  void GetL1EGs(bool bPrintList=false);
+  void GetL1Muons(bool bPrintList=false);
+  vector<L1JetParticle> GetL1Jets(bool bPrintList=false);
+  vector<L1JetParticle> GetL1Taus(bool bPrintList=false);
+  void GetL1Sums(bool bPrintList=false);
+  
   GenParticle GetGenParticle(unsigned int Index);
 
   void SetGenParticleMomsAndDaus(GenParticle &p);
@@ -248,7 +256,6 @@ class CaloTk : public TreeAnalyserMC{
   void SetGenParticleFinalDaughters(GenParticle &p);
 
   vector<GenParticle> GetGenParticles(bool bPrintList=false);
-
   vector<GenParticle> GetGenParticles(int pdgId,
 				      bool isLastCopy=false);
   
