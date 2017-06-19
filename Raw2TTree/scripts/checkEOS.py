@@ -168,6 +168,12 @@ def main(opts, args):
     Print("Found %s items under %s:" % (len(fileList), eosPath + "/"), True)
     for f in fileList:
         Print(f, False)
+    
+        if opts.cp:
+            cmd = "xrdcp root://eoscms.cern.ch:/%s ." % (opts.dir+f)
+            Print(cmd, False)
+            p = subprocess.Popen(['/bin/csh', '-c', cmd], stdout=subprocess.PIPE)
+            os.system(cmd)
 
     # Get the EOS quota
     quota_out, quota_err = GetEosQuota(opts)
@@ -213,6 +219,9 @@ if __name__ == "__main__":
 
     parser.add_option("-d", "--dir", dest="dir", default="CRAB3_TransferData", action="store", 
                       help="Dir to probe in EOS [default: CRAB3_TransferData]")
+
+    parser.add_option("--cp", dest="cp", default=False, action="store",
+                      help="Copy all files under --dir in EOS to current working directory [default: false]")
 
     (opts, args) = parser.parse_args()
 
