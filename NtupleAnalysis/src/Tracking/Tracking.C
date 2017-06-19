@@ -132,7 +132,7 @@ void Tracking::Loop()
   for (int jentry = 0; jentry < nEntries; jentry++, nEvts++)
     {
 
-      if(1) cout << "\tEntry = " << jentry << endl;
+      if(DEBUG) cout << "\tEntry = " << jentry << endl;
 
       // Load the tree && Get the entry
       Long64_t ientry = LoadTree(jentry);
@@ -140,28 +140,102 @@ void Tracking::Loop()
       nb = fChain->GetEntry(jentry);
       nbytes += nb;
 
+
+      // =============================================================================
       // GenParticles Collection
+      // =============================================================================
+      
       if (DEBUG) cout << "=== GenParticles (" << GenP_Pt->size() << ")" << endl;
       vector<GenParticle> GenParticles = GetGenParticles(false);
-      if (DEBUG) PrintGenParticleCollection(GenParticles);
+      cout << "===================================" << endl;
+      if (1) PrintGenParticleCollection(GenParticles);
+      cout << "===================================\n" << endl;
 
+      
+      // =============================================================================
       // Tracking Particle Collections
+      // =============================================================================
       if (DEBUG) cout << "=== Tracking Particles (" << TP_Pt->size() << ")" << endl;
       vector<TrackingParticle> TPs  = GetTrackingParticles(false);
       sort( TPs.begin(), TPs.end(), PtComparatorTP() ); // not sorted by default
       if (DEBUG) PrintTrackingParticleCollection(TPs);
       
+
+
+      // =============================================================================
       // TTTracks Collections
+      // =============================================================================
       if (DEBUG) cout << "=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
       vector<TTTrack> TTTracks = GetTTTracks(tk_minPt, tk_minEta, tk_maxEta, tk_maxChiSqRed, tk_minStubs, tk_minStubsPS, tk_maxStubsPS, tk_nFitParams, false);
       sort( TTTracks.begin(), TTTracks.end(), PtComparatorTTTrack() ); // not sorted by default
       if (DEBUG) PrintTTTrackCollection(TTTracks);
 
-      // Tau Collection
-      if (1) cout << "=== Taus (" << tauEt->size() << ")" << endl;
-      // vector<GenParticle> GenParticles = GetGenParticles(false);
-      // if (DEBUG) PrintGenParticleCollection(GenParticles);
+      // For-loop: TTTracks
+      for (vector<TTTrack>::iterator tk = TTTracks.begin(); tk != TTTracks.end(); tk++)
+	{
+	  double tk_pt     = tk->getPt();
+	  double tk_eta    = tk->getEta();
+	  double tk_phi    = tk->getPhi();
+	  
+	  double tp_pt     = 0;
+	  double tp_eta    = 0;
+	  double tp_phi    = 0;	    
+	  
+	  int tp_index = 0;
+	  tp_index = tk->getTPIndex();
 
+	  // If there is a TP matching to TTTrack
+	  if(tp_index >= 0)
+	    {
+	      
+	      TrackingParticle tp = GetTrackingParticle(tp_index);
+	      
+	      tp_pt  = tp.getPt();
+	      tp_eta = tp.getEta();
+	      tp_phi = tp.getPhi();
+
+	      // Fill resolution histograms (only for cases where there is a matching TP)	      
+	      hL1Tks_Pt->Fill(tk_pt);
+	      hL1Tks_Eta->Fill(tk_eta);
+	      hL1Tks_Phi->Fill(tk_phi);
+	      
+	      hL1Tks_Pt_Res->Fill( (tk_pt-tp_pt)/tp_pt );
+	      hL1Tks_Eta_Res->Fill( (tk_eta-tp_eta)/tp_eta );
+	      hL1Tks_Phi_Res->Fill( (tk_phi-tp_phi)/tp_phi );
+	      
+	      hTP_Pt->Fill(tp_pt);
+	      hTP_Eta->Fill(tp_eta);
+	      hTP_Phi->Fill(tp_phi);
+	      
+	    }//tp_index >= 0
+	  
+	}//for-loop: TTTracks
+      
+
+      // =============================================================================
+      // L1Taus Collection
+      // =============================================================================
+      if (DEBUG) cout << "=== Taus (" << tauEt->size() << ")" << endl;
+      //vector<L1JetParticle> L1Taus = GetL1Taus(false);
+      // FIXME: From L1Taus, we should construct L1TkTaus_Calo, see CaloTk.C for details
+      // if (DEBUG) PrintGenParticleCollection(GenParticles); //FIXME
+
+
+    // Fill L1TkTaus_Calo resoltion histograms 
+/*    for (vector<L1TkTauParticle>::iterator tau = L1TkTaus_Calo.begin(); tau != L1TkTaus_Calo.end(); tau++) //FIXME: construct L1TkTaus_Calo
+    {
+      	GenParticle p = tau->GetMatchingGenParticle();	
+	    hL1Tau_CaloEt ->Fill(tau->GetCaloTau().Pt());
+	    hL1Tau_CaloEt ->Fill(tau->GetCaloTau().Eta());
+	    hL1Tau_CaloEt ->Fill(tau->GetCaloTau().Phi());
+      	hL1Tau_CaloEt_Res ->Fill( (tau->GetCaloTau().Pt() - p.p4vis().Pt() )/p.p4vis().Pt()  );
+	    hL1Tau_CaloEta_Res->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
+	    hL1Tau_CaloPhi_Res->Fill( (tau->GetCaloTau().phi() - p.p4vis().Phi())/p.p4vis().Phi() );
+	    hL1TauGenMatch_VisEt ->Fill(p.p4vis().Pt());
+	    hL1TauGenMatch_Eta ->Fill(p.p4vis().Eta());
+	    hL1TauGenMatch_Phi ->Fill(p.p4vis().Phi());
+    } */
+          
     }//eof: Entries
 
   
@@ -170,8 +244,8 @@ void Tracking::Loop()
   ////////////////////////////////////////////////
   hHepMCEvt_VtxX_VtxY->Fill(HepMCEvt_VtxX, HepMCEvt_VtxY);
   hHepMCEvt_VtxZ->Fill(HepMCEvt_VtxZ);
-
   
+
   ////////////////////////////////////////////////
   // Fill counters
   ////////////////////////////////////////////////
@@ -195,10 +269,32 @@ void Tracking::BookHistos_(void)
 {
   if (DEBUG) std::cout << "=== Tracking::BookHistos_()" << std::endl;
   
-  // Event-Type Histograms
+  // Event-Type histograms
   histoTools_.BookHisto_1D(hCounters, "Counters",  "", 2, 0.0, +2.0);
   histoTools_.BookHisto_1D(hHepMCEvt_VtxZ      , "HepMCEvt_VtxZ"     ,  "", 600, -30.0,  +30.0);
   histoTools_.BookHisto_2D(hHepMCEvt_VtxX_VtxY , "HepMCEvt_VtxX_VtxY",  "", 400,  -0.01,  +0.01, 400,  -0.01,  +0.01);
+  
+  // TTTracks resolution histograms
+  histoTools_.BookHisto_1D(hL1Tks_Pt, "L1Tks_MatchedToTP_Pt", "; p_{T} (GeV/c); Entries", 200,  +0.0,  +200.0);
+  histoTools_.BookHisto_1D(hL1Tks_Eta, "L1Tks_MatchedToTP_Eta", "; #eta; Entries", 130,  -2.6,  +2.6);
+  histoTools_.BookHisto_1D(hL1Tks_Phi, "L1Tks_MatchedToTP_Phi", "; #phi (rads); Entries", 128,  -3.2,  +3.2);
+  histoTools_.BookHisto_1D(hL1Tks_Pt_Res, "L1Tks_MatchedToTP_Pt_Res", "; (p_{T}^{track}-p_{T}^{particle})/p_{T}^{particle}; Entries", 200,  -1.0,  +1.0);
+  histoTools_.BookHisto_1D(hL1Tks_Eta_Res, "L1Tks_MatchedToTP_Eta_Res", "; (#eta^{track}-#eta^{particle})/#eta^{particle}; Entries", 400,  -0.2,  +0.2);
+  histoTools_.BookHisto_1D(hL1Tks_Phi_Res, "L1Tks_MatchedToTP_Phi_Res", "; (#phi^{track}-#phi^{particle})/#phi}^{particle} ; Entries", 400,  -0.2,  +0.2);
+  histoTools_.BookHisto_1D(hTP_Pt, "TP_MatchedToL1Tk_Pt", "; p_{T} (GeV/c); Entries", 200,  +0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTP_Eta, "TP_MatchedToL1Tk_Eta", "; #eta; Entries", 130,  -2.6,  +2.6);
+  histoTools_.BookHisto_1D(hTP_Phi, "TP_MatchedToL1Tk_Phi", "; #phi (rads); Entries", 128,  -3.2,  +3.2);  
+  
+  // L1Taus resoultion histograms
+  histoTools_.BookHisto_1D(hL1Tau_CaloEt, "L1Tau_CaloEt", "; E_{T}^{vis} (GeV/c); Entries", 200,  +0.0,  +200.0);
+  histoTools_.BookHisto_1D(hL1Tau_CaloEta, "L1Tau_CaloEta", "; #eta^{vis}; Entries", 130,  -2.6,  +2.6);
+  histoTools_.BookHisto_1D(hL1Tau_CaloPhi,  "L1Tau_CaloPhi", "; #phi^{vis} (rads); Entries", 128,  -3.2,  +3.2);
+  histoTools_.BookHisto_1D(hL1Tau_CaloEt_Res, "L1Tau_CaloEt_Res", "; (E_{T}^{vis} - E_{T}^{vis,gen})/E_{T}^{vis,gen}; Entries", 200,  -1.0,  +1.0);
+  histoTools_.BookHisto_1D(hL1Tau_CaloEta_Res, "L1Tau_CaloEta_Res", "; (#eta^{vis} - #eta^{vis,gen})/#eta^{vis,gen}; Entries", 80,  -0.2,  +0.2);
+  histoTools_.BookHisto_1D(hL1Tau_CaloPhi_Res,  "L1Tau_CaloPhi_Res", "; (#phi^{vis} - #phi^{vis,gen})/#phi^{vis,gen}; Entries", 80,  -0.2,  +0.2);
+  histoTools_.BookHisto_1D(hL1TauGenMatch_VisEt, "L1TauGenMatch_VisEt", "; E_{T}^{vis} (GeV/c); Entries", 200,  +0.0,  +200.0);
+  histoTools_.BookHisto_1D(hL1TauGenMatch_Eta, "L1TauGenMatch_VisEta", "; #eta^{vis}; Entries", 130,  -2.6,  +2.6);
+  histoTools_.BookHisto_1D(hL1TauGenMatch_Phi, "L1TauGenMatch_VisPhi", "; #phi^{vis} (rads); Entries", 128,  -3.2,  +3.2);
   
   return;
 }
@@ -691,21 +787,34 @@ void Tracking::PrintGenParticleCollection(vector<GenParticle> collection)
 //============================================================================
 {
   if (DEBUG) std::cout << "=== Tracking::PrintGenParticleCollection()" << std::endl;
-  
+
+  int index = -1;
   for (vector<GenParticle>::iterator p = collection.begin(); p != collection.end(); p++)
     {
-      std::cout << "\nGenParticle:" << endl;
-      p->PrintProperties();
-      std::cout << "\nDaughters:" << endl;
-      p->PrintDaughters();
-      std::cout << "\nFinal Daughters:" << endl;
-      p->PrintFinalDaughters();
-      std::cout << "\nFinal Daughters (Charged):" << endl;
-      p->PrintFinalDaughtersCharged();
-      std::cout << "\nFinal Daughters (Neutral):" << endl;
-      p->PrintFinalDaughtersNeutral();
-      std::cout << "\nMothers:" << endl;
-      p->PrintMothers();
+      if (1)
+	{
+	  index++;
+	  p->PrintProperties(index==0);
+	}
+      else
+	{
+	  std::cout << "\nGenParticle:" << endl;
+	  p->PrintProperties();
+	  std::cout << "\nDaughters:" << endl;
+	  p->PrintDaughters();
+	  
+	  std::cout << "\nFinal Daughters:" << endl;
+	  p->PrintFinalDaughters();
+	  
+	  std::cout << "\nFinal Daughters (Charged):" << endl;
+	  p->PrintFinalDaughtersCharged();
+	  
+	  std::cout << "\nFinal Daughters (Neutral):" << endl;
+	  p->PrintFinalDaughtersNeutral();
+	  
+	  std::cout << "\nMothers:" << endl;
+	  p->PrintMothers();
+	}
     }
   
   return;

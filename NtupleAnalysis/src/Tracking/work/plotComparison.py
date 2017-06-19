@@ -176,13 +176,25 @@ def ComparisonPlot(datasetsMgr, json):
     cutBox_    = {"cutValue": json["cutValue"] , "fillColor": json["cutFillColour"],
                   "box": json["cutBox"]=="True", "line": json["cutLine"]=="True",
                   "greaterThan": json["cutGreaterThan"]=="True"}
-    normToOne_ = json["normalizationToOne"]=="True"
+    if("normalization" in json):
+        normToOne_ = json["normalization"]=="normalizationToOne"
+    elif("normalizationToOne" in json):
+        normToOne_ = json["normalizationToOne"]=="True"
+    else:
+        raise Exception("This should never be reached")
+
     if normToOne_:
         ylabel_ = ylabel_.replace(json["ylabel"].split(" /")[0], "Arbitrary Units")
 
     # Get the reference histo and the list of histos to compare
-    histoReference = getHisto(datasetsMgr, json['sample'], json['histograms'][0])
-    histoCompares  = getHistos(datasetsMgr, json['sample'], json['histograms'])
+    refSample = ""
+    if('sample' in json):        
+        refSample = json['sample']
+    else:
+        refSample = datasetsMgr.getAllDatasets()[0]
+        
+    histoReference = getHisto(datasetsMgr, refSample, json['histograms'][0])
+    histoCompares  = getHistos(datasetsMgr, refSample, json['histograms'])
     p = plots.ComparisonManyPlot(histoReference, histoCompares, saveFormats=[])
     
     # Set universal histo styles
@@ -191,7 +203,7 @@ def ComparisonPlot(datasetsMgr, json):
 
     # Set individual styles
     for i in range(0, len(histoCompares)+1):
-        hName = "h%s-%s" % (i, json["sample"])
+        hName = "h%s-%s" % (i, refSample)
         legendDict[hName] = styles.getCaloLegend(i)
         p.histoMgr.forHisto(hName, styles.getCaloStyle(i) )
         if 0:

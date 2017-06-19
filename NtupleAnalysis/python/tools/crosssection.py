@@ -200,7 +200,27 @@ backgroundCrossSections = CrossSectionList(
             "13": 7.921e+01, # 7.921e+01 +- 5.425e-02 [14]
     }),
     CrossSection("SingleNeutrino", {
-            "13": 1.0, # Unknown. Dummy value.                                                                                                                                           
+            "13": 1.0, # Unknown. Dummy value.
+    }),
+    CrossSection("SingleTau_NoPU", {
+        "13": 1.0, 
+        "14": 1.0,
+    }),
+    CrossSection("SingleTau_PU140", {
+        "13": 1.0, 
+        "14": 1.0,
+    }),
+    CrossSection("SingleTau_PU200", {
+        "13": 1.0, 
+        "14": 1.0,
+    }),
+    CrossSection("SingleNeutrino_PU140", {
+        "13": 1.0, 
+        "14": (100.0/1000.0)*1e12, #100 mb (40mb elastic + 60mb inelastic) # Dummy value. 
+    }),
+    CrossSection("SingleNeutrino_PU200", {
+        "13": 1.0, 
+        "14": (100.0/1000.0)*1e12, #100 mb (40mb elastic + 60mb inelastic) # Dummy value. 
     }),
     CrossSection("WW", {
             "7": 43.0, # [3]
@@ -233,9 +253,28 @@ backgroundCrossSections = CrossSectionList(
             "13": 6.639e+02, #6.639e+02 +- 8.237e+00 pb [16] (inputFiles="001AFDCE-C33B-E611-B032-0025905D1C54.root")            
             }),
     CrossSection("TT", {
-            "7": 172.0, # [10]
-            "8": 245.8, # [10]
-            "13": 831.76, # [18] 
+             "7": 172.0,  # [10]
+             "8": 245.8,  # [10]
+            "13": 831.76, # [18]
+            "14": 984.50, # [18] 
+            }),
+    CrossSection("TT_TuneCUETP8M1_14TeV_NoPU", {
+             "7": 172.0,  # [10]
+             "8": 245.8,  # [10]
+            "13": 831.76, # [18]
+            "14": 984.50, # [18] 
+            }),
+    CrossSection("TT_TuneCUETP8M1_14TeV_PU140", {
+             "7": 172.0,  # [10]
+             "8": 245.8,  # [10]
+            "13": 831.76, # [18]
+            "14": 984.50, # [18] 
+            }),
+    CrossSection("TT_TuneCUETP8M1_14TeV_PU200", {
+             "7": 172.0,  # [10]
+             "8": 245.8,  # [10]
+            "13": 831.76, # [18]
+            "14": 984.50, # [18] 
             }),
     CrossSection("TTJets_HT600to800", {
             "13": 0.0, 

@@ -45,7 +45,7 @@ class CaloTk : public TreeAnalyserMC{
 		const int maxEvents_ = -1, 
 		TTree* tree=0) : 
   
-  TreeAnalyserMC("CaloTk", SamplePath, SampleName, text_, maxEvents_, tree) 
+  TreeAnalyserMC("", SamplePath, SampleName, text_, maxEvents_, tree) 
     { 
       auxTools_.StopwatchStart();
       mcSample = SampleName;
@@ -237,9 +237,9 @@ class CaloTk : public TreeAnalyserMC{
 					const int minHits = 0.0,
 					bool bPrintList=false);
 
-  L1JetParticle GetL1CaloTau(unsigned int Index);
+  L1JetParticle GetL1Tau(unsigned int Index);
   
-  vector<L1JetParticle> GetL1CaloTaus(bool bPrintList=false);
+  vector<L1JetParticle> GetL1Taus(bool bPrintList=false);
 
   GenParticle GetGenParticle(unsigned int Index);
 
@@ -355,10 +355,10 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkTau_VtxIsoAbs;
   TH1D* hL1TkTau_DeltaRGenP;
 
-  // L1CaloTaus: Resolutions
-  TH1D* hL1CaloTau_ResolutionCaloEt;
-  TH1D* hL1CaloTau_ResolutionCaloEta;
-  TH1D* hL1CaloTau_ResolutionCaloPhi;
+  // L1Taus: Resolutions
+  TH1D* hL1Tau_ResolutionCaloEt;
+  TH1D* hL1Tau_ResolutionCaloEta;
+  TH1D* hL1Tau_ResolutionCaloPhi;
 
   // L1TkTaus: Resolutions
   TH1D* hL1TkTau_ResolutionCaloEt;

@@ -1,4 +1,3 @@
-#lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON.txt" # ICHEP dataset 271036-276811
 lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt"
 
 
@@ -13,7 +12,6 @@ class Dataset:
         self.DBS = dbs
         self.dataVersion = dataVersion
         if not os.path.dirname(lumiMask):
-            #lumiMask = os.path.join(os.environ['CMSSW_BASE'],"src/HiggsAnalysis/MiniAOD2TTree/data",lumiMask)
             lumiMask = os.path.join("", "src/HiggsAnalysis/MiniAOD2TTree/data",lumiMask)
         self.lumiMask = lumiMask
         self.DASquery = dasQuery
@@ -118,18 +116,20 @@ TP2015Datasets.extend(datasetsMinBias_UpgFall13d)
 TP2015Datasets.extend(datasetsTTbar_UpgFall13d)
 TP2015Datasets.extend(datasetsTauThreeProngs_UpgFall13d)
 
+ID2017Datasets = []
+ID2017Datasets.extend(datasetsBs_PhaseIISpring17D)
+ID2017Datasets.extend(datasetsSingleE_PhaseIISpring17D)
+ID2017Datasets.extend(datasetsSingleMu_PhaseIISpring17D)
+ID2017Datasets.extend(datasetsSingleNu_PhaseIISpring17D)
+ID2017Datasets.extend(datasetsSinglePhoton_PhaseIISpring17D)
+ID2017Datasets.extend(datasetsSinglePion0_PhaseIISpring17D)
+ID2017Datasets.extend(datasetsSinglePion_PhaseIISpring17D)
+ID2017Datasets.extend(datasetsSingleTau_PhaseIISpring17D)
+ID2017Datasets.extend(datasetsTTJpsiFilter_PhaseIISpring17D)
+ID2017Datasets.extend(datasetsTT_PhaseIISpring17D)
+ID2017Datasets.extend(datasetsTTbar_PhaseIISpring17D)
+
 TDR2019Datasets = []
-TDR2019Datasets.extend(datasetsBs_PhaseIISpring17D)
-TDR2019Datasets.extend(datasetsSingleE_PhaseIISpring17D)
-TDR2019Datasets.extend(datasetsSingleMu_PhaseIISpring17D)
-TDR2019Datasets.extend(datasetsSingleNu_PhaseIISpring17D)
-TDR2019Datasets.extend(datasetsSinglePhoton_PhaseIISpring17D)
-TDR2019Datasets.extend(datasetsSinglePion0_PhaseIISpring17D)
-TDR2019Datasets.extend(datasetsSinglePion_PhaseIISpring17D)
-TDR2019Datasets.extend(datasetsSingleTau_PhaseIISpring17D)
-TDR2019Datasets.extend(datasetsTTJpsiFilter_PhaseIISpring17D)
-TDR2019Datasets.extend(datasetsTT_PhaseIISpring17D)
-TDR2019Datasets.extend(datasetsTTbar_PhaseIISpring17D)
 
 
 #================================================================================================ 
@@ -175,12 +175,14 @@ class DatasetGroup:
         Create dataset grouping in a dictionary for easy access.
         '''
 
-        analyses = ["SignalAnalysis", "Hplus2tbAnalysis", "TauLeg", "METLeg", "L1Study", "All"]
+        analyses = ["TP2015", "ID2017", "TDR2019", "All"]
+
         if self.analysis not in analyses:
             raise Exception("Unknown analysis \"%s\". Please select one of the following: \"%s" % (self.analysis, "\", \"".join(analyses) + "\".") )
 
 
         self.GroupDict["TP2015"]  = TP2015Datasets
+        self.GroupDict["ID2017"]  = ID2017Datasets
         self.GroupDict["TDR2019"] = TDR2019Datasets
         self.GroupDict["All"]     = TP2015Datasets + TDR2019Datasets
         return

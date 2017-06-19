@@ -49,16 +49,17 @@ _dataEras = {
     #"Run2012AB": ["_2012A_", "_2012B_"],
     #"Run2012ABC": ["_2012A_", "_2012B_", "_2012C_"],
     #"Run2012ABCD": ["_2012A_", "_2012B_", "_2012C_", "_2012D_"],
-    "Run2015C": ["_Run2015C"],
-    "Run2015D": ["_Run2015D"],
-    "Run2015CD": ["_Run2015C", "_Run2015D"],
-    "Run2015": ["_Run2015C", "_Run2015D"],
-    "Run2016BCD": ["_Run2016B", "_Run2016C", "_Run2016D"],
-    "Run2016D": ["_Run2016D"],
-    "Run2016E": ["_Run2016E"],
-    "Run2016F": ["_Run2016F"],
-    "Run2016": ["_Run2016B", "_Run2016C", "_Run2016D","_Run2016E","_Run2016F", "_Run2016G", "_Run2016H"],
+    #"Run2015C": ["_Run2015C"],
+    #"Run2015D": ["_Run2015D"],
+    #"Run2015CD": ["_Run2015C", "_Run2015D"],
+    #"Run2015": ["_Run2015C", "_Run2015D"],
+    #"Run2016BCD": ["_Run2016B", "_Run2016C", "_Run2016D"],
+    #"Run2016D": ["_Run2016D"],
+    #"Run2016E": ["_Run2016E"],
+    #"Run2016F": ["_Run2016F"],
+    #"Run2016": ["_Run2016B", "_Run2016C", "_Run2016D","_Run2016E","_Run2016F", "_Run2016G", "_Run2016H"],
     "TP2015" : ["_TP2015"],
+    "ID2017" : ["_ID2017"],
     "TDR2019": ["_TDR2019"]
 }
 
@@ -272,18 +273,20 @@ def readFromCrabDirs(taskdirs, emptyDatasetsAsNone=False, **kwargs):
         inputFile = _optionDefaults["input"]
     postfix = kwargs.get("namePostfix", "")
 
-    dlist = []
+    dlist   = []
     noFiles = False
+
+    # For-loop: All task directories
     for d in taskdirs:
         # crab2
         resdir = os.path.join(d, "res")
-        name = os.path.basename(d)
+        name   = os.path.basename(d)
         if os.path.exists(resdir):
             files = glob.glob(os.path.join(resdir, inputFile))
         else:
             # crab3
             files = glob.glob(os.path.join(d, "results", inputFile))        
-            name = name.replace("crab_", "")
+            name  = name.replace("crab_", "")
         if len(files) == 0:
             print >> sys.stderr, "Ignoring dataset %s: no files matched to '%s' in task directory %s" % (d, inputFile, os.path.join(d, "res"))
             noFiles = True
@@ -3984,7 +3987,8 @@ class DatasetManager:
 
             if allowMissingDatasets:
                 if not silent:
-                    print >> sys.stderr, message
+                    if 0:
+                        print >> sys.stderr, message
                     #Print(message, True)
             else:
                 raise Exception(message)
@@ -3992,7 +3996,8 @@ class DatasetManager:
         elif len(selected) == 1 and not keepSources:
             if not silent:
                 message = "Dataset merge, one dataset '" + selected[0].getName() + "' found from list '" + ", ".join(nameList)+"'. Renaming it to '%s'" % newName
-                print >> sys.stderr, message
+                if 0:
+                    print >> sys.stderr, message
                 #Print(message, True)
             self.rename(selected[0].getName(), newName)
             return

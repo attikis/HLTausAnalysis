@@ -14,17 +14,27 @@ void TreeAnalyserBase::Initialize(const std::string MyName_,
 				  const int MaxEvents_)
 {
 
-  MyName     = MyName_;
+  MyName     = MyName_; // passed from TreeAnalyserMC(, in each analyzer header file
   SamplePath = SamplePath_;
   SampleName = SampleName_;
   MaxEvents  = MaxEvents_;
   Text       = Text_;
 
+  // Create filename
+  std::string prefix;
+  std::string postfix;
   std::string outFileName;
-  if (Text == "") outFileName = MyName + "_Histograms_" + SampleName + ".root";
-  else outFileName = MyName + "_Histograms_" + SampleName + "_" + Text + ".root";
+  if (MyName == "") prefix = "";
+  else prefix = MyName + "_";
 
-  outFile = new TFile(outFileName.c_str(),"Recreate");
+  if (Text_ == "") postfix = "";
+  else postfix = "_" + Text_;
+
+  // Create the output file name
+  outFileName = prefix + "histograms-" + SampleName_ + postfix + ".root";
+  outFile     = new TFile(outFileName.c_str(),"Recreate");
+
+  return;
 }
 
 TreeAnalyserBase::~TreeAnalyserBase()

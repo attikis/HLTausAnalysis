@@ -38,7 +38,7 @@ class Tracking : public TreeAnalyserMC{
 	  const int maxEvents_ = -1, 
 	  TTree* tree=0) : 
   
-  TreeAnalyserMC("TTTracks", SamplePath, SampleName, text_, maxEvents_, tree) 
+  TreeAnalyserMC("", SamplePath, SampleName, text_, maxEvents_, tree) 
     { 
       auxTools_.StopwatchStart();
       mcSample = SampleName;
@@ -120,6 +120,31 @@ class Tracking : public TreeAnalyserMC{
   TH1D* hCounters;
   TH1D* hHepMCEvt_VtxZ;
   TH2D* hHepMCEvt_VtxX_VtxY;
+
+  // TTTracks resolution histograms
+  TH1D* hL1Tks_Pt;
+  TH1D* hL1Tks_Eta;
+  TH1D* hL1Tks_Phi;
+  TH1D* hL1Tks_Pt_Res;
+  TH1D* hL1Tks_Eta_Res;
+  TH1D* hL1Tks_Phi_Res;
+  TH1D* hTP_Pt;
+  TH1D* hTP_Eta;
+  TH1D* hTP_Phi;
+  
+  // L1Taus resolutions histograms
+  TH1D* hL1Tau_CaloEt;
+  TH1D* hL1Tau_CaloEta;
+  TH1D* hL1Tau_CaloPhi;
+
+  TH1D* hL1Tau_CaloEt_Res;
+  TH1D* hL1Tau_CaloEta_Res;
+  TH1D* hL1Tau_CaloPhi_Res;
+
+  TH1D* hL1TauGenMatch_VisEt;
+  TH1D* hL1TauGenMatch_Eta;
+  TH1D* hL1TauGenMatch_Phi;  
+
 };
 
 #endif

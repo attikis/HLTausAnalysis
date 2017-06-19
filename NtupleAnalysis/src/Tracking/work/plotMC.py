@@ -10,7 +10,7 @@ Usage (multiple plots):
 
 Last Used:
 ./plotMC.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/L1TkTau/Multiplicity.json -i "VBF|Neutrino"
-./plotMC.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/*/*.json -i "VBF|Neutrino"
+./plotMC.py -m multicrab_CaloPlusTracks_v61XSLHC6_20170420T1537/ json/*/*.json -i "SingleTau_P140|SingleTau_P200|"
 '''
 
 #================================================================================================
@@ -162,7 +162,12 @@ def MCPlot(datasetsMgr, json):
         p.histoMgr.setHistoDrawStyleAll(json["drawStyle"])
     if("legendStyle" in json):
         p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
-    
+    else:
+        if json["drawStyle"] == "HIST":
+            p.histoMgr.setHistoLegendStyleAll("F")
+        else:
+            p.histoMgr.setHistoLegendStyleAll("LP")
+        
     # Draw a customised plot
     saveName = os.path.join(json["saveDir"], json["title"])
     plots.drawPlot(p, 

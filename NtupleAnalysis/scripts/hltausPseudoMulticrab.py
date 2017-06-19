@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 '''
 Description:
-This script is used to create a pseudo multicrab directory, using an input ROOT file (miniaod2tree.root).
-The purpose is primarily to enable the easy testing of local changes to the MiniAOD2TTree code and the 
+This script is used to create a pseudo multicrab directory, using an input ROOT file (raw2TTree.root).
+The purpose is primarily to enable the easy testing of local changes to the  code and the 
 NtupleAnalysis code using the hplusGenerateDataFormats.py script.
 A script execution will thus create an empty multicrab with identical name and structure as those created
 by the multicrab.py script. It will contain a single dataset with a single ROOT file under results/ dir, which is 
@@ -15,12 +15,8 @@ To add  a dataset to an existing <multicrab_dir>:
 hltausPseudoMulticrab.py -f test.root -r <multicrab_dir> 
 
 Examples:
-hltausPseudoMulticrab.py -f test.root 
-hltausPseudoMulticrab.py -f test.root --cmssw "612SLHC6mc"
-hltausPseudoMulticrab.py -f test.root --dir multicrab_test -v 
-hltausPseudoMulticrab.py -f test.root --dir multicrab_CaloPlusTracks_v_20170419T1926/ --dataset Neutrino_Pt2to20_gun
-hltausPseudoMulticrab.py -f results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/CaloPlusTracks_Histograms_VBF.root
-hltausPseudoMulticrab.py -f results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/CaloPlusTracks_Histograms_MinBias.root --dataset Neutrino_Pt2to20_gun --dir multicrab_CaloPlusTracks_v612SLHC6_20170420T1226
+hltausPseudoMulticrab.py -f histograms-SingleTau_PU140.root
+hltausPseudoMulticrab.py -f histograms-SingleTau_PU200.root --dir <multicrab_dir>
 
 Last Used:
 hltausPseudoMulticrab.py -f CaloPlusTracks_Histograms_VBF.root
@@ -234,7 +230,7 @@ def moveAllHistosIntoAnalysisFolder(fileName, opts):
             k.Delete()
 
     # Close the ROOT file
-    Print("Closing file %s." % (fOUT.GetName()) )
+    Verbose("Closing file %s." % (fOUT.GetName()) )
     fOUT.Close()
     return
 
@@ -349,7 +345,7 @@ def GetAnalysis():
     Verbose("GetAnalysis()")
     
     # Create a compiled regular expression object
-    leg_re = re.compile("miniAOD2TTree_(?P<leg>\S+)_cfg.py")
+    leg_re = re.compile("raw2TTree_(?P<leg>\S+)_cfg.py")
 
     # Scan through the string 'pwd' & look for any location where the compiled RE 'cmssw_re' matches
     match = leg_re.search(opts.pset)
@@ -370,7 +366,7 @@ def AskToContinue(taskDirName, analysis, opts):
     '''
     Verbose("AskToContinue()")
 
-    Print("Creating pseudo-multicrab directory \"%s\" using the file \"%s\" as input" % (taskDirName, opts.rootFile) )
+    Print("Creating pseudo-multicrab directory \"%s\" using the file \"%s\" as input." % (taskDirName, opts.rootFile) )
     #DatasetGroup(analysis).PrintDatasets(False)
     
     AbortTask(keystroke="q")
@@ -382,10 +378,9 @@ def AbortTask(keystroke):
     Give user last chance to abort CRAB task creation.
     '''
     Verbose("AbortTask()")
-    if not opts.ask:
-        return
 
-    message  = "=== %s:\n\tPress \"%s\" to abort, any other key to proceed: " % (GetSelfName(), keystroke)
+    #message  = "=== %s:\n\tPress \"%s\" to abort, any other key to proceed: " % (GetSelfName(), keystroke)
+    message  = "\tPress \"%s\" to abort, any other key to proceed: " % (keystroke)
     response = raw_input(message)
     if (response!= keystroke):
         return
@@ -467,61 +462,43 @@ def GetRequestName(dataset):
     '''
     Verbose("GetRequestName()")
     
-    # Create compiled regular expression objects
-    datadataset_re = re.compile("^/(?P<name>\S+?)/(?P<run>Run\S+?)/")
+    # New regular expressions for HLTausAnalysis
     mcdataset_re   = re.compile("^/(?P<name>\S+?)/")
-    tune_re        = re.compile("(?P<name>\S+)_Tune")
-    tev_re         = re.compile("(?P<name>\S+)_13TeV")
-    ext_re         = re.compile("(?P<name>_ext\d+)-")
-    runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_")
-    # runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_13TeV_PromptReco_Collisions15(?P<BunchSpacing>\S*)_JSON(?P<Silver>(_\S+|))\.")
-    # runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_13TeV_PromptReco_Collisions15(?P<BunchSpacing>\S*)_JSON")
-    # runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_13TeV_PromptReco_Collisions15_(?P<BunchSpacing>\d+ns)_JSON_v")
-    
-    # Scan through the string 'dataset.URL' & look for any location where the compiled RE 'mcdataset_re' matches
+    tune_re        = re.compile("Tune\w+_")
+    tev_re         = re.compile("\d*TeV")
+    pileup_re      = re.compile("\w*PU\d*")
+
+    # Scan through the string 'dataset' & look for any location where the compiled RE 'mcdataset_re' matches
     match = mcdataset_re.search(dataset.URL)
-    if dataset.isData():
-	match = datadataset_re.search(dataset.URL)
-        
-    # Append the dataset name
     if match:
-	requestName = match.group("name")
+        requestName = match.group().split("_")[0]        
 
-    # Append the Run number (for Data samples only)
-    if dataset.isData():
-	requestName+= "_"
-	requestName+= match.group("run")
-
-    # Append the MC-tune (for MC samples only) 
-    tune_match = tune_re.search(requestName)
+    # Append the MC-tune
+    tune_match = tune_re.search(dataset.URL)
     if tune_match:
-	requestName = tune_match.group("name")
+        requestName += "_" + tune_match.group()
 
-    # Append the COM Energy (for MC samples only) 
-    tev_match = tev_re.search(requestName)
+    # Append the COM Energy
+    tev_match = tev_re.search(dataset.URL)
     if tev_match:
-	requestName = tev_match.group("name")
+        requestName += tev_match.group()
 
-    # Append the Ext
-    ext_match = ext_re.search(dataset.URL)
-    if ext_match:
-	requestName+=ext_match.group("name")
+    # Append the Pileup
+    pileup_match = pileup_re.search(dataset.URL)
+    if pileup_match:
+        requestName += "_" + pileup_match.group()
 
     # Append the Run Range (for Data samples only)
     if dataset.isData():
 	runRangeMatch = runRange_re.search(dataset.lumiMask)
 	if runRangeMatch:
-	    runRange= runRangeMatch.group("RunRange")
-	    runRange = runRange.replace("-","_")
-	    #bunchSpace = runRangeMatch.group("BunchSpacing")
+	    runRange     = runRangeMatch.group("RunRange")
+	    runRange     = runRange.replace("-","_")
 	    requestName += "_" + runRange #+ bunchSpace
-	    #Ag = runRangeMatch.group("Silver")
-	    #if Ag == "_Silver": # Use  chemical element of silver (Ag)
-            #    requestName += Ag
 
     # Finally, replace dashes with underscores    
     requestName = requestName.replace("-","_")
-
+    requestName = requestName.replace("/","")
     return requestName
 
 
@@ -551,12 +528,11 @@ def CreateJob(opts, args):
     Verbose("CreateJob()")
     
     # Get general info
-    version     = GetCMSSW(opts)
-    analysis    = GetAnalysis()
-    dataset = None
-    for d in DatasetGroup("All").GetDatasetList():
-        if opts.dataset in d.URL.replace("-", "_"):
-            dataset = d
+    version  = GetCMSSW(opts)
+    analysis = GetAnalysis()
+    dataset  = None
+    for d in DatasetGroup(opts.dataEra).GetDatasetList():
+        dataset = d
     if dataset == None:
         raise Exception("Could not find dataset object for dataset with name \"%s\"." % (opts.dataset) )
     else:
@@ -568,7 +544,8 @@ def CreateJob(opts, args):
         taskDirName = opts.dirName
 
     # Give user last chance to abort
-    AskToContinue(taskDirName, analysis, opts)
+    if 0:
+        AskToContinue(taskDirName, analysis, opts)
     
     # Create CRAB task diractory
     if opts.dirName == "":
@@ -576,34 +553,29 @@ def CreateJob(opts, args):
 
     # Create the "multicrab.cfg" file
     multicrabCfg = open(taskDirName + "/" + "multicrab.cfg", 'a')
-        
-    # For-loop: All datasets [always 1 in this case]
-    for dataset in datasets:        
-	Verbose("Determining request name for dataset with URL \"%s\"" % (dataset.URL))
-        requestName = GetRequestName(dataset)
 
-	Verbose("Creating directory for dataset with request name \"%s\"" % (requestName))
-        datasetDir = os.path.join(taskDirName, requestName)
-        if os.path.exists(datasetDir) and os.path.isdir(datasetDir):
-            raise Exception("Cannot create directory \"%s\". It already exists!" % (datasetDir))
+    # Create the dataset subdirectory
+    datasetDir   = os.path.join(taskDirName, opts.dataset)
+    if os.path.exists(datasetDir) and os.path.isdir(datasetDir):
+        raise Exception("Cannot create directory \"%s\". It already exists!" % (datasetDir))
+    else:
+        os.mkdir(datasetDir)
+        
+    # Write the new dataset to multicrab.cfg
+    multicrabCfg.write("[" + str(opts.dataset) + "]")
+    multicrabCfg.write("\n")
+        
+    Verbose("Creating directory structure for dataset with name \"%s\"" % (opts.dataset))
+    dirs = ["results", "inputs"]
+    for d in dirs:
+        newDir = os.path.join(datasetDir, d)
+        if os.path.exists(newDir) and os.path.isdir(newDir):
+            raise Exception("Cannot create directory \"%s\". It already exists!" % (newDir))
         else:
-            os.mkdir(datasetDir)
-
-        # Write dataset to multicrab.cfg
-        multicrabCfg.write("[" + str(requestName) + "]")
-        multicrabCfg.write("\n")
-        
-	Verbose("Creating directory structure for dataset with request name \"%s\"" % (requestName))
-        dirs = ["results", "inputs"]
-        for d in dirs:
-            newDir = os.path.join(datasetDir, d)
-            if os.path.exists(newDir) and os.path.isdir(newDir):
-                raise Exception("Cannot create directory \"%s\". It already exists!" % (newDir))
-            else:
-                os.mkdir(newDir)
+            os.mkdir(newDir)
 
         resultsDir  = os.path.join(datasetDir, "results")
-        resultsFile = "histograms-%s.root" % (requestName)
+        resultsFile = "histograms-%s.root" % (opts.dataset)
         resultsPath = os.path.join(resultsDir, resultsFile)
 	Verbose("Copying the ROOT file \"%s\" in the directory \"%s\"" % (opts.rootFile, resultsDir))
         cmd = "cp %s %s" % (opts.rootFile, resultsPath)
@@ -613,7 +585,7 @@ def CreateJob(opts, args):
         moveAllHistosIntoAnalysisFolder(resultsPath, opts)
         writeCounters(resultsPath, opts)
 
-    Print("Successfully created pseudo-multicrab directory \"%s\" " % (taskDirName))
+    Print("Successfully created pseudo-multicrab directory \"%s\" " % (taskDirName), False)
     multicrabCfg.close()
     if 0:
         os.system("ls -lt")
@@ -640,12 +612,12 @@ if __name__ == "__main__":
     # Default Values
     VERBOSE      = False
     ASK          = False
-    PSET         = "miniAOD2TTree_CaloTk_cfg.py"
+    PSET         = "raw2TTree_CaloTkSkim_cfg.py"
     DIRNAME      = ""
-    DATASET      = ""
-    CMSSW        = "61XSLHC6"
+    DATASET      = None #"VBF_HToTauTau_125_14TeV_powheg_pythia6"
+    CMSSW        = "910pre2" #"61XSLHC6"
     ANALYSIS     = "HLTausAnalysis"
-    DATAERA      = "TP2015" #"TDR2019"
+    DATAERA      = "ID2017"
     DATAVERSION  = CMSSW + "mc"
     ROOTFILE     = "test.root"
     NOMINALLUMI  = 5 # 5e34 (<PU>=140)
@@ -656,11 +628,11 @@ if __name__ == "__main__":
     parser.add_option("-v", "--verbose", dest="verbose", default=VERBOSE, action="store_true",
                       help="Verbose mode for debugging purposes [default: %s]" % (VERBOSE))
 
-    parser.add_option("--dataset", dest="dataset", default="VBF_HToTauTau_125_14TeV_powheg_pythia6", 
+    parser.add_option("--dataset", dest="dataset", default=DATASET, 
                       help="Dataset to include in multicrab dir [default: %s]" % (DATASET))
 
     parser.add_option("-f", "--rootFile", dest="rootFile", default= ROOTFILE,
-                      help="The ROOT file (miniaod2tree.root) to be copied inside the multicrab dir[default: %s]" % (ROOTFILE) )
+                      help="The ROOT file (raw2TTree.root) to be copied inside the multicrab dir[default: %s]" % (ROOTFILE) )
 
     parser.add_option("-p", "--pset", dest="pset", default=PSET, type="string",
                       help="The python cfg file to be used by cmsRun [default: %s]" % (PSET))
@@ -693,16 +665,21 @@ if __name__ == "__main__":
     if len(sys.argv) < 1:
         parser.print_help()
         sys.exit(1)
-    else:
-        pass
+        
     # The ROOT file options must be provided
     if opts.rootFile == None:
-        raise Exception("Must provide a ROOT file (miniaod2tree.root) as argument!")
+        raise Exception("Must provide a ROOT file (raw2TTree.root) as argument!")
 
     # Luminosity setting
     validLumis = [NOMINALLUMI, ULTIMATELUMI]
     if opts.lumi not in validLumis:
         Print("Invalid value for lumi (\"%s\"). Luminosity value must correspond to either the HL-LHC nominal luminosity %s (E+34) or the HL-LHC ultimate luminosity %s (E+34)." % (opts.lumi, NOMINALLUMI, ULTIMATELUMI), True)
+        sys.exit()
+
+    # Data-era setting
+    validEras = ["TP2015", "ID2017", "TDR2019"]
+    if opts.dataEra not in validEras:
+        Print("Invalid data-eta \"%s\". Please select one of the following:\n\t%s" % (opts.dataEra, ", ".join(validEras)), True)
         sys.exit()
 
     # Pileup setting        
@@ -713,26 +690,21 @@ if __name__ == "__main__":
     Print("The average pileup for the HL-LHC luminosity %sE+34 is set to <PU>=%s" % (opts.lumi, opts.pileup), True)
 
     # Dataset check
-    validDataset  = True
-    validDatasets = []
-    for d in DatasetGroup("All").GetDatasetList():
-        dName = GetRequestName(d)
-        validDatasets.append(dName)
-        if opts.dataset == dName:
-            validDataset = True
-        else:
-            pass
+    if opts.dataset is None:
+        text = 'sample'
+        try:
+            opts.dataset = re.search('histograms-(.+?).root', opts.rootFile).group(1)
+            Print("File \"%s\" corresponds to dataset is \"%s\""% (opts.rootFile, opts.dataset), False)
+        except AttributeError:
+            raise Exception("Could not determine the dataset corresponding to the file \"%s\"" % (opts.rootFile) )
 
-    if not validDataset:
-        Print("Invalid dataset %s. Please select one of the following:\n\t" % (opts.dataset, ", ".join(validDatasets)), True)
+    # For-loop: All data-era datasets
+    datasets     = DatasetGroup(opts.dataEra).GetDatasetList()
+    datasetNames = [GetRequestName(d) for d in datasets]
+    if opts.dataset not in datasetNames:
+        Print("Invalid dataset \"%s\". Please select one of the following:\n\t%s" % (opts.dataset, "\n\t".join(datasetNames)), True)
         sys.exit()
     
-    # Additional sanity checks
-    datasets = ["VBF_HToTauTau_125_14TeV_powheg_pythia6", "Neutrino_Pt2to20_gun", "PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV", "TauThreeProngs"]
-    if opts.dataset not in datasets:
-        Print("Dataset %s not valid. Please select one of the following:\n\t%s" % (opts.dataset, ", ".join(datasets)))
-        sys.exit()
-
     # Create the pseudo-multicrab dir (if the ROOT file exists)
     if os.path.exists(opts.rootFile):
         sys.exit( CreateJob(opts, args) )

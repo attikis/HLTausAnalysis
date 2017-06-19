@@ -336,7 +336,7 @@ def addEnergyText(x=None, y=None, s=None):
     text = energyText
     if s != None:
         text = s
-    addText(x, y, "#sqrt{s} = "+text, textDefaults.getSize("energy"), bold=False)
+    addText(x, y, "#sqrt{s} = " + text, textDefaults.getSize("energy"), bold=False)
 
 def addPileupText(x=None, y=None, s=None):
     _printTextDeprecationWarning("histograms.addPileupText()")
@@ -418,13 +418,16 @@ def addStandardTexts(lumi=None, sqrts=None, addCmsText=True, cmsTextPosition=Non
             lumiText = lumi
         else:
             lumiText = formatLuminosityInFb(lumi)
-        lumiText += " fb^{-1} ("
+        lumiText += " fb^{-1}"
 
-    lumiText += pileupText + ", "
+    # Disable automatic addition of PU=140 text
+    #lumiText += pileupText + ", "
     if sqrts is not None:
-        lumiText += sqrts
+        #lumiText += " (" + sqrts + ")"
+        lumiText += "  " + sqrts + " "
     else:
-        lumiText += energyText
+        #lumiText += " (" + energyText + ")"
+        lumiText += " " + energyText + " "
 
     
     lumiTextOffset = 0.2

@@ -68,7 +68,7 @@ class TTTrack{
   unsigned int getNumOfStubsPS(void) const {return theNStubsPS;}
   unsigned int getNumOfBarrelStubs(void) const {return theNStubsBarrel;}
   unsigned int getNumOfEndcapStubs(void) const {return theNStubsEndcap;}
-  bool getTPIndex(void) const {return theTPIndex;}
+  int getTPIndex(void) const {return theTPIndex;}
   double getD0(void);
   int getDOF(void);
   void PrintProperties(void);

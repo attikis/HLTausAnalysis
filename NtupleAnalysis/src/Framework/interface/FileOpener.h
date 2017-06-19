@@ -8,7 +8,8 @@ class FileOpener
 {
 
  public:
-  TChain* OpenFile(const std::string SamplePath, const std::string SampleName, TChain* tree = 0);
+  TChain* OpenFiles(const std::string multicrabPath, const std::string dataset, TChain* tree = 0);
+  vector<string> GetListOfFiles(const string inDir);
     
  private:
   Datasets datasets_;
