@@ -1935,9 +1935,9 @@ vector<L1JetParticle> CaloTk::GetL1Taus(bool bPrintList)
   vector<L1JetParticle> theL1Taus;
   L1JetParticle theL1Tau;
   // For-loop: All L1Taus
-  for (Size_t iCalo = 0; iCalo < tauEt->size(); iCalo++)
+  for (Size_t iCalo = 0; iCalo < L1Tau_Et->size(); iCalo++)
     {
-      // cout << "iCalo = " << iCalo << endl;
+      // cout << "iCalo = " << iCalo << endl;-
       theL1Tau = GetL1Tau(iCalo); 
       theL1Taus.push_back( theL1Tau );
     }
@@ -1953,11 +1953,11 @@ L1JetParticle CaloTk::GetL1Tau(unsigned int Index)
 {
 
   //double E    = tau_E->at(Index);
-  double Et   = tauEt->at(Index);
-  double Eta  = tauEta->at(Index);
-  double Phi  = tauPhi->at(Index);
-  double Bx   = -1.0; // tauBx->at(Index);   // tauBx->size()=6, while tauEt->size()=12
-  double Type = -1.0; // tauType->at(Index); // missing from tree
+  double Et   = L1Tau_Et->at(Index);
+  double Eta  = L1Tau_Eta->at(Index);
+  double Phi  = L1Tau_Phi->at(Index);
+  double Bx   = L1Tau_Bx->at(Index);   // tauBx->size()=6, while tauEt->size()=12
+  double Type = -1.0; // missing from tree
   // cout << "GeL1Tau returns theL1Tau(" << Index << ", " << Et << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << " , -1)" << endl;
   L1JetParticle theL1Tau(Index, Et, Et, Eta, Phi, Bx, Type);
 
@@ -1975,7 +1975,7 @@ vector<L1JetParticle> CaloTk::GetL1Jets(bool bPrintList)
   L1JetParticle theL1Jet;
   
   // For-loop: All L1 Jets
-  for (Size_t i = 0; i < jetEt->size(); i++)
+  for (Size_t i = 0; i < L1Jet_Et->size(); i++)
     {
       theL1Jet = GetL1Jet(i); 
       theL1Jets.push_back(theL1Jet);
@@ -1991,27 +1991,25 @@ L1JetParticle CaloTk::GetL1Jet(unsigned int Index)
 //============================================================================
 {
 
-
-  // jetIEt       
-  // jetIEta      
-  // jetIPhi      
-  // jetBx        
-  // jetRawEt     
-  // jetSeedEt    
-  // jetTowerIEta 
-  // jetTowerIPhi 
-  // jetPUEt      
-  // jetPUDonutEt0
-  // jetPUDonutEt1
-  // jetPUDonutEt2
-  // jetPUDonutEt3
-
   // int nJets = nJets->at(Index);
-  double Et   = jetEt->at(Index);
-  double Eta  = jetEta->at(Index);
-  double Phi  = jetPhi->at(Index);
-  double Bx   = -1.0; // jetBx->at(Index);
+  double Et   = L1Jet_Et->at(Index);
+  double Eta  = L1Jet_Eta->at(Index);
+  double Phi  = L1Jet_Phi->at(Index);
+  double Bx   = L1Jet_Bx->at(Index);
   double Type = -1.0;
+  // L1Jet_IEt       
+  // L1Jet_IEta      
+  // L1Jet_IPhi      
+  // L1Jet_Bx        
+  // L1Jet_RawEt     
+  // L1Jet_SeedEt    
+  // L1Jet_TowerIEta 
+  // L1Jet_TowerIPhi 
+  // L1Jet_PUEt      
+  // L1Jet_PUDonutEt0
+  // L1Jet_PUDonutEt1
+  // L1Jet_PUDonutEt2
+  // L1Jet_PUDonutEt3
 
   // cout << "GeL1Jet returns theL1Jet(" << Index << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << "," << Type << ")" << endl;
   L1JetParticle theL1Jet(Index, Et, Et, Eta, Phi, Bx, Type);
@@ -2026,9 +2024,9 @@ void CaloTk::GetL1EGs(bool bPrintList)
 {
 
   // For-loop: All L1 EGs
-  for (Size_t i = 0; i < egEt->size(); i++)
+  for (Size_t i = 0; i < L1EG_Et->size(); i++)
     {
-      cout << "L1EG " << i << "/" << egEt->size() << endl;
+      // cout << "L1EG " << i << "/" << L1EG_Et->size() << endl;
       if (bPrintList) GetL1EG(i);
     }
   
@@ -2041,56 +2039,40 @@ void CaloTk::GetL1EG(unsigned int Index)
 //============================================================================
 {
   
-  // int nEGammas   = *nEGs;
-  cout << "egEt->size() = " << egEt->size() << endl;
-  cout << "egEta->size() = " << egEta->size() << endl;
-  cout << "egPhi->size() = " << egPhi->size() << endl;
-  cout << "egIEt->size() = " << egIEt->size() << endl;
-  cout << "egIEta->size() = " << egIEta->size() << endl;
-  cout << "egIPhi->size() = " << egIPhi->size() << endl;
-  cout << "egIso->size() = " << egIso->size() << endl;
-  cout << "egBx->size() = " << egBx->size() << endl;
-  cout << "egRawEt->size() = " << egRawEt->size() << endl;
-  cout << "egIsoEt->size() = " << egIsoEt->size() << endl;
-  cout << "egFootprintEt->size() = " << egFootprintEt->size() << endl;
-  cout << "egNTT->size() = " << egNTT->size() << endl;
-  cout << "egShape->size() = " << egShape->size() << endl;
-  cout << "egTowerHoE->size() = " << egTowerHoE->size() << endl;
-
-  double Et      = egEt->at(Index);
-  double Eta     = egEta->at(Index);
-  double Phi     = egPhi->at(Index);
-  int IEt        = egIEt->at(Index);
-  int IEta       = egIEta->at(Index);
-  int IPhi       = egIPhi->at(Index);
-  int Iso        = egIso->at(Index);
-  int Bx         = egBx->at(Index);
-  // int TowerIPhi  = egTowerIPhi->at(Index); 
-  // int TowerIEta  = egTowerIEta->at(Index); 
-  int RawEt      = egRawEt->at(Index);
-  int IsoEt      = egIsoEt->at(Index); 
-  int FootprintEt= egFootprintEt->at(Index);
-  int NTT        = egNTT->at(Index);
-  int Shape      = egShape->at(Index);
-  int TowerHoE   = egTowerHoE->at(Index);
+  double Et      = L1EG_Et->at(Index);
+  double Eta     = L1EG_Eta->at(Index);
+  double Phi     = L1EG_Phi->at(Index);
+  int IEt        = L1EG_IET->at(Index);
+  int IEta       = L1EG_IEta->at(Index);
+  int IPhi       = L1EG_IPhi->at(Index);
+  int Iso        = L1EG_Iso->at(Index);
+  int Bx         = L1EG_Bx->at(Index);
+  // int TowerIPhi  = LEG_TowerIPhi->at(Index); 
+  // int TowerIEta  = LEG_TowerIEta->at(Index); 
+  int RawEt      = L1EG_RawEt->at(Index);
+  int IsoEt      = L1EG_IsoEt->at(Index); 
+  int FootprintEt= L1EG_FootprintEt->at(Index);
+  int NTT        = L1EG_NTT->at(Index);
+  int Shape      = L1EG_Shape->at(Index);
+  int TowerHoE   = L1EG_TowerHoE->at(Index);
   
-  cout << "nEGs = " << egEt->size()
-       << ", Et   = " << Et
-       << ", Eta  = " << Eta
-       << ", Phi  = " << Phi
-       << ", IEt  = " << IEt
-       << ", IEta = " << IEta
-       << ", IPhi = " << IPhi
-       << ", Iso  = " << Iso
-       << ", Bx   = " << Bx
-    // << ", TowerIPhi   = " << TowerIPhi
-    // << ", TowerIEta   = " << TowerIEta
-       << ", RawEt       = " << RawEt
-       << ", IsoEt       = " << IsoEt
-       << ", FootprintEt = " << FootprintEt
-       << ", NTT         = " << NTT
-       << ", Shape       = " << Shape
-       << ", TowerHoE    = " << TowerHoE
+  cout << "nEGs        = " << L1EG_Et->size()
+       << "\nEt          = " << Et
+       << "\nEta         = " << Eta
+       << "\nPhi         = " << Phi
+       << "\nIEt         = " << IEt
+       << "\nIEta        = " << IEta
+       << "\nIPhi        = " << IPhi
+       << "\nIso         = " << Iso
+       << "\nBx          = " << Bx
+    // << "\nTowerIPhi   = " << TowerIPhi
+    // << "\nTowerIEta   = " << TowerIEta
+       << "\nRawEt       = " << RawEt
+       << "\nIsoEt       = " << IsoEt
+       << "\nFootprintEt = " << FootprintEt
+       << "\nNTT         = " << NTT
+       << "\nShape       = " << Shape
+       << "\nTowerHoE    = " << TowerHoE
        << "\n" << endl;
   
   return;
@@ -2103,10 +2085,10 @@ void CaloTk::GetL1Sums(bool bPrintList)
 {
 
   // For-loop: All L1 Sums
-  for (Size_t i = 0; i < sumEt->size(); i++)
+  for (Size_t i = 0; i < L1Sum_Et->size(); i++)
     {
-      cout << "L1Sum(" << i << ")" << endl;
-      if (bPrintList) GetL1EG(i);
+      // cout << "L1Sum(" << i << ")" << endl;
+      if (bPrintList) GetL1Sum(i);
     }
   
   return;
@@ -2117,13 +2099,13 @@ void CaloTk::GetL1Sum(unsigned int Index)
 //============================================================================
 {
 
-  cout << "nSums   = " << nSums
-       << "sumType = " << sumType->at(Index)
-       << "sumEt   = " << sumEt->at(Index)
-       << "sumPhi  = " << sumPhi->at(Index)
-       << "sumIEt  = " << sumIEt->at(Index)
-       << "sumIPhi = " << sumIPhi->at(Index)
-       << "sumBx   = " << sumBx->at(Index)
+  cout << "nSums        = " << L1Sum_Et->size()
+       << "\nL1Sum_umType = " << L1Sum_Type->at(Index)
+       << "\nL1Sum_umEt   = " << L1Sum_Et->at(Index)
+       << "\nL1Sum_umPhi  = " << L1Sum_Phi->at(Index)
+       << "\nL1Sum_umIET  = " << L1Sum_IET->at(Index)
+       << "\nL1Sum_umIPhi = " << L1Sum_IPhi->at(Index)
+       << "\nL1Sum_umBx   = " << L1Sum_Bx->at(Index)
        << "\n" << endl;
   
   return;
