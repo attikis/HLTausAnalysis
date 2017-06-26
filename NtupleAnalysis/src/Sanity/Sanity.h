@@ -4,7 +4,6 @@
 // System 
 #include <iostream>
 #include <stdlib.h> 
-#include <iomanip>
 
 // User
 #include "../Framework/src/TreeAnalyserMC.C"
@@ -13,10 +12,18 @@
 #include "../Auxiliary/src/Table.C"
 #include "../Auxiliary/src/MCTools.C"
 #include "../Auxiliary/src/HistoTools.C"
+// #include "../Auxiliary/src/L1Tracks.C" // needed?
 #include "../Auxiliary/src/Datasets.C" 
+
+#include "../DataFormat/src/L1TkTauParticle.C"
 #include "../DataFormat/src/GenParticle.C"
 #include "../DataFormat/src/TrackingParticle.C"
 #include "../DataFormat/interface/TTTrack.h"
+#include "../DataFormat/interface/TTPixelTrack.h"
+#include "../DataFormat/src/L1JetParticle.C"
+
+// #include "../Plugins/src/L1TkPrimaryVertex.C"
+#include "../Plugins/src/L1PixelTrackFit.C"
 
 // ROOT
 #include "TEfficiency.h"
@@ -55,20 +62,32 @@ class Sanity : public TreeAnalyserMC{
 
   void PrintTTTrackCollection(vector<TTTrack> collection);
 
-  
-  // Public Variables
-  bool DEBUG;
-  string mcSample;
-  string tk_Collection;
-  int tk_nFitParams;
-  double tk_minPt;
-  double tk_minEta;
-  double tk_maxEta;
-  double tk_maxChiSqRed;
-  double tk_minStubs;
-  double tk_minStubsPS;
-  double tk_maxStubsPS;
+  void PrintL1JetParticleCollection(vector<L1JetParticle> collection);
 
+  void PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection);
+
+  // Public Variable
+  string mcSample;
+  bool cfg_AddGenP;   // Flag to enable sanity of GenParticles
+  bool cfg_AddL1Tks;  // Flag to enable sanity of TTTracks
+  bool cfg_AddStubs;  // Flag to enable sanity all TTSTubs
+  bool cfg_AddTPs;    // Flag to enable sanity of all Tracking Particles
+  bool cfg_AddEGs;    // Flag to enable sanity of all L1 EG objects
+  bool cfg_AddTaus;   // Flag to enable sanity of all L1 Taus
+  bool cfg_AddJets;   // Flag to enable sanity of all L1 Jets
+  bool cfg_AddMuons;  // Flag to enable sanity of all L1 Muons
+  bool cfg_AddSums;   // Flag to enable sanity of all L1 Et sums
+  string cfg_tk_Collection;
+  int cfg_tk_nFitParams;
+  double cfg_tk_minPt;
+  double cfg_tk_minEta;
+  double cfg_tk_maxEta;
+  double cfg_tk_maxChiSqRed;
+  double cfg_tk_minStubs;
+  double cfg_tk_minStubsPS;
+  double cfg_tk_maxStubsPS;
+  bool cfg_DEBUG;
+  
   struct SortAscendingAbs{ bool operator() (double a, double b) const { return abs(a) > abs(b); } }; 
   struct SortDescendingAbs{ bool operator() (double a, double b) const { return abs(a) < abs(b); } };
   struct PtComparatorTP{ bool operator() (TrackingParticle a, TrackingParticle b) const { return a.getPt() > b.getPt(); } };
@@ -104,9 +123,29 @@ class Sanity : public TreeAnalyserMC{
   GenParticle GetGenParticle(unsigned int Index);
 
   vector<GenParticle> GetGenParticles(bool bPrintList=false);
-
   vector<GenParticle> GetGenParticles(int pdgId, bool isLastCopy=false);
 
+  void GetL1EG(unsigned int Index);
+
+  void GetL1EGs(bool bPrintList=false);
+ 
+  void GetL1Muon(unsigned int Index);
+  
+  void GetL1Muons(bool bPrintList=false);
+
+  L1JetParticle GetL1Jet(unsigned int Index);
+
+  vector<L1JetParticle> GetL1Jets(bool bPrintList=false);
+  
+  L1JetParticle GetL1Tau(unsigned int Index);
+
+  vector<L1JetParticle> GetL1Taus(bool bPrintList=false);
+  
+  void GetL1Sum(unsigned int Index);
+
+  void GetL1Sums(bool bPrintList=false);
+
+  
   void GetHadronicTauFinalDaughters(GenParticle hTau, vector<unsigned short> &Daug);
 
   

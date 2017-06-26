@@ -11,19 +11,31 @@ void Sanity::InitVars_()
 //============================================================================
 {
 
-  DEBUG = false;
-  if (DEBUG) std::cout << "=== Sanity::InitVars_()" << std::endl;
+  cfg_DEBUG = true;
+  datasets_ = datasets_.GetDataset(mcSample);
+  if (cfg_DEBUG) std::cout << "=== Sanity::InitVars_()" << std::endl;
   
-  datasets_      = datasets_.GetDataset(mcSample);
-  tk_Collection  =  "TTTracks"; // Default: Only "TTTracks" available (not "TTPixelTracks")
-  tk_nFitParams  = 4;           // Default: 4
-  tk_minPt       = 2.00;        // Default: 2.0
-  tk_minEta      = 0.0;         // Default: 0.0
-  tk_maxEta      = 1e6;         // Default: 1e6
-  tk_maxChiSqRed = 1e6;         // Default: 1e6
-  tk_minStubs    =   0;         // Default: 0
-  tk_minStubsPS  =   0;         // Default: 0
-  tk_maxStubsPS  = 1e6;         // Default: 1e6
+  cfg_AddGenP    = true;
+  cfg_AddL1Tks   = true;
+  cfg_AddStubs   = false;
+  cfg_AddTPs     = true;
+  cfg_AddEGs     = true;
+  cfg_AddTaus    = true;
+  cfg_AddJets    = true;
+  cfg_AddMuons   = false;
+  cfg_AddSums    = true;
+
+  cfg_tk_Collection  =  "TTTracks"; // Default: "TTTracks" (not "TTPixelTracks")
+  cfg_tk_nFitParams  = 4;           // Default: 4
+  cfg_tk_minPt       = 2.00;        // Default: 2.0
+  cfg_tk_minEta      = 0.0;         // Default: 0.0
+  cfg_tk_maxEta      = 1e6;         // Default: 1e6
+  cfg_tk_maxChiSqRed = 1e6;         // Default: 1e6
+  cfg_tk_minStubs    =   0;         // Default: 0
+  cfg_tk_minStubsPS  =   0;         // Default: 0
+  cfg_tk_maxStubsPS  = 1e6;         // Default: 1e6
+  
+  PrintSettings();
 
   return;
 }
@@ -33,70 +45,122 @@ void Sanity::InitVars_()
 void Sanity::PrintSettings(void)
 //============================================================================
 {
-  if (DEBUG) std::cout << "=== Sanity::PrintSettings()" << std::endl;
+  if (cfg_DEBUG) std::cout << "=== Sanity::PrintSettings()" << std::endl;
   
   // Inform user of settings
-  Table settings("Variable | Cut | Value | Default | Units", "Text");  // Table settingsTable("Variable & Value & Units", "LaTeX", "l l l");
+  Table settings("Variable | Cut | Value | Default | Units", "Text");
   settings.AddRowColumn(0, "MC Sample");
   settings.AddRowColumn(0, "==" );
   settings.AddRowColumn(0, mcSample );
   settings.AddRowColumn(0, "");
-
-  settings.AddRowColumn(1, "Tracks: Collection");
-  settings.AddRowColumn(1, "==");
-  settings.AddRowColumn(1, tk_Collection);
-  settings.AddRowColumn(1, "TTTracks");
-  settings.AddRowColumn(1, "");
+ 
+  settings.AddRowColumn(1, "Add: Gen Particles");
+  settings.AddRowColumn(1, "==" );
+  settings.AddRowColumn(1, auxTools_.ToString(cfg_AddGenP ) );
+  settings.AddRowColumn(1, "true");
   
-  settings.AddRowColumn(2, "Tracks: Fit Parameters");
-  settings.AddRowColumn(2, "==");
-  settings.AddRowColumn(2, auxTools_.ToString( tk_nFitParams) );
-  settings.AddRowColumn(2, "4");
-  settings.AddRowColumn(2, "");
-
-  settings.AddRowColumn(3, "Tracks: Pt");
-  settings.AddRowColumn(3, ">=");
-  settings.AddRowColumn(3, auxTools_.ToString( tk_minPt) );
-  settings.AddRowColumn(3, "2" );
-  settings.AddRowColumn(3, "GeV/c" );
+  settings.AddRowColumn(2, "Add: TTTracks");
+  settings.AddRowColumn(2, "==" );
+  settings.AddRowColumn(2, auxTools_.ToString(cfg_AddL1Tks) );
+  settings.AddRowColumn(2, "true");
   
-  settings.AddRowColumn(4, "Tracks: |Eta|");
-  settings.AddRowColumn(4, ">=");
-  settings.AddRowColumn(4, auxTools_.ToString( tk_minEta) );
-  settings.AddRowColumn(4, "0.0" );
-  settings.AddRowColumn(4, "" );
+  settings.AddRowColumn(3, "Add: TTStubs");
+  settings.AddRowColumn(3, "==" );
+  settings.AddRowColumn(3, auxTools_.ToString(cfg_AddStubs) );
+  settings.AddRowColumn(3, "false");
 
-  settings.AddRowColumn(5, "Tracks: |Eta|");
-  settings.AddRowColumn(5, "<=");
-  settings.AddRowColumn(5, auxTools_.ToString(tk_maxEta) );
-  settings.AddRowColumn(5, auxTools_.ToString(2.5) );
-  settings.AddRowColumn(5, "" );
+  settings.AddRowColumn(4, "Add: Tracking Particles");
+  settings.AddRowColumn(4, "==" );
+  settings.AddRowColumn(4, auxTools_.ToString(cfg_AddTPs) );
+  settings.AddRowColumn(4, "true");
+
+  settings.AddRowColumn(5, "Add: EGs");
+  settings.AddRowColumn(5, "==" );
+  settings.AddRowColumn(5, auxTools_.ToString(cfg_AddEGs) );
+  settings.AddRowColumn(5, "true");
+
+  settings.AddRowColumn(6, "Add: L1 Taus");
+  settings.AddRowColumn(6, "==" );
+  settings.AddRowColumn(6, auxTools_.ToString(cfg_AddTaus) );
+  settings.AddRowColumn(6, "true");
+
+  settings.AddRowColumn(7, "Add: L1 Jets");
+  settings.AddRowColumn(7, "==" );
+  settings.AddRowColumn(7, auxTools_.ToString(cfg_AddJets) );
+  settings.AddRowColumn(7, "true");
   
-  settings.AddRowColumn(6, "Tracks: ChiSqRed");
-  settings.AddRowColumn(6, "<=");
-  settings.AddRowColumn(6, auxTools_.ToString( tk_maxChiSqRed) );
-  settings.AddRowColumn(6, "200/DOF");
-  settings.AddRowColumn(6, "");
-
-  settings.AddRowColumn(7, "Tracks: Stubs");
-  settings.AddRowColumn(7, ">=");
-  settings.AddRowColumn(7, auxTools_.ToString(tk_minStubs) );
-  settings.AddRowColumn(7, auxTools_.ToString(4) );
-  settings.AddRowColumn(7, "" );
+  settings.AddRowColumn(8, "Add: L1 Muons");
+  settings.AddRowColumn(8, "==" );
+  settings.AddRowColumn(8, auxTools_.ToString(cfg_AddMuons) );
+  settings.AddRowColumn(8, "false");
   
-  settings.AddRowColumn(8, "Tracks: PS-Stubs (min)");
-  settings.AddRowColumn(8, ">=");
-  settings.AddRowColumn(8, auxTools_.ToString(tk_minStubsPS) );
-  settings.AddRowColumn(8, auxTools_.ToString(3) );
-  settings.AddRowColumn(8, "" );
+  settings.AddRowColumn(9, "Add: L1 Sums");
+  settings.AddRowColumn(9, "==" );
+  settings.AddRowColumn(9, auxTools_.ToString(cfg_AddSums) );
+  settings.AddRowColumn(9, "true");
+  
+  settings.AddRowColumn(11, "Tracks: Collection");
+  settings.AddRowColumn(11, "==");
+  settings.AddRowColumn(11, cfg_tk_Collection);
+  settings.AddRowColumn(11, "TTTracks");
+  settings.AddRowColumn(11, "");
+  
+  settings.AddRowColumn(12, "Tracks: Fit Parameters");
+  settings.AddRowColumn(12, "==");
+  settings.AddRowColumn(12, auxTools_.ToString( cfg_tk_nFitParams) );
+  settings.AddRowColumn(12, "4");
+  settings.AddRowColumn(12, "");
 
-  settings.AddRowColumn(9, "Tracks: PS-Stubs (max)");
-  settings.AddRowColumn(9, "<=");
-  settings.AddRowColumn(9, auxTools_.ToString(tk_maxStubsPS) );
-  settings.AddRowColumn(9, auxTools_.ToString(6) );
-  settings.AddRowColumn(9, "" );
+  settings.AddRowColumn(13, "Tracks: Pt");
+  settings.AddRowColumn(13, ">=");
+  settings.AddRowColumn(13, auxTools_.ToString( cfg_tk_minPt) );
+  settings.AddRowColumn(13, "2" );
+  settings.AddRowColumn(13, "GeV/c" );
+  
+  settings.AddRowColumn(14, "Tracks: |Eta|");
+  settings.AddRowColumn(14, ">=");
+  settings.AddRowColumn(14, auxTools_.ToString( cfg_tk_minEta) );
+  settings.AddRowColumn(14, "0.0" );
+  settings.AddRowColumn(14, "" );
 
-  settings.AddRowColumn(10, "" );
+  settings.AddRowColumn(15, "Tracks: |Eta|");
+  settings.AddRowColumn(15, "<=");
+  settings.AddRowColumn(15, auxTools_.ToString(cfg_tk_maxEta) );
+  settings.AddRowColumn(15, auxTools_.ToString(2.5) );
+  settings.AddRowColumn(15, "" );
+  
+  settings.AddRowColumn(16, "Tracks: ChiSqRed");
+  settings.AddRowColumn(16, "<=");
+  settings.AddRowColumn(16, auxTools_.ToString( cfg_tk_maxChiSqRed) );
+  settings.AddRowColumn(16, "200/DOF");
+  settings.AddRowColumn(16, "");
+
+  settings.AddRowColumn(17, "Tracks: Stubs");
+  settings.AddRowColumn(17, ">=");
+  settings.AddRowColumn(17, auxTools_.ToString(cfg_tk_minStubs) );
+  settings.AddRowColumn(17, auxTools_.ToString(4) );
+  settings.AddRowColumn(17, "" );
+  
+  settings.AddRowColumn(18, "Tracks: PS-Stubs (min)");
+  settings.AddRowColumn(18, ">=");
+  settings.AddRowColumn(18, auxTools_.ToString(cfg_tk_minStubsPS) );
+  settings.AddRowColumn(18, auxTools_.ToString(3) );
+  settings.AddRowColumn(18, "" );
+
+  settings.AddRowColumn(19, "Tracks: PS-Stubs (max)");
+  settings.AddRowColumn(19, "<=");
+  settings.AddRowColumn(19, auxTools_.ToString(cfg_tk_maxStubsPS) );
+  settings.AddRowColumn(19, auxTools_.ToString(6) );
+  settings.AddRowColumn(19, "" );
+ 
+  settings.AddRowColumn(20, "" );
+
+  settings.AddRowColumn(21, "cfg_DEBUG");
+  settings.AddRowColumn(21, "==");
+  settings.AddRowColumn(21, auxTools_.ToString(cfg_DEBUG) );
+  settings.AddRowColumn(21, "false" );
+  settings.AddRowColumn(21, "" );
+
   
   settings.Print();
   
@@ -108,13 +172,11 @@ void Sanity::Loop()
 //============================================================================
 {
 
-  if (1) std::cout << "=== Sanity::Loop()" << std::endl;
-  
   // Sanity check
   if (fChain == 0) return;
-  cout << "\tGetting Tree Entries ..." << endl;
   const Long64_t nEntries = (MaxEvents == -1) ? fChain->GetEntries() : min((int)fChain->GetEntries(), MaxEvents);
-  
+
+  cout << "=== Sanity:\n\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
   // Initialisations
   InitVars_();
   BookHistos_();
@@ -123,16 +185,11 @@ void Sanity::Loop()
   unsigned int nAllEvts = fChain->GetEntries();
   unsigned int nEvts    = 0;
 
-  // Print User Settings
-  cout << "\tPrinting user settings:" << endl;
-  PrintSettings();
-
-  cout << "\tAnalyzing " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
   // For-loop: All TTree Entries
   for (int jentry = 0; jentry < nEntries; jentry++, nEvts++)
     {
 
-      if(DEBUG) cout << "\tEntry = " << jentry << endl;
+      if(cfg_DEBUG) cout << "\tEntry = " << jentry << endl;
 
       // Load the tree && Get the entry
       Long64_t ientry = LoadTree(jentry);
@@ -144,88 +201,90 @@ void Sanity::Loop()
       // ======================================================================
       // GenParticles Collection
       // ======================================================================
-      if (DEBUG) cout << "=== GenParticles (" << GenP_Pt->size() << ")" << endl;
-      vector<GenParticle> GenParticles = GetGenParticles(false);
-      if (DEBUG) PrintGenParticleCollection(GenParticles);
+      if (cfg_AddGenP)
+	{
+	  if (cfg_DEBUG) cout << "\n=== GenParticles (" << GenP_Pt->size() << ")" << endl;
+	  vector<GenParticle> GenParticles = GetGenParticles(false);
+	  if (cfg_DEBUG) PrintGenParticleCollection(GenParticles);
       
-      // For-loop: GenParticles
-      for (vector<GenParticle>::iterator p = GenParticles.begin(); p != GenParticles.end(); p++)
-	  {
-	    
-	    // Fill Histograms
-	    hGenP_Index->Fill(p->index());
-	    hGenP_Pt->Fill(p->pt());
-	    hGenP_Eta->Fill(p->eta());
-	    hGenP_Phi->Fill(p->phi());
-	    hGenP_PtVis->Fill(p->p4vis().Pt());
-	    hGenP_EtaVis->Fill(p->p4vis().Eta());
-	    hGenP_PhiVis->Fill(p->p4vis().Phi());
-	    hGenP_Mass->Fill(p->mass());
-	    hGenP_PdgId->Fill(p->pdgId());
-	    hGenP_Charge->Fill(p->charge());
-	    hGenP_Status->Fill(p->status());
-	    hGenP_VertexX->Fill(p->vx());
-	    hGenP_VertexY->Fill(p->vy());
-	    hGenP_VertexZ->Fill(p->vz());
-	    hGenP_Mothers->Fill(p->mothers().size());
-	    hGenP_Daughters->Fill(p->daughters().size());
-	    hGenP_FinalDaughters->Fill(p->finalDaughters().size());
-	    hGenP_FinalDaughtersCharged->Fill(p->finalDaughtersCharged().size());
-	    hGenP_FinalDaughtersNeutral->Fill(p->finalDaughtersNeutral().size());
-	    
-	  }
-
+	  // For-loop: GenParticles
+	  for (vector<GenParticle>::iterator p = GenParticles.begin(); p != GenParticles.end(); p++)
+	    {
+	      
+	      // Fill Histograms
+	      hGenP_Index->Fill(p->index());
+	      hGenP_Pt->Fill(p->pt());
+	      hGenP_Eta->Fill(p->eta());
+	      hGenP_Phi->Fill(p->phi());
+	      hGenP_PtVis->Fill(p->p4vis().Pt());
+	      hGenP_EtaVis->Fill(p->p4vis().Eta());
+	      hGenP_PhiVis->Fill(p->p4vis().Phi());
+	      hGenP_Mass->Fill(p->mass());
+	      hGenP_PdgId->Fill(p->pdgId());
+	      hGenP_Charge->Fill(p->charge());
+	      hGenP_Status->Fill(p->status());
+	      hGenP_VertexX->Fill(p->vx());
+	      hGenP_VertexY->Fill(p->vy());
+	      hGenP_VertexZ->Fill(p->vz());
+	      hGenP_Mothers->Fill(p->mothers().size());
+	      hGenP_Daughters->Fill(p->daughters().size());
+	      hGenP_FinalDaughters->Fill(p->finalDaughters().size());
+	      hGenP_FinalDaughtersCharged->Fill(p->finalDaughtersCharged().size());
+	      hGenP_FinalDaughtersNeutral->Fill(p->finalDaughtersNeutral().size());
+	    }
+	}
   
       
       // ======================================================================
-      // Sanity Particle Collections
+      // Tracking Particle Collections
       // ======================================================================
-      if (DEBUG) cout << "=== Tracking Particles (" << TP_Pt->size() << ")" << endl;
-      vector<TrackingParticle> TPs  = GetTrackingParticles(false);
-      sort( TPs.begin(), TPs.end(), PtComparatorTP() ); // not sorted by default
-      if (DEBUG) PrintTrackingParticleCollection(TPs);
-
-      // For-loop: GenParticles
-      for (vector<TrackingParticle>::iterator p = TPs.begin(); p != TPs.end(); p++)
-	  {
-
-	    // Fill histograms
-	    hTP_Index->Fill(p->index());
-	    hTP_Pt->Fill(p->getPt());
-	    hTP_Eta->Fill(p->getEta());
-	    hTP_Phi->Fill(p->getPhi());
-	    hTP_PdgId->Fill(p->getPdgId());
-	    hTP_X0->Fill(p->getX0());
-	    hTP_Y0->Fill(p->getY0());
-	    hTP_Z0->Fill(p->getZ0());
-	    hTP_Charge->Fill(p->getCharge());
-	    hTP_Dxy->Fill(p->getDxy());
-	    hTP_D0propagated->Fill(p->getD0propagated());
-	    hTP_Z0propagated->Fill(p->getZ0propagated());
-	    hTP_D0->Fill(p->getD0());
-	    hTP_D0Sign->Fill(p->getD0Sign());
-	    hTP_D0Phi->Fill(p->getD0Phi());
-	    hTP_EventId->Fill(p->getEventId());
-	    hTP_NMatch->Fill(p->getNMatch());
-	    hTP_TTTrackIndex->Fill(p->getTTTrackIndex());
-	    hTP_TTClusters->Fill(p->getTTClusters());
-	    hTP_TTStubs->Fill(p->getTTStubs());
-	    hTP_TTTracks->Fill(p->getTTTracks());
-
-	    // p->PrintProperties(false);
-	    // p->PrintAllProperties();
-	    
-	  }
-
+      if (cfg_AddTPs)
+	{
+	  if (cfg_DEBUG) cout << "\n=== Tracking Particles (" << TP_Pt->size() << ")" << endl;
+	  vector<TrackingParticle> TPs  = GetTrackingParticles(false);
+	  sort( TPs.begin(), TPs.end(), PtComparatorTP() ); // not sorted by default
+	  if (cfg_DEBUG) PrintTrackingParticleCollection(TPs);
+	  
+	  // For-loop: GenParticles
+	  for (vector<TrackingParticle>::iterator p = TPs.begin(); p != TPs.end(); p++)
+	    {
+	      
+	      // Fill histograms
+	      hTP_Index->Fill(p->index());
+	      hTP_Pt->Fill(p->getPt());
+	      hTP_Eta->Fill(p->getEta());
+	      hTP_Phi->Fill(p->getPhi());
+	      hTP_PdgId->Fill(p->getPdgId());
+	      hTP_X0->Fill(p->getX0());
+	      hTP_Y0->Fill(p->getY0());
+	      hTP_Z0->Fill(p->getZ0());
+	      hTP_Charge->Fill(p->getCharge());
+	      hTP_Dxy->Fill(p->getDxy());
+	      hTP_D0propagated->Fill(p->getD0propagated());
+	      hTP_Z0propagated->Fill(p->getZ0propagated());
+	      hTP_D0->Fill(p->getD0());
+	      hTP_D0Sign->Fill(p->getD0Sign());
+	      hTP_D0Phi->Fill(p->getD0Phi());
+	      hTP_EventId->Fill(p->getEventId());
+	      hTP_NMatch->Fill(p->getNMatch());
+	      hTP_TTTrackIndex->Fill(p->getTTTrackIndex());
+	      hTP_TTClusters->Fill(p->getTTClusters());
+	      hTP_TTStubs->Fill(p->getTTStubs());
+	      hTP_TTTracks->Fill(p->getTTTracks());
+	      
+	      // p->PrintProperties(false);
+	      // p->PrintAllProperties();
+	    }
+	}
 
 
       // ======================================================================
       // TTTracks Collections
       // ======================================================================
-      if (DEBUG) cout << "=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
-      vector<TTTrack> TTTracks = GetTTTracks(tk_minPt, tk_minEta, tk_maxEta, tk_maxChiSqRed, tk_minStubs, tk_minStubsPS, tk_maxStubsPS, tk_nFitParams, false);
+      if (cfg_DEBUG) cout << "\n=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
+      vector<TTTrack> TTTracks = GetTTTracks(cfg_tk_minPt, cfg_tk_minEta, cfg_tk_maxEta, cfg_tk_maxChiSqRed, cfg_tk_minStubs, cfg_tk_minStubsPS, cfg_tk_maxStubsPS, cfg_tk_nFitParams, false);
       sort( TTTracks.begin(), TTTracks.end(), PtComparatorTTTrack() ); // not sorted by default
-      if (DEBUG) PrintTTTrackCollection(TTTracks);
+      if (cfg_DEBUG) PrintTTTrackCollection(TTTracks);
 
       // For-loop: TTTracks
       for (vector<TTTrack>::iterator tk = TTTracks.begin(); tk != TTTracks.end(); tk++)
@@ -287,11 +346,44 @@ void Sanity::Loop()
 	  }
 
 
+      // ======================================================================
       // Tau Collection
-      if (DEBUG) cout << "=== Taus (" << tauEt->size() << ")" << endl;
-      // vector<GenParticle> GenParticles = GetGenParticles(false);
-      // if (DEBUG) PrintGenParticleCollection(GenParticles);
+      // ======================================================================
+      if (cfg_DEBUG) cout << "=== Taus (" << L1Tau_Et->size() << ")" << endl;
+      vector<L1JetParticle> L1Taus = GetL1Taus(cfg_DEBUG);
 
+      // For-loop: TTTracks
+      // unsigned short int tau_nTaus = L1Tau_nTaus;
+      for (auto tau = L1Taus.begin(); tau != L1Taus.end(); tau++)
+	  {
+	    double tau_pt      = tau->et();
+	    double tau_eta     = tau->eta();
+	    double tau_phi     = tau->phi();
+	    // short int tau_IET  = tau->(); // add to class
+	    // short int tau_IEta = tau->();
+	    // short int tau_IPhi = tau->();
+	    // short int tau_Iso  = tau->();
+	    short int tau_Bx   = tau->bx();
+	    // short int tau_TowerIPhi = tau->();
+	    // short int tau_TowerIEta = tau->();
+	    // short int tau_RawEt     = tau->();
+	    // short int tau_IsoEt     = tau->();
+	    // short int tau_NTT       = tau->();
+	    // short int tau_HasEM     = tau->();
+	    // short int tau_IsMerged  = tau->();
+	    // short int tau_HwQual    = tau->();
+	    
+	    
+	    // if (0) tau->PrintProperties();
+	    // if (0) tau->PrintAllProperties();
+
+	    // Fill Histograms
+	    // hL1Taus_Et ->Fill(tk_pt);
+	    // hL1Taus_Eta->Fill(tk_eta);
+	    // hL1Taus_Phi->Fill(tk_phi);
+	  }
+
+      
       ////////////////////////////////////////////////
       // Fill histograms
       ////////////////////////////////////////////////
@@ -322,7 +414,7 @@ void Sanity::Loop()
 void Sanity::BookHistos_(void)
 //============================================================================
 {
-  if (DEBUG) std::cout << "=== Sanity::BookHistos_()" << std::endl;
+  if (cfg_DEBUG) std::cout << "=== Sanity::BookHistos_()" << std::endl;
   
   // Event-Type Histograms
   histoTools_.BookHisto_1D(hCounters, "Counters",  "", 2, 0.0, +2.0);
@@ -365,14 +457,14 @@ void Sanity::BookHistos_(void)
   histoTools_.BookHisto_1D(hTP_D0propagated, "TP_D0propagated", "; d_{0} propagated (cm); Entries", 40,  -20.0,  +20.0);
   histoTools_.BookHisto_1D(hTP_Z0propagated, "TP_Z0propagated", "; z_{0} propagated (cm); Entries", 40,  -20.0,  +20.0);
   histoTools_.BookHisto_1D(hTP_D0, "TP_D0", "; d_{0} (cm); Entries", 80,  -20.0,  +20.0);
-    histoTools_.BookHisto_1D(hTP_D0Sign, "TP_D0Sign", "; d_{0} sign; Entries", 3,  -1.5,  +1.5);
-    histoTools_.BookHisto_1D(hTP_D0Phi, "TP_D0Phi", "; d_{0} #phi (rads); Entries", 128,  -3.2,  +3.2);
-    histoTools_.BookHisto_1D(hTP_EventId, "TP_EventId", "; Event Id; Entries", 1000,  -0.5,  +1000.5);
-    histoTools_.BookHisto_1D(hTP_NMatch, "TP_NMatch", "number of tk-matches; Entries", 100,  -0.5,  +100.5);
-    histoTools_.BookHisto_1D(hTP_TTTrackIndex, "TP_TTTrackIndex", "; index; Entries", 501,  -0.5,  +500.5);
-    histoTools_.BookHisto_1D(hTP_TTClusters, "TP_TTClusters", "; TTClusters matched; Entries", 51,  -0.5,  +50.5);
-    histoTools_.BookHisto_1D(hTP_TTStubs, "TP_TTStubs", "; TTStubs matched; Entries", 51,  -0.5,  +50.5);
-    histoTools_.BookHisto_1D(hTP_TTTracks, "TP_TTTracks", "; TTStubs matched; Entries", 11,  -0.5,  +10.5);
+  histoTools_.BookHisto_1D(hTP_D0Sign, "TP_D0Sign", "; d_{0} sign; Entries", 3,  -1.5,  +1.5);
+  histoTools_.BookHisto_1D(hTP_D0Phi, "TP_D0Phi", "; d_{0} #phi (rads); Entries", 128,  -3.2,  +3.2);
+  histoTools_.BookHisto_1D(hTP_EventId, "TP_EventId", "; Event Id; Entries", 1000,  -0.5,  +1000.5);
+  histoTools_.BookHisto_1D(hTP_NMatch, "TP_NMatch", "number of tk-matches; Entries", 100,  -0.5,  +100.5);
+  histoTools_.BookHisto_1D(hTP_TTTrackIndex, "TP_TTTrackIndex", "; index; Entries", 501,  -0.5,  +500.5);
+  histoTools_.BookHisto_1D(hTP_TTClusters, "TP_TTClusters", "; TTClusters matched; Entries", 51,  -0.5,  +50.5);
+  histoTools_.BookHisto_1D(hTP_TTStubs, "TP_TTStubs", "; TTStubs matched; Entries", 51,  -0.5,  +50.5);
+  histoTools_.BookHisto_1D(hTP_TTTracks, "TP_TTTracks", "; TTStubs matched; Entries", 11,  -0.5,  +10.5);
   
   // TTracks
   histoTools_.BookHisto_1D(hL1Tks_Pt, "L1Tks_Pt", "; p_{T} (GeV/c); Entries", 200,  +0.0,  +200.0);
@@ -408,7 +500,7 @@ void Sanity::GetHadronicTauFinalDaughters(GenParticle p,
 //============================================================================
 {
 
-  if (DEBUG) std::cout << "=== Sanity::GetHadronicTauFinalDaughters()" << std::endl;
+  if (cfg_DEBUG) std::cout << "=== Sanity::GetHadronicTauFinalDaughters()" << std::endl;
   //
   // Description:
   // Keep only the detector-related particles (tracker/calo)
@@ -470,7 +562,7 @@ void Sanity::GetHadronicTauFinalDaughters(GenParticle p,
 vector<GenParticle> Sanity::GetGenParticles(bool bPrintList)
 //============================================================================
 {
-  if (DEBUG) std::cout << "=== Sanity::GetGenParticles()" << std::endl;
+  if (cfg_DEBUG*0) std::cout << "=== Sanity::GetGenParticles()" << std::endl;
     
   vector<GenParticle> theGenParticles;
   Table info("Index | PdgId | Status | Charge | Pt | Eta | Phi | E | Vertex (mm) | Mothers | Daughters |", "Text"); //LaTeX or Text    
@@ -520,7 +612,7 @@ vector<GenParticle> Sanity::GetGenParticles(bool bPrintList)
 vector<GenParticle> Sanity::GetGenParticles(int pdgId, bool isLastCopy)
 //============================================================================
 {
-  if (DEBUG) std::cout << "=== Sanity::GetGenParticles()" << std::endl;
+  if (cfg_DEBUG*0) std::cout << "=== Sanity::GetGenParticles()" << std::endl;
   
   // Initialise variables
   vector<GenParticle> myGenParticles;
@@ -571,7 +663,7 @@ vector<GenParticle> Sanity::GetGenParticles(int pdgId, bool isLastCopy)
 GenParticle Sanity::GetGenParticle(unsigned int Index)
 //============================================================================
 {
-  if (DEBUG) std::cout << "=== Sanity::GetGenParticle()" << std::endl;
+  if (cfg_DEBUG*0) std::cout << "=== Sanity::GetGenParticle()" << std::endl;
 
   // Get the GenParticle properties
   double Pt      = GenP_Pt->at(Index);
@@ -599,7 +691,7 @@ GenParticle Sanity::GetGenParticle(unsigned int Index)
 void Sanity::SetGenParticleMomsAndDaus(GenParticle &p)
 //============================================================================
 {
-  if (DEBUG) std::cout << "=== Sanity::SetGenParticleMomsAndDaus()" << std::endl;
+  if (cfg_DEBUG) std::cout << "=== Sanity::SetGenParticleMomsAndDaus()" << std::endl;
   
   // Variable declaration
   vector<GenParticle> Mothers;
@@ -621,7 +713,7 @@ void Sanity::SetGenParticleFinalDaughters(GenParticle &p)
 //============================================================================
 {
 
-  if (DEBUG) std::cout << "=== Sanity::SetGenParticleFinalDaughters()" << std::endl;
+  if (cfg_DEBUG) std::cout << "=== Sanity::SetGenParticleFinalDaughters()" << std::endl;
   
   // Variable declaration
   vector<GenParticle> finalDaughters;
@@ -657,7 +749,7 @@ vector<TTTrack> Sanity::GetTTTracks(const double minPt,
 				      bool bPrintList)
 //============================================================================
 {
-  if (DEBUG) std::cout << "=== Sanity::GetTTTracks()" << std::endl;
+  if (cfg_DEBUG*0) std::cout << "=== Sanity::GetTTTracks()" << std::endl;
 
   vector<TTTrack> theTTTracks;
 
@@ -691,7 +783,7 @@ TTTrack Sanity::GetTTTrack(unsigned int Index,
 			     const unsigned int nFitParams)
 //============================================================================
 {
-  if (DEBUG) std::cout << "=== Sanity::GetTTTrack()" << std::endl;
+  if (cfg_DEBUG*0) std::cout << "=== Sanity::GetTTTrack()" << std::endl;
   
   // Initialise variables
   TVector3 p;  
@@ -729,8 +821,8 @@ TTTrack Sanity::GetTTTrack(unsigned int Index,
   if (matchTP_index >= 0) theTP= GetTrackingParticle(matchTP_index);
   // theTTTrack.SetTP(theTP); // cannot implement. cyclic
   
-  if (DEBUG) theTTTrack.PrintProperties();
-  if (DEBUG && matchTP_index >= 0)
+  if (cfg_DEBUG*0) theTTTrack.PrintProperties();
+  if (cfg_DEBUG*0 && matchTP_index >= 0)
     {
       theTP.PrintProperties();
       cout << "" << endl;
@@ -745,7 +837,7 @@ TTTrack Sanity::GetTTTrack(unsigned int Index,
 vector<TrackingParticle> Sanity::GetTrackingParticles(bool bPrintList)
 //============================================================================
 {
-  if (DEBUG) std::cout << "=== Sanity::GetTrackingParticles()" << std::endl;
+  if (cfg_DEBUG) std::cout << "=== Sanity::GetTrackingParticles()" << std::endl;
   
   vector<TrackingParticle> theTrackingParticles;
 
@@ -766,7 +858,7 @@ vector<TrackingParticle> Sanity::GetTrackingParticles(bool bPrintList)
 TrackingParticle Sanity::GetTrackingParticle(unsigned int Index)
 //============================================================================
 {
-  if (DEBUG) std::cout << "=== Sanity::GetTrackingParticle()" << std::endl;
+  if (cfg_DEBUG*0) std::cout << "=== Sanity::GetTrackingParticle()" << std::endl;
   
   // Get the track properties
   double pt            = TP_Pt->at(Index);
@@ -793,13 +885,13 @@ TrackingParticle Sanity::GetTrackingParticle(unsigned int Index)
 
   // Construct the TP
   TrackingParticle theTrackingParticle(Index, p, poca, d0_propagated, z0_propagated, charge, pdgId, nMatch, ttTrackIndex, ttClusters, ttStubs, ttTracks, eventId);  
-  if (DEBUG) theTrackingParticle.PrintProperties();
+  if (cfg_DEBUG*0) theTrackingParticle.PrintProperties();
 
   // Get the uniquely matched TTTrack
   // TTTrack theTrack;
   // if (ttTrackIndex >= 0) theTrack= GetTTTrack(ttTrackIndex, 4);
   // theTrackingParticle.SetTTTTrack(theTrack); // cannot use! cyclic problems 
-  // if (DEBUG) theTrack.PrintProperties(); // cannot use! cyclic problems
+  // if (cfg_DEBUG) theTrack.PrintProperties(); // cannot use! cyclic problems
   
   return theTrackingParticle;
 }
@@ -809,7 +901,7 @@ TrackingParticle Sanity::GetTrackingParticle(unsigned int Index)
 void Sanity::PrintTrackingParticleCollection(vector<TrackingParticle> collection)
 //============================================================================
 {
-  if (DEBUG) std::cout << "=== Sanity::PrintTrackingParticleCollection()" << std::endl;
+  if (cfg_DEBUG) std::cout << "=== Sanity::PrintTrackingParticleCollection()" << std::endl;
   
   Table info("Index | Pt | Eta | Phi | PdgId | Q | x0 | y0 | z0 | d0 | d0-phi | NMatch | TTTrackIndex | TTClusters | TTStubs | TTTracks | Event-Id", "Text");
 
@@ -849,7 +941,7 @@ void Sanity::PrintTrackingParticleCollection(vector<TrackingParticle> collection
 void Sanity::PrintTTTrackCollection(vector<TTTrack> collection)
 //============================================================================
 {
-  if (DEBUG) std::cout << "=== Sanity::PrintTTTrackCollection()" << std::endl;
+  if (cfg_DEBUG) std::cout << "=== Sanity::PrintTTTrackCollection()" << std::endl;
 
   Table info("Index | Pt | Eta | Phi | x0 | y0 | z0 | d0 | Q | Chi2 | DOF | Chi2Red | Stubs (PS) | StubPtCons. | Genuine | Unknown | Comb.", "Text");
       
@@ -887,25 +979,278 @@ void Sanity::PrintTTTrackCollection(vector<TTTrack> collection)
 void Sanity::PrintGenParticleCollection(vector<GenParticle> collection)
 //============================================================================
 {
-  if (DEBUG) std::cout << "=== Sanity::PrintGenParticleCollection()" << std::endl;
+  if (cfg_DEBUG) std::cout << "=== Sanity::PrintGenParticleCollection()" << std::endl;
   
   for (vector<GenParticle>::iterator p = collection.begin(); p != collection.end(); p++)
     {
       std::cout << "\nGenParticle:" << endl;
       p->PrintProperties();
-      std::cout << "\nDaughters:" << endl;
-      p->PrintDaughters();
-      std::cout << "\nFinal Daughters:" << endl;
-      p->PrintFinalDaughters();
-      std::cout << "\nFinal Daughters (Charged):" << endl;
-      p->PrintFinalDaughtersCharged();
-      std::cout << "\nFinal Daughters (Neutral):" << endl;
-      p->PrintFinalDaughtersNeutral();
-      std::cout << "\nMothers:" << endl;
-      p->PrintMothers();
+
+      // For more information
+      if (0){
+
+	std::cout << "\nDaughters:" << endl;
+	p->PrintDaughters();
+	std::cout << "\nFinal Daughters:" << endl;
+	p->PrintFinalDaughters();
+	std::cout << "\nFinal Daughters (Charged):" << endl;
+	p->PrintFinalDaughtersCharged();
+	std::cout << "\nFinal Daughters (Neutral):" << endl;
+	p->PrintFinalDaughtersNeutral();
+	std::cout << "\nMothers:" << endl;
+	p->PrintMothers();
+      }
+      
     }
   
   return;
 }
+
+
+//============================================================================
+vector<L1JetParticle> Sanity::GetL1Taus(bool bPrintList)
+//============================================================================
+{
+  vector<L1JetParticle> theL1Taus;
+  L1JetParticle theL1Tau;
+  // For-loop: All L1Taus
+  for (Size_t iCalo = 0; iCalo < L1Tau_Et->size(); iCalo++)
+    {
+      // cout << "iCalo = " << iCalo << endl;-
+      theL1Tau = GetL1Tau(iCalo); 
+      theL1Taus.push_back( theL1Tau );
+    }
+  
+  if (bPrintList) PrintL1JetParticleCollection(theL1Taus); 
+  return theL1Taus;
+}
+
+
+//============================================================================
+L1JetParticle Sanity::GetL1Tau(unsigned int Index)
+//============================================================================
+{
+
+  //double E    = tau_E->at(Index);
+  double Et   = L1Tau_Et->at(Index);
+  double Eta  = L1Tau_Eta->at(Index);
+  double Phi  = L1Tau_Phi->at(Index);
+  double Bx   = L1Tau_Bx->at(Index);   // tauBx->size()=6, while tauEt->size()=12
+  double Type = -1.0; // missing from tree
+  // cout << "GeL1Tau returns theL1Tau(" << Index << ", " << Et << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << " , -1)" << endl;
+  L1JetParticle theL1Tau(Index, Et, Et, Eta, Phi, Bx, Type);
+
+  return theL1Tau;
+}
+
+
+
+//============================================================================
+vector<L1JetParticle> Sanity::GetL1Jets(bool bPrintList)
+//============================================================================
+{
+
+  vector<L1JetParticle> theL1Jets;
+  L1JetParticle theL1Jet;
+  
+  // For-loop: All L1 Jets
+  for (Size_t i = 0; i < L1Jet_Et->size(); i++)
+    {
+      theL1Jet = GetL1Jet(i); 
+      theL1Jets.push_back(theL1Jet);
+    }
+  
+  if (bPrintList) PrintL1JetParticleCollection(theL1Jets); 
+  return theL1Jets;
+}
+
+
+//============================================================================
+L1JetParticle Sanity::GetL1Jet(unsigned int Index)
+//============================================================================
+{
+
+  // int nJets = nJets->at(Index);
+  double Et   = L1Jet_Et->at(Index);
+  double Eta  = L1Jet_Eta->at(Index);
+  double Phi  = L1Jet_Phi->at(Index);
+  double Bx   = L1Jet_Bx->at(Index);
+  double Type = -1.0;
+  // L1Jet_IEt       
+  // L1Jet_IEta      
+  // L1Jet_IPhi      
+  // L1Jet_Bx        
+  // L1Jet_RawEt     
+  // L1Jet_SeedEt    
+  // L1Jet_TowerIEta 
+  // L1Jet_TowerIPhi 
+  // L1Jet_PUEt      
+  // L1Jet_PUDonutEt0
+  // L1Jet_PUDonutEt1
+  // L1Jet_PUDonutEt2
+  // L1Jet_PUDonutEt3
+
+  // cout << "GeL1Jet returns theL1Jet(" << Index << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << "," << Type << ")" << endl;
+  L1JetParticle theL1Jet(Index, Et, Et, Eta, Phi, Bx, Type);
+
+  return theL1Jet;
+}
+
+
+//============================================================================
+void Sanity::GetL1EGs(bool bPrintList)
+//============================================================================
+{
+
+  // For-loop: All L1 EGs
+  for (Size_t i = 0; i < L1EG_Et->size(); i++)
+    {
+      // cout << "L1EG " << i << "/" << L1EG_Et->size() << endl;
+      if (bPrintList) GetL1EG(i);
+    }
+  
+  return;
+}
+
+
+//============================================================================
+void Sanity::GetL1EG(unsigned int Index)
+//============================================================================
+{
+  
+  double Et      = L1EG_Et->at(Index);
+  double Eta     = L1EG_Eta->at(Index);
+  double Phi     = L1EG_Phi->at(Index);
+  int IEt        = L1EG_IET->at(Index);
+  int IEta       = L1EG_IEta->at(Index);
+  int IPhi       = L1EG_IPhi->at(Index);
+  int Iso        = L1EG_Iso->at(Index);
+  int Bx         = L1EG_Bx->at(Index);
+  // int TowerIPhi  = LEG_TowerIPhi->at(Index); 
+  // int TowerIEta  = LEG_TowerIEta->at(Index); 
+  int RawEt      = L1EG_RawEt->at(Index);
+  int IsoEt      = L1EG_IsoEt->at(Index); 
+  int FootprintEt= L1EG_FootprintEt->at(Index);
+  int NTT        = L1EG_NTT->at(Index);
+  int Shape      = L1EG_Shape->at(Index);
+  int TowerHoE   = L1EG_TowerHoE->at(Index);
+  
+  cout << "nEGs        = " << L1EG_Et->size()
+       << "\nEt          = " << Et
+       << "\nEta         = " << Eta
+       << "\nPhi         = " << Phi
+       << "\nIEt         = " << IEt
+       << "\nIEta        = " << IEta
+       << "\nIPhi        = " << IPhi
+       << "\nIso         = " << Iso
+       << "\nBx          = " << Bx
+    // << "\nTowerIPhi   = " << TowerIPhi
+    // << "\nTowerIEta   = " << TowerIEta
+       << "\nRawEt       = " << RawEt
+       << "\nIsoEt       = " << IsoEt
+       << "\nFootprintEt = " << FootprintEt
+       << "\nNTT         = " << NTT
+       << "\nShape       = " << Shape
+       << "\nTowerHoE    = " << TowerHoE
+       << "\n" << endl;
+  
+  return;
+}
+
+
+//============================================================================
+void Sanity::GetL1Sums(bool bPrintList)
+//============================================================================
+{
+
+  // For-loop: All L1 Sums
+  for (Size_t i = 0; i < L1Sum_Et->size(); i++)
+    {
+      // cout << "L1Sum(" << i << ")" << endl;
+      if (bPrintList) GetL1Sum(i);
+    }
+  
+  return;
+}
+
+//============================================================================
+void Sanity::GetL1Sum(unsigned int Index)
+//============================================================================
+{
+
+  cout << "nSums        = " << L1Sum_Et->size()
+       << "\nL1Sum_umType = " << L1Sum_Type->at(Index)
+       << "\nL1Sum_umEt   = " << L1Sum_Et->at(Index)
+       << "\nL1Sum_umPhi  = " << L1Sum_Phi->at(Index)
+       << "\nL1Sum_umIET  = " << L1Sum_IET->at(Index)
+       << "\nL1Sum_umIPhi = " << L1Sum_IPhi->at(Index)
+       << "\nL1Sum_umBx   = " << L1Sum_Bx->at(Index)
+       << "\n" << endl;
+  
+  return;
+}
+
+
+//============================================================================
+void Sanity::PrintL1JetParticleCollection(vector<L1JetParticle> collection)
+//============================================================================
+{
+  
+  Table info("Index | Energy | Et | Eta | Phi | Bx | Type", "Text");
+
+  // For-loop: All L1JetParticles
+  int row=0;
+  for (auto p = collection.begin(); p != collection.end(); p++)
+  {
+    // Construct table
+    info.AddRowColumn(row, auxTools_.ToString( p->index() , 4) );
+    info.AddRowColumn(row, auxTools_.ToString( p->energy(), 4) );
+    info.AddRowColumn(row, auxTools_.ToString( p->et()    , 4) );
+    info.AddRowColumn(row, auxTools_.ToString( p->eta()   , 4) );
+    info.AddRowColumn(row, auxTools_.ToString( p->phi()   , 4) );
+    info.AddRowColumn(row, auxTools_.ToString( p->bx()    , 4) );
+    info.AddRowColumn(row, auxTools_.ToString( p->type()  , 4) );
+    row++;
+  }
+
+  info.Print();
+  return;
+}
+
+
+//============================================================================
+void Sanity::PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection)
+//============================================================================
+{
+  
+  Table info("Match-Cone | Sig-Cone | Iso-Cone | Calo-Et | Calo-Eta | Tk-Pt | Tk-Eta | Tk-dR | Gen-Pt | Gen-Eta | Gen-dR | Sig-Tks | Iso-Tks | VtxIso | RelIso", "Text");
+  
+  // For-loop: All L1TkTauParticles
+  int row=0;
+  for (vector<L1TkTauParticle>::iterator p = collection.begin(); p != collection.end(); p++)
+  {
+    // Construct table
+    info.AddRowColumn(0, auxTools_.ToString( p->GetMatchConeMin(), 2) + " < dR < " + auxTools_.ToString( p->GetMatchConeMax(), 2) );
+    info.AddRowColumn(0, auxTools_.ToString( p->GetSigConeMin()  , 2) + " < dR < " + auxTools_.ToString( p->GetSigConeMax()  , 2) );
+    info.AddRowColumn(0, auxTools_.ToString( p->GetIsoConeMin()  , 2) + " < dR < " + auxTools_.ToString( p->GetIsoConeMax()  , 2) ); 
+    info.AddRowColumn(0, auxTools_.ToString( p->GetCaloTau().et()       ,3  ) );
+    info.AddRowColumn(0, auxTools_.ToString( p->GetCaloTau().eta()      ,3  ) );
+    info.AddRowColumn(0, auxTools_.ToString( p->GetMatchingTk().getPt() ,3  ) );
+    info.AddRowColumn(0, auxTools_.ToString( p->GetMatchingTk().getEta(),3  ) );
+    info.AddRowColumn(0, auxTools_.ToString( p->GetMatchingTkDeltaR()   ,3  ) );
+    info.AddRowColumn(0, auxTools_.ToString( p->GetMatchingGenParticle().pt() , 3) );
+    info.AddRowColumn(0, auxTools_.ToString( p->GetMatchingGenParticle().eta(), 3) );
+    info.AddRowColumn(0, auxTools_.ToString( p->GetMatchingGenParticleDeltaR(), 3) );  
+    info.AddRowColumn(0, auxTools_.ToString( p->GetSigConeTTTracks().size() ) );
+    info.AddRowColumn(0, auxTools_.ToString( p->GetIsoConeTTTracks().size() ) );
+    info.AddRowColumn(0, auxTools_.ToString( p->GetVtxIsolation(), 3) );
+    info.AddRowColumn(0, auxTools_.ToString( p->GetRelIsolation(), 3) );
+    row++;
+  }
+
+  info.Print();
+  return;
+}
+
 
 #endif
