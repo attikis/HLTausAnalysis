@@ -347,12 +347,12 @@ void Sanity::Loop()
 
 
       // ======================================================================
-      // Tau Collection
+      // L1Tau Collection
       // ======================================================================
-      if (cfg_DEBUG) cout << "\n=== Taus (" << L1Tau_Et->size() << ")" << endl;
-      // vector<L1JetParticle> L1Taus = GetL1Taus(cfg_DEBUG);
+      if (cfg_DEBUG) cout << "\n=== L1Taus (" << L1Tau_Et->size() << ")" << endl;
       vector<L1Tau> L1Taus = GetL1Taus(cfg_DEBUG);
 
+      hL1Tau_nTaus->Fill(L1Tau_Et->size()); //L1Tau_nTaus);
       // For-loop: L1 Taus
       int index = 0;
       for (auto tau = L1Taus.begin(); tau != L1Taus.end(); tau++, index++)
@@ -394,6 +394,55 @@ void Sanity::Loop()
 	    hL1Tau_IsMerged->Fill(tau_IsMerged);
 	    hL1Tau_HwQual->Fill(tau_HwQual);
 
+	  }
+
+      
+      // ======================================================================
+      // L1Jet Collection
+      // ======================================================================
+      if (cfg_DEBUG) cout << "\n=== L1Jets (" << L1Jet_Et->size() << ")" << endl;
+      vector<L1Jet> L1Jets = GetL1Jets(cfg_DEBUG);
+
+      hL1Jet_nJets->Fill(L1Jet_Et->size()); //L1Jet_nJets);      
+      // For-loop: L1 Jets
+      for (auto jet = L1Jets.begin(); jet != L1Jets.end(); jet++)
+	  {
+	    short Index      = jet->getIndex();
+	    float Et         = jet->getEt();
+	    float Eta        = jet->getEta();
+	    float Phi        = jet->getPhi();
+	    short IET        = jet->getIET();
+	    short IEta       = jet->getIEta();
+	    short IPhi       = jet->getIPhi();
+	    short Bx         = jet->getBx();
+	    short RawEt      = jet->getRawEt();
+	    short SeedEt     = jet->getSeedEt();
+	    short TowerIEta  = 0; //jet->getTowerIEta();
+	    short TowerIPhi  = 0; //jet->getTowerIPhi();
+	    short PUEt       = jet->getPUEt();
+	    short PUDonutEt0 = jet->getPUDonutEt0();
+	    short PUDonutEt1 = jet->getPUDonutEt1();
+	    short PUDonutEt2 = jet->getPUDonutEt2();
+	    short PUDonutEt3 = jet->getPUDonutEt3();
+	    
+	    // Fill Histograms
+	    hL1Jet_Index->Fill(Index);
+	    hL1Jet_Et->Fill(Et);
+	    hL1Jet_Eta->Fill(Eta);
+	    hL1Jet_Phi->Fill(Phi);
+	    hL1Jet_IET->Fill(IET);
+	    hL1Jet_IEta->Fill(IEta);
+	    hL1Jet_IPhi->Fill(IPhi);
+	    hL1Jet_Bx->Fill(Bx);
+	    hL1Jet_RawEt->Fill(RawEt);
+	    hL1Jet_SeedEt->Fill(SeedEt);
+	    hL1Jet_TowerIPhi->Fill(TowerIPhi);
+	    hL1Jet_TowerIEta->Fill(TowerIEta);
+	    hL1Jet_PUEt->Fill(PUEt);
+	    hL1Jet_PUDonutEt0->Fill(PUDonutEt0);
+	    hL1Jet_PUDonutEt1->Fill(PUDonutEt1);
+	    hL1Jet_PUDonutEt2->Fill(PUDonutEt2);
+	    hL1Jet_PUDonutEt3->Fill(PUDonutEt3);
 	  }
 
       
@@ -504,7 +553,7 @@ void Sanity::BookHistos_(void)
 
   // L1Taus 
   histoTools_.BookHisto_1D(hL1Tau_Index    , "L1Tau_Index"    , "; index of L1 Tau; Entries"    ,  20, +0.0,  20.0);
-  histoTools_.BookHisto_1D(hL1Tau_nTaus    , "L1Tau_nTaus"    , "; L1Taus multiplicity; Entries",  20, +0.0,  20.0);
+  histoTools_.BookHisto_1D(hL1Tau_nTaus    , "L1Tau_nTaus"    , "; L1Tau multiplicity; Entries" ,  20, +0.0,  20.0);
   histoTools_.BookHisto_1D(hL1Tau_Et       , "L1Tau_Et"       , "; E_{T} (GeV/; Entries"        ,  60, +0.0, 300.0);
   histoTools_.BookHisto_1D(hL1Tau_Eta      , "L1Tau_Eta"      , "; #eta; Entries"               , 130, -2.6,   2.6);
   histoTools_.BookHisto_1D(hL1Tau_Phi      , "L1Tau_Phi"      , "; #phi (rads); Entries"        , 128, -3.2,   3.2);
@@ -521,7 +570,28 @@ void Sanity::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1Tau_HasEM    , "L1Tau_HasEM"    , "; has EM; Entries"             ,   2, -0.5,   1.5);
   histoTools_.BookHisto_1D(hL1Tau_IsMerged , "L1Tau_IsMerged" , "; is Merged; Entries"          ,   2, -0.5,   1.5);
   histoTools_.BookHisto_1D(hL1Tau_HwQual   , "L1Tau_HwQual"   , "; Hw Qual; Entries"            ,   2, -0.5,   1.5);
-			     
+
+  // L1Jets
+  histoTools_.BookHisto_1D(hL1Jet_Index     , "L1Jet_Index"     , "; index of L1 Tau; Entries"       ,  20,  +0.0,  20.0);
+  histoTools_.BookHisto_1D(hL1Jet_nJets     , "L1Jet_nJets"     , "; L1Jet multiplicity; Entries"    ,  20,  +0.0,  20.0);
+  histoTools_.BookHisto_1D(hL1Jet_Et        , "L1Jet_Et"        , "; E_{T} (GeV/; Entries"           ,  60,  +0.0, 300.0);
+  histoTools_.BookHisto_1D(hL1Jet_Eta       , "L1Jet_Eta"       , "; #eta; Entries"                  , 300,  -6.0,   6.0);
+  histoTools_.BookHisto_1D(hL1Jet_Phi       , "L1Jet_Phi"       , "; #phi (rads); Entries"           , 128,  -3.2,   3.2);
+  histoTools_.BookHisto_1D(hL1Jet_IET       , "L1Jet_IET"       , "; I-E_{T} (GeV/c); Entries"       , 200,   0.0, 200.0);
+  histoTools_.BookHisto_1D(hL1Jet_IEta      , "L1Jet_IEta"      , "; I-#eta; Entries"                , 250,-125.0, 125.0);
+  histoTools_.BookHisto_1D(hL1Jet_IPhi      , "L1Jet_IPhi"      , "; I-#phi (rads); Entries"         , 145,   0.0, 145.0);
+  histoTools_.BookHisto_1D(hL1Jet_Bx        , "L1Jet_Bx"        , "; BX; Entries"                    , 200,   0.0, 200.0);
+  histoTools_.BookHisto_1D(hL1Jet_RawEt     , "L1Jet_RawEt"     , "; Raw E_{T} (GeV); Entries"       ,  60,   0.0, 300.0);
+  histoTools_.BookHisto_1D(hL1Jet_SeedEt    , "L1Jet_SeedEt"    , "; Seed E_{T} (GeV); Entries"      ,  60,   0.0, 300.0);
+  histoTools_.BookHisto_1D(hL1Jet_TowerIPhi , "L1Jet_TowerIPhi" , "; Tower I-#phi (rads); Entries"   , 128,  -3.2,   3.2); 
+  histoTools_.BookHisto_1D(hL1Jet_TowerIEta , "L1Jet_TowerIEta" , "; Tower I-#eta; Entries"          , 130,  -2.6,   2.6);
+  histoTools_.BookHisto_1D(hL1Jet_PUEt      , "L1Jet_PUEt"      , "; PU E_{T} (GeV); Entries"        ,  60,   0.0, 300.0);
+  histoTools_.BookHisto_1D(hL1Jet_PUDonutEt0, "L1Jet_PUDonutEt0", "; PU Donut E_{T,0} (GeV); Entries",  50,   0.0,  50.0);
+  histoTools_.BookHisto_1D(hL1Jet_PUDonutEt1, "L1Jet_PUDonutEt1", "; PU Donut E_{T,1} (GeV); Entries", 200,   0.0, 200.0);
+  histoTools_.BookHisto_1D(hL1Jet_PUDonutEt2, "L1Jet_PUDonutEt2", "; PU Donut E_{T,2} (GeV); Entries", 250,   0.0, 250.0);
+  histoTools_.BookHisto_1D(hL1Jet_PUDonutEt3, "L1Jet_PUDonutEt3", "; PU Donut E_{T,3} (GeV); Entries", 500,   0.0, 500.0);
+
+
   return;
 }
 
@@ -1110,56 +1180,47 @@ L1Tau Sanity::GetL1Tau(unsigned int Index)
 
 
 //============================================================================
-vector<L1Tau> Sanity::GetL1Jets(bool bPrintList)
+vector<L1Jet> Sanity::GetL1Jets(bool bPrintList)
 //============================================================================
 {
 
-  vector<L1Tau> theL1Jets;
-  L1Tau theL1Jet;
-  //int counter = -1;
-  
+  vector<L1Jet> theL1Jets;
+  L1Jet theL1Jet;
+
   // For-loop: All L1 Jets
   for (Size_t i = 0; i < L1Jet_Et->size(); i++)
     {
-      //counter++;
-      
       theL1Jet = GetL1Jet(i);
-      // if (bPrintList) theL1Jet.PrintProperties(counter==0);
       theL1Jets.push_back(theL1Jet);
     }
   
-  if (bPrintList) PrintL1TauCollection(theL1Jets); 
+  if (bPrintList) PrintL1JetCollection(theL1Jets); 
   return theL1Jets;
 }
 
 
 //============================================================================
-L1Tau Sanity::GetL1Jet(unsigned int Index)
+L1Jet Sanity::GetL1Jet(unsigned int Index)
 //============================================================================
 {
 
-  // // int nJets = nJets->at(Index);
-  // double Et   = L1Jet_Et->at(Index);
-  // double Eta  = L1Jet_Eta->at(Index);
-  // double Phi  = L1Jet_Phi->at(Index);
-  // double Bx   = L1Jet_Bx->at(Index);
-  //  double Type = -1.0;
-  // L1Jet_IEt       
-  // L1Jet_IEta      
-  // L1Jet_IPhi      
-  // L1Jet_Bx        
-  // L1Jet_RawEt     
-  // L1Jet_SeedEt    
-  // L1Jet_TowerIEta 
-  // L1Jet_TowerIPhi 
-  // L1Jet_PUEt      
-  // L1Jet_PUDonutEt0
-  // L1Jet_PUDonutEt1
-  // L1Jet_PUDonutEt2
-  // L1Jet_PUDonutEt3
-
-  // cout << "GeL1Jet returns theL1Jet(" << Index << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << "," << Type << ")" << endl;
-  L1Tau theL1Jet; //(Index, Et, Et, Eta, Phi, Bx, Type);
+  L1Jet theL1Jet(Index,
+		 L1Jet_Et->at(Index),
+		 L1Jet_Eta->at(Index),
+		 L1Jet_Phi->at(Index),
+		 L1Jet_IET->at(Index),
+		 L1Jet_IEta->at(Index),
+		 L1Jet_IPhi->at(Index),
+		 L1Jet_Bx->at(Index),
+		 L1Jet_RawEt->at(Index),
+		 L1Jet_SeedEt->at(Index),
+		 0,//L1Jet_TowerIEta->at(Index),
+		 0,//L1Jet_TowerIPhi->at(Index),
+		 L1Jet_PUEt->at(Index),
+		 L1Jet_PUDonutEt0->at(Index),
+		 L1Jet_PUDonutEt1->at(Index),
+		 L1Jet_PUDonutEt2->at(Index),
+		 L1Jet_PUDonutEt3->at(Index));
 
   return theL1Jet;
 }
@@ -1290,6 +1351,41 @@ void Sanity::PrintL1TauCollection(vector<L1Tau> collection)
     info.AddRowColumn(row, auxTools_.ToString( p->getHwQual(), 3)    );
     row++;
     
+  }
+
+  info.Print();
+  return;
+}
+
+//============================================================================
+void Sanity::PrintL1JetCollection(vector<L1Jet> collection)
+//============================================================================
+{
+  
+  Table info("Index | Et | Eta | Phi | IET | IEta | IPhi | Bx | Raw Et | Seed Et | TowerIPhi | TowerIEta | PU Et | PUDonutEt0 | PUDonutEt1 | PUDonutEt2 | PUDonutEt3", "Text");
+
+  // For-loop: All L1Taus
+  int row=0;
+  for (auto p = collection.begin(); p != collection.end(); p++, row++)
+  {
+    // Construct table
+    info.AddRowColumn(row, auxTools_.ToString( p->getIndex() )        );
+    info.AddRowColumn(row, auxTools_.ToString( p->getEt(), 3)         );
+    info.AddRowColumn(row, auxTools_.ToString( p->getEta(), 3)        );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPhi(), 3)        );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIET() , 3)       );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIEta(), 3)       );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIPhi(), 3)       );
+    info.AddRowColumn(row, auxTools_.ToString( p->getBx() , 3)        );
+    info.AddRowColumn(row, auxTools_.ToString( p->getRawEt(), 3)      );
+    info.AddRowColumn(row, auxTools_.ToString( p->getSeedEt(), 3)     );
+    info.AddRowColumn(row, auxTools_.ToString( p->getTowerIPhi(), 3)  );
+    info.AddRowColumn(row, auxTools_.ToString( p->getTowerIEta(), 3)  );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPUEt(), 3)       );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPUDonutEt0(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPUDonutEt1(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPUDonutEt2(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPUDonutEt3(), 3) );
   }
 
   info.Print();

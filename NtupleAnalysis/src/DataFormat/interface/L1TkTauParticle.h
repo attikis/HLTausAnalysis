@@ -6,7 +6,8 @@
 
 // User
 #include "../../Auxiliary/src/AuxTools.C"
-#include "../../DataFormat/src/L1JetParticle.C"
+#include "../../DataFormat/src/L1Jet.C"
+#include "../../DataFormat/src/L1Tau.C"
 #include "../../DataFormat/interface/TTTrack.h"
 #include "../../DataFormat/interface/TTPixelTrack.h"
 #include "../../DataFormat/interface/GenParticle.h"
@@ -69,7 +70,7 @@ class L1TkTauParticle{
   double GetVtxIsolation(void)const { return theVtxIsolation;}
   TTTrack GetVtxIsolationTrack(void)const {return theVtxIsolationTk;}
   double GetRelIsolation(void)const { return theRelIsolation;}
-  L1JetParticle GetCaloTau(void) const{ return theCaloTau;}
+  L1Tau GetCaloTau(void) const{ return theCaloTau;}
   TTTrack GetMatchingTk(void) const{ return theMatchingTk;}
   TTTrack GetSigConeLdgTk(void);
   TTTrack GetIsoConeLdgTk(void);
@@ -86,7 +87,7 @@ class L1TkTauParticle{
   bool HasMatchingGenParticle(void) const{return GetMatchingGenParticleDeltaR() < 999.9;}
   int GetNProngs(void) const{ return theNProngs;}
   //        
-  void SetCaloTau(L1JetParticle CaloTau){theCaloTau = CaloTau;}
+  void SetCaloTau(L1Tau CaloTau){theCaloTau = CaloTau;}
   void SetMatchingTk(TTTrack matchTk){theMatchingTk = matchTk;}
   void SetMatchTkDeltaRNew(double matchTk_dR){theMatchingTk_dR = matchTk_dR;}
   void SetMatchTkDeltaRMin(double matchTk_dRMin){theMatchCone_dRMin = matchTk_dRMin;}
@@ -132,7 +133,7 @@ class L1TkTauParticle{
   double isoCone_minDeltaR_;
   double isoCone_maxDeltaR_;
   // NEW
-  L1JetParticle theCaloTau;
+  L1Tau theCaloTau;
   TTTrack theMatchingTk;
   double theMatchingTk_dR;
   double theMatchCone_dRMin;

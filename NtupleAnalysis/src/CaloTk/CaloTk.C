@@ -2001,29 +2001,24 @@ L1Tau CaloTk::GetL1Jet(unsigned int Index)
 //============================================================================
 {
 
-  // int nJets = nJets->at(Index);
-  double Et   = L1Jet_Et->at(Index);
-  double Eta  = L1Jet_Eta->at(Index);
-  double Phi  = L1Jet_Phi->at(Index);
-  double Bx   = L1Jet_Bx->at(Index);
-  double Type = -1.0;
-  // L1Jet_IEt       
-  // L1Jet_IEta      
-  // L1Jet_IPhi      
-  // L1Jet_Bx        
-  // L1Jet_RawEt     
-  // L1Jet_SeedEt    
-  // L1Jet_TowerIEta 
-  // L1Jet_TowerIPhi 
-  // L1Jet_PUEt      
-  // L1Jet_PUDonutEt0
-  // L1Jet_PUDonutEt1
-  // L1Jet_PUDonutEt2
-  // L1Jet_PUDonutEt3
-
-  // cout << "GeL1Jet returns theL1Jet(" << Index << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << "," << Type << ")" << endl;
-  L1Tau theL1Jet;//(Index, Et, Et, Eta, Phi, Bx, Type);
-
+  L1Tau theL1Jet(Index,
+		 L1Jet_Et->at(Index),
+		 L1Jet_Eta->at(Index),
+		 L1Jet_Phi->at(Index),
+		 L1Jet_IET->at(Index),
+		 L1Jet_IEta->at(Index),
+		 L1Jet_IPhi->at(Index),
+		 L1Jet_Bx->at(Index),
+		 L1Jet_RawEt->at(Index),
+		 L1Jet_SeedEt->at(Index),
+		 0,//L1Jet_TowerIEta->at(Index),
+		 0,//L1Jet_TowerIPhi->at(Index),
+		 L1Jet_PUEt->at(Index),
+		 L1Jet_PUDonutEt0->at(Index),
+		 L1Jet_PUDonutEt1->at(Index),
+		 L1Jet_PUDonutEt2->at(Index),
+		 L1Jet_PUDonutEt3->at(Index));
+		 
   return theL1Jet;
 }
 

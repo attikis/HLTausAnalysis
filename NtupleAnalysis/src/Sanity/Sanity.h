@@ -20,8 +20,8 @@
 #include "../DataFormat/src/TrackingParticle.C"
 #include "../DataFormat/interface/TTTrack.h"
 #include "../DataFormat/interface/TTPixelTrack.h"
+#include "../DataFormat/src/L1Jet.C"
 #include "../DataFormat/src/L1Tau.C"
-//#include "../DataFormat/src/L1JetParticle.C"
 
 // #include "../Plugins/src/L1TkPrimaryVertex.C"
 #include "../Plugins/src/L1PixelTrackFit.C"
@@ -62,6 +62,8 @@ class Sanity : public TreeAnalyserMC{
   void PrintTrackingParticleCollection(vector<TrackingParticle> collection);
 
   void PrintTTTrackCollection(vector<TTTrack> collection);
+
+  void PrintL1JetCollection(vector<L1Jet> collection);
 
   void PrintL1TauCollection(vector<L1Tau> collection);
 
@@ -134,9 +136,9 @@ class Sanity : public TreeAnalyserMC{
   
   void GetL1Muons(bool bPrintList=false);
 
-  L1Tau GetL1Jet(unsigned int Index);
+  L1Jet GetL1Jet(unsigned int Index);
 
-  vector<L1Tau> GetL1Jets(bool bPrintList=false);
+  vector<L1Jet> GetL1Jets(bool bPrintList=false);
   
   L1Tau GetL1Tau(unsigned int Index);
 
@@ -250,7 +252,25 @@ class Sanity : public TreeAnalyserMC{
   TH1D* hL1Tau_IsMerged;
   TH1D* hL1Tau_HwQual;
 
-
+  // L1Jets
+  TH1D* hL1Jet_Index;
+  TH1D* hL1Jet_nJets;
+  TH1D* hL1Jet_Et;
+  TH1D* hL1Jet_Eta;
+  TH1D* hL1Jet_Phi;
+  TH1D* hL1Jet_IET;
+  TH1D* hL1Jet_IEta;
+  TH1D* hL1Jet_IPhi;
+  TH1D* hL1Jet_Bx;
+  TH1D* hL1Jet_RawEt;
+  TH1D* hL1Jet_SeedEt;
+  TH1D* hL1Jet_TowerIPhi;
+  TH1D* hL1Jet_TowerIEta;
+  TH1D* hL1Jet_PUEt;
+  TH1D* hL1Jet_PUDonutEt0;
+  TH1D* hL1Jet_PUDonutEt1;
+  TH1D* hL1Jet_PUDonutEt2;
+  TH1D* hL1Jet_PUDonutEt3;
 
 };
 

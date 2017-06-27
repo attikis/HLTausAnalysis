@@ -21,6 +21,7 @@
 #include "../DataFormat/interface/TTTrack.h"
 #include "../DataFormat/interface/TTPixelTrack.h"
 #include "../DataFormat/src/L1Tau.C"
+#include "../DataFormat/src/L1Jet.C"
 
 // #include "../Plugins/src/L1TkPrimaryVertex.C"
 #include "../Plugins/src/L1PixelTrackFit.C"
