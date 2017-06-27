@@ -23,8 +23,7 @@
 #include "../DataFormat/src/L1EG.C"
 #include "../DataFormat/src/L1Jet.C"
 #include "../DataFormat/src/L1Tau.C"
-
-// #include "../Plugins/src/L1TkPrimaryVertex.C"
+#include "../DataFormat/src/L1Sum.C"
 #include "../Plugins/src/L1PixelTrackFit.C"
 
 // ROOT
@@ -63,6 +62,8 @@ class Sanity : public TreeAnalyserMC{
   void PrintTrackingParticleCollection(vector<TrackingParticle> collection);
 
   void PrintTTTrackCollection(vector<TTTrack> collection);
+
+  void PrintL1SumCollection(vector<L1Sum> collection);
 
   void PrintL1EGCollection(vector<L1EG> collection);
 
@@ -148,9 +149,9 @@ class Sanity : public TreeAnalyserMC{
 
   vector<L1Tau> GetL1Taus(bool bPrintList=false);
   
-  void GetL1Sum(unsigned int Index);
+  L1Sum GetL1Sum(unsigned int Index);
 
-  void GetL1Sums(bool bPrintList=false);
+  vector<L1Sum> GetL1Sums(bool bPrintList=false);
 
   
   void GetHadronicTauFinalDaughters(GenParticle hTau, vector<unsigned short> &Daug);
@@ -212,7 +213,6 @@ class Sanity : public TreeAnalyserMC{
   TH1D* hTP_TTStubs;
   TH1D* hTP_TTTracks;
 
-  
   // TTTracks
   TH1D* hL1Tks_Pt;
   TH1D* hL1Tks_Eta;
@@ -276,6 +276,36 @@ class Sanity : public TreeAnalyserMC{
   TH1D* hL1Jet_PUDonutEt2;
   TH1D* hL1Jet_PUDonutEt3;
 
+  // L1EGs
+  TH1D* hL1EG_Index;
+  TH1D* hL1EG_nEGs;
+  TH1D* hL1EG_Et;
+  TH1D* hL1EG_Eta;
+  TH1D* hL1EG_Phi;
+  TH1D* hL1EG_IEt;
+  TH1D* hL1EG_IEta;
+  TH1D* hL1EG_IPhi;
+  TH1D* hL1EG_Iso;
+  TH1D* hL1EG_Bx;
+  TH1D* hL1EG_TowerIPhi;
+  TH1D* hL1EG_TowerIEta;
+  TH1D* hL1EG_RawEt;
+  TH1D* hL1EG_IsoEt;
+  TH1D* hL1EG_FootprintEt;
+  TH1D* hL1EG_NTT;
+  TH1D* hL1EG_Shape;
+  TH1D* hL1EG_TowerHoE;
+
+  // L1Sums
+  TH1D* hL1Sum_Index;
+  TH1D* hL1Sum_nSums;
+  TH1D* hL1Sum_Et;
+  TH1D* hL1Sum_Phi;
+  TH1D* hL1Sum_IEt;
+  TH1D* hL1Sum_IPhi;
+  TH1D* hL1Sum_Bx;
+  TH1D* hL1Sum_Type;
+  
 };
 
 #endif

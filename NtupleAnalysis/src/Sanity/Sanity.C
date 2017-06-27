@@ -281,220 +281,272 @@ void Sanity::Loop()
       // ======================================================================
       // TTTracks Collections
       // ======================================================================
-      if (cfg_DEBUG) cout << "\n=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
-      vector<TTTrack> TTTracks = GetTTTracks(cfg_tk_minPt, cfg_tk_minEta, cfg_tk_maxEta, cfg_tk_maxChiSqRed, cfg_tk_minStubs, cfg_tk_minStubsPS, cfg_tk_maxStubsPS, cfg_tk_nFitParams, false);
-      sort( TTTracks.begin(), TTTracks.end(), PtComparatorTTTrack() ); // not sorted by default
-      if (cfg_DEBUG) PrintTTTrackCollection(TTTracks);
+      if (cfg_AddL1Tks)
+	{
 
-      // For-loop: TTTracks
-      for (vector<TTTrack>::iterator tk = TTTracks.begin(); tk != TTTracks.end(); tk++)
-	  {
-	    // TVector3 tk_p3   = tk->getMomentum();
-	    double tk_pt     = tk->getPt();
-	    double tk_eta    = tk->getEta();
-	    double tk_phi    = tk->getPhi();
-	    int tk_charge    = tk->getCharge();
-	    double tk_Chi2   = tk->getChi2();
-	    double tk_Chi2Red= tk->getChi2Red();
-	    bool tk_IsLoose  = tk->getIsLoose();
-	    bool tk_IsFake   = tk->getIsFake();
-	    bool tk_TPIndex  = tk->getTPIndex();
-	    double tk_getD0  = tk->getD0();
-	    int tk_DOF       = tk->getDOF();
-	    double tk_StubPtCons   = tk->getStubPtConsistency();
-	    bool tk_IsGenuine      = tk->getIsGenuine();
-	    bool tk_IsUnknown      = tk->getIsUnknown();
-	    bool tk_IsCombinatoric = tk->getIsCombinatoric();
-
-	    unsigned int tk_NStubs       = tk->getNumOfStubs();
-	    unsigned int tk_NStubsPS     = tk->getNumOfStubsPS();
-	    unsigned int tk_NStubsBarrel = tk->getNumOfBarrelStubs();
-	    unsigned int tk_NStubsEndcap = tk->getNumOfEndcapStubs();
-
-	    double tk_X0   = tk->getX0();
-	    double tk_Y0   = tk->getY0();
-	    double tk_Z0   = tk->getZ0();
-	    double tk_RInv = tk->getRInv();
-	    // ROOT::Math::XYZVector tk_POCA = tk->getPOCA();
-	    
-	    if (0) tk->PrintProperties();
-	    if (0) tk->PrintAllProperties();
-
-	    // Fill Histograms
-	    hL1Tks_Pt ->Fill(tk_pt);
-	    hL1Tks_Eta->Fill(tk_eta);
-	    hL1Tks_Phi->Fill(tk_phi);
-	    hL1Tks_Charge->Fill(tk_charge);
-	    hL1Tks_POCAx->Fill(tk_X0);
-	    hL1Tks_POCAy->Fill(tk_Y0);
-	    hL1Tks_POCAz->Fill(tk_Z0);
-	    hL1Tks_ChiSq->Fill(tk_Chi2);
-	    hL1Tks_ChiSqRed->Fill(tk_Chi2Red);
-	    hL1Tks_StubPtConsistency->Fill(tk_StubPtCons);
-	    hL1Tks_RInv->Fill(tk_RInv);
-	    hL1Tks_IsGenuine->Fill(tk_IsGenuine);
-	    hL1Tks_IsUnknown->Fill(tk_IsUnknown);
-	    hL1Tks_IsCombinatoric->Fill(tk_IsCombinatoric);
-	    hL1Tks_IsLoose->Fill(tk_IsLoose);
-	    hL1Tks_IsFake->Fill(tk_IsLoose);
-	    hL1Tks_NStubs->Fill(tk_NStubs);
-	    hL1Tks_NStubsPS->Fill(tk_NStubsPS);
-	    hL1Tks_NStubsBarrel->Fill(tk_NStubsBarrel);
-	    hL1Tks_NStubsEndcap->Fill(tk_NStubsEndcap);
-	    hL1Tks_TP_Index->Fill(tk_TPIndex);
-
-	  }
+	  if (cfg_DEBUG) cout << "\n=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
+	  vector<TTTrack> TTTracks = GetTTTracks(cfg_tk_minPt, cfg_tk_minEta, cfg_tk_maxEta, cfg_tk_maxChiSqRed, cfg_tk_minStubs, cfg_tk_minStubsPS, cfg_tk_maxStubsPS, cfg_tk_nFitParams, false);
+	  sort( TTTracks.begin(), TTTracks.end(), PtComparatorTTTrack() ); // not sorted by default
+	  if (cfg_DEBUG) PrintTTTrackCollection(TTTracks);
+	  
+	  // For-loop: TTTracks
+	  for (vector<TTTrack>::iterator tk = TTTracks.begin(); tk != TTTracks.end(); tk++)
+	    {
+	      // TVector3 tk_p3   = tk->getMomentum();
+	      double tk_pt     = tk->getPt();
+	      double tk_eta    = tk->getEta();
+	      double tk_phi    = tk->getPhi();
+	      int tk_charge    = tk->getCharge();
+	      double tk_Chi2   = tk->getChi2();
+	      double tk_Chi2Red= tk->getChi2Red();
+	      bool tk_IsLoose  = tk->getIsLoose();
+	      bool tk_IsFake   = tk->getIsFake();
+	      bool tk_TPIndex  = tk->getTPIndex();
+	      double tk_getD0  = tk->getD0();
+	      int tk_DOF       = tk->getDOF();
+	      double tk_StubPtCons   = tk->getStubPtConsistency();
+	      bool tk_IsGenuine      = tk->getIsGenuine();
+	      bool tk_IsUnknown      = tk->getIsUnknown();
+	      bool tk_IsCombinatoric = tk->getIsCombinatoric();
+	      
+	      unsigned int tk_NStubs       = tk->getNumOfStubs();
+	      unsigned int tk_NStubsPS     = tk->getNumOfStubsPS();
+	      unsigned int tk_NStubsBarrel = tk->getNumOfBarrelStubs();
+	      unsigned int tk_NStubsEndcap = tk->getNumOfEndcapStubs();
+	      
+	      double tk_X0   = tk->getX0();
+	      double tk_Y0   = tk->getY0();
+	      double tk_Z0   = tk->getZ0();
+	      double tk_RInv = tk->getRInv();
+	      // ROOT::Math::XYZVector tk_POCA = tk->getPOCA();
+	      
+	      if (0) tk->PrintProperties();
+	      if (0) tk->PrintAllProperties();
+	      
+	      // Fill Histograms
+	      hL1Tks_Pt ->Fill(tk_pt);
+	      hL1Tks_Eta->Fill(tk_eta);
+	      hL1Tks_Phi->Fill(tk_phi);
+	      hL1Tks_Charge->Fill(tk_charge);
+	      hL1Tks_POCAx->Fill(tk_X0);
+	      hL1Tks_POCAy->Fill(tk_Y0);
+	      hL1Tks_POCAz->Fill(tk_Z0);
+	      hL1Tks_ChiSq->Fill(tk_Chi2);
+	      hL1Tks_ChiSqRed->Fill(tk_Chi2Red);
+	      hL1Tks_StubPtConsistency->Fill(tk_StubPtCons);
+	      hL1Tks_RInv->Fill(tk_RInv);
+	      hL1Tks_IsGenuine->Fill(tk_IsGenuine);
+	      hL1Tks_IsUnknown->Fill(tk_IsUnknown);
+	      hL1Tks_IsCombinatoric->Fill(tk_IsCombinatoric);
+	      hL1Tks_IsLoose->Fill(tk_IsLoose);
+	      hL1Tks_IsFake->Fill(tk_IsLoose);
+	      hL1Tks_NStubs->Fill(tk_NStubs);
+	      hL1Tks_NStubsPS->Fill(tk_NStubsPS);
+	      hL1Tks_NStubsBarrel->Fill(tk_NStubsBarrel);
+	      hL1Tks_NStubsEndcap->Fill(tk_NStubsEndcap);
+	      hL1Tks_TP_Index->Fill(tk_TPIndex);
+	      
+	    }
+	}
 
 
       // ======================================================================
       // L1Tau Collection
       // ======================================================================
-      if (cfg_DEBUG) cout << "\n=== L1Taus (" << L1Tau_Et->size() << ")" << endl;
-      vector<L1Tau> L1Taus = GetL1Taus(cfg_DEBUG);
+      if (cfg_AddTaus)
+	{
 
-      hL1Tau_nTaus->Fill(L1Tau_Et->size()); //L1Tau_nTaus);
-      // For-loop: L1 Taus
-      int index = 0;
-      for (auto tau = L1Taus.begin(); tau != L1Taus.end(); tau++, index++)
-	  {
-	    
-	    double tau_et           = tau->getEt();
-	    double tau_eta          = tau->getEta();
-	    double tau_phi          = tau->getPhi();
-	    short int tau_IET       = tau->getIET();
-	    short int tau_IEta      = tau->getIEta();
-	    short int tau_IPhi      = tau->getIPhi();
-	    short int tau_Iso       = tau->getIso();
-	    short int tau_Bx        = tau->getBx();
-	    short int tau_TowerIPhi = 0; //tau->getTowerIPhi();
-	    short int tau_TowerIEta = 0; //tau->getTowerIEta();
-	    short int tau_RawEt     = tau->getRawEt();
-	    short int tau_IsoEt     = tau->getIsoEt();
-	    short int tau_NTT       = tau->getNTT();
-	    short int tau_HasEM     = tau->getHasEM();
-	    short int tau_IsMerged  = tau->getIsMerged();
-	    short int tau_HwQual    = tau->getHwQual();
-	    
-	    // Fill Histograms
-	    hL1Tau_Index->Fill(index);
-	    hL1Tau_Et->Fill(tau_et);
-	    hL1Tau_Eta->Fill(tau_eta);
-	    hL1Tau_Phi->Fill(tau_phi);
-	    hL1Tau_IET->Fill(tau_IET);
-	    hL1Tau_IEta->Fill(tau_IEta);
-	    hL1Tau_IPhi->Fill(tau_IPhi);
-	    hL1Tau_Iso->Fill(tau_Iso);
-	    hL1Tau_Bx->Fill(tau_Bx);
-	    hL1Tau_TowerIPhi->Fill(tau_TowerIPhi);
-	    hL1Tau_TowerIEta->Fill(tau_TowerIEta);
-	    hL1Tau_RawEt->Fill(tau_RawEt);
-	    hL1Tau_IsoEt->Fill(tau_IsoEt);
-	    hL1Tau_NTT->Fill(tau_NTT);
-	    hL1Tau_HasEM->Fill(tau_HasEM);
-	    hL1Tau_IsMerged->Fill(tau_IsMerged);
-	    hL1Tau_HwQual->Fill(tau_HwQual);
-
+	  if (cfg_DEBUG) cout << "\n=== L1Taus (" << L1Tau_Et->size() << ")" << endl;
+	  vector<L1Tau> L1Taus = GetL1Taus(cfg_DEBUG);
+	  
+	  hL1Tau_nTaus->Fill(L1Tau_Et->size()); //L1Tau_nTaus);
+	  // For-loop: L1 Taus
+	  int index = 0;
+	  for (auto tau = L1Taus.begin(); tau != L1Taus.end(); tau++, index++)
+	    {
+	      
+	      double tau_et           = tau->getEt();
+	      double tau_eta          = tau->getEta();
+	      double tau_phi          = tau->getPhi();
+	      short int tau_IET       = tau->getIET();
+	      short int tau_IEta      = tau->getIEta();
+	      short int tau_IPhi      = tau->getIPhi();
+	      short int tau_Iso       = tau->getIso();
+	      short int tau_Bx        = tau->getBx();
+	      short int tau_TowerIPhi = 0; //tau->getTowerIPhi();
+	      short int tau_TowerIEta = 0; //tau->getTowerIEta();
+	      short int tau_RawEt     = tau->getRawEt();
+	      short int tau_IsoEt     = tau->getIsoEt();
+	      short int tau_NTT       = tau->getNTT();
+	      short int tau_HasEM     = tau->getHasEM();
+	      short int tau_IsMerged  = tau->getIsMerged();
+	      short int tau_HwQual    = tau->getHwQual();
+	      
+	      // Fill Histograms
+	      hL1Tau_Index->Fill(index);
+	      hL1Tau_Et->Fill(tau_et);
+	      hL1Tau_Eta->Fill(tau_eta);
+	      hL1Tau_Phi->Fill(tau_phi);
+	      hL1Tau_IET->Fill(tau_IET);
+	      hL1Tau_IEta->Fill(tau_IEta);
+	      hL1Tau_IPhi->Fill(tau_IPhi);
+	      hL1Tau_Iso->Fill(tau_Iso);
+	      hL1Tau_Bx->Fill(tau_Bx);
+	      hL1Tau_TowerIPhi->Fill(tau_TowerIPhi);
+	      hL1Tau_TowerIEta->Fill(tau_TowerIEta);
+	      hL1Tau_RawEt->Fill(tau_RawEt);
+	      hL1Tau_IsoEt->Fill(tau_IsoEt);
+	      hL1Tau_NTT->Fill(tau_NTT);
+	      hL1Tau_HasEM->Fill(tau_HasEM);
+	      hL1Tau_IsMerged->Fill(tau_IsMerged);
+	      hL1Tau_HwQual->Fill(tau_HwQual);
 	  }
+	}
 
       
       // ======================================================================
       // L1Jet Collection
       // ======================================================================
-      if (cfg_DEBUG) cout << "\n=== L1Jets (" << L1Jet_Et->size() << ")" << endl;
-      vector<L1Jet> L1Jets = GetL1Jets(cfg_DEBUG);
-
-      hL1Jet_nJets->Fill(L1Jet_Et->size()); //L1Jet_nJets);      
-      // For-loop: L1 Jets
-      for (auto jet = L1Jets.begin(); jet != L1Jets.end(); jet++)
-	  {
-	    short Index      = jet->getIndex();
-	    float Et         = jet->getEt();
-	    float Eta        = jet->getEta();
-	    float Phi        = jet->getPhi();
-	    short IET        = jet->getIET();
-	    short IEta       = jet->getIEta();
-	    short IPhi       = jet->getIPhi();
-	    short Bx         = jet->getBx();
-	    short RawEt      = jet->getRawEt();
-	    short SeedEt     = jet->getSeedEt();
-	    short TowerIEta  = 0; //jet->getTowerIEta();
-	    short TowerIPhi  = 0; //jet->getTowerIPhi();
-	    short PUEt       = jet->getPUEt();
-	    short PUDonutEt0 = jet->getPUDonutEt0();
-	    short PUDonutEt1 = jet->getPUDonutEt1();
-	    short PUDonutEt2 = jet->getPUDonutEt2();
-	    short PUDonutEt3 = jet->getPUDonutEt3();
-	    
-	    // Fill Histograms
-	    hL1Jet_Index->Fill(Index);
-	    hL1Jet_Et->Fill(Et);
-	    hL1Jet_Eta->Fill(Eta);
-	    hL1Jet_Phi->Fill(Phi);
-	    hL1Jet_IET->Fill(IET);
-	    hL1Jet_IEta->Fill(IEta);
-	    hL1Jet_IPhi->Fill(IPhi);
-	    hL1Jet_Bx->Fill(Bx);
-	    hL1Jet_RawEt->Fill(RawEt);
-	    hL1Jet_SeedEt->Fill(SeedEt);
-	    hL1Jet_TowerIPhi->Fill(TowerIPhi);
-	    hL1Jet_TowerIEta->Fill(TowerIEta);
-	    hL1Jet_PUEt->Fill(PUEt);
-	    hL1Jet_PUDonutEt0->Fill(PUDonutEt0);
-	    hL1Jet_PUDonutEt1->Fill(PUDonutEt1);
-	    hL1Jet_PUDonutEt2->Fill(PUDonutEt2);
-	    hL1Jet_PUDonutEt3->Fill(PUDonutEt3);
-	  }
-
+      if (cfg_AddJets)
+	{
+	  if (cfg_DEBUG) cout << "\n=== L1Jets (" << L1Jet_Et->size() << ")" << endl;
+	  vector<L1Jet> L1Jets = GetL1Jets(cfg_DEBUG);
+	  
+	  hL1Jet_nJets->Fill(L1Jet_Et->size()); //L1Jet_nJets);      
+	  // For-loop: L1 Jets
+	  for (auto jet = L1Jets.begin(); jet != L1Jets.end(); jet++)
+	    {
+	      short Index      = jet->getIndex();
+	      float Et         = jet->getEt();
+	      float Eta        = jet->getEta();
+	      float Phi        = jet->getPhi();
+	      short IET        = jet->getIET();
+	      short IEta       = jet->getIEta();
+	      short IPhi       = jet->getIPhi();
+	      short Bx         = jet->getBx();
+	      short RawEt      = jet->getRawEt();
+	      short SeedEt     = jet->getSeedEt();
+	      short TowerIEta  = 0; //jet->getTowerIEta();
+	      short TowerIPhi  = 0; //jet->getTowerIPhi();
+	      short PUEt       = jet->getPUEt();
+	      short PUDonutEt0 = jet->getPUDonutEt0();
+	      short PUDonutEt1 = jet->getPUDonutEt1();
+	      short PUDonutEt2 = jet->getPUDonutEt2();
+	      short PUDonutEt3 = jet->getPUDonutEt3();
+	      
+	      // Fill Histograms
+	      hL1Jet_Index->Fill(Index);
+	      hL1Jet_Et->Fill(Et);
+	      hL1Jet_Eta->Fill(Eta);
+	      hL1Jet_Phi->Fill(Phi);
+	      hL1Jet_IET->Fill(IET);
+	      hL1Jet_IEta->Fill(IEta);
+	      hL1Jet_IPhi->Fill(IPhi);
+	      hL1Jet_Bx->Fill(Bx);
+	      hL1Jet_RawEt->Fill(RawEt);
+	      hL1Jet_SeedEt->Fill(SeedEt);
+	      hL1Jet_TowerIPhi->Fill(TowerIPhi);
+	      hL1Jet_TowerIEta->Fill(TowerIEta);
+	      hL1Jet_PUEt->Fill(PUEt);
+	      hL1Jet_PUDonutEt0->Fill(PUDonutEt0);
+	      hL1Jet_PUDonutEt1->Fill(PUDonutEt1);
+	      hL1Jet_PUDonutEt2->Fill(PUDonutEt2);
+	      hL1Jet_PUDonutEt3->Fill(PUDonutEt3);
+	    }
+	}
 
       // ======================================================================
       // L1EG Collection
       // ======================================================================
-      if (cfg_DEBUG) cout << "\n=== L1EG (" << L1EG_Et->size() << ")" << endl;
-      vector<L1EG> L1EGs = GetL1EGs(cfg_DEBUG);
-
-      // hL1EG_nEGs->Fill(L1EG_nEGs->size());
-      // For-loop: L1 Jets
-      for (auto jet = L1Jets.begin(); jet != L1Jets.end(); jet++)
-	  {
-	    // short Index      = jet->getIndex();
-	    // float Et         = jet->getEt();
-	    // float Eta        = jet->getEta();
-	    // float Phi        = jet->getPhi();
-	    // short IET        = jet->getIET();
-	    // short IEta       = jet->getIEta();
-	    // short IPhi       = jet->getIPhi();
-	    // short Bx         = jet->getBx();
-	    // short RawEt      = jet->getRawEt();
-	    // short SeedEt     = jet->getSeedEt();
-	    // short TowerIEta  = 0; //jet->getTowerIEta();
-	    // short TowerIPhi  = 0; //jet->getTowerIPhi();
-	    // short PUEt       = jet->getPUEt();
-	    // short PUDonutEt0 = jet->getPUDonutEt0();
-	    // short PUDonutEt1 = jet->getPUDonutEt1();
-	    // short PUDonutEt2 = jet->getPUDonutEt2();
-	    // short PUDonutEt3 = jet->getPUDonutEt3();
-	    
-	    // // Fill Histograms
-	    // hL1Jet_Index->Fill(Index);
-	    // hL1Jet_Et->Fill(Et);
-	    // hL1Jet_Eta->Fill(Eta);
-	    // hL1Jet_Phi->Fill(Phi);
-	    // hL1Jet_IET->Fill(IET);
-	    // hL1Jet_IEta->Fill(IEta);
-	    // hL1Jet_IPhi->Fill(IPhi);
-	    // hL1Jet_Bx->Fill(Bx);
-	    // hL1Jet_RawEt->Fill(RawEt);
-	    // hL1Jet_SeedEt->Fill(SeedEt);
-	    // hL1Jet_TowerIPhi->Fill(TowerIPhi);
-	    // hL1Jet_TowerIEta->Fill(TowerIEta);
-	    // hL1Jet_PUEt->Fill(PUEt);
-	    // hL1Jet_PUDonutEt0->Fill(PUDonutEt0);
-	    // hL1Jet_PUDonutEt1->Fill(PUDonutEt1);
-	    // hL1Jet_PUDonutEt2->Fill(PUDonutEt2);
-	    // hL1Jet_PUDonutEt3->Fill(PUDonutEt3);
+      if (cfg_AddEGs)
+	{
+	  if (cfg_DEBUG) cout << "\n=== L1EG (" << L1EG_Et->size() << ")" << endl;
+	  vector<L1EG> L1EGs = GetL1EGs(cfg_DEBUG);
+	  
+	  hL1EG_nEGs->Fill(L1EG_Et->size());
+	  // For-loop: L1 Jets
+	  for (auto eg = L1EGs.begin(); eg != L1EGs.end(); eg++)
+	    {
+	      int index      = eg->getIndex();
+	      double Et      = eg->getEt();
+	      double Eta     = eg->getEta();
+	      double Phi     = eg->getPhi();
+	      int IEt        = eg->getIET();
+	      int IEta       = eg->getIEta();
+	      int IPhi       = eg->getIPhi();
+	      int Iso        = eg->getIso();
+	      int Bx         = eg->getBx();
+	      int TowerIPhi  = 0; // eg->getTowerIPhi();
+	      int TowerIEta  = 0; // eg->getTowerIEta();
+	      int RawEt      = eg->getRawEt();
+	      int IsoEt      = eg->getIsoEt();
+	      int FootprintEt= eg->getFootprintEt();
+	      int NTT        = eg->getNTT();
+	      int Shape      = eg->getShape();
+	      int TowerHoE   = eg->getTowerHoE();
+	      
+	      // Fill Histograms
+	      hL1EG_Index->Fill(index);
+	      hL1EG_Et->Fill(Et);
+	      hL1EG_Eta->Fill(Eta);
+	      hL1EG_Phi->Fill(Phi);
+	      hL1EG_IEt->Fill(IEt);
+	      hL1EG_IEta->Fill(IEta);
+	      hL1EG_IPhi->Fill(IPhi);
+	      hL1EG_Iso->Fill(Iso);
+	      hL1EG_Bx->Fill(Bx);
+	      hL1EG_TowerIPhi->Fill(TowerIPhi);
+	      hL1EG_TowerIEta->Fill(TowerIEta);
+	      hL1EG_RawEt->Fill(RawEt);
+	      hL1EG_IsoEt->Fill(IsoEt);
+	      hL1EG_FootprintEt->Fill(FootprintEt);
+	      hL1EG_NTT->Fill(NTT);
+	      hL1EG_Shape->Fill(Shape);
+	      hL1EG_TowerHoE->Fill(TowerHoE);
 	  }
-      
-      
+	}
+
+      // ======================================================================
+      // L1Sum Collection
+      // ======================================================================
+      if (cfg_AddSums)
+	{
+	  if (cfg_DEBUG) cout << "\n=== L1Sum (" << L1Sum_Et->size() << ")" << endl;
+	  vector<L1Sum> L1Sums = GetL1Sums(cfg_DEBUG);
+	  
+	  hL1Sum_nSums->Fill(L1Sum_Et->size());
+	  // For-loop: L1 Jets
+	  for (auto sum = L1Sums.begin(); sum != L1Sums.end(); sum++)
+	    {
+	      unsigned short theIndex = sum->getIndex();
+	      float theEt       = sum->getEt();
+	      float thePhi      = sum->getPhi();
+	      short int theIEt  = sum->getIEt();
+	      short int theIPhi = sum->getIPhi();
+	      short int theType = sum->getType();
+	      short int theBx   = sum->getBx();
+	      
+	      // Fill Histograms
+	      hL1Sum_Index->Fill(theIndex);
+	      hL1Sum_Et   ->Fill(theEt);
+	      hL1Sum_Phi  ->Fill(thePhi);
+	      hL1Sum_IEt  ->Fill(theIEt);
+	      hL1Sum_IPhi ->Fill(theIPhi);
+	      hL1Sum_Bx   ->Fill(theBx);
+	      hL1Sum_Type ->Fill(theType);
+	    }	      
+	}
+	  
+	  
+      // ======================================================================
+      // L1Muons Collection
+      // ======================================================================
+      if (cfg_AddMuons)
+	{
+	  
+	}
+
+
       ////////////////////////////////////////////////
       // Fill histograms
       ////////////////////////////////////////////////
@@ -623,7 +675,7 @@ void Sanity::BookHistos_(void)
   // L1Jets
   histoTools_.BookHisto_1D(hL1Jet_Index     , "L1Jet_Index"     , "; index of L1 Tau; Entries"       ,  20,  +0.0,  20.0);
   histoTools_.BookHisto_1D(hL1Jet_nJets     , "L1Jet_nJets"     , "; L1Jet multiplicity; Entries"    ,  20,  +0.0,  20.0);
-  histoTools_.BookHisto_1D(hL1Jet_Et        , "L1Jet_Et"        , "; E_{T} (GeV/; Entries"           ,  60,  +0.0, 300.0);
+  histoTools_.BookHisto_1D(hL1Jet_Et        , "L1Jet_Et"        , "; E_{T} (GeV); Entries"           ,  60,  +0.0, 300.0);
   histoTools_.BookHisto_1D(hL1Jet_Eta       , "L1Jet_Eta"       , "; #eta; Entries"                  , 300,  -6.0,   6.0);
   histoTools_.BookHisto_1D(hL1Jet_Phi       , "L1Jet_Phi"       , "; #phi (rads); Entries"           , 128,  -3.2,   3.2);
   histoTools_.BookHisto_1D(hL1Jet_IET       , "L1Jet_IET"       , "; I-E_{T} (GeV/c); Entries"       , 200,   0.0, 200.0);
@@ -640,6 +692,35 @@ void Sanity::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1Jet_PUDonutEt2, "L1Jet_PUDonutEt2", "; PU Donut E_{T,2} (GeV); Entries", 250,   0.0, 250.0);
   histoTools_.BookHisto_1D(hL1Jet_PUDonutEt3, "L1Jet_PUDonutEt3", "; PU Donut E_{T,3} (GeV); Entries", 500,   0.0, 500.0);
 
+  // L1EGs
+  histoTools_.BookHisto_1D(hL1EG_Index      , "L1EG_Index"       , "; index of L1 EG; Entries"       ,  20,  +0.0,   20.0);
+  histoTools_.BookHisto_1D(hL1EG_nEGs       , "L1EG_nEGs"        , "; L1EG multiplicity; Entries"    ,  20,  +0.0,   20.0);
+  histoTools_.BookHisto_1D(hL1EG_Et         , "L1EG_Et"          , "; E_{T} (GeV); Entries"          ,  60,  +0.0,  300.0);
+  histoTools_.BookHisto_1D(hL1EG_Eta        , "L1EG_Eta"         , "; #eta; Entries"                 , 300,  -6.0,    6.0);
+  histoTools_.BookHisto_1D(hL1EG_Phi        , "L1EG_Phi"         , "; #phi (rads); Entries"          , 128,  -3.2,    3.2);
+  histoTools_.BookHisto_1D(hL1EG_IEt        , "L1EG_IEt"         , "; I E_{T} (GeV); Entries"        , 200,   0.0,  200.0);
+  histoTools_.BookHisto_1D(hL1EG_IEta       , "L1EG_IEta"        , "; I-#eta; Entries"               ,  66, -33.0,   33.0);
+  histoTools_.BookHisto_1D(hL1EG_IPhi       , "L1EG_IPhi"        , "; I-#phi (rads); Entries"        , 145,   0.0,  145.0);
+  histoTools_.BookHisto_1D(hL1EG_Iso        , "L1EG_Iso"         , "; Iso; Entries"                  ,   2,  -0.5,    1.5);
+  histoTools_.BookHisto_1D(hL1EG_Bx         , "L1EG_Bx"          , "; Bx; Entries"                   , 200,   0.0,  200.0);
+  histoTools_.BookHisto_1D(hL1EG_TowerIPhi  , "L1EG_TowerIPhi"   , "; Tower I-#phi (rads); Entries"  , 200,   0.0,  200.0);
+  histoTools_.BookHisto_1D(hL1EG_TowerIEta  , "L1EG_TowerIEta"   , "; Tower I-#eta; Entries"         , 200,   0.0,  200.0);
+  histoTools_.BookHisto_1D(hL1EG_RawEt      , "L1EG_RawEt"       , "; Raw E_{T} (GeV); Entries"      , 400,   0.0, 2000.0);
+  histoTools_.BookHisto_1D(hL1EG_IsoEt      , "L1EG_IsoEt"       , "; Iso E_{T} (GeV); Entries"      , 400,   0.0, 2000.0);
+  histoTools_.BookHisto_1D(hL1EG_FootprintEt, "L1EG_FootprintEt" , "; Footprint E_{T} (GeV); Entries", 400,   0.0, 2000.0);
+  histoTools_.BookHisto_1D(hL1EG_NTT        , "L1EG_NTT"         , "; NTT; Entries"                  , 200,   0.0,  200.0);
+  histoTools_.BookHisto_1D(hL1EG_Shape      , "L1EG_Shape"       , "; Shape; Entries"                , 200,   0.0,  200.0);
+  histoTools_.BookHisto_1D(hL1EG_TowerHoE   , "L1EG_TowerHoE"    , "; Tower H/E; Entries"            ,  30, -10.0,   20.0);
+
+  // L1Sums
+  histoTools_.BookHisto_1D(hL1Sum_Index, "L1Sum_Index", "; index of L1 EG; Entries"       ,  20,  +0.0,   20.0);
+  histoTools_.BookHisto_1D(hL1Sum_nSums, "L1Sum_nSums", "; L1EG multiplicity; Entries"    ,  20,  +0.0,   20.0);
+  histoTools_.BookHisto_1D(hL1Sum_Et   , "L1Sum_Et"   , "; E_{T} (GeV); Entries"          , 600,  +0.0, 3000.0);
+  histoTools_.BookHisto_1D(hL1Sum_Phi  , "L1Sum_Phi"  , "; #phi (rads); Entries"          , 128,  -3.2,    3.2);
+  histoTools_.BookHisto_1D(hL1Sum_IEt  , "L1Sum_IEt"  , "; I E_{T} (GeV); Entries"        , 600,  +0.0, 3000.0);
+  histoTools_.BookHisto_1D(hL1Sum_IPhi , "L1Sum_IPhi" , "; I-#phi (rads); Entries"        , 145,   0.0,  145.0);
+  histoTools_.BookHisto_1D(hL1Sum_Bx   , "L1Sum_Bx"   , "; Bx; Entries"                   , 200,   0.0,  200.0);
+  histoTools_.BookHisto_1D(hL1Sum_Type , "L1Sum_Type" , "; Type; Entries"                 ,  30,   0.0,   30.0);
 
   return;
 }
@@ -1279,7 +1360,6 @@ L1Jet Sanity::GetL1Jet(unsigned int Index)
 vector<L1EG> Sanity::GetL1EGs(bool bPrintList)
 //============================================================================
 {
-
   vector<L1EG> theL1EGs;
   L1EG theL1EG;
 
@@ -1293,7 +1373,6 @@ vector<L1EG> Sanity::GetL1EGs(bool bPrintList)
   if (bPrintList) PrintL1EGCollection(theL1EGs); 
   return theL1EGs;
 }
-
 
 //============================================================================
 L1EG Sanity::GetL1EG(unsigned int Index)
@@ -1321,23 +1400,43 @@ L1EG Sanity::GetL1EG(unsigned int Index)
     return theL1EG;
 }
 
-
 //============================================================================
-void Sanity::GetL1Sum(unsigned int Index)
+L1Sum Sanity::GetL1Sum(unsigned int Index)
 //============================================================================
 {
 
-  cout << "nSums        = " << L1Sum_Et->size()
-       << "\nL1Sum_umType = " << L1Sum_Type->at(Index)
-       << "\nL1Sum_umEt   = " << L1Sum_Et->at(Index)
-       << "\nL1Sum_umPhi  = " << L1Sum_Phi->at(Index)
-       << "\nL1Sum_umIET  = " << L1Sum_IET->at(Index)
-       << "\nL1Sum_umIPhi = " << L1Sum_IPhi->at(Index)
-       << "\nL1Sum_umBx   = " << L1Sum_Bx->at(Index)
-       << "\n" << endl;
-  
-  return;
+  L1Sum theL1Sum(Index,
+		 L1Sum_Et->at(Index),
+		 L1Sum_Phi->at(Index),
+		 L1Sum_IET->at(Index),
+		 L1Sum_IPhi->at(Index),
+		 L1Sum_Type->at(Index),
+		 L1Sum_Bx->at(Index));
+
+  return theL1Sum;
 }
+
+
+//============================================================================
+vector<L1Sum> Sanity::GetL1Sums(bool bPrintList)
+//============================================================================
+{
+
+  vector<L1Sum> theL1Sums;
+  L1Sum theL1Sum;
+
+  // For-loop: All L1 EG
+  for (Size_t i = 0; i < L1Sum_Et->size(); i++)
+    {
+      theL1Sum = GetL1Sum(i);
+      theL1Sums.push_back(theL1Sum);
+    }
+  
+  if (bPrintList) PrintL1SumCollection(theL1Sums); 
+  return theL1Sums;
+}
+
+#endif
 
 
 //============================================================================
@@ -1451,6 +1550,32 @@ void Sanity::PrintL1EGCollection(vector<L1EG> collection)
 
 
 //============================================================================
+void Sanity::PrintL1SumCollection(vector<L1Sum> collection)
+//============================================================================
+{
+  
+  Table info("Index | Et | Phi | IEt | IPhi | Type | Bx", "Text");
+  
+  // For-loop: All L1Sum
+  int row=0;
+  for (auto p = collection.begin(); p != collection.end(); p++, row++)
+  {
+    // Construct table
+    info.AddRowColumn(row, auxTools_.ToString( p->getIndex() ) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getEt()  , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPhi() , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIEt() , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIPhi(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getType(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getBx()  , 3) );
+  }
+
+  info.Print();
+  return;
+}
+
+
+//============================================================================
 void Sanity::PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection)
 //============================================================================
 {
@@ -1483,22 +1608,3 @@ void Sanity::PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection)
   info.Print();
   return;
 }
-
-
-
-//============================================================================
-void Sanity::GetL1Sums(bool bPrintList)
-//============================================================================
-{
-
-  // For-loop: All L1 Sums
-  for (Size_t i = 0; i < L1Sum_Et->size(); i++)
-    {
-      // cout << "L1Sum(" << i << ")" << endl;
-      if (bPrintList) GetL1Sum(i);
-    }
-  
-  return;
-}
-
-#endif
