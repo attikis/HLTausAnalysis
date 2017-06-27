@@ -349,38 +349,51 @@ void Sanity::Loop()
       // ======================================================================
       // Tau Collection
       // ======================================================================
-      if (cfg_DEBUG) cout << "=== Taus (" << L1Tau_Et->size() << ")" << endl;
-      vector<L1JetParticle> L1Taus = GetL1Taus(cfg_DEBUG);
+      if (cfg_DEBUG) cout << "\n=== Taus (" << L1Tau_Et->size() << ")" << endl;
+      // vector<L1JetParticle> L1Taus = GetL1Taus(cfg_DEBUG);
+      vector<L1Tau> L1Taus = GetL1Taus(cfg_DEBUG);
 
-      // For-loop: TTTracks
-      // unsigned short int tau_nTaus = L1Tau_nTaus;
-      for (auto tau = L1Taus.begin(); tau != L1Taus.end(); tau++)
+      // For-loop: L1 Taus
+      int index = 0;
+      for (auto tau = L1Taus.begin(); tau != L1Taus.end(); tau++, index++)
 	  {
-	    double tau_pt      = tau->et();
-	    double tau_eta     = tau->eta();
-	    double tau_phi     = tau->phi();
-	    // short int tau_IET  = tau->(); // add to class
-	    // short int tau_IEta = tau->();
-	    // short int tau_IPhi = tau->();
-	    // short int tau_Iso  = tau->();
-	    short int tau_Bx   = tau->bx();
-	    // short int tau_TowerIPhi = tau->();
-	    // short int tau_TowerIEta = tau->();
-	    // short int tau_RawEt     = tau->();
-	    // short int tau_IsoEt     = tau->();
-	    // short int tau_NTT       = tau->();
-	    // short int tau_HasEM     = tau->();
-	    // short int tau_IsMerged  = tau->();
-	    // short int tau_HwQual    = tau->();
 	    
+	    double tau_et           = tau->getEt();
+	    double tau_eta          = tau->getEta();
+	    double tau_phi          = tau->getPhi();
+	    short int tau_IET       = tau->getIET();
+	    short int tau_IEta      = tau->getIEta();
+	    short int tau_IPhi      = tau->getIPhi();
+	    short int tau_Iso       = tau->getIso();
+	    short int tau_Bx        = tau->getBx();
+	    short int tau_TowerIPhi = 0; //tau->getTowerIPhi();
+	    short int tau_TowerIEta = 0; //tau->getTowerIEta();
+	    short int tau_RawEt     = tau->getRawEt();
+	    short int tau_IsoEt     = tau->getIsoEt();
+	    short int tau_NTT       = tau->getNTT();
+	    short int tau_HasEM     = tau->getHasEM();
+	    short int tau_IsMerged  = tau->getIsMerged();
+	    short int tau_HwQual    = tau->getHwQual();
 	    
-	    // if (0) tau->PrintProperties();
-	    // if (0) tau->PrintAllProperties();
-
 	    // Fill Histograms
-	    // hL1Taus_Et ->Fill(tk_pt);
-	    // hL1Taus_Eta->Fill(tk_eta);
-	    // hL1Taus_Phi->Fill(tk_phi);
+	    hL1Tau_Index->Fill(index);
+	    hL1Tau_Et->Fill(tau_et);
+	    hL1Tau_Eta->Fill(tau_eta);
+	    hL1Tau_Phi->Fill(tau_phi);
+	    hL1Tau_IET->Fill(tau_IET);
+	    hL1Tau_IEta->Fill(tau_IEta);
+	    hL1Tau_IPhi->Fill(tau_IPhi);
+	    hL1Tau_Iso->Fill(tau_Iso);
+	    hL1Tau_Bx->Fill(tau_Bx);
+	    hL1Tau_TowerIPhi->Fill(tau_TowerIPhi);
+	    hL1Tau_TowerIEta->Fill(tau_TowerIEta);
+	    hL1Tau_RawEt->Fill(tau_RawEt);
+	    hL1Tau_IsoEt->Fill(tau_IsoEt);
+	    hL1Tau_NTT->Fill(tau_NTT);
+	    hL1Tau_HasEM->Fill(tau_HasEM);
+	    hL1Tau_IsMerged->Fill(tau_IsMerged);
+	    hL1Tau_HwQual->Fill(tau_HwQual);
+
 	  }
 
       
@@ -489,6 +502,26 @@ void Sanity::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1Tks_NStubsEndcap, "L1Tks_NStubsEndcap", "; stub multiplicity (E)", 13, -0.5, 12.5);
   histoTools_.BookHisto_1D(hL1Tks_TP_Index, "L1Tks_TP_Index", "; index of matched TP", 301, -0.5, 300.5);
 
+  // L1Taus 
+  histoTools_.BookHisto_1D(hL1Tau_Index    , "L1Tau_Index"    , "; index of L1 Tau; Entries"    ,  20, +0.0,  20.0);
+  histoTools_.BookHisto_1D(hL1Tau_nTaus    , "L1Tau_nTaus"    , "; L1Taus multiplicity; Entries",  20, +0.0,  20.0);
+  histoTools_.BookHisto_1D(hL1Tau_Et       , "L1Tau_Et"       , "; E_{T} (GeV/; Entries"        ,  60, +0.0, 300.0);
+  histoTools_.BookHisto_1D(hL1Tau_Eta      , "L1Tau_Eta"      , "; #eta; Entries"               , 130, -2.6,   2.6);
+  histoTools_.BookHisto_1D(hL1Tau_Phi      , "L1Tau_Phi"      , "; #phi (rads); Entries"        , 128, -3.2,   3.2);
+  histoTools_.BookHisto_1D(hL1Tau_IET      , "L1Tau_IET"      , "; I-E_{T} (GeV/c); Entries"    , 200,  0.0, 200.0);
+  histoTools_.BookHisto_1D(hL1Tau_IEta     , "L1Tau_IEta"     , "; I-#eta; Entries"             ,  66,-33.0, +33.0);
+  histoTools_.BookHisto_1D(hL1Tau_IPhi     , "L1Tau_IPhi"     , "; I-#phi (rads); Entries"      , 145,  0.0, 145.0);
+  histoTools_.BookHisto_1D(hL1Tau_Iso      , "L1Tau_Iso"      , "; Iso; Entries"                , 100,  0.0, 100.0);
+  histoTools_.BookHisto_1D(hL1Tau_Bx       , "L1Tau_Bx"       , "; BX; Entries"                 , 200,  0.0, 200.0);
+  histoTools_.BookHisto_1D(hL1Tau_TowerIPhi, "L1Tau_TowerIPhi", "; Tower I-#phi (rads); Entries", 128, -3.2,   3.2); 
+  histoTools_.BookHisto_1D(hL1Tau_TowerIEta, "L1Tau_TowerIEta", "; Tower I-#eta; Entries"       , 130, -2.6,   2.6);
+  histoTools_.BookHisto_1D(hL1Tau_RawEt    , "L1Tau_RawEt"    , "; Raw E_{T} (GeV); Entries"    ,  60,  0.0, 300.0);
+  histoTools_.BookHisto_1D(hL1Tau_IsoEt    , "L1Tau_IsoEt"    , "; Iso E_{T} (GeV); Entries"    ,  60,  0.0, 300.0);
+  histoTools_.BookHisto_1D(hL1Tau_NTT      , "L1Tau_NTT"      , "; NTT; Entries"                , 200,  0.0, 200.0);
+  histoTools_.BookHisto_1D(hL1Tau_HasEM    , "L1Tau_HasEM"    , "; has EM; Entries"             ,   2, -0.5,   1.5);
+  histoTools_.BookHisto_1D(hL1Tau_IsMerged , "L1Tau_IsMerged" , "; is Merged; Entries"          ,   2, -0.5,   1.5);
+  histoTools_.BookHisto_1D(hL1Tau_HwQual   , "L1Tau_HwQual"   , "; Hw Qual; Entries"            ,   2, -0.5,   1.5);
+			     
   return;
 }
 
@@ -837,7 +870,7 @@ TTTrack Sanity::GetTTTrack(unsigned int Index,
 vector<TrackingParticle> Sanity::GetTrackingParticles(bool bPrintList)
 //============================================================================
 {
-  if (cfg_DEBUG) std::cout << "=== Sanity::GetTrackingParticles()" << std::endl;
+  if (cfg_DEBUG*0) std::cout << "=== Sanity::GetTrackingParticles()" << std::endl;
   
   vector<TrackingParticle> theTrackingParticles;
 
@@ -1008,37 +1041,68 @@ void Sanity::PrintGenParticleCollection(vector<GenParticle> collection)
 
 
 //============================================================================
-vector<L1JetParticle> Sanity::GetL1Taus(bool bPrintList)
+vector<L1Tau> Sanity::GetL1Taus(bool bPrintList)
 //============================================================================
 {
-  vector<L1JetParticle> theL1Taus;
-  L1JetParticle theL1Tau;
+  vector<L1Tau> theL1Taus;
+  L1Tau theL1Tau;
+
   // For-loop: All L1Taus
   for (Size_t iCalo = 0; iCalo < L1Tau_Et->size(); iCalo++)
-    {
-      // cout << "iCalo = " << iCalo << endl;-
-      theL1Tau = GetL1Tau(iCalo); 
+    { 
+      theL1Tau = GetL1Tau(iCalo);
+      // if (bPrintList) theL1Tau.PrintProperties(false);
       theL1Taus.push_back( theL1Tau );
     }
   
-  if (bPrintList) PrintL1JetParticleCollection(theL1Taus); 
+  if (bPrintList) PrintL1TauCollection(theL1Taus); 
   return theL1Taus;
 }
 
 
 //============================================================================
-L1JetParticle Sanity::GetL1Tau(unsigned int Index)
+L1Tau Sanity::GetL1Tau(unsigned int Index)
 //============================================================================
 {
 
-  //double E    = tau_E->at(Index);
-  double Et   = L1Tau_Et->at(Index);
-  double Eta  = L1Tau_Eta->at(Index);
-  double Phi  = L1Tau_Phi->at(Index);
-  double Bx   = L1Tau_Bx->at(Index);   // tauBx->size()=6, while tauEt->size()=12
-  double Type = -1.0; // missing from tree
-  // cout << "GeL1Tau returns theL1Tau(" << Index << ", " << Et << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << " , -1)" << endl;
-  L1JetParticle theL1Tau(Index, Et, Et, Eta, Phi, Bx, Type);
+  if (0)
+    {
+      std::cout << " 1: " << L1Tau_Et->at(Index) << std::endl;
+      std::cout << " 2: " << L1Tau_Eta->at(Index) << std::endl;
+      std::cout << " 3: " << L1Tau_Phi->at(Index) << std::endl;
+      std::cout << " 4: " << L1Tau_IET->at(Index) << std::endl;
+      std::cout << " 5: " << L1Tau_IEta->at(Index) << std::endl;
+      std::cout << " 6: " << L1Tau_IPhi->at(Index) << std::endl;
+      std::cout << " 7: " << L1Tau_Iso->at(Index) << std::endl;
+      std::cout << " 8: " << L1Tau_Bx->at(Index) << std::endl;
+      // std::cout << " 9: " << L1Tau_TowerIPhi->at(Index) << std::endl;
+      // std::cout << "10: " << L1Tau_TowerIEta->at(Index) << std::endl;
+      std::cout << "11: " << L1Tau_RawEt->at(Index) << std::endl;
+      std::cout << "12: " << L1Tau_IsoEt->at(Index) << std::endl;
+      std::cout << "13: " << L1Tau_NTT->at(Index) << std::endl;
+      std::cout << "14: " << L1Tau_HasEM->at(Index) << std::endl;
+      std::cout << "15: " << L1Tau_IsMerged->at(Index) << std::endl;
+      std::cout << "16: " << L1Tau_HwQual->at(Index) << std::endl;
+    }
+  
+  L1Tau theL1Tau(Index,
+			 L1Tau_Et->at(Index),
+			 L1Tau_Eta->at(Index),
+			 L1Tau_Phi->at(Index),
+			 L1Tau_IET->at(Index),
+			 L1Tau_IEta->at(Index),
+			 L1Tau_IPhi->at(Index),
+			 L1Tau_Iso->at(Index),
+			 L1Tau_Bx->at(Index),
+			 0, //L1Tau_TowerIPhi->at(Index),
+			 0, //L1Tau_TowerIEta->at(Index),
+			 L1Tau_RawEt->at(Index),
+			 L1Tau_IsoEt->at(Index),
+			 L1Tau_NTT->at(Index),
+			 L1Tau_HasEM->at(Index),
+			 L1Tau_IsMerged->at(Index),
+			 L1Tau_HwQual->at(Index)
+			 );
 
   return theL1Tau;
 }
@@ -1046,36 +1110,40 @@ L1JetParticle Sanity::GetL1Tau(unsigned int Index)
 
 
 //============================================================================
-vector<L1JetParticle> Sanity::GetL1Jets(bool bPrintList)
+vector<L1Tau> Sanity::GetL1Jets(bool bPrintList)
 //============================================================================
 {
 
-  vector<L1JetParticle> theL1Jets;
-  L1JetParticle theL1Jet;
+  vector<L1Tau> theL1Jets;
+  L1Tau theL1Jet;
+  //int counter = -1;
   
   // For-loop: All L1 Jets
   for (Size_t i = 0; i < L1Jet_Et->size(); i++)
     {
-      theL1Jet = GetL1Jet(i); 
+      //counter++;
+      
+      theL1Jet = GetL1Jet(i);
+      // if (bPrintList) theL1Jet.PrintProperties(counter==0);
       theL1Jets.push_back(theL1Jet);
     }
   
-  if (bPrintList) PrintL1JetParticleCollection(theL1Jets); 
+  if (bPrintList) PrintL1TauCollection(theL1Jets); 
   return theL1Jets;
 }
 
 
 //============================================================================
-L1JetParticle Sanity::GetL1Jet(unsigned int Index)
+L1Tau Sanity::GetL1Jet(unsigned int Index)
 //============================================================================
 {
 
-  // int nJets = nJets->at(Index);
-  double Et   = L1Jet_Et->at(Index);
-  double Eta  = L1Jet_Eta->at(Index);
-  double Phi  = L1Jet_Phi->at(Index);
-  double Bx   = L1Jet_Bx->at(Index);
-  double Type = -1.0;
+  // // int nJets = nJets->at(Index);
+  // double Et   = L1Jet_Et->at(Index);
+  // double Eta  = L1Jet_Eta->at(Index);
+  // double Phi  = L1Jet_Phi->at(Index);
+  // double Bx   = L1Jet_Bx->at(Index);
+  //  double Type = -1.0;
   // L1Jet_IEt       
   // L1Jet_IEta      
   // L1Jet_IPhi      
@@ -1091,7 +1159,7 @@ L1JetParticle Sanity::GetL1Jet(unsigned int Index)
   // L1Jet_PUDonutEt3
 
   // cout << "GeL1Jet returns theL1Jet(" << Index << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << "," << Type << ")" << endl;
-  L1JetParticle theL1Jet(Index, Et, Et, Eta, Phi, Bx, Type);
+  L1Tau theL1Jet; //(Index, Et, Et, Eta, Phi, Bx, Type);
 
   return theL1Jet;
 }
@@ -1192,25 +1260,36 @@ void Sanity::GetL1Sum(unsigned int Index)
 
 
 //============================================================================
-void Sanity::PrintL1JetParticleCollection(vector<L1JetParticle> collection)
+void Sanity::PrintL1TauCollection(vector<L1Tau> collection)
 //============================================================================
 {
   
-  Table info("Index | Energy | Et | Eta | Phi | Bx | Type", "Text");
+  Table info("Index | Et | Eta | Phi | IET | IPhi | Iso | Bx | TowerIPhi | TowerIEta | RawEt | IsoEt | NTT | HasEM | IsMerged | HwQual | Type", "Text");
 
-  // For-loop: All L1JetParticles
+  // For-loop: All L1Taus
   int row=0;
   for (auto p = collection.begin(); p != collection.end(); p++)
   {
     // Construct table
-    info.AddRowColumn(row, auxTools_.ToString( p->index() , 4) );
-    info.AddRowColumn(row, auxTools_.ToString( p->energy(), 4) );
-    info.AddRowColumn(row, auxTools_.ToString( p->et()    , 4) );
-    info.AddRowColumn(row, auxTools_.ToString( p->eta()   , 4) );
-    info.AddRowColumn(row, auxTools_.ToString( p->phi()   , 4) );
-    info.AddRowColumn(row, auxTools_.ToString( p->bx()    , 4) );
-    info.AddRowColumn(row, auxTools_.ToString( p->type()  , 4) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIndex(), 1)     );
+    info.AddRowColumn(row, auxTools_.ToString( p->getEt(), 4)        );
+    info.AddRowColumn(row, auxTools_.ToString( p->getEta(), 4)       );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPhi(), 4)       );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIET() , 3)      );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIEta(), 3)      );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIPhi(), 3)      );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIso() , 3)      );
+    info.AddRowColumn(row, auxTools_.ToString( p->getBx()  , 3)      );
+    info.AddRowColumn(row, auxTools_.ToString( p->getTowerIPhi(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getTowerIEta(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getRawEt(), 3)     );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIsoEt(), 3)     );
+    info.AddRowColumn(row, auxTools_.ToString( p->getNTT(), 3)       );
+    info.AddRowColumn(row, auxTools_.ToString( p->getHasEM(), 3)     );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIsMerged(), 3)  );
+    info.AddRowColumn(row, auxTools_.ToString( p->getHwQual(), 3)    );
     row++;
+    
   }
 
   info.Print();

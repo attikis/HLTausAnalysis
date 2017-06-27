@@ -463,7 +463,7 @@ void CaloTk::Loop()
 
     
     // Tau Collections
-    vector<L1JetParticle> L1Taus = GetL1Taus(false);
+    vector<L1Tau> L1Taus = GetL1Taus(false);
     vector<L1TkTauParticle> L1TkTauCandidates;
     vector<L1TkTauParticle> L1TkTaus_Calo;
     vector<L1TkTauParticle> L1TkTaus_Tk;
@@ -471,7 +471,7 @@ void CaloTk::Loop()
 
 
     // alex: new-start
-    vector<L1JetParticle> L1Jets = GetL1Jets(true);
+    vector<L1Tau> L1Jets = GetL1Jets(true);
     GetL1EGs(true);
     GetL1Sums(true);
     // alex: new-end
@@ -483,7 +483,7 @@ void CaloTk::Loop()
     // ======================================================================================
     // For-loop: L1Taus
     // ======================================================================================
-    for (vector<L1JetParticle>::iterator calo = L1Taus.begin(); calo != L1Taus.end(); calo++)
+    for (vector<L1Tau>::iterator calo = L1Taus.begin(); calo != L1Taus.end(); calo++)
       {
 	// Calculate the Et-dependent signal & isolation cone sizes
 	GetShrinkingConeSizes(calo->et(), sigCone_Constant, isoCone_Constant, sigCone_cutoffDeltaR,
@@ -529,7 +529,7 @@ void CaloTk::Loop()
 
     if (DEBUG)
       {
-	PrintL1JetParticleCollection(L1Taus);
+	PrintL1TauCollection(L1Taus);
 	PrintL1TkTauParticleCollection(L1TkTauCandidates);
 	PrintL1TkTauParticleCollection(L1TkTaus_Calo);
 	PrintL1TkTauParticleCollection(L1TkTaus_Tk);
@@ -594,7 +594,7 @@ void CaloTk::Loop()
 	TTTrack matchTk   = tau->GetMatchingTk();
 	double matchTk_dR = auxTools_.DeltaR(matchTk.getEta(), matchTk.getPhi(), tau->GetCaloTau().eta(), tau->GetCaloTau().phi() );
 	TLorentzVector caloTau_p4;
-      	caloTau_p4.SetPtEtaPhiE(tau->GetCaloTau().et(), tau->GetCaloTau().eta(), tau->GetCaloTau().phi(), tau->GetCaloTau().energy() );
+      	caloTau_p4.SetPtEtaPhiE(tau->GetCaloTau().et(), tau->GetCaloTau().eta(), tau->GetCaloTau().phi(), tau->GetCaloTau().et() );
 	hL1TkTau_MatchTk_DeltaR        ->Fill( matchTk_dR );
 	hL1TkTau_MatchTk_PtRel         ->Fill( matchTk.p3().Perp(caloTau_p4.Vect()) );
 	hL1TkTau_MatchTk_Pt            ->Fill( matchTk.getPt() );
@@ -1508,7 +1508,7 @@ void CaloTk::FillTurnOn_Numerator_(vector<L1TkTauParticle> L1TkTaus,
 
 //============================================================================
 void CaloTk::GetMatchingTrack(L1TkTauParticle &L1TkTau,
-			      L1JetParticle L1Tau,
+			      L1Tau myL1Tau,
 			      vector<TTTrack> TTTracks)
 
 //============================================================================
@@ -1521,7 +1521,7 @@ void CaloTk::GetMatchingTrack(L1TkTauParticle &L1TkTau,
   // For-loop: All Tracks
   for (vector<TTTrack>::iterator tk = TTTracks.begin(); tk != TTTracks.end(); tk++)
     {
-      double dR = auxTools_.DeltaR(tk->getEta(), tk->getPhi(), L1Tau.eta(), L1Tau.phi());
+      double dR = auxTools_.DeltaR(tk->getEta(), tk->getPhi(), myL1Tau.eta(), myL1Tau.phi());
 
       // Only consider tracks within matching cone (0 <= DeltaR < matchTk_dR_max)
       if (dR > L1TkTau.GetMatchConeMax()) continue;
@@ -1535,7 +1535,7 @@ void CaloTk::GetMatchingTrack(L1TkTauParticle &L1TkTau,
     }
 
   // Assign values to the L1TkTau
-  L1TkTau.SetCaloTau(L1Tau);
+  L1TkTau.SetCaloTau(myL1Tau.index());
   L1TkTau.SetMatchingTk(matchTk);
   L1TkTau.SetMatchTkDeltaRNew(matchTk_dR);
   if (0) L1TkTau.PrintProperties(false, false, true, false);
@@ -1929,11 +1929,11 @@ TrackingParticle CaloTk::GetTrackingParticle(unsigned int Index)
 
 
 //============================================================================
-vector<L1JetParticle> CaloTk::GetL1Taus(bool bPrintList)
+vector<L1Tau> CaloTk::GetL1Taus(bool bPrintList)
 //============================================================================
 {
-  vector<L1JetParticle> theL1Taus;
-  L1JetParticle theL1Tau;
+  vector<L1Tau> theL1Taus;
+  L1Tau theL1Tau;
   // For-loop: All L1Taus
   for (Size_t iCalo = 0; iCalo < L1Tau_Et->size(); iCalo++)
     {
@@ -1942,24 +1942,34 @@ vector<L1JetParticle> CaloTk::GetL1Taus(bool bPrintList)
       theL1Taus.push_back( theL1Tau );
     }
   
-  if (bPrintList) PrintL1JetParticleCollection(theL1Taus); 
+  if (bPrintList) PrintL1TauCollection(theL1Taus); 
   return theL1Taus;
 }
 
 
 //============================================================================
-L1JetParticle CaloTk::GetL1Tau(unsigned int Index)
+L1Tau CaloTk::GetL1Tau(unsigned int Index)
 //============================================================================
 {
 
-  //double E    = tau_E->at(Index);
-  double Et   = L1Tau_Et->at(Index);
-  double Eta  = L1Tau_Eta->at(Index);
-  double Phi  = L1Tau_Phi->at(Index);
-  double Bx   = L1Tau_Bx->at(Index);   // tauBx->size()=6, while tauEt->size()=12
-  double Type = -1.0; // missing from tree
-  // cout << "GeL1Tau returns theL1Tau(" << Index << ", " << Et << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << " , -1)" << endl;
-  L1JetParticle theL1Tau(Index, Et, Et, Eta, Phi, Bx, Type);
+  L1Tau theL1Tau(Index,
+			 L1Tau_Et->at(Index),
+			 L1Tau_Eta->at(Index),
+			 L1Tau_Phi->at(Index),
+			 L1Tau_IET->at(Index),
+			 L1Tau_IEta->at(Index),
+			 L1Tau_IPhi->at(Index),
+			 L1Tau_Iso->at(Index),
+			 L1Tau_Bx->at(Index),
+			 0, //L1Tau_TowerIPhi->at(Index),
+			 0, //L1Tau_TowerIEta->at(Index),
+			 L1Tau_RawEt->at(Index),
+			 L1Tau_IsoEt->at(Index),
+			 L1Tau_NTT->at(Index),
+			 L1Tau_HasEM->at(Index),
+			 L1Tau_IsMerged->at(Index),
+			 L1Tau_HwQual->at(Index)
+			 );
 
   return theL1Tau;
 }
@@ -1967,12 +1977,12 @@ L1JetParticle CaloTk::GetL1Tau(unsigned int Index)
 
 
 //============================================================================
-vector<L1JetParticle> CaloTk::GetL1Jets(bool bPrintList)
+vector<L1Tau> CaloTk::GetL1Jets(bool bPrintList)
 //============================================================================
 {
 
-  vector<L1JetParticle> theL1Jets;
-  L1JetParticle theL1Jet;
+  vector<L1Tau> theL1Jets;
+  L1Tau theL1Jet;
   
   // For-loop: All L1 Jets
   for (Size_t i = 0; i < L1Jet_Et->size(); i++)
@@ -1981,13 +1991,13 @@ vector<L1JetParticle> CaloTk::GetL1Jets(bool bPrintList)
       theL1Jets.push_back(theL1Jet);
     }
   
-  if (bPrintList) PrintL1JetParticleCollection(theL1Jets); 
+  if (bPrintList) PrintL1TauCollection(theL1Jets); 
   return theL1Jets;
 }
 
 
 //============================================================================
-L1JetParticle CaloTk::GetL1Jet(unsigned int Index)
+L1Tau CaloTk::GetL1Jet(unsigned int Index)
 //============================================================================
 {
 
@@ -2012,7 +2022,7 @@ L1JetParticle CaloTk::GetL1Jet(unsigned int Index)
   // L1Jet_PUDonutEt3
 
   // cout << "GeL1Jet returns theL1Jet(" << Index << ", " << Et << " , " << Eta << ", " << Phi << ", " << Bx << "," << Type << ")" << endl;
-  L1JetParticle theL1Jet(Index, Et, Et, Eta, Phi, Bx, Type);
+  L1Tau theL1Jet;//(Index, Et, Et, Eta, Phi, Bx, Type);
 
   return theL1Jet;
 }
@@ -2360,25 +2370,37 @@ void CaloTk::PrintTTTrackCollection(vector<TTTrack> collection)
 
 
 //============================================================================
-void CaloTk::PrintL1JetParticleCollection(vector<L1JetParticle> collection)
+void CaloTk::PrintL1TauCollection(vector<L1Tau> collection)
 //============================================================================
 {
   
-  Table info("Index | Energy | Et | Eta | Phi | Bx | Type", "Text");
+  
+  Table info("Index | Et | Eta | Phi | IET | IPhi | Iso | Bx | TowerIPhi | TowerIEta | RawEt | IsoEt | NTT | HasEM | IsMerged | HwQual | Type", "Text");
 
-  // For-loop: All L1JetParticles
+  // For-loop: All L1Taus
   int row=0;
   for (auto p = collection.begin(); p != collection.end(); p++)
   {
     // Construct table
-    info.AddRowColumn(row, auxTools_.ToString( p->index() , 4) );
-    info.AddRowColumn(row, auxTools_.ToString( p->energy(), 4) );
-    info.AddRowColumn(row, auxTools_.ToString( p->et()    , 4) );
-    info.AddRowColumn(row, auxTools_.ToString( p->eta()   , 4) );
-    info.AddRowColumn(row, auxTools_.ToString( p->phi()   , 4) );
-    info.AddRowColumn(row, auxTools_.ToString( p->bx()    , 4) );
-    info.AddRowColumn(row, auxTools_.ToString( p->type()  , 4) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIndex(), 1)     );
+    info.AddRowColumn(row, auxTools_.ToString( p->getEt(), 4)        );
+    info.AddRowColumn(row, auxTools_.ToString( p->getEta(), 4)       );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPhi(), 4)       );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIET() , 3)      );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIEta(), 3)      );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIPhi(), 3)      );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIso() , 3)      );
+    info.AddRowColumn(row, auxTools_.ToString( p->getBx()  , 3)      );
+    info.AddRowColumn(row, auxTools_.ToString( p->getTowerIPhi(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getTowerIEta(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getRawEt(), 3)     );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIsoEt(), 3)     );
+    info.AddRowColumn(row, auxTools_.ToString( p->getNTT(), 3)       );
+    info.AddRowColumn(row, auxTools_.ToString( p->getHasEM(), 3)     );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIsMerged(), 3)  );
+    info.AddRowColumn(row, auxTools_.ToString( p->getHwQual(), 3)    );
     row++;
+    
   }
 
   info.Print();

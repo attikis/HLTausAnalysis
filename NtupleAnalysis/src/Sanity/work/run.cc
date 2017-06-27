@@ -4,7 +4,8 @@
 //
 // Example:
 // root -l
-// root[0] .x run.cc("multicrab_CaloTk_v910p2_test", "SingleTau-PU140", "", -1);
+// root[0].x run.cc("multicrab_CaloTk_v910p2_20170613T2048", "SingleTau_PU140", "", -1)
+// root[0].x run.cc("multicrab_CaloTk_v910p2_test", "SingleTau-PU140", "", -1);
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "../Sanity.C+" // how to compile macro in ROOT6 (compatible with ROOT5 as well)

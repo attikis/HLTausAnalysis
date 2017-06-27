@@ -20,7 +20,8 @@
 #include "../DataFormat/src/TrackingParticle.C"
 #include "../DataFormat/interface/TTTrack.h"
 #include "../DataFormat/interface/TTPixelTrack.h"
-#include "../DataFormat/src/L1JetParticle.C"
+#include "../DataFormat/src/L1Tau.C"
+//#include "../DataFormat/src/L1JetParticle.C"
 
 // #include "../Plugins/src/L1TkPrimaryVertex.C"
 #include "../Plugins/src/L1PixelTrackFit.C"
@@ -62,7 +63,7 @@ class Sanity : public TreeAnalyserMC{
 
   void PrintTTTrackCollection(vector<TTTrack> collection);
 
-  void PrintL1JetParticleCollection(vector<L1JetParticle> collection);
+  void PrintL1TauCollection(vector<L1Tau> collection);
 
   void PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection);
 
@@ -133,13 +134,13 @@ class Sanity : public TreeAnalyserMC{
   
   void GetL1Muons(bool bPrintList=false);
 
-  L1JetParticle GetL1Jet(unsigned int Index);
+  L1Tau GetL1Jet(unsigned int Index);
 
-  vector<L1JetParticle> GetL1Jets(bool bPrintList=false);
+  vector<L1Tau> GetL1Jets(bool bPrintList=false);
   
-  L1JetParticle GetL1Tau(unsigned int Index);
+  L1Tau GetL1Tau(unsigned int Index);
 
-  vector<L1JetParticle> GetL1Taus(bool bPrintList=false);
+  vector<L1Tau> GetL1Taus(bool bPrintList=false);
   
   void GetL1Sum(unsigned int Index);
 
@@ -181,7 +182,6 @@ class Sanity : public TreeAnalyserMC{
   TH1D* hGenP_FinalDaughters;
   TH1D* hGenP_FinalDaughtersCharged;
   TH1D* hGenP_FinalDaughtersNeutral;
-
 
   // TrackingParticles
   TH1D* hTP_Index;
@@ -229,6 +229,27 @@ class Sanity : public TreeAnalyserMC{
   TH1D* hL1Tks_NStubsBarrel;
   TH1D* hL1Tks_NStubsEndcap;
   TH1D* hL1Tks_TP_Index;
+
+  // L1Taus
+  TH1D* hL1Tau_Index;
+  TH1D* hL1Tau_nTaus;
+  TH1D* hL1Tau_Et;
+  TH1D* hL1Tau_Eta;
+  TH1D* hL1Tau_Phi;
+  TH1D* hL1Tau_IET;
+  TH1D* hL1Tau_IEta;
+  TH1D* hL1Tau_IPhi;
+  TH1D* hL1Tau_Iso;
+  TH1D* hL1Tau_Bx;
+  TH1D* hL1Tau_TowerIPhi;
+  TH1D* hL1Tau_TowerIEta;
+  TH1D* hL1Tau_RawEt;
+  TH1D* hL1Tau_IsoEt;
+  TH1D* hL1Tau_NTT;
+  TH1D* hL1Tau_HasEM;
+  TH1D* hL1Tau_IsMerged;
+  TH1D* hL1Tau_HwQual;
+
 
 
 };

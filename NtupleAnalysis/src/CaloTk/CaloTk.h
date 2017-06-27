@@ -20,7 +20,7 @@
 #include "../DataFormat/src/TrackingParticle.C"
 #include "../DataFormat/interface/TTTrack.h"
 #include "../DataFormat/interface/TTPixelTrack.h"
-#include "../DataFormat/src/L1JetParticle.C"
+#include "../DataFormat/src/L1Tau.C"
 
 // #include "../Plugins/src/L1TkPrimaryVertex.C"
 #include "../Plugins/src/L1PixelTrackFit.C"
@@ -65,7 +65,7 @@ class CaloTk : public TreeAnalyserMC{
 
   void PrintTTPixelTrackCollection(vector<TTPixelTrack> collection);
 
-  void PrintL1JetParticleCollection(vector<L1JetParticle> collection);
+  void PrintL1TauCollection(vector<L1Tau> collection);
 
   void PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection);
 
@@ -86,7 +86,7 @@ class CaloTk : public TreeAnalyserMC{
 			     double &isoCone_dRMax);
 
   void GetMatchingTrack(L1TkTauParticle &L1TkTau,
-			L1JetParticle L1CaloTau,
+			L1Tau L1CaloTau,
 			vector<TTTrack> TTTracks);
   
   void GetSigConeTracks(L1TkTauParticle &L1TkTau,
@@ -239,14 +239,14 @@ class CaloTk : public TreeAnalyserMC{
 
   void GetL1EG(unsigned int Index);
   void GetL1Muon(unsigned int Index);
-  L1JetParticle GetL1Jet(unsigned int Index);
-  L1JetParticle GetL1Tau(unsigned int Index);
+  L1Tau GetL1Jet(unsigned int Index);
+  L1Tau GetL1Tau(unsigned int Index);
   void GetL1Sum(unsigned int Index);
 
   void GetL1EGs(bool bPrintList=false);
   void GetL1Muons(bool bPrintList=false);
-  vector<L1JetParticle> GetL1Jets(bool bPrintList=false);
-  vector<L1JetParticle> GetL1Taus(bool bPrintList=false);
+  vector<L1Tau> GetL1Jets(bool bPrintList=false);
+  vector<L1Tau> GetL1Taus(bool bPrintList=false);
   void GetL1Sums(bool bPrintList=false);
   
   GenParticle GetGenParticle(unsigned int Index);

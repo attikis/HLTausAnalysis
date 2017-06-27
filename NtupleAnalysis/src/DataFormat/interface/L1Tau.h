@@ -1,5 +1,5 @@
-#ifndef L1JetParticle_h
-#define L1JetParticle_h
+#ifndef L1Tau_h
+#define L1Tau_h
 
 // System
 #include <iostream>
@@ -16,11 +16,11 @@
 
 using namespace std;
 
-class L1JetParticle{     
+class L1Tau{     
  public:
   // Constructors/Destructors
-  L1JetParticle();
-  L1JetParticle(unsigned short Index,
+  L1Tau();
+  L1Tau(unsigned short Index,
 		double Et,
 		double Eta,
 		double Phi,
@@ -37,7 +37,7 @@ class L1JetParticle{
 		short int HasEM,
 		short int IsMerged,
 		short int HwQual);
-  ~L1JetParticle();
+  ~L1Tau();
   
   void PrintProperties(bool printHeader=true);
   unsigned short index(void) const {return theIndex;}

@@ -1,11 +1,11 @@
-#ifndef L1JetParticle_cxx
-#define L1JetParticle_cxx
+#ifndef L1Tau_cxx
+#define L1Tau_cxx
 
 // User
-#include "../interface/L1JetParticle.h"
+#include "../interface/L1Tau.h"
 
 //****************************************************************************
-L1JetParticle::L1JetParticle()
+L1Tau::L1Tau()
 //****************************************************************************
 {
 
@@ -14,7 +14,7 @@ L1JetParticle::L1JetParticle()
 }
 
 //****************************************************************************
-void L1JetParticle::_InitVars(void)
+void L1Tau::_InitVars(void)
 //****************************************************************************
 {
 
@@ -40,7 +40,7 @@ void L1JetParticle::_InitVars(void)
 }
 
 //****************************************************************************
-L1JetParticle::~L1JetParticle()
+L1Tau::~L1Tau()
 //****************************************************************************
 {
 
@@ -48,7 +48,7 @@ L1JetParticle::~L1JetParticle()
 
 
 //****************************************************************************
-L1JetParticle::L1JetParticle(unsigned short Index,
+L1Tau::L1Tau(unsigned short Index,
 			     double Et,
 			     double Eta,
 			     double Phi,
@@ -94,7 +94,7 @@ L1JetParticle::L1JetParticle(unsigned short Index,
 }
 
 //****************************************************************************
-void L1JetParticle::PrintProperties(bool printHeader)
+void L1Tau::PrintProperties(bool printHeader)
 //****************************************************************************
 {
   
