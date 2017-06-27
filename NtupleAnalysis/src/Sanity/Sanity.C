@@ -445,6 +445,55 @@ void Sanity::Loop()
 	    hL1Jet_PUDonutEt3->Fill(PUDonutEt3);
 	  }
 
+
+      // ======================================================================
+      // L1EG Collection
+      // ======================================================================
+      if (cfg_DEBUG) cout << "\n=== L1EG (" << L1EG_Et->size() << ")" << endl;
+      vector<L1EG> L1EGs = GetL1EGs(cfg_DEBUG);
+
+      // hL1EG_nEGs->Fill(L1EG_nEGs->size());
+      // For-loop: L1 Jets
+      for (auto jet = L1Jets.begin(); jet != L1Jets.end(); jet++)
+	  {
+	    // short Index      = jet->getIndex();
+	    // float Et         = jet->getEt();
+	    // float Eta        = jet->getEta();
+	    // float Phi        = jet->getPhi();
+	    // short IET        = jet->getIET();
+	    // short IEta       = jet->getIEta();
+	    // short IPhi       = jet->getIPhi();
+	    // short Bx         = jet->getBx();
+	    // short RawEt      = jet->getRawEt();
+	    // short SeedEt     = jet->getSeedEt();
+	    // short TowerIEta  = 0; //jet->getTowerIEta();
+	    // short TowerIPhi  = 0; //jet->getTowerIPhi();
+	    // short PUEt       = jet->getPUEt();
+	    // short PUDonutEt0 = jet->getPUDonutEt0();
+	    // short PUDonutEt1 = jet->getPUDonutEt1();
+	    // short PUDonutEt2 = jet->getPUDonutEt2();
+	    // short PUDonutEt3 = jet->getPUDonutEt3();
+	    
+	    // // Fill Histograms
+	    // hL1Jet_Index->Fill(Index);
+	    // hL1Jet_Et->Fill(Et);
+	    // hL1Jet_Eta->Fill(Eta);
+	    // hL1Jet_Phi->Fill(Phi);
+	    // hL1Jet_IET->Fill(IET);
+	    // hL1Jet_IEta->Fill(IEta);
+	    // hL1Jet_IPhi->Fill(IPhi);
+	    // hL1Jet_Bx->Fill(Bx);
+	    // hL1Jet_RawEt->Fill(RawEt);
+	    // hL1Jet_SeedEt->Fill(SeedEt);
+	    // hL1Jet_TowerIPhi->Fill(TowerIPhi);
+	    // hL1Jet_TowerIEta->Fill(TowerIEta);
+	    // hL1Jet_PUEt->Fill(PUEt);
+	    // hL1Jet_PUDonutEt0->Fill(PUDonutEt0);
+	    // hL1Jet_PUDonutEt1->Fill(PUDonutEt1);
+	    // hL1Jet_PUDonutEt2->Fill(PUDonutEt2);
+	    // hL1Jet_PUDonutEt3->Fill(PUDonutEt3);
+	  }
+      
       
       ////////////////////////////////////////////////
       // Fill histograms
@@ -1227,80 +1276,51 @@ L1Jet Sanity::GetL1Jet(unsigned int Index)
 
 
 //============================================================================
-void Sanity::GetL1EGs(bool bPrintList)
+vector<L1EG> Sanity::GetL1EGs(bool bPrintList)
 //============================================================================
 {
 
-  // For-loop: All L1 EGs
+  vector<L1EG> theL1EGs;
+  L1EG theL1EG;
+
+  // For-loop: All L1 EG
   for (Size_t i = 0; i < L1EG_Et->size(); i++)
     {
-      // cout << "L1EG " << i << "/" << L1EG_Et->size() << endl;
-      if (bPrintList) GetL1EG(i);
+      theL1EG = GetL1EG(i);
+      theL1EGs.push_back(theL1EG);
     }
   
-  return;
+  if (bPrintList) PrintL1EGCollection(theL1EGs); 
+  return theL1EGs;
 }
 
 
 //============================================================================
-void Sanity::GetL1EG(unsigned int Index)
+L1EG Sanity::GetL1EG(unsigned int Index)
 //============================================================================
 {
   
-  double Et      = L1EG_Et->at(Index);
-  double Eta     = L1EG_Eta->at(Index);
-  double Phi     = L1EG_Phi->at(Index);
-  int IEt        = L1EG_IET->at(Index);
-  int IEta       = L1EG_IEta->at(Index);
-  int IPhi       = L1EG_IPhi->at(Index);
-  int Iso        = L1EG_Iso->at(Index);
-  int Bx         = L1EG_Bx->at(Index);
-  // int TowerIPhi  = LEG_TowerIPhi->at(Index); 
-  // int TowerIEta  = LEG_TowerIEta->at(Index); 
-  int RawEt      = L1EG_RawEt->at(Index);
-  int IsoEt      = L1EG_IsoEt->at(Index); 
-  int FootprintEt= L1EG_FootprintEt->at(Index);
-  int NTT        = L1EG_NTT->at(Index);
-  int Shape      = L1EG_Shape->at(Index);
-  int TowerHoE   = L1EG_TowerHoE->at(Index);
-  
-  cout << "nEGs        = " << L1EG_Et->size()
-       << "\nEt          = " << Et
-       << "\nEta         = " << Eta
-       << "\nPhi         = " << Phi
-       << "\nIEt         = " << IEt
-       << "\nIEta        = " << IEta
-       << "\nIPhi        = " << IPhi
-       << "\nIso         = " << Iso
-       << "\nBx          = " << Bx
-    // << "\nTowerIPhi   = " << TowerIPhi
-    // << "\nTowerIEta   = " << TowerIEta
-       << "\nRawEt       = " << RawEt
-       << "\nIsoEt       = " << IsoEt
-       << "\nFootprintEt = " << FootprintEt
-       << "\nNTT         = " << NTT
-       << "\nShape       = " << Shape
-       << "\nTowerHoE    = " << TowerHoE
-       << "\n" << endl;
-  
-  return;
+  L1EG theL1EG(Index,
+	       L1EG_Et->at(Index),
+	       L1EG_Eta->at(Index),
+	       L1EG_Phi->at(Index),
+	       L1EG_IET->at(Index),
+	       L1EG_IEta->at(Index),
+	       L1EG_IPhi->at(Index),
+	       L1EG_Iso->at(Index),
+	       L1EG_Bx->at(Index),
+	       0,// LEG_TowerIPhi->at(Index),
+	       0,// LEG_TowerIEta->at(Index),
+	       L1EG_RawEt->at(Index),
+	       L1EG_IsoEt->at(Index),
+	       L1EG_FootprintEt->at(Index),
+	       L1EG_NTT->at(Index),
+	       L1EG_Shape->at(Index),
+	       L1EG_TowerHoE->at(Index));
+    
+    return theL1EG;
 }
 
-
-//============================================================================
-void Sanity::GetL1Sums(bool bPrintList)
-//============================================================================
-{
-
-  // For-loop: All L1 Sums
-  for (Size_t i = 0; i < L1Sum_Et->size(); i++)
-    {
-      // cout << "L1Sum(" << i << ")" << endl;
-      if (bPrintList) GetL1Sum(i);
-    }
-  
-  return;
-}
 
 //============================================================================
 void Sanity::GetL1Sum(unsigned int Index)
@@ -1394,6 +1414,43 @@ void Sanity::PrintL1JetCollection(vector<L1Jet> collection)
 
 
 //============================================================================
+void Sanity::PrintL1EGCollection(vector<L1EG> collection)
+//============================================================================
+{
+  
+  Table info("Index | Et | Eta | Phi | IET | IEta | IPhi | Iso | Bx | TowerIPhi | TowerIEta | Raw Et | Iso Et| Footprint Et | NTT | Shape | TowerHoE", "Text");
+  
+  // For-loop: All L1EG
+  int row=0;
+  for (auto p = collection.begin(); p != collection.end(); p++, row++)
+  {
+    // Construct table
+  info.AddRowColumn(row, auxTools_.ToString( p->getIndex() ) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getEt()         , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getEta()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getPhi()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getIET()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getIEta()       , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getIPhi()       , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getIso()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getBx()         , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getTowerIPhi()  , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getTowerIEta()  , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getRawEt()      , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getIsoEt()      , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getFootprintEt(), 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getNTT()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getShape()      , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getTowerHoE()   , 3) );
+  
+  }
+
+  info.Print();
+  return;
+}
+
+
+//============================================================================
 void Sanity::PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection)
 //============================================================================
 {
@@ -1427,5 +1484,21 @@ void Sanity::PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection)
   return;
 }
 
+
+
+//============================================================================
+void Sanity::GetL1Sums(bool bPrintList)
+//============================================================================
+{
+
+  // For-loop: All L1 Sums
+  for (Size_t i = 0; i < L1Sum_Et->size(); i++)
+    {
+      // cout << "L1Sum(" << i << ")" << endl;
+      if (bPrintList) GetL1Sum(i);
+    }
+  
+  return;
+}
 
 #endif

@@ -20,6 +20,7 @@
 #include "../DataFormat/src/TrackingParticle.C"
 #include "../DataFormat/interface/TTTrack.h"
 #include "../DataFormat/interface/TTPixelTrack.h"
+#include "../DataFormat/src/L1EG.C"
 #include "../DataFormat/src/L1Jet.C"
 #include "../DataFormat/src/L1Tau.C"
 
@@ -62,6 +63,8 @@ class Sanity : public TreeAnalyserMC{
   void PrintTrackingParticleCollection(vector<TrackingParticle> collection);
 
   void PrintTTTrackCollection(vector<TTTrack> collection);
+
+  void PrintL1EGCollection(vector<L1EG> collection);
 
   void PrintL1JetCollection(vector<L1Jet> collection);
 
@@ -126,11 +129,12 @@ class Sanity : public TreeAnalyserMC{
   GenParticle GetGenParticle(unsigned int Index);
 
   vector<GenParticle> GetGenParticles(bool bPrintList=false);
+
   vector<GenParticle> GetGenParticles(int pdgId, bool isLastCopy=false);
 
-  void GetL1EG(unsigned int Index);
-
-  void GetL1EGs(bool bPrintList=false);
+  L1EG GetL1EG(unsigned int Index);
+  
+  vector<L1EG> GetL1EGs(bool bPrintList=false);
  
   void GetL1Muon(unsigned int Index);
   
