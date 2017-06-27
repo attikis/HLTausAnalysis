@@ -20,8 +20,10 @@
 #include "../DataFormat/src/TrackingParticle.C"
 #include "../DataFormat/interface/TTTrack.h"
 #include "../DataFormat/interface/TTPixelTrack.h"
-#include "../DataFormat/src/L1Tau.C"
+#include "../DataFormat/src/L1EG.C"
 #include "../DataFormat/src/L1Jet.C"
+#include "../DataFormat/src/L1Tau.C"
+#include "../DataFormat/src/L1Sum.C"
 
 // #include "../Plugins/src/L1TkPrimaryVertex.C"
 #include "../Plugins/src/L1PixelTrackFit.C"
@@ -65,6 +67,12 @@ class CaloTk : public TreeAnalyserMC{
   void PrintTTTrackCollection(vector<TTTrack> collection);
 
   void PrintTTPixelTrackCollection(vector<TTPixelTrack> collection);
+
+  void PrintL1SumCollection(vector<L1Sum> collection);
+
+  void PrintL1EGCollection(vector<L1EG> collection);
+
+  void PrintL1JetCollection(vector<L1Jet> collection);
 
   void PrintL1TauCollection(vector<L1Tau> collection);
 
@@ -238,17 +246,26 @@ class CaloTk : public TreeAnalyserMC{
 					const int minHits = 0.0,
 					bool bPrintList=false);
 
-  void GetL1EG(unsigned int Index);
-  void GetL1Muon(unsigned int Index);
-  L1Tau GetL1Jet(unsigned int Index);
-  L1Tau GetL1Tau(unsigned int Index);
-  void GetL1Sum(unsigned int Index);
 
-  void GetL1EGs(bool bPrintList=false);
+  L1EG GetL1EG(unsigned int Index);
+  
+  vector<L1EG> GetL1EGs(bool bPrintList=false);
+ 
+  void GetL1Muon(unsigned int Index);
+  
   void GetL1Muons(bool bPrintList=false);
-  vector<L1Tau> GetL1Jets(bool bPrintList=false);
+
+  L1Jet GetL1Jet(unsigned int Index);
+
+  vector<L1Jet> GetL1Jets(bool bPrintList=false);
+  
+  L1Tau GetL1Tau(unsigned int Index);
+
   vector<L1Tau> GetL1Taus(bool bPrintList=false);
-  void GetL1Sums(bool bPrintList=false);
+
+  L1Sum GetL1Sum(unsigned int Index);
+
+  vector<L1Sum> GetL1Sums(bool bPrintList=false);
   
   GenParticle GetGenParticle(unsigned int Index);
 

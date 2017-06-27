@@ -1436,7 +1436,6 @@ vector<L1Sum> Sanity::GetL1Sums(bool bPrintList)
   return theL1Sums;
 }
 
-#endif
 
 
 //============================================================================
@@ -1608,3 +1607,5 @@ void Sanity::PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection)
   info.Print();
   return;
 }
+
+#endif

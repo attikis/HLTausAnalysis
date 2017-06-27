@@ -469,12 +469,12 @@ void CaloTk::Loop()
     vector<L1TkTauParticle> L1TkTaus_Tk;
     vector<L1TkTauParticle> L1TkTaus_VtxIso;    
 
-
-    // alex: new-start
-    vector<L1Tau> L1Jets = GetL1Jets(true);
-    GetL1EGs(true);
-    GetL1Sums(true);
-    // alex: new-end
+    // -------------------------------------- ALEX-START -------------------------------------- 
+    // Jet Collections
+    vector<L1Jet> L1Jets = GetL1Jets(true);
+    vector<L1EG> L1EGs   = GetL1EGs(true);
+    vector<L1Sum> L1Sums = GetL1Sums(true);
+    // -------------------------------------- ALEX-END -------------------------------------- 
 
     // Ensure that all taus are found
     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
@@ -1929,6 +1929,52 @@ TrackingParticle CaloTk::GetTrackingParticle(unsigned int Index)
 
 
 //============================================================================
+vector<L1Jet> CaloTk::GetL1Jets(bool bPrintList)
+//============================================================================
+{
+
+  vector<L1Jet> theL1Jets;
+  L1Jet theL1Jet;
+
+  // For-loop: All L1 Jets
+  for (Size_t i = 0; i < L1Jet_Et->size(); i++)
+    {
+      theL1Jet = GetL1Jet(i);
+      theL1Jets.push_back(theL1Jet);
+    }
+  
+  if (bPrintList) PrintL1JetCollection(theL1Jets); 
+  return theL1Jets;
+}
+
+
+//============================================================================
+L1Jet CaloTk::GetL1Jet(unsigned int Index)
+//============================================================================
+{
+
+  L1Jet theL1Jet(Index,
+		 L1Jet_Et->at(Index),
+		 L1Jet_Eta->at(Index),
+		 L1Jet_Phi->at(Index),
+		 L1Jet_IET->at(Index),
+		 L1Jet_IEta->at(Index),
+		 L1Jet_IPhi->at(Index),
+		 L1Jet_Bx->at(Index),
+		 L1Jet_RawEt->at(Index),
+		 L1Jet_SeedEt->at(Index),
+		 0,//L1Jet_TowerIEta->at(Index),
+		 0,//L1Jet_TowerIPhi->at(Index),
+		 L1Jet_PUEt->at(Index),
+		 L1Jet_PUDonutEt0->at(Index),
+		 L1Jet_PUDonutEt1->at(Index),
+		 L1Jet_PUDonutEt2->at(Index),
+		 L1Jet_PUDonutEt3->at(Index));
+
+  return theL1Jet;
+}
+
+//============================================================================
 vector<L1Tau> CaloTk::GetL1Taus(bool bPrintList)
 //============================================================================
 {
@@ -1975,145 +2021,84 @@ L1Tau CaloTk::GetL1Tau(unsigned int Index)
 }
 
 
-
 //============================================================================
-vector<L1Tau> CaloTk::GetL1Jets(bool bPrintList)
-//============================================================================
-{
-
-  vector<L1Tau> theL1Jets;
-  L1Tau theL1Jet;
-  
-  // For-loop: All L1 Jets
-  for (Size_t i = 0; i < L1Jet_Et->size(); i++)
-    {
-      theL1Jet = GetL1Jet(i); 
-      theL1Jets.push_back(theL1Jet);
-    }
-  
-  if (bPrintList) PrintL1TauCollection(theL1Jets); 
-  return theL1Jets;
-}
-
-
-//============================================================================
-L1Tau CaloTk::GetL1Jet(unsigned int Index)
+vector<L1EG> CaloTk::GetL1EGs(bool bPrintList)
 //============================================================================
 {
+  vector<L1EG> theL1EGs;
+  L1EG theL1EG;
 
-  L1Tau theL1Jet(Index,
-		 L1Jet_Et->at(Index),
-		 L1Jet_Eta->at(Index),
-		 L1Jet_Phi->at(Index),
-		 L1Jet_IET->at(Index),
-		 L1Jet_IEta->at(Index),
-		 L1Jet_IPhi->at(Index),
-		 L1Jet_Bx->at(Index),
-		 L1Jet_RawEt->at(Index),
-		 L1Jet_SeedEt->at(Index),
-		 0,//L1Jet_TowerIEta->at(Index),
-		 0,//L1Jet_TowerIPhi->at(Index),
-		 L1Jet_PUEt->at(Index),
-		 L1Jet_PUDonutEt0->at(Index),
-		 L1Jet_PUDonutEt1->at(Index),
-		 L1Jet_PUDonutEt2->at(Index),
-		 L1Jet_PUDonutEt3->at(Index));
-		 
-  return theL1Jet;
-}
-
-
-//============================================================================
-void CaloTk::GetL1EGs(bool bPrintList)
-//============================================================================
-{
-
-  // For-loop: All L1 EGs
+  // For-loop: All L1 EG
   for (Size_t i = 0; i < L1EG_Et->size(); i++)
     {
-      // cout << "L1EG " << i << "/" << L1EG_Et->size() << endl;
-      if (bPrintList) GetL1EG(i);
+      theL1EG = GetL1EG(i);
+      theL1EGs.push_back(theL1EG);
     }
   
-  return;
+  if (bPrintList) PrintL1EGCollection(theL1EGs); 
+  return theL1EGs;
+}
+
+//============================================================================
+L1EG CaloTk::GetL1EG(unsigned int Index)
+//============================================================================
+{
+  
+  L1EG theL1EG(Index,
+	       L1EG_Et->at(Index),
+	       L1EG_Eta->at(Index),
+	       L1EG_Phi->at(Index),
+	       L1EG_IET->at(Index),
+	       L1EG_IEta->at(Index),
+	       L1EG_IPhi->at(Index),
+	       L1EG_Iso->at(Index),
+	       L1EG_Bx->at(Index),
+	       0,// LEG_TowerIPhi->at(Index),
+	       0,// LEG_TowerIEta->at(Index),
+	       L1EG_RawEt->at(Index),
+	       L1EG_IsoEt->at(Index),
+	       L1EG_FootprintEt->at(Index),
+	       L1EG_NTT->at(Index),
+	       L1EG_Shape->at(Index),
+	       L1EG_TowerHoE->at(Index));
+    
+    return theL1EG;
+}
+
+//============================================================================
+L1Sum CaloTk::GetL1Sum(unsigned int Index)
+//============================================================================
+{
+
+  L1Sum theL1Sum(Index,
+		 L1Sum_Et->at(Index),
+		 L1Sum_Phi->at(Index),
+		 L1Sum_IET->at(Index),
+		 L1Sum_IPhi->at(Index),
+		 L1Sum_Type->at(Index),
+		 L1Sum_Bx->at(Index));
+
+  return theL1Sum;
 }
 
 
 //============================================================================
-void CaloTk::GetL1EG(unsigned int Index)
-//============================================================================
-{
-  
-  double Et      = L1EG_Et->at(Index);
-  double Eta     = L1EG_Eta->at(Index);
-  double Phi     = L1EG_Phi->at(Index);
-  int IEt        = L1EG_IET->at(Index);
-  int IEta       = L1EG_IEta->at(Index);
-  int IPhi       = L1EG_IPhi->at(Index);
-  int Iso        = L1EG_Iso->at(Index);
-  int Bx         = L1EG_Bx->at(Index);
-  // int TowerIPhi  = LEG_TowerIPhi->at(Index); 
-  // int TowerIEta  = LEG_TowerIEta->at(Index); 
-  int RawEt      = L1EG_RawEt->at(Index);
-  int IsoEt      = L1EG_IsoEt->at(Index); 
-  int FootprintEt= L1EG_FootprintEt->at(Index);
-  int NTT        = L1EG_NTT->at(Index);
-  int Shape      = L1EG_Shape->at(Index);
-  int TowerHoE   = L1EG_TowerHoE->at(Index);
-  
-  cout << "nEGs        = " << L1EG_Et->size()
-       << "\nEt          = " << Et
-       << "\nEta         = " << Eta
-       << "\nPhi         = " << Phi
-       << "\nIEt         = " << IEt
-       << "\nIEta        = " << IEta
-       << "\nIPhi        = " << IPhi
-       << "\nIso         = " << Iso
-       << "\nBx          = " << Bx
-    // << "\nTowerIPhi   = " << TowerIPhi
-    // << "\nTowerIEta   = " << TowerIEta
-       << "\nRawEt       = " << RawEt
-       << "\nIsoEt       = " << IsoEt
-       << "\nFootprintEt = " << FootprintEt
-       << "\nNTT         = " << NTT
-       << "\nShape       = " << Shape
-       << "\nTowerHoE    = " << TowerHoE
-       << "\n" << endl;
-  
-  return;
-}
-
-
-//============================================================================
-void CaloTk::GetL1Sums(bool bPrintList)
+vector<L1Sum> CaloTk::GetL1Sums(bool bPrintList)
 //============================================================================
 {
 
-  // For-loop: All L1 Sums
+  vector<L1Sum> theL1Sums;
+  L1Sum theL1Sum;
+
+  // For-loop: All L1 EG
   for (Size_t i = 0; i < L1Sum_Et->size(); i++)
     {
-      // cout << "L1Sum(" << i << ")" << endl;
-      if (bPrintList) GetL1Sum(i);
+      theL1Sum = GetL1Sum(i);
+      theL1Sums.push_back(theL1Sum);
     }
   
-  return;
-}
-
-//============================================================================
-void CaloTk::GetL1Sum(unsigned int Index)
-//============================================================================
-{
-
-  cout << "nSums        = " << L1Sum_Et->size()
-       << "\nL1Sum_umType = " << L1Sum_Type->at(Index)
-       << "\nL1Sum_umEt   = " << L1Sum_Et->at(Index)
-       << "\nL1Sum_umPhi  = " << L1Sum_Phi->at(Index)
-       << "\nL1Sum_umIET  = " << L1Sum_IET->at(Index)
-       << "\nL1Sum_umIPhi = " << L1Sum_IPhi->at(Index)
-       << "\nL1Sum_umBx   = " << L1Sum_Bx->at(Index)
-       << "\n" << endl;
-  
-  return;
+  if (bPrintList) PrintL1SumCollection(theL1Sums); 
+  return theL1Sums;
 }
 
 //============================================================================
@@ -2362,8 +2347,6 @@ void CaloTk::PrintTTTrackCollection(vector<TTTrack> collection)
 }
 
 
-
-
 //============================================================================
 void CaloTk::PrintL1TauCollection(vector<L1Tau> collection)
 //============================================================================
@@ -2402,6 +2385,104 @@ void CaloTk::PrintL1TauCollection(vector<L1Tau> collection)
   return;
 }
 
+
+//============================================================================
+void CaloTk::PrintL1JetCollection(vector<L1Jet> collection)
+//============================================================================
+{
+  
+  Table info("Index | Et | Eta | Phi | IET | IEta | IPhi | Bx | Raw Et | Seed Et | TowerIPhi | TowerIEta | PU Et | PUDonutEt0 | PUDonutEt1 | PUDonutEt2 | PUDonutEt3", "Text");
+
+  // For-loop: All L1Taus
+  int row=0;
+  for (auto p = collection.begin(); p != collection.end(); p++, row++)
+  {
+    // Construct table
+    info.AddRowColumn(row, auxTools_.ToString( p->getIndex() )        );
+    info.AddRowColumn(row, auxTools_.ToString( p->getEt(), 3)         );
+    info.AddRowColumn(row, auxTools_.ToString( p->getEta(), 3)        );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPhi(), 3)        );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIET() , 3)       );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIEta(), 3)       );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIPhi(), 3)       );
+    info.AddRowColumn(row, auxTools_.ToString( p->getBx() , 3)        );
+    info.AddRowColumn(row, auxTools_.ToString( p->getRawEt(), 3)      );
+    info.AddRowColumn(row, auxTools_.ToString( p->getSeedEt(), 3)     );
+    info.AddRowColumn(row, auxTools_.ToString( p->getTowerIPhi(), 3)  );
+    info.AddRowColumn(row, auxTools_.ToString( p->getTowerIEta(), 3)  );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPUEt(), 3)       );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPUDonutEt0(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPUDonutEt1(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPUDonutEt2(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPUDonutEt3(), 3) );
+  }
+
+  info.Print();
+  return;
+}
+
+
+//============================================================================
+void CaloTk::PrintL1EGCollection(vector<L1EG> collection)
+//============================================================================
+{
+  
+  Table info("Index | Et | Eta | Phi | IET | IEta | IPhi | Iso | Bx | TowerIPhi | TowerIEta | Raw Et | Iso Et| Footprint Et | NTT | Shape | TowerHoE", "Text");
+  
+  // For-loop: All L1EG
+  int row=0;
+  for (auto p = collection.begin(); p != collection.end(); p++, row++)
+  {
+    // Construct table
+  info.AddRowColumn(row, auxTools_.ToString( p->getIndex() ) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getEt()         , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getEta()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getPhi()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getIET()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getIEta()       , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getIPhi()       , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getIso()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getBx()         , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getTowerIPhi()  , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getTowerIEta()  , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getRawEt()      , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getIsoEt()      , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getFootprintEt(), 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getNTT()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getShape()      , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getTowerHoE()   , 3) );
+  
+  }
+
+  info.Print();
+  return;
+}
+
+
+//============================================================================
+void CaloTk::PrintL1SumCollection(vector<L1Sum> collection)
+//============================================================================
+{
+  
+  Table info("Index | Et | Phi | IEt | IPhi | Type | Bx", "Text");
+  
+  // For-loop: All L1Sum
+  int row=0;
+  for (auto p = collection.begin(); p != collection.end(); p++, row++)
+  {
+    // Construct table
+    info.AddRowColumn(row, auxTools_.ToString( p->getIndex() ) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getEt()  , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getPhi() , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIEt() , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIPhi(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getType(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->getBx()  , 3) );
+  }
+
+  info.Print();
+  return;
+}
 
 //============================================================================
 void CaloTk::PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection)
