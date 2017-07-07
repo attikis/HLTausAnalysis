@@ -74,6 +74,8 @@ class TTTrack{
   void PrintProperties(void);
   void PrintAllProperties(void);
   // int getL1Track() const {return 0; } //TTPixelTrack
+
+  bool operator<(const TTTrack& other) {return this->getPt() < other.getPt();}
   
  private:
   void _InitVars(void);

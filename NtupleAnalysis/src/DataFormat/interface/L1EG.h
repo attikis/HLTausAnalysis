@@ -63,6 +63,8 @@ class L1EG{
   int getNTT(void) const {return theNTT;}
   int getShape(void) const {return theShape;}
   int getTowerHoE(void) const {return theTowerHoE;}
+
+  bool operator<(const L1EG& other) {return this->et() < other.et();}
   
  private:
   void _InitVars(void);
