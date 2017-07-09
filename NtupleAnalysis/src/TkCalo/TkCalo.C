@@ -191,18 +191,27 @@ void TkCalo::Loop()
         newCandidateTracks.clear();
         newCandidateTracks.push_back(*leadTrkIter);
         trackTauCandidates.push_back(newCandidateTracks);
+        // Fill lead track histograms
+        h_leadTrks_Pt->Fill( leadTrkIter->getPt() );
+        h_leadTrks_Eta->Fill( leadTrkIter->getEta() );
+        h_leadTrks_Phi->Fill( leadTrkIter->getPhi() );
+        h_leadTrks_Phi_Eta->Fill( leadTrkIter->getPhi(),leadTrkIter->getEta() );
       }
     }
+    // Fill number of lead tracks (in this event) to a histogram
+    h_leadTrks_Multiplicity->Fill( trackTauCandidates.size() );
     // Debug prints
     if (cfg_DEBUG) std::cout << "Lead tracks:" << std::endl;
     if (cfg_DEBUG) std::cout << trackTauCandidates.size() << " lead tracks found, here are 3 first:" << std::endl;
     for (std::size_t i=0; i<3 && i<trackTauCandidates.size(); i++) {
       if (cfg_DEBUG) std::cout << "leading track index = " << trackTauCandidates[i][0].index() << ", Pt = " << trackTauCandidates[i][0].getPt() << std::endl;
     }  
+    // TODO: fill counters in h_leadTrkSelection
 
     // Cluster surrounding tracks with lead tracks
     TTTrack* leadTrackPtr = NULL;
     float invMass;
+    float pT;
     bool stopClustering;
     for (size_t i=0; i<trackTauCandidates.size(); i++) {
         leadTrackPtr = &(trackTauCandidates[i][0]);
@@ -217,19 +226,32 @@ void TkCalo::Loop()
           if (deltaR < minDeltaR_leadtrk) continue;
           // Calculate invariant mass of already clustered tracks + new track
           invMass = 0.0;
+          pT = 0.0;
           TLorentzVector p4sum; // initialized to (0,0,0,0)
           for(size_t j=0; j < trackTauCandidates[i].size(); j++){
             p4sum += trackTauCandidates[i][j].p4();
           }
           invMass = p4sum.M();
+          pT = p4sum.Pt();
           p4sum += trackIter->p4();
-          if (p4sum.M() < maxInvMass_trk) 
+          if (p4sum.M() < maxInvMass_trk) {
             trackTauCandidates[i].push_back(*trackIter);
-          else
+            h_clustTrks_Pt->Fill( trackIter->getPt() );
+            h_clustTrks_Eta->Fill( trackIter->getEta() );
+            h_clustTrks_Phi->Fill( trackIter->getPhi() );
+            h_clustTrks_Phi_Eta->Fill( trackIter->getPhi(),trackIter->getEta() );
+          }  
+          else {
+            // Stop clustering and fill track cluster histograms
             stopClustering = true;
+            h_trkClusters_MultiplicityPerCluster->Fill( trackTauCandidates[i].size() );
+            h_trkClusters_Pt->Fill( pT );
+            h_trkClusters_M->Fill( invMass );
+          }
         }
         if (cfg_DEBUG) cout << "After clustering trackTauCandidates[" << i << "] with leadTrack " << leadTrackPtr->index() << ", it has " 
                             << trackTauCandidates[i].size() << " tracks and a mass of " << invMass << endl;
+
     }
 
     // Build EG clusters
@@ -237,6 +259,7 @@ void TkCalo::Loop()
     for (size_t i=0; i<trackTauCandidates.size(); i++) {
         std::cout << "Clustering EGs around trackTauCandidates[" << i << "]" << endl;
         EGcluster.clear();
+        pT = 0.0;
         invMass = 0.0;
         leadTrackPtr = &(trackTauCandidates[i][0]);
         stopClustering = false;
@@ -253,12 +276,23 @@ void TkCalo::Loop()
           std::cout << "invMassTmp = " << p4sum.M() << endl;
           if (p4sum.M() < maxInvMass_EG){
             EGcluster.push_back(*eg);
+            pT = p4sum.Pt();
             invMass = p4sum.M();
+            // Fill EG histograms
+            h_clustEGs_Et->Fill( eg->getEt() );
+            h_clustEGs_Eta->Fill( eg->getEta() );
+            h_clustEGs_Phi->Fill( eg->getPhi() );
+            h_clustEGs_Phi_Eta->Fill( eg->getPhi(),eg->getEta() );
+            // Fill EG cluster histograms
+            h_EGClusters_Pt->Fill( pT );            
+            h_EGClusters_M->Fill( invMass );            
           }
           else {
             stopClustering = true;
           }
         }
+        // Fill the number of EGs in cluster
+        h_clustEGs_MultiplicityPerCluster->Fill( EGcluster.size() );
 
         // Build a tau candidate from tracks and EGs
         L1TkEGParticle newTauCandidate(trackTauCandidates[i], EGcluster);
@@ -284,6 +318,8 @@ void TkCalo::Loop()
       }
       // Calculate relative isolation
       relIso = tkeg->GetTrackPtSum() / ptSum;
+      // Fill relative isolation histogram
+      h_trkClusters_relIso->Fill( relIso );
       //cout << "relIso = " << relIso << endl;
       if(relIso < maxRelIso) {
         TauCandidatesIsolated.push_back(*tkeg);
@@ -324,7 +360,12 @@ void TkCalo::Loop()
   // Write the histograms to the file
   ////////////////////////////////////////////////
 
-  // TODO
+  ////////////////////////////////////////////////
+  // Write the histograms to the file
+  ////////////////////////////////////////////////
+  outFile->cd();
+  outFile->Write();
+  auxTools_.StopwatchStop(5, "minutes", "Total Time");
 
 }
 
@@ -353,8 +394,70 @@ float TkCalo::deltaR(float eta1, float eta2, float phi1, float phi2)
 void TkCalo::BookHistos_(void)
 //============================================================================
 {
+
+  // Number of lead tracks (per event)
+  histoTools_.BookHisto_1D(h_leadTrks_Multiplicity, "leadTrks_Multiplicity", ";Number of lead tracks in event;Events / bin", 30, -0.5, +14.5);
+
+  // Lead track Pt
+  histoTools_.BookHisto_1D(h_leadTrks_Pt, "leadTrks_Pt", ";Pt (GeV);Events / bin", 300, +0.0, +300.0);
+
+  // Lead track Eta
+  histoTools_.BookHisto_1D(h_leadTrks_Eta, "leadTrks_Eta", ";#eta;Events / bin", 600, -3.0, +3.0);
+
+  // Lead track Phi
+  histoTools_.BookHisto_1D(h_leadTrks_Phi, "leadTrks_Phi", ";#phi (rads);Events / bin", 23,  -3.15,  +3.15);
   
-  //TODO
+  // Lead tracks in Eta-Phi plane
+  // (Syntax: BookHisto_2D(histogram, hName, hTitle, binsX, xMin, xMax, binsY, yMin, yMax)
+  histoTools_.BookHisto_2D(h_leadTrks_Phi_Eta, "leadTrks_Phi_Eta",  ";#phi (rads);#eta", 230,  -3.15,  +3.15, 600,  -3.0,  +3.0);  
+
+  // Counters for the selection of lead tracks
+  histoTools_.BookHisto_1D(h_leadTrkSelection, "leadTrkSelection", "", 5,  0.0,  5.0);  
+
+  // Clustered tracks Pt
+  histoTools_.BookHisto_1D(h_clustTrks_Pt, "clustTrks_Pt", ";Pt (GeV);Events / bin", 300, +0.0, +300.0);
+
+  // Clustered tracks Eta
+  histoTools_.BookHisto_1D(h_clustTrks_Eta, "clustTrks_Eta", ";#eta;Events / bin", 600, -3.0, +3.0);
+
+  // Clustered tracks Phi
+  histoTools_.BookHisto_1D(h_clustTrks_Phi, "clustTrks_Phi", ";#phi (rads);Events / bin", 23,  -3.15,  +3.15);
+  
+  // Clustered tracks in Eta-Phi plane
+  histoTools_.BookHisto_2D(h_clustTrks_Phi_Eta, "clustTrks_Phi_Eta",  ";#phi (rads);#eta", 230,  -3.15,  +3.15, 600,  -3.0,  +3.0);  			      
+
+  // Number of clustered tracks (per cluster)
+  histoTools_.BookHisto_1D(h_trkClusters_MultiplicityPerCluster, "trkClusters_MultiplicityPerCluster", ";Number of tracks in cluster;Clusters / bin", 30, -0.5, +14.5);
+
+  // Pt of track clusters
+  histoTools_.BookHisto_1D(h_trkClusters_Pt, "trkClusters_Pt", ";Pt (GeV);Clusters / bin", 300, +0.0, +300.0);
+  
+  // Invariant mass of track clusters
+  histoTools_.BookHisto_1D(h_trkClusters_M, "trkClusters_M", ";Invariant mass;Clusters / bin", 100, +0.0, +5.0);
+
+  // Number of EGs (per cluster)
+  histoTools_.BookHisto_1D(h_clustEGs_MultiplicityPerCluster, "clustEGs_MultiplicityPerCluster", ";Number of EGs in cluster;Clusters / bin", 30, -0.5, +14.5);
+
+  // Clustered EGs Pt
+  histoTools_.BookHisto_1D(h_clustEGs_Et, "clustEGs_Pt", ";Pt (GeV);Events / bin", 300, +0.0, +300.0);
+
+  // Clustered EGs Eta
+  histoTools_.BookHisto_1D(h_clustEGs_Eta, "clustEGs_Eta", ";#eta;Events / bin", 600, -3.0, +3.0);
+
+  // Clustered EGs Phi
+  histoTools_.BookHisto_1D(h_clustEGs_Phi, "clustEGs_Phi", ";#phi (rads);Events / bin", 23,  -3.15,  +3.15);
+
+  // Clustered EGs in Eta-Phi plane
+  histoTools_.BookHisto_2D(h_clustEGs_Phi_Eta, "clustEGs_Phi_Eta",  ";#phi (rads);#eta", 230,  -3.15,  +3.15, 600,  -3.0,  +3.0);		      
+
+  // Pt of EG clusters
+  histoTools_.BookHisto_1D(h_EGClusters_Pt, "EGClusters_Pt", ";Pt (GeV);Clusters / bin", 300, +0.0, +300.0);
+  
+  // Invariant mass of EG clusters
+  histoTools_.BookHisto_1D(h_EGClusters_M, "EGClusters_M", ";Invariant mass;Clusters / bin", 100, +0.0, +5.0);
+
+  // Track-based relative isolation of tau candidates
+  histoTools_.BookHisto_1D(h_trkClusters_relIso, "trkClusters_relIso", ";Relative isolation;Clusters / bin", 100, 0.0, +5.0);
 
   return;
 }

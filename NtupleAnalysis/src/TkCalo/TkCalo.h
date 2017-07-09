@@ -15,7 +15,7 @@
 
 //#include "../Auxiliary/src/Table.C"
 //#include "../Auxiliary/src/MCTools.C"
-//#include "../Auxiliary/src/HistoTools.C"
+#include "../Auxiliary/src/HistoTools.C"
 //#include "../Auxiliary/src/Datasets.C" 
 //#include "../DataFormat/src/L1TkTauParticle.C"
 //#include "../DataFormat/src/GenParticle.C"
@@ -101,7 +101,8 @@ class TkCalo : public TreeAnalyserMC{
   // Private variables
   AuxTools auxTools_;
   Datasets datasets_;
-
+  HistoTools histoTools_;
+  
   // Old parameters
   float ETmin; // min ET in GeV of L1EG objects
   float ZMAX; // |z_track| < ZMAX in cm
@@ -138,7 +139,36 @@ class TkCalo : public TreeAnalyserMC{
   vector< vector <TTTrack> > trackTauCandidates;
   vector<L1TkEGParticle> TauCandidates;
   vector<L1TkEGParticle> TauCandidatesIsolated;
+  
+  // Histogram declarations
+  TH1D* h_leadTrks_Multiplicity;
+  
+  TH1D* h_leadTrks_Pt;
+  TH1D* h_leadTrks_Eta;
+  TH1D* h_leadTrks_Phi;
+  TH2D* h_leadTrks_Phi_Eta;
 
+  TH1D* h_leadTrkSelection;
+
+  TH1D* h_clustTrks_Pt;
+  TH1D* h_clustTrks_Eta;
+  TH1D* h_clustTrks_Phi;
+  TH2D* h_clustTrks_Phi_Eta;
+
+  TH1D* h_trkClusters_MultiplicityPerCluster;
+  TH1D* h_trkClusters_Pt;
+  TH1D* h_trkClusters_M;
+
+  TH1D* h_clustEGs_MultiplicityPerCluster;
+  TH1D* h_clustEGs_Et;
+  TH1D* h_clustEGs_Eta;
+  TH1D* h_clustEGs_Phi;
+  TH2D* h_clustEGs_Phi_Eta;
+
+  TH1D* h_EGClusters_Pt;
+  TH1D* h_EGClusters_M;
+
+  TH1D* h_trkClusters_relIso;
 };
 
 #endif
