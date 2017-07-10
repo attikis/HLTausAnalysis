@@ -737,8 +737,6 @@ void HistoTools::ConvertToRateHisto_2D(TH2D *histo,
   return;
 }
 
-#endif  // HistoTools_cxx
-
 //****************************************************************************
 void HistoTools::FillAllBinsUpToValue_1D(TH1D *histo, 
 					 const Double_t fillValue)
@@ -863,4 +861,4 @@ void HistoTools::ConvertNumeratorHistoToEfficiency_2D(TH2D *histo,
   return;
 }
 
-//#endif // HistoTools_cxx
+#endif  // HistoTools_cxx

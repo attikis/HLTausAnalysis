@@ -80,23 +80,8 @@ class TkCalo : public TreeAnalyserMC{
   void BookHistos_(void);
   void InitObjects(void);
   void InitVars_(void);
-  TTTrack GetTTTrack(unsigned int Index, const unsigned int nFitParams = 5);
-  vector<TTTrack> GetTTTracks(const double minPt = 0.0,
-			      const double minEta = 0.0,
-			      const double maxEta = 9999.9,
-			      const double maxChiSqRed = 9999.9,
-			      const unsigned int minStubs = 0,
-			      const unsigned int minStubsPS = 0,
-			      const unsigned int maxStubsPS = 999,
-			      const unsigned nFitParams = 5,
-			      bool bPrintList = false);			      
-  TrackingParticle GetTrackingParticle(unsigned int Index);
-  L1EG GetL1EG(unsigned int Index);  
-  vector<L1EG> GetL1EGs(bool bPrintList=false);
   float DeltaPhi(float phi1, float phi2);
   float deltaR(float eta1, float eta2, float phi1, float phi2);
-  //struct PtComparatorTTTrack{ bool operator() (TTTrack a, TTTrack b) const { return a.getPt() > b.getPt(); } };
-  //struct EtComparatorL1EG{ bool operator() (L1EG a, L1EG b) const { return a.et() > b.et(); } };
   
   // Private variables
   AuxTools auxTools_;

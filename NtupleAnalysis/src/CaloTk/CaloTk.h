@@ -57,7 +57,7 @@ class CaloTk : public TreeAnalyserMC{
   virtual void Loop();
 
   void PrintSettings(void);
-
+/*
   void PrintGenParticleCollection(vector<GenParticle> collection);
 
   void PrintTrackingParticleCollection(vector<TrackingParticle> collection);
@@ -69,14 +69,14 @@ class CaloTk : public TreeAnalyserMC{
   void PrintL1TauCollection(vector<L1Tau> collection);
 
   void PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection);
-
+*/
   void ApplyDiTauZMatching(string tkCollectionType,
 			   vector<L1TkTauParticle> &L1TkTaus);
-
+/*
   vector<GenParticle> GetHadronicGenTaus(vector<GenParticle> GenTaus,
 					 double visEt=20.0,
 					 double visEta=2.3);
-
+*/
   void GetShrinkingConeSizes(double calo_et,
 			     double sigCone_Constant,
 			     double isoCone_Constant,
@@ -211,60 +211,7 @@ class CaloTk : public TreeAnalyserMC{
 		  TH2D *hRate,
 		  TH2D *hEfficiency);
 
-  TrackingParticle GetTrackingParticle(unsigned int Index);
-  vector<TrackingParticle> GetTrackingParticles(bool bPrintList=false);
-
-  TTTrack GetTTTrack(unsigned int Index,
-		     const unsigned int nFitParams = 5);
-  
-  vector<TTTrack> GetTTTracks(const double minPt = 0.0,
-			      const double minEta = 0.0,
-			      const double maxEta = 9999.9,
-			      const double maxChiSqRed = 9999.9,
-			      const unsigned int minStubs = 0,
-			      const unsigned int minStubsPS = 0,
-			      const unsigned int maxStubsPS = 999,
-			      const unsigned nFitParams = 5,
-			      bool bPrintList = false);
-
-  double GetPVTTTracks(vector<TTTrack> &pvTTTracks,
-		       bool bPrintList = false);
-
-  TTPixelTrack GetTTPixelTrack(unsigned int Index);
-
-  vector<TTPixelTrack> GetTTPixelTracks(const double minPt = 0.0,
-					const double maxEta = 9999.9,
-					const double maxChiSqRed = 9999.9,
-					const int minHits = 0.0,
-					bool bPrintList=false);
-
-  void GetL1EG(unsigned int Index);
-  void GetL1Muon(unsigned int Index);
-  L1Tau GetL1Jet(unsigned int Index);
-  L1Tau GetL1Tau(unsigned int Index);
-  void GetL1Sum(unsigned int Index);
-
-  void GetL1EGs(bool bPrintList=false);
-  void GetL1Muons(bool bPrintList=false);
-  vector<L1Tau> GetL1Jets(bool bPrintList=false);
-  vector<L1Tau> GetL1Taus(bool bPrintList=false);
-  void GetL1Sums(bool bPrintList=false);
-  
-  GenParticle GetGenParticle(unsigned int Index);
-
-  void SetGenParticleMomsAndDaus(GenParticle &p);
-
-  void SetGenParticleFinalDaughters(GenParticle &p);
-
-  vector<GenParticle> GetGenParticles(bool bPrintList=false);
-  vector<GenParticle> GetGenParticles(int pdgId,
-				      bool isLastCopy=false);
-  
   vector<L1TkTauParticle> GetMcMatchedL1TkTaus(vector<L1TkTauParticle> L1TkTaus);
-
-  void GetHadronicTauFinalDaughters(GenParticle hTau,
-				    vector<unsigned short> &Daug);
-
   
   // Variable declaration
   // L1TkPrimaryVertex *pvProducer;

@@ -11,7 +11,7 @@
 #include "../Auxiliary/src/AuxTools.C"
 #include "../Auxiliary/src/Table.C"
 #include "../Auxiliary/src/MCTools.C"
-#include "../Auxiliary/src/HistoTools.C"
+//#include "../Auxiliary/src/HistoTools.C"
 // #include "../Auxiliary/src/L1Tracks.C" // needed?
 #include "../Auxiliary/src/Datasets.C" 
 
@@ -57,22 +57,6 @@ class Sanity : public TreeAnalyserMC{
 
   void PrintSettings(void);
 
-  void PrintGenParticleCollection(vector<GenParticle> collection);
-
-  void PrintTrackingParticleCollection(vector<TrackingParticle> collection);
-
-  void PrintTTTrackCollection(vector<TTTrack> collection);
-
-  void PrintL1SumCollection(vector<L1Sum> collection);
-
-  void PrintL1EGCollection(vector<L1EG> collection);
-
-  void PrintL1JetCollection(vector<L1Jet> collection);
-
-  void PrintL1TauCollection(vector<L1Tau> collection);
-
-  void PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection);
-
   // Public Variable
   string mcSample;
   bool cfg_AddGenP;   // Flag to enable sanity of GenParticles
@@ -104,58 +88,7 @@ class Sanity : public TreeAnalyserMC{
   // Private Functions
   void BookHistos_(void);
   
-  void InitVars_(void);
-
-  TrackingParticle GetTrackingParticle(unsigned int Index);
-
-  vector<TrackingParticle> GetTrackingParticles(bool bPrintList=false);
- 
-  TTTrack GetTTTrack(unsigned int Index, const unsigned int nFitParams = 5);
-
-  vector<TTTrack> GetTTTracks(const double minPt = 0.0,
-			      const double minEta = 0.0,
-			      const double maxEta = 9999.9,
-			      const double maxChiSqRed = 9999.9,
-			      const unsigned int minStubs = 0,
-			      const unsigned int minStubsPS = 0,
-			      const unsigned int maxStubsPS = 999,
-			      const unsigned nFitParams = 5,
-			      bool bPrintList = false);
-
-
-  void SetGenParticleMomsAndDaus(GenParticle &p);
-
-  void SetGenParticleFinalDaughters(GenParticle &p);
-
-  GenParticle GetGenParticle(unsigned int Index);
-
-  vector<GenParticle> GetGenParticles(bool bPrintList=false);
-
-  vector<GenParticle> GetGenParticles(int pdgId, bool isLastCopy=false);
-
-  L1EG GetL1EG(unsigned int Index);
-  
-  vector<L1EG> GetL1EGs(bool bPrintList=false);
- 
-  void GetL1Muon(unsigned int Index);
-  
-  void GetL1Muons(bool bPrintList=false);
-
-  L1Jet GetL1Jet(unsigned int Index);
-
-  vector<L1Jet> GetL1Jets(bool bPrintList=false);
-  
-  L1Tau GetL1Tau(unsigned int Index);
-
-  vector<L1Tau> GetL1Taus(bool bPrintList=false);
-  
-  L1Sum GetL1Sum(unsigned int Index);
-
-  vector<L1Sum> GetL1Sums(bool bPrintList=false);
-
-  
-  void GetHadronicTauFinalDaughters(GenParticle hTau, vector<unsigned short> &Daug);
-
+  void InitVars_(void);  
   
   // Private variables
   AuxTools auxTools_;
