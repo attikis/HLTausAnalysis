@@ -84,9 +84,6 @@ class TkCalo : public TreeAnalyserMC{
   float deltaR(float eta1, float eta2, float phi1, float phi2);
   
   // Private variables
-  AuxTools auxTools_;
-  Datasets datasets_;
-  HistoTools histoTools_;
   
   // Old parameters
   float ETmin; // min ET in GeV of L1EG objects

@@ -64,7 +64,7 @@ class L1EG{
   int getShape(void) const {return theShape;}
   int getTowerHoE(void) const {return theTowerHoE;}
 
-  bool operator<(const L1EG& other) {return this->et() < other.et();}
+  bool operator<(const L1EG& other) const {return this->et() > other.et();}
   
  private:
   void _InitVars(void);

@@ -143,16 +143,20 @@ void TkCalo::Loop()
     ////////////////////////////////////////////////       
 
     // Tracks
-    if (true) { //TODO if (cfg_AddL1Tks) {
+    if (cfg_AddL1Tks) {
 	  if (cfg_DEBUG) cout << "\n=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
+	  cout << "Getting tracks..." << endl;
 	  TTTracks = GetTTTracks(cfg_tk_minPt, cfg_tk_minEta, cfg_tk_maxEta, cfg_tk_maxChiSqRed, cfg_tk_minStubs, cfg_tk_minStubsPS, cfg_tk_maxStubsPS, cfg_tk_nFitParams, false);
-	  sort( TTTracks.rbegin(), TTTracks.rend() ); // Sort from highest Pt to lowest (not done by default)
+	  cout << "Got tracks. Now sorting..." << endl;
+	  sort( TTTracks.begin(), TTTracks.end() ); // Sort from highest Pt to lowest (not done by default)
+	  cout << "Sorted tracks!" << endl;
 	}    
 	
 	// EGs
 	if (cfg_AddEGs) {
 	  L1EGs = GetL1EGs(cfg_DEBUG);
-	  sort( L1EGs.rbegin(), L1EGs.rend() ); // Sort from highest Et to lowest Et (should be already done by default)
+	  sort( L1EGs.begin(), L1EGs.end() ); // Sort from highest Et to lowest Et (should be already done by default)
+	  cout << "Sorted EGs!" << endl;
 	  if (cfg_DEBUG) cout << "\n=== L1EGs (" << L1EGs.size() << ")" << endl;
 	}
 

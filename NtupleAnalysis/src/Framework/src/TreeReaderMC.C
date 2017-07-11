@@ -312,13 +312,14 @@ vector<TTTrack> TreeReaderMC::GetTTTracks(const double minPt,
 				      bool bPrintList)
 //============================================================================
 {
-  if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::GetTTTracks()" << std::endl;
+  if (cfg_DEBUG) std::cout << "=== TreeReaderMC::GetTTTracks()" << std::endl;
 
   vector<TTTrack> theTTTracks;
 
   // For-loop: All TTTracsk
   for (Size_t iTk = 0; iTk < L1Tks_Pt->size(); iTk++)
     { 
+      cout << "Getting TTTrack " << iTk << endl;
       TTTrack tk = GetTTTrack(iTk, nFitParams);
 
       // Apply selection criteria
@@ -335,7 +336,8 @@ vector<TTTrack> TreeReaderMC::GetTTTracks(const double minPt,
 
     }
 
-  if (bPrintList) PrintTTTrackCollection(theTTTracks);
+//  if (bPrintList) PrintTTTrackCollection(theTTTracks);
+  if (true) PrintTTTrackCollection(theTTTracks);
   
   return theTTTracks;
 }
@@ -350,6 +352,8 @@ TTTrack TreeReaderMC::GetTTTrack(unsigned int Index,
   
   // Initialise variables
   TVector3 p;  
+
+  cout << "Getting track properties" << endl;
 
   // Get the track properties
   double pt  = L1Tks_Pt->at(Index);
@@ -372,23 +376,26 @@ TTTrack TreeReaderMC::GetTTTrack(unsigned int Index,
   int  nStubsPS       = L1Tks_NStubsPS->at(Index);
   int  nStubsBarrel   = L1Tks_NStubsBarrel->at(Index);
   int  nStubsEndcap   = L1Tks_NStubsEndcap->at(Index);
-  int matchTP_index = L1Tks_TP_Index->at(Index);
+  int  matchTP_index  = L1Tks_TP_Index->at(Index);
   // auxTools_.PrintVector(stubs_isPS);
+  
+    cout << "Constructing the track TTTrack" << endl;
   
   // Construct the TTTrack
   TTTrack theTTTrack(Index, p, aPOCA,  aRInv, aChi2, aStubPtCons, isGenuine, isUnknown, isCombinatoric,
 		     isLoose, isFake, nStubs, nStubsPS, nStubsBarrel, nStubsEndcap, matchTP_index, nFitParams);
-  
-  // Get the uniquely matched TP
-  TrackingParticle theTP;
-  if (matchTP_index >= 0) theTP= GetTrackingParticle(matchTP_index);
-  // theTTTrack.SetTP(theTP); // cannot implement. cyclic
-  
+
+    cout << "Getting TP with L1Tks_TP_Index->at(Index) = "<< L1Tks_TP_Index->at(Index) << endl;
+ 
   if (cfg_DEBUG*0) theTTTrack.PrintProperties();
-  if (cfg_DEBUG*0 && matchTP_index >= 0)
-    {
-      theTP.PrintProperties();
-      cout << "" << endl;
+
+  // Get the uniquely matched TP and print its properties
+  if (cfg_DEBUG*0 && matchTP_index >= 0) {
+    TrackingParticle theTP;
+    theTP = GetTrackingParticle(matchTP_index);
+    // theTTTrack.SetTP(theTP); // cannot implement. cyclic
+    theTP.PrintProperties();
+    cout << "" << endl;
     }
   
   return theTTTrack;
@@ -446,9 +453,11 @@ TrackingParticle TreeReaderMC::GetTrackingParticle(unsigned int Index)
   p.SetPtEtaPhi(pt, eta, phi);
   ROOT::Math::XYZVector poca(x0, y0, z0);
 
+  cout << "Constructing TP" << endl;
+
   // Construct the TP
   TrackingParticle theTrackingParticle(Index, p, poca, d0_propagated, z0_propagated, charge, pdgId, nMatch, ttTrackIndex, ttClusters, ttStubs, ttTracks, eventId);  
-  if (cfg_DEBUG*0) theTrackingParticle.PrintProperties();
+  if (cfg_DEBUG) theTrackingParticle.PrintProperties();
 
   // Get the uniquely matched TTTrack
   // TTTrack theTrack;
