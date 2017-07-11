@@ -39,7 +39,7 @@ void L1TkEGParticle::InitVars_(void)
 double L1TkEGParticle::GetTrackPtSum()
 //****************************************************************************
 {
-  double sum;
+  double sum = 0.0;
   for (auto tk = theTracks.begin(); tk != theTracks.end(); tk++)
     sum += tk->getPt();
   return sum;
