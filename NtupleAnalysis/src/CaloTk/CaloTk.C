@@ -1437,6 +1437,7 @@ void CaloTk::GetMatchingTrack(L1TkTauParticle &L1TkTau,
 
   // Assign values to the L1TkTau
   L1TkTau.SetCaloTau(myL1Tau.index());
+  L1TkTau.SetCaloTau(myL1Tau);
   L1TkTau.SetMatchingTk(matchTk);
   L1TkTau.SetMatchTkDeltaRNew(matchTk_dR);
   if (0) L1TkTau.PrintProperties(false, false, true, false);
