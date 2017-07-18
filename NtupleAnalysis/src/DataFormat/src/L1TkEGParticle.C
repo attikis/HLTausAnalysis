@@ -16,13 +16,15 @@ L1TkEGParticle::L1TkEGParticle()
 
 
 //****************************************************************************
-L1TkEGParticle::L1TkEGParticle(vector<TTTrack> tracks, vector<L1EG> EGs)
+L1TkEGParticle::L1TkEGParticle(vector<TTTrack> tracks, vector<L1EG> EGs,
+                               GenParticle genTau, bool matching)
 //****************************************************************************
 {
 
   theTracks = tracks;
   theEGs = EGs;
-  
+  theGenTau = genTau;
+  theMatching = matching;
 }
 
 
@@ -39,10 +41,10 @@ void L1TkEGParticle::InitVars_(void)
 double L1TkEGParticle::GetTrackPtSum()
 //****************************************************************************
 {
-  double sum = 0.0;
+  TLorentzVector sum; // initialized to (0,0,0,0)
   for (auto tk = theTracks.begin(); tk != theTracks.end(); tk++)
-    sum += tk->getPt();
-  return sum;
+    sum += tk->p4();
+  return sum.Pt();
 }
 
 
@@ -68,7 +70,39 @@ double L1TkEGParticle::GetEGInvMass()
 }
 
 
-				 
+//****************************************************************************
+double L1TkEGParticle::GetGenTauPt()
+//****************************************************************************
+{
+  if (theMatching)
+    return theGenTau.p4vis().Pt();
+  else
+    return -1.0;
+}
+	
+	
+//****************************************************************************
+double L1TkEGParticle::GetGenTauEt()
+//****************************************************************************
+{
+  if (theMatching)
+    return theGenTau.p4vis().Et();
+  else
+    return -1.0;
+}				 
+
+
+//****************************************************************************
+double L1TkEGParticle::GetTrackBasedEt()
+//****************************************************************************
+{
+  TLorentzVector sum; // initialized to (0,0,0,0)
+  for (auto tk = theTracks.begin(); tk != theTracks.end(); tk++)
+    sum += tk->p4();
+  return sum.Et();
+}
+
+
 //****************************************************************************
 void L1TkEGParticle::PrintTTTracks()
 //****************************************************************************
