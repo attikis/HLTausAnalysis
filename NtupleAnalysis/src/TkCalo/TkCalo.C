@@ -177,7 +177,7 @@ void TkCalo::Loop()
     
     // Ensure that all taus are found, needed by the current efficiency definition 
     // E.g. for ttbar, only events iwth two taus within trigger acceptance are considered for efficiency calculation)
-    bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
+     = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
     if (bFoundAllTaus_) nEvtsWithMaxHTaus++;
 
     ////////////////////////////////////////////////
@@ -664,8 +664,8 @@ void TkCalo::FillSingleTau_(vector<L1TkEGParticle> L1TkEGs,
   vector<L1TkEGParticle> L1TkEGs_mcMatched = GetMcMatchedL1TkEGs(TauCandidates);
   if (L1TkEGs_mcMatched.size() < 1) return;
   
-  // Check that all taus were found
-  //if(!bFoundAllTaus_) return; //TODO what is the point?
+  // Check that all taus were found (needed due to the efficiency defintion)
+  if(!bFoundAllTaus_) return;
 
   // Fill efficiency
   double ldgEt_mcMatched = L1TkEGs_mcMatched.at(0).GetTrackBasedEt();
@@ -703,8 +703,8 @@ void TkCalo::FillDiTau_(vector<L1TkEGParticle> L1TkEGs,
   vector<L1TkEGParticle> L1TkEGs_mcMatched = GetMcMatchedL1TkEGs(L1TkEGs);
   if (L1TkEGs_mcMatched.size() < 2) return;
     
-  // Check that all taus were found
- // if(!bFoundAllTaus_) return; //TODO
+  // Check that all taus were found (needed due to the efficiency defintion)
+  if(!bFoundAllTaus_) return;
 
   // Fill efficiency
   double subLdgEt_mcMatched = L1TkEGs_mcMatched.at(1).GetTrackBasedEt();
