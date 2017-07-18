@@ -186,15 +186,17 @@ class TkCalo : public TreeAnalyserMC{
 
   TH1D* h_trkClusters_MultiplicityPerCluster;
   TH1D* h_trkClusters_Pt;
+  TH1D* h_trkClusters_PtResolution;
   TH1D* h_trkClusters_M;
 
-  TH1D* h_clustEGs_MultiplicityPerCluster;
+  TH1D* h_EGClusters_MultiplicityPerCluster;
   TH1D* h_clustEGs_Et;
   TH1D* h_clustEGs_Eta;
   TH1D* h_clustEGs_Phi;
   TH2D* h_clustEGs_Phi_Eta;
 
-  TH1D* h_EGClusters_Pt;
+  TH1D* h_EGClusters_Et;
+  TH1D* h_EGClusters_EtResolution;
   TH1D* h_EGClusters_M;
 
   TH1D* h_trkClusters_relIso;

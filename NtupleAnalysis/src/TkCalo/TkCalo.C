@@ -28,7 +28,7 @@ void TkCalo::InitVars_()
   datasets_  = datasets_.GetDataset(mcSample);
   nMaxNumOfHTausPossible = datasets_.nMcTaus_;
   
-  cfg_DEBUG = true;
+  cfg_DEBUG = false;
   if (cfg_DEBUG) std::cout << "=== TkCalo::InitVars_()" << std::endl;
   
   cfg_AddL1Tks   = true;
@@ -156,7 +156,6 @@ void TkCalo::Loop()
 	if (cfg_AddEGs) {
 	  L1EGs = GetL1EGs(false);
 	  sort( L1EGs.begin(), L1EGs.end() ); // Sort from highest Et to lowest Et (should be already done by default)
-	  cout << "Sorted EGs!" << endl;
 	  if (cfg_DEBUG) cout << "\n=== L1EGs (" << L1EGs.size() << ")" << endl;
 	}
 
@@ -176,8 +175,8 @@ void TkCalo::Loop()
     if (!isMinBias) GenTausTrigger = GetHadronicGenTaus(GenTaus, 20.0, 2.4);  
     
     // Ensure that all taus are found, needed by the current efficiency definition 
-    // E.g. for ttbar, only events iwth two taus within trigger acceptance are considered for efficiency calculation)
-     = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
+    // E.g. for ttbar, only events with two taus within trigger acceptance are considered for efficiency calculation)
+    bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
     if (bFoundAllTaus_) nEvtsWithMaxHTaus++;
 
     ////////////////////////////////////////////////
@@ -243,10 +242,13 @@ void TkCalo::Loop()
     bool stopClustering;
     for (size_t i=0; i<trackTauCandidates.size(); i++) {
         leadTrackPtr = &(trackTauCandidates[i][0]);
+        int Ntrks = 1;
         if (cfg_DEBUG*0) cout << "Starting to cluster lead track " << leadTrackPtr->index();
         // Loop over other tracks
         stopClustering = false;
-        for (vector<TTTrack>::iterator trackIter = TTTracks.begin(); !stopClustering && trackIter != TTTracks.end(); trackIter++) {
+        for (vector<TTTrack>::iterator trackIter = TTTracks.begin(); ( !stopClustering && (trackIter != TTTracks.end()) ); trackIter++) {
+          // Do not double-counts the lead track
+          if (trackIter->index() == leadTrackPtr->index()) continue;
           // Skip tracks that are not close in terms of deltaR and deltaZ
           if (abs (trackIter->getZ0() - leadTrackPtr->getZ0() ) > maxDeltaZ_trk) continue;
           deltaR = auxTools_.DeltaR(leadTrackPtr->getEta(), leadTrackPtr->getPhi(), trackIter->getEta(), trackIter->getPhi());
@@ -272,7 +274,8 @@ void TkCalo::Loop()
           else {
             // Stop clustering and fill track cluster histograms
             stopClustering = true;
-            h_trkClusters_MultiplicityPerCluster->Fill( trackTauCandidates[i].size() );
+            Ntrks = trackTauCandidates[i].size();
+            h_trkClusters_MultiplicityPerCluster->Fill( Ntrks );
             h_trkClusters_Pt->Fill( pT );
             h_trkClusters_M->Fill( invMass );
           }
@@ -285,10 +288,11 @@ void TkCalo::Loop()
     // Build EG clusters and create tau candidates
     vector<L1EG> EGcluster;
     TauCandidates.clear();
+    double ET;
     for (size_t i=0; i<trackTauCandidates.size(); i++) {
         std::cout << "Clustering EGs around trackTauCandidates[" << i << "]" << endl;
         EGcluster.clear();
-        pT = 0.0;
+        ET = 0.0;
         invMass = 0.0;
         leadTrackPtr = &(trackTauCandidates[i][0]);
         stopClustering = false;
@@ -305,7 +309,7 @@ void TkCalo::Loop()
           std::cout << "invMassTmp = " << p4sum.M() << endl;
           if (p4sum.M() < maxInvMass_EG){
             EGcluster.push_back(*eg);
-            pT = p4sum.Pt();
+            ET = p4sum.Et();
             invMass = p4sum.M();
             // Fill EG histograms
             h_clustEGs_Et->Fill( eg->getEt() );
@@ -313,7 +317,7 @@ void TkCalo::Loop()
             h_clustEGs_Phi->Fill( eg->getPhi() );
             h_clustEGs_Phi_Eta->Fill( eg->getPhi(),eg->getEta() );
             // Fill EG cluster histograms
-            h_EGClusters_Pt->Fill( pT );            
+            h_EGClusters_Et->Fill( ET );            
             h_EGClusters_M->Fill( invMass );            
           }
           else {
@@ -321,7 +325,7 @@ void TkCalo::Loop()
           }
         }
         // Fill the number of EGs in cluster
-        h_clustEGs_MultiplicityPerCluster->Fill( EGcluster.size() );
+        h_EGClusters_MultiplicityPerCluster->Fill( EGcluster.size() );
 
         // Find the genTau matching to the lead track
         GenParticle genTau;
@@ -332,8 +336,19 @@ void TkCalo::Loop()
 
         // Fill histograms with the matched genTau
         if (hasGenTau){
+          // Properties of the genTau
           hTkEG_VisEt->Fill( genTau.p4vis().Et() );
           hTkEG_DeltaRmatch->Fill( deltaR_match );
+          // Pt resolution
+          TLorentzVector p4tracks; // initialized to (0,0,0,0) 
+          for (auto tk = trackTauCandidates[i].begin(); tk != trackTauCandidates[i].end(); tk++) {
+            p4tracks += tk->p4();
+          }
+          double pTresolution = ( p4tracks.Pt()-genTau.p4vis().Pt() ) / genTau.p4vis().Pt();
+          h_trkClusters_PtResolution->Fill(pTresolution);
+          // ET resolution
+          double ETresolution = ( ET -genTau.p4vis().Et() ) / genTau.p4vis().Et();
+          h_EGClusters_EtResolution->Fill(ETresolution);
         }
 
         // Build a tau candidate from tracks and EGs
@@ -361,7 +376,7 @@ void TkCalo::Loop()
           ptSum += tk -> getPt();
       }
       // Calculate relative isolation
-      relIso = tkeg->GetTrackPtSum() / ptSum;
+      relIso = tkeg->GetTrackBasedPt() / ptSum;
       // Fill relative isolation histogram
       h_trkClusters_relIso->Fill( relIso );
       //cout << "relIso = " << relIso << endl;
@@ -522,16 +537,16 @@ void TkCalo::BookHistos_(void)
   histoTools_.BookHisto_2D(h_clustTrks_Phi_Eta, "clustTrks_Phi_Eta",  ";#phi (rads);#eta", 230,  -3.15,  +3.15, 600,  -3.0,  +3.0);  			      
 
   // Number of clustered tracks (per cluster)
-  histoTools_.BookHisto_1D(h_trkClusters_MultiplicityPerCluster, "trkClusters_MultiplicityPerCluster", ";Number of tracks in cluster;Clusters / bin", 30, -0.5, +14.5);
+  histoTools_.BookHisto_1D(h_trkClusters_MultiplicityPerCluster, "trkClusters_MultiplicityPerCluster", ";Number of tracks in cluster;Clusters / bin", 15, 0., +15.);
 
   // Pt of track clusters
   histoTools_.BookHisto_1D(h_trkClusters_Pt, "trkClusters_Pt", ";Pt (GeV);Clusters / bin", 300, +0.0, +300.0);
+
+  // Pt resolution of track clusters
+  histoTools_.BookHisto_1D(h_trkClusters_PtResolution, "trkClusters_PtResolution", ";Pt resolution (GeV);Clusters / bin", 50, -5.0, +5.0);
   
   // Invariant mass of track clusters
-  histoTools_.BookHisto_1D(h_trkClusters_M, "trkClusters_M", ";Invariant mass;Clusters / bin", 100, +0.0, +5.0);
-
-  // Number of EGs (per cluster)
-  histoTools_.BookHisto_1D(h_clustEGs_MultiplicityPerCluster, "clustEGs_MultiplicityPerCluster", ";Number of EGs in cluster;Clusters / bin", 30, -0.5, +14.5);
+  histoTools_.BookHisto_1D(h_trkClusters_M, "trkClusters_M", ";Invariant mass;Clusters / bin", 12, -2.0, +10.0);
 
   // Clustered EGs Pt
   histoTools_.BookHisto_1D(h_clustEGs_Et, "clustEGs_Pt", ";Pt (GeV);Events / bin", 300, +0.0, +300.0);
@@ -545,8 +560,14 @@ void TkCalo::BookHistos_(void)
   // Clustered EGs in Eta-Phi plane
   histoTools_.BookHisto_2D(h_clustEGs_Phi_Eta, "clustEGs_Phi_Eta",  ";#phi (rads);#eta", 230,  -3.15,  +3.15, 600,  -3.0,  +3.0);		      
 
-  // Pt of EG clusters
-  histoTools_.BookHisto_1D(h_EGClusters_Pt, "EGClusters_Pt", ";Pt (GeV);Clusters / bin", 300, +0.0, +300.0);
+  // Number of EGs (per cluster)
+  histoTools_.BookHisto_1D(h_EGClusters_MultiplicityPerCluster, "EGClusters_MultiplicityPerCluster", ";Number of EGs in cluster;Clusters / bin", 15, -0., +15.);
+
+  // Et of EG clusters
+  histoTools_.BookHisto_1D(h_EGClusters_Et, "EGClusters_Et", ";Et (GeV);Clusters / bin", 300, +0.0, +300.0);
+
+  // Et resolution of EG clusters
+  histoTools_.BookHisto_1D(h_EGClusters_EtResolution, "EGClusters_EtResolution", ";Et resolution (GeV);Clusters / bin", 50, -5.0, +5.0);
   
   // Invariant mass of EG clusters
   histoTools_.BookHisto_1D(h_EGClusters_M, "EGClusters_M", ";Invariant mass;Clusters / bin", 100, +0.0, +5.0);
@@ -564,22 +585,22 @@ void TkCalo::BookHistos_(void)
   histoTools_.BookHisto_1D(hMcHadronicTau_VisEt, "hMcHadronicTau_VisEt", ";VisEt (GeV);Particles / bin", 40, 0.0,  +200.0);
 
   // Turn-on histograms
-  histoTools_.BookHisto_1D(hTurnOn25_all, "TurnOn25_all", "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTurnOn25_relIso, "TurnOn25_relIso", "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTurnOn50_all, "TurnOn50_all", "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTurnOn50_relIso, "TurnOn50_relIso", "", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn25_all, "TurnOn25_all", ";track cluster p_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn25_relIso, "TurnOn25_relIso", ";track cluster p_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn50_all, "TurnOn50_all", ";track cluster p_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn50_relIso, "TurnOn50_relIso", ";track cluster p_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
   
   // Single-tau rates
-  histoTools_.BookHisto_1D(hRateSingleTau    , "Rate_SingleTau"    , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hRateSingleTau_C  , "Rate_SingleTau_C"  , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hRateSingleTau_I  , "Rate_SingleTau_I"  , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hRateSingleTau_F  , "Rate_SingleTau_F"  , "", 200, 0.0,  +200.0);  
+  histoTools_.BookHisto_1D(hRateSingleTau    , "Rate_SingleTau"    , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hRateSingleTau_C  , "Rate_SingleTau_C"  , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hRateSingleTau_I  , "Rate_SingleTau_I"  , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hRateSingleTau_F  , "Rate_SingleTau_F"  , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);  
   
   // Single-tau efficiencies
-  histoTools_.BookHisto_1D(hEffSingleTau     , "Eff_SingleTau"     , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hEffSingleTau_C   , "Eff_SingleTau_C"   , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hEffSingleTau_I   , "Eff_SingleTau_I"   , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hEffSingleTau_F   , "Eff_SingleTau_F"   , "", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hEffSingleTau     , "Eff_SingleTau"     , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_C   , "Eff_SingleTau_C"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_I   , "Eff_SingleTau_I"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_F   , "Eff_SingleTau_F"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
   
   return;
 }
@@ -652,7 +673,7 @@ void TkCalo::FillSingleTau_(vector<L1TkEGParticle> L1TkEGs,
   if( L1TkEGs.size() < 1 ) return;
   
   // Fill rate
-  double ldgEt = L1TkEGs.at(0).GetTrackBasedEt();
+  double ldgEt = L1TkEGs.at(0).GetTrackBasedPt();
 
   // Inclusive or Eta slice in Central/Intermedieate/Forward Tracker region?
   if ( abs(L1TkEGs.at(0).GetLeadingTrack().getEta()) < minEta) return;
@@ -668,7 +689,7 @@ void TkCalo::FillSingleTau_(vector<L1TkEGParticle> L1TkEGs,
   if(!bFoundAllTaus_) return;
 
   // Fill efficiency
-  double ldgEt_mcMatched = L1TkEGs_mcMatched.at(0).GetTrackBasedEt();
+  double ldgEt_mcMatched = L1TkEGs_mcMatched.at(0).GetTrackBasedPt();
   FillEfficiency_(hEfficiency, ldgEt_mcMatched);
 
   return;
@@ -689,7 +710,7 @@ void TkCalo::FillDiTau_(vector<L1TkEGParticle> L1TkEGs,
 
   // Fill rate
   L1TkEGParticle L1TkEG = L1TkEGs.at(1);
-  double subLdgEt = L1TkEG.GetTrackBasedEt();
+  double subLdgEt = L1TkEG.GetTrackBasedPt();
   
   // Inclusive or Eta slice in Central/Intermedieate/Forward Tracker region?
   if ( abs(L1TkEGs.at(0).GetLeadingTrack().getEta()) < minEta) return;
@@ -707,7 +728,7 @@ void TkCalo::FillDiTau_(vector<L1TkEGParticle> L1TkEGs,
   if(!bFoundAllTaus_) return;
 
   // Fill efficiency
-  double subLdgEt_mcMatched = L1TkEGs_mcMatched.at(1).GetTrackBasedEt();
+  double subLdgEt_mcMatched = L1TkEGs_mcMatched.at(1).GetTrackBasedPt();
   FillEfficiency_(hEfficiency, subLdgEt_mcMatched);
 
   return;
@@ -731,8 +752,8 @@ void TkCalo::FillDiTau_(vector<L1TkEGParticle> L1TkEGs1,
   vector<L1TkEGParticle> L1TkEGs2_mcMatched = GetMcMatchedL1TkEGs(L1TkEGs2);
 
   // Fill rate 
-  double ldgEt1 = L1TkEGs1.at(0).GetTrackBasedEt();
-  double ldgEt2 = L1TkEGs2.at(0).GetTrackBasedEt();
+  double ldgEt1 = L1TkEGs1.at(0).GetTrackBasedPt();
+  double ldgEt2 = L1TkEGs2.at(0).GetTrackBasedPt();
 
   // Ensure that different calo objects are used
   unsigned int index1 = L1TkEGs1.at(0).GetLeadingTrack().index();
@@ -753,8 +774,8 @@ void TkCalo::FillDiTau_(vector<L1TkEGParticle> L1TkEGs1,
   if (L1TkEGs2_mcMatched.size() < 1) return;
 
   // Get MC-matched Et
-  double ldgEt1_mcMatched = L1TkEGs1_mcMatched.at(0).GetTrackBasedEt();
-  double ldgEt2_mcMatched = L1TkEGs2_mcMatched.at(0).GetTrackBasedEt();
+  double ldgEt1_mcMatched = L1TkEGs1_mcMatched.at(0).GetTrackBasedPt();
+  double ldgEt2_mcMatched = L1TkEGs2_mcMatched.at(0).GetTrackBasedPt();
 
   
   // Ensure that different calo objects are used
@@ -820,7 +841,7 @@ void TkCalo::FillEfficiency_(TH1D *hEfficiency,
 
 //============================================================================
 void TkCalo::FillTurnOn_Numerator_(vector<L1TkEGParticle> L1TkEGs, 
-				   const double minEt,
+				   const double minPt,
 				   TH1D *hTurnOn)
 //============================================================================
 {
@@ -837,8 +858,8 @@ void TkCalo::FillTurnOn_Numerator_(vector<L1TkEGParticle> L1TkEGs,
       if (!tau->HasMatchingGenParticle()) continue;	 
       
       matched_particles++;
-      // Skip if trigger object has eT < minEt
-      if (tau->GetTrackBasedEt() < minEt) continue;
+      // Skip if trigger object has Pt < minPt
+      if (tau->GetTrackBasedPt() < minPt) continue;
       passed_cut++;      
             
       // Fill the turn-on
