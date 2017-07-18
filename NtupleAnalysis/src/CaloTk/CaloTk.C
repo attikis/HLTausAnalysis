@@ -469,12 +469,12 @@ void CaloTk::Loop()
     vector<L1TkTauParticle> L1TkTaus_Tk;
     vector<L1TkTauParticle> L1TkTaus_VtxIso;    
 
-
-    // alex: new-start
+    // -------------------------------------- ALEX-START -------------------------------------- 
+    // Jet Collections
     vector<L1Jet> L1Jets = GetL1Jets(true);
-    GetL1EGs(true);
-    GetL1Sums(true);
-    // alex: new-end
+    vector<L1EG> L1EGs   = GetL1EGs(true);
+    vector<L1Sum> L1Sums = GetL1Sums(true);
+    // -------------------------------------- ALEX-END -------------------------------------- 
 
     // Ensure that all taus are found
     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
@@ -1652,6 +1652,5 @@ vector<L1TkTauParticle> CaloTk::GetMcMatchedL1TkTaus(vector<L1TkTauParticle> L1T
   
   return matchedL1TkTaus;
 }
-
 
 #endif

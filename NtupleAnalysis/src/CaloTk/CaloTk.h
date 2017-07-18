@@ -20,8 +20,10 @@
 #include "../DataFormat/src/TrackingParticle.C"
 #include "../DataFormat/interface/TTTrack.h"
 #include "../DataFormat/interface/TTPixelTrack.h"
-#include "../DataFormat/src/L1Tau.C"
+#include "../DataFormat/src/L1EG.C"
 #include "../DataFormat/src/L1Jet.C"
+#include "../DataFormat/src/L1Tau.C"
+#include "../DataFormat/src/L1Sum.C"
 
 // #include "../Plugins/src/L1TkPrimaryVertex.C"
 #include "../Plugins/src/L1PixelTrackFit.C"
@@ -65,6 +67,12 @@ class CaloTk : public TreeAnalyserMC{
   void PrintTTTrackCollection(vector<TTTrack> collection);
 
   void PrintTTPixelTrackCollection(vector<TTPixelTrack> collection);
+
+  void PrintL1SumCollection(vector<L1Sum> collection);
+
+  void PrintL1EGCollection(vector<L1EG> collection);
+
+  void PrintL1JetCollection(vector<L1Jet> collection);
 
   void PrintL1TauCollection(vector<L1Tau> collection);
 
