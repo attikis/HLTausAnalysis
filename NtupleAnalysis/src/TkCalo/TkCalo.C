@@ -26,12 +26,14 @@ void TkCalo::InitVars_()
 {
 
   datasets_  = datasets_.GetDataset(mcSample);
+  nMaxNumOfHTausPossible = datasets_.nMcTaus_;
   
   cfg_DEBUG = true;
   if (cfg_DEBUG) std::cout << "=== TkCalo::InitVars_()" << std::endl;
   
   cfg_AddL1Tks   = true;
   cfg_AddEGs     = true;
+  cfg_AddGenP    = true;
   
   // Track parameters
   cfg_tk_Collection  =  "TTTracks"; // Default: "TTTracks" (not "TTPixelTracks")
@@ -69,6 +71,7 @@ void TkCalo::InitVars_()
   minDeltaR_EG      = 0.0;
   maxDeltaR_EG      = 0.3;
   maxInvMass_EG     = 1.77; // GeV
+  maxDeltaR_MCmatch = 0.1;    
   minDeltaR_iso     = 0.0;
   maxDeltaR_iso     = 5.0;
   maxDeltaZ_iso     = 0.8;  // cm
@@ -145,24 +148,44 @@ void TkCalo::Loop()
     // Tracks
     if (cfg_AddL1Tks) {
 	  if (cfg_DEBUG) cout << "\n=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
-	  cout << "Getting tracks..." << endl;
 	  TTTracks = GetTTTracks(cfg_tk_minPt, cfg_tk_minEta, cfg_tk_maxEta, cfg_tk_maxChiSqRed, cfg_tk_minStubs, cfg_tk_minStubsPS, cfg_tk_maxStubsPS, cfg_tk_nFitParams, false);
-	  cout << "Got tracks. Now sorting..." << endl;
 	  sort( TTTracks.begin(), TTTracks.end() ); // Sort from highest Pt to lowest (not done by default)
-	  cout << "Sorted tracks!" << endl;
 	}    
 	
 	// EGs
 	if (cfg_AddEGs) {
-	  L1EGs = GetL1EGs(cfg_DEBUG);
+	  L1EGs = GetL1EGs(false);
 	  sort( L1EGs.begin(), L1EGs.end() ); // Sort from highest Et to lowest Et (should be already done by default)
 	  cout << "Sorted EGs!" << endl;
 	  if (cfg_DEBUG) cout << "\n=== L1EGs (" << L1EGs.size() << ")" << endl;
 	}
 
+    // GenParticles
+    vector<GenParticle> GenTaus;
+	GenTaus = GetGenParticles(15, false);
+	
+	// Hadronic GenTaus
+    GenTausHadronic.clear();
+    if (cfg_AddGenP) {
+      if (cfg_DEBUG) cout << "\n=== GenParticles (" << GenP_Pt->size() << ")" << endl;
+	  GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
+	}
+
+    // Triggred GenTaus
+    vector<GenParticle> GenTausTrigger;  
+    GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 2.4);  
+    
+    // Ensure that all taus are found //TODO: what is the point?
+    bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
+    if (bFoundAllTaus_) nEvtsWithMaxHTaus++;
+
     ////////////////////////////////////////////////
     // TkCalo algorithm
     ////////////////////////////////////////////////    
+
+    // Consider only events with at least one genuine hadronic tau
+    h_genTausHad_N->Fill( GenTausHadronic.size() );
+    if (GenTausHadronic.size() < 1) continue;
 
     // Select lead tracks  
     vector<unsigned short> leadTrackIndices;
@@ -258,8 +281,9 @@ void TkCalo::Loop()
 
     }
 
-    // Build EG clusters
+    // Build EG clusters and create tau candidates
     vector<L1EG> EGcluster;
+    TauCandidates.clear();
     for (size_t i=0; i<trackTauCandidates.size(); i++) {
         std::cout << "Clustering EGs around trackTauCandidates[" << i << "]" << endl;
         EGcluster.clear();
@@ -298,10 +322,25 @@ void TkCalo::Loop()
         // Fill the number of EGs in cluster
         h_clustEGs_MultiplicityPerCluster->Fill( EGcluster.size() );
 
+        // Find the genTau matching to the lead track
+        GenParticle genTau;
+        double deltaR_match = GetMatchingGenParticle(trackTauCandidates[i][0], &genTau);
+
+        bool hasGenTau = false;
+        if (deltaR_match < maxDeltaR_MCmatch) hasGenTau = true;
+
+        // Fill histograms with the matched genTau
+        if (hasGenTau){
+          hTkEG_VisEt->Fill( genTau.p4vis().Et() );
+          hTkEG_DeltaRmatch->Fill( deltaR_match );
+        }
+
         // Build a tau candidate from tracks and EGs
-        L1TkEGParticle newTauCandidate(trackTauCandidates[i], EGcluster);
-        cout << "Constructed a new tau candidate with track invariant mass of " << newTauCandidate.GetTrackInvMass() 
-             << " and EG invariant mass of " << newTauCandidate.GetEGInvMass() << endl;
+        L1TkEGParticle newTauCandidate(trackTauCandidates[i], EGcluster, genTau, hasGenTau);
+        cout << "Constructed a new tau candidate with a track invariant mass of " << newTauCandidate.GetTrackInvMass() 
+             << ", an EG invariant mass of " << newTauCandidate.GetEGInvMass();
+        if (hasGenTau) cout  << " and a generator tau with visible pT " << newTauCandidate.GetGenTauPt() << endl;
+        else cout << " and does not have a matching generator tau" << endl;
         TauCandidates.push_back(newTauCandidate);
     }  
        
@@ -334,17 +373,49 @@ void TkCalo::Loop()
     // Print the properties of L1TkEMParticles
     ////////////////////////////////////////////////
 
-   
+    // TODO
+    
     ////////////////////////////////////////////////
     // Fill Turn-On histograms
     ////////////////////////////////////////////////
-    
-    // TODO
-    
+
+    // Fill visible Et of hadronic taus to a histogram
+    for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++) hMcHadronicTau_VisEt->Fill( tau->p4vis().Et() );
+
+    // Fill turn-on numerators
+    FillTurnOn_Numerator_(TauCandidates, 25.0, hTurnOn25_all);
+    FillTurnOn_Numerator_(TauCandidatesIsolated, 25.0, hTurnOn25_relIso);
+    FillTurnOn_Numerator_(TauCandidates, 50.0, hTurnOn50_all);
+    FillTurnOn_Numerator_(TauCandidatesIsolated, 50.0, hTurnOn50_relIso);
+
+    ////////////////////////////////////////////////
+    // Rates and efficiencies for single tau
+    ////////////////////////////////////////////////
+    FillSingleTau_(TauCandidates, hRateSingleTau, hEffSingleTau);
+    FillSingleTau_(TauCandidates, hRateSingleTau_C, hEffSingleTau_C, 0.0, 1.0);
+    FillSingleTau_(TauCandidates, hRateSingleTau_I, hEffSingleTau_I, 1.0, 1.6);
+    FillSingleTau_(TauCandidates, hRateSingleTau_F, hEffSingleTau_F, 1.6, 3.0); // 2.5 is max
+
+    ////////////////////////////////////////////////
+    // Rates and efficiencies for ditau
+    ////////////////////////////////////////////////
+/*    FillDiTau_(L1TkTaus_Calo, L1TkTaus_Tk    , hDiTau_Rate_Calo_Tk    , hDiTau_Eff_Calo_Tk    );
+    FillDiTau_(L1TkTaus_Calo, L1TkTaus_VtxIso, hDiTau_Rate_Calo_VtxIso, hDiTau_Eff_Calo_VtxIso);
+    FillDiTau_(L1TkTaus_Tk  , L1TkTaus_VtxIso, hDiTau_Rate_Tk_VtxIso  , hDiTau_Eff_Tk_VtxIso  );
+
+    ////////////////////////////////////////////////
+    // WARNING: Erases L1TkTaus from vector!
+    ////////////////////////////////////////////////
+    ApplyDiTauZMatching(matchTk_Collection, L1TkTaus_Tk);
+    FillDiTau_(L1TkTaus_Tk, hDiTau_Rate_Tk  , hDiTau_Eff_Tk);
+    FillDiTau_(L1TkTaus_Tk, hDiTau_Rate_Tk_C, hDiTau_Eff_Tk_C, 0.0, 1.0);
+    FillDiTau_(L1TkTaus_Tk, hDiTau_Rate_Tk_I, hDiTau_Eff_Tk_I, 1.0, 1.6);
+    FillDiTau_(L1TkTaus_Tk, hDiTau_Rate_Tk_F, hDiTau_Eff_Tk_F, 1.6, 3.0); */
+
     // Progress bar
     if (!cfg_DEBUG) auxTools_.ProgressBar(jentry, nEntries, 100, 100);
     
-  }// For-loop: Entries
+  } // For-loop: Entries
 
   ////////////////////////////////////////////////
   // Fill counters
@@ -354,10 +425,26 @@ void TkCalo::Loop()
   
   
   ////////////////////////////////////////////////
-  // Convert/Finalise Histos
+  // Convert/Finalise histogramss
   ////////////////////////////////////////////////
 
-  // TODO
+  // Divide turn-on numerators by the denumerator
+  histoTools_.DivideHistos_1D(hTurnOn25_all, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hTurnOn25_relIso, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hTurnOn50_all, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hTurnOn50_relIso, hMcHadronicTau_VisEt); 
+  
+  // Convert rate histograms
+  histoTools_.ConvertToRateHisto_1D(hRateSingleTau, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRateSingleTau_C, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRateSingleTau_I, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRateSingleTau_F, nEntries);
+
+  // Finalise efficiency histograms
+  FinaliseEffHisto_(hEffSingleTau  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_(hEffSingleTau_C, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_(hEffSingleTau_I, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_(hEffSingleTau_F, nEvtsWithMaxHTaus);
 
 
   ////////////////////////////////////////////////
@@ -399,17 +486,20 @@ void TkCalo::BookHistos_(void)
 //============================================================================
 {
 
+  // Number of genuine hadronic taus (per event)
+  histoTools_.BookHisto_1D(h_genTausHad_N, "genTausHadronic_N", ";Number of genuine hadronic taus in event;Events / bin", 4, -0.5, +4.5);
+
   // Number of lead tracks (per event)
   histoTools_.BookHisto_1D(h_leadTrks_Multiplicity, "leadTrks_Multiplicity", ";Number of lead tracks in event;Events / bin", 30, -0.5, +14.5);
 
   // Lead track Pt
-  histoTools_.BookHisto_1D(h_leadTrks_Pt, "leadTrks_Pt", ";Pt (GeV);Events / bin", 300, +0.0, +300.0);
+  histoTools_.BookHisto_1D(h_leadTrks_Pt, "leadTrks_Pt", ";Pt (GeV);Tracks / bin", 300, +0.0, +300.0);
 
   // Lead track Eta
-  histoTools_.BookHisto_1D(h_leadTrks_Eta, "leadTrks_Eta", ";#eta;Events / bin", 600, -3.0, +3.0);
+  histoTools_.BookHisto_1D(h_leadTrks_Eta, "leadTrks_Eta", ";#eta;Tracks / bin", 600, -3.0, +3.0);
 
   // Lead track Phi
-  histoTools_.BookHisto_1D(h_leadTrks_Phi, "leadTrks_Phi", ";#phi (rads);Events / bin", 23,  -3.15,  +3.15);
+  histoTools_.BookHisto_1D(h_leadTrks_Phi, "leadTrks_Phi", ";#phi (rads);Tracks / bin", 23,  -3.15,  +3.15);
   
   // Lead tracks in Eta-Phi plane
   // (Syntax: BookHisto_2D(histogram, hName, hTitle, binsX, xMin, xMax, binsY, yMin, yMax)
@@ -419,13 +509,13 @@ void TkCalo::BookHistos_(void)
   histoTools_.BookHisto_1D(h_leadTrkSelection, "leadTrkSelection", "", 5,  0.0,  5.0);  
 
   // Clustered tracks Pt
-  histoTools_.BookHisto_1D(h_clustTrks_Pt, "clustTrks_Pt", ";Pt (GeV);Events / bin", 300, +0.0, +300.0);
+  histoTools_.BookHisto_1D(h_clustTrks_Pt, "clustTrks_Pt", ";Pt (GeV);Tracks / bin", 300, +0.0, +300.0);
 
   // Clustered tracks Eta
-  histoTools_.BookHisto_1D(h_clustTrks_Eta, "clustTrks_Eta", ";#eta;Events / bin", 600, -3.0, +3.0);
+  histoTools_.BookHisto_1D(h_clustTrks_Eta, "clustTrks_Eta", ";#eta;Tracks / bin", 600, -3.0, +3.0);
 
   // Clustered tracks Phi
-  histoTools_.BookHisto_1D(h_clustTrks_Phi, "clustTrks_Phi", ";#phi (rads);Events / bin", 23,  -3.15,  +3.15);
+  histoTools_.BookHisto_1D(h_clustTrks_Phi, "clustTrks_Phi", ";#phi (rads);Tracks / bin", 23,  -3.15,  +3.15);
   
   // Clustered tracks in Eta-Phi plane
   histoTools_.BookHisto_2D(h_clustTrks_Phi_Eta, "clustTrks_Phi_Eta",  ";#phi (rads);#eta", 230,  -3.15,  +3.15, 600,  -3.0,  +3.0);  			      
@@ -462,6 +552,355 @@ void TkCalo::BookHistos_(void)
 
   // Track-based relative isolation of tau candidates
   histoTools_.BookHisto_1D(h_trkClusters_relIso, "trkClusters_relIso", ";Relative isolation;Clusters / bin", 100, 0.0, +5.0);
+
+  // DeltaR in MC matching of the lead track of tau candidates
+  histoTools_.BookHisto_1D(hTkEG_DeltaRmatch  , "TkEG_DeltaRmatch"  , ";#Delta R;Particles / bin",   100,  0.0,   +1.0);
+
+  // Visible Et of the matched generator taus
+  histoTools_.BookHisto_1D(hTkEG_VisEt, "TkEG_VisEt", ";VisEt (GeV);Particles / bin", 40, 0.0,  +200.0);
+
+  // Visible Et of all generator taus
+  histoTools_.BookHisto_1D(hMcHadronicTau_VisEt, "hMcHadronicTau_VisEt", ";VisEt (GeV);Particles / bin", 40, 0.0,  +200.0);
+
+  // Turn-on histograms
+  histoTools_.BookHisto_1D(hTurnOn25_all, "TurnOn25_all", "", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn25_relIso, "TurnOn25_relIso", "", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn50_all, "TurnOn50_all", "", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn50_relIso, "TurnOn50_relIso", "", 40, 0.0,  +200.0);
+  
+  // Single-tau rates
+  histoTools_.BookHisto_1D(hRateSingleTau    , "Rate_SingleTau"    , "", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hRateSingleTau_C  , "Rate_SingleTau_C"  , "", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hRateSingleTau_I  , "Rate_SingleTau_I"  , "", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hRateSingleTau_F  , "Rate_SingleTau_F"  , "", 200, 0.0,  +200.0);  
+  
+  // Single-tau efficiencies
+  histoTools_.BookHisto_1D(hEffSingleTau     , "Eff_SingleTau"     , "", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_C   , "Eff_SingleTau_C"   , "", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_I   , "Eff_SingleTau_I"   , "", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_F   , "Eff_SingleTau_F"   , "", 200, 0.0,  +200.0);
+  
+  return;
+}
+
+
+
+//============================================================================
+vector<L1TkEGParticle> TkCalo::GetMcMatchedL1TkEGs(vector<L1TkEGParticle> L1TkEGs)
+//============================================================================
+{
+
+  // Get all MC-matched trigger objects
+  vector<L1TkEGParticle> matchedL1TkEGs;
+  for (vector<L1TkEGParticle>::iterator tau = L1TkEGs.begin(); tau != L1TkEGs.end(); tau++)
+    {
+      if (!tau->HasMatchingGenParticle()) continue;
+      matchedL1TkEGs.push_back(*tau);
+    }
+  
+  return matchedL1TkEGs;
+}
+
+
+//============================================================================
+double TkCalo::GetMatchingGenParticle(TTTrack track, GenParticle *genParticlePtr)					    
+//============================================================================
+{
+
+  // Match the track with a genParticle. At the moment try to match a genParticle (tau)
+  // final decay products (pions, Kaons) with the track. If a match is found
+  // the assign the tau (not the pion) to the L1TkEG as the matching genParticle.
+  // Returns the match dR.
+
+  // Sanity check
+  // if (GenTausHadronic.size() < 1 ) return; // FIXME: move outside this function
+
+  // Initialise the GenParticle (to be returned)
+  GenParticle match_GenParticle;
+  double deltaR;
+  double match_dR = 999;
+  
+  // For-loop: All hadronic GenTaus
+  for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++) {
+      // If no hadronic decay products found (pi+/-, pi0, K+/-, K0, K0L), skip this tau
+      if (tau->finalDaughtersCharged().size() < 1) continue;
+      deltaR = auxTools_.DeltaR( track.getEta(), track.getPhi(), tau->eta(), tau->phi() );
+      if (deltaR > maxDeltaR_MCmatch) continue;
+      if (deltaR < match_dR) {
+        match_dR = deltaR;
+        *genParticlePtr = *tau;
+	}
+      
+  } 
+  
+  return match_dR;
+  
+}      
+
+
+//============================================================================
+void TkCalo::FillSingleTau_(vector<L1TkEGParticle> L1TkEGs, 
+			    TH1D *hRate,
+			    TH1D *hEfficiency,
+			    double minEta,
+			    double maxEta)
+//============================================================================
+{
+
+  // Sanity check
+  if( L1TkEGs.size() < 1 ) return;
+  
+  // Fill rate
+  double ldgEt = L1TkEGs.at(0).GetTrackBasedEt();
+
+  // Inclusive or Eta slice in Central/Intermedieate/Forward Tracker region?
+  if ( abs(L1TkEGs.at(0).GetLeadingTrack().getEta()) < minEta) return;
+  if ( abs(L1TkEGs.at(0).GetLeadingTrack().getEta()) > maxEta) return;
+    
+  FillRate_(hRate, ldgEt);
+  
+  // Get MC-matched trigger objects
+  vector<L1TkEGParticle> L1TkEGs_mcMatched = GetMcMatchedL1TkEGs(TauCandidates);
+  if (L1TkEGs_mcMatched.size() < 1) return;
+  
+  // Check that all taus were found
+  //if(!bFoundAllTaus_) return; //TODO what is the point?
+
+  // Fill efficiency
+  double ldgEt_mcMatched = L1TkEGs_mcMatched.at(0).GetTrackBasedEt();
+  FillEfficiency_(hEfficiency, ldgEt_mcMatched);
+
+  return;
+}
+
+
+//============================================================================
+void TkCalo::FillDiTau_(vector<L1TkEGParticle> L1TkEGs, 
+			TH1D *hRate,
+			TH1D *hEfficiency,
+			double minEta,
+			double maxEta)
+//============================================================================
+{
+
+  // Sanity check
+  if( L1TkEGs.size() < 2 ) return;  
+
+  // Fill rate
+  L1TkEGParticle L1TkEG = L1TkEGs.at(1);
+  double subLdgEt = L1TkEG.GetTrackBasedEt();
+  
+  // Inclusive or Eta slice in Central/Intermedieate/Forward Tracker region?
+  if ( abs(L1TkEGs.at(0).GetLeadingTrack().getEta()) < minEta) return;
+  if ( abs(L1TkEGs.at(0).GetLeadingTrack().getEta()) > maxEta) return;
+  if ( abs(L1TkEGs.at(1).GetLeadingTrack().getEta()) < minEta) return;
+  if ( abs(L1TkEGs.at(1).GetLeadingTrack().getEta()) > maxEta) return;
+
+  FillRate_(hRate, subLdgEt);
+
+  // Get MC-Matched trigger objects
+  vector<L1TkEGParticle> L1TkEGs_mcMatched = GetMcMatchedL1TkEGs(L1TkEGs);
+  if (L1TkEGs_mcMatched.size() < 2) return;
+    
+  // Check that all taus were found
+ // if(!bFoundAllTaus_) return; //TODO
+
+  // Fill efficiency
+  double subLdgEt_mcMatched = L1TkEGs_mcMatched.at(1).GetTrackBasedEt();
+  FillEfficiency_(hEfficiency, subLdgEt_mcMatched);
+
+  return;
+}
+
+
+//============================================================================
+void TkCalo::FillDiTau_(vector<L1TkEGParticle> L1TkEGs1,
+				vector<L1TkEGParticle> L1TkEGs2, 
+				TH2D *hRate,
+				TH2D *hEfficiency)
+//============================================================================
+{
+
+  // Sanity check
+  if( L1TkEGs1.size() < 1 ) return;
+  if( L1TkEGs2.size() < 1 ) return;
+  
+  // Get MC-Matched trigger objects
+  vector<L1TkEGParticle> L1TkEGs1_mcMatched = GetMcMatchedL1TkEGs(L1TkEGs1);
+  vector<L1TkEGParticle> L1TkEGs2_mcMatched = GetMcMatchedL1TkEGs(L1TkEGs2);
+
+  // Fill rate 
+  double ldgEt1 = L1TkEGs1.at(0).GetTrackBasedEt();
+  double ldgEt2 = L1TkEGs2.at(0).GetTrackBasedEt();
+
+  // Ensure that different calo objects are used
+  unsigned int index1 = L1TkEGs1.at(0).GetLeadingTrack().index();
+  unsigned int index2 = L1TkEGs2.at(0).GetLeadingTrack().index();
+  if (index1==index2)
+    {
+      if (L1TkEGs2.size() < 2) return;
+      index2 = L1TkEGs2.at(1).GetLeadingTrack().index();
+    }
+
+  // Make x-axis the ldgEt axis
+  if (ldgEt1 > ldgEt2) FillRate_(hRate, ldgEt1, ldgEt2); 
+  else FillRate_(hRate, ldgEt2, ldgEt1);
+
+  
+  // Get MC-matched trigger objects
+  if (L1TkEGs1_mcMatched.size() < 1) return;
+  if (L1TkEGs2_mcMatched.size() < 1) return;
+
+  // Get MC-matched Et
+  double ldgEt1_mcMatched = L1TkEGs1_mcMatched.at(0).GetTrackBasedEt();
+  double ldgEt2_mcMatched = L1TkEGs2_mcMatched.at(0).GetTrackBasedEt();
+
+  
+  // Ensure that different calo objects are used
+  index1 = L1TkEGs1_mcMatched.at(0).GetLeadingTrack().index();
+  index2 = L1TkEGs2_mcMatched.at(0).GetLeadingTrack().index();
+  if (index1==index2)
+    {
+      if (L1TkEGs2_mcMatched.size() < 2) return;
+      index2 = L1TkEGs2_mcMatched.at(1).GetLeadingTrack().index();
+    }
+
+  // Check that all taus were found
+  //if(!bFoundAllTaus_) return; //TODO
+
+  // Make x-axis the ldgEt axis
+  if (ldgEt1_mcMatched > ldgEt2_mcMatched) histoTools_.FillAllBinsUpToValue_2D(hEfficiency, ldgEt1_mcMatched, ldgEt2_mcMatched);
+  else histoTools_.FillAllBinsUpToValue_2D(hEfficiency, ldgEt2_mcMatched, ldgEt1_mcMatched);
+
+  return;
+}
+
+
+
+//============================================================================
+void TkCalo::FillRate_(TH1D *hRate,
+			   const double ldgEt)
+//============================================================================
+{
+  
+  if (ldgEt < 0) return;
+  hRate ->Fill( ldgEt );
+  return;
+}
+
+
+//============================================================================
+void TkCalo::FillRate_(TH2D *hRate,
+			   const double ldgEt1,
+			   const double ldgEt2)
+//============================================================================
+{
+  
+  if (ldgEt1 < 0) return;
+  if (ldgEt2 < 0) return;
+
+  hRate ->Fill( ldgEt1, ldgEt2 );
+  
+  return;
+}
+
+
+//============================================================================
+void TkCalo::FillEfficiency_(TH1D *hEfficiency,
+			     const double ldgEt)
+//============================================================================
+{
+  
+  histoTools_.FillAllBinsUpToValue_1D(hEfficiency, ldgEt);
+
+  return;
+}
+
+
+//============================================================================
+void TkCalo::FillTurnOn_Numerator_(vector<L1TkEGParticle> L1TkEGs, 
+				   const double minEt,
+				   TH1D *hTurnOn)
+//============================================================================
+{
+  
+  // For-loop: L1TkEGs
+  int iterated_particles = 0;
+  int matched_particles = 0;
+  int passed_cut = 0;
+  for (vector<L1TkEGParticle>::iterator tau = L1TkEGs.begin(); tau != L1TkEGs.end(); tau++)
+    {
+      
+      iterated_particles++;
+      // Skip if trigger object is not MC matched
+      if (!tau->HasMatchingGenParticle()) continue;	 
+      
+      matched_particles++;
+      // Skip if trigger object has eT < minEt
+      if (tau->GetTrackBasedEt() < minEt) continue;
+      passed_cut++;      
+            
+      // Fill the turn-on
+      hTurnOn->Fill( tau->GetGenTauEt() );
+      // DEBUG
+
+    } // For-loop: L1TkEGs
+//      cout << "Filling turn-on histogram: iterated particles=" << iterated_particles << ", matched=" << matched_particles << ", passed_cut=" << passed_cut << endl;
+
+  return;
+   
+}
+
+//============================================================================
+void TkCalo::FinaliseEffHisto_(TH1D *histo, 
+				       const int nEvtsTotal)
+//============================================================================
+{
+
+  const int nBins = histo->GetNbinsX()+1;
+  double eff, err;
+
+  // For-loop: Histogram bins
+  for (int i = 0; i<= nBins; i++){
+    
+    const int nPass = histo->GetBinContent(i);
+    auxTools_.Efficiency(nPass, nEvtsTotal, "binomial", eff, err ); //fixme: use TEfficiency?
+
+    // Update current histo bin to true eff value and error
+    histo->SetBinContent(i, eff);
+    histo->SetBinError  (i, err);
+  }
+
+  return;
+}
+
+
+//============================================================================
+void TkCalo::FinaliseEffHisto_(TH2D *histo, 
+				       const int nEvtsTotal)
+//============================================================================
+{
+
+  const int nBinsX  = histo->GetNbinsX()+1;
+  const int nBinsY  = histo->GetNbinsY()+1;
+  double eff, err;
+  
+  // For-loop: x-axis bins
+  for (int bx=0; bx <= nBinsX; bx++){
+
+    // For-loop: y-axis bins
+    for (int by=0; by <= nBinsY; by++){
+
+      const int nPass = histo->GetBinContent(bx, by);
+      auxTools_.Efficiency(nPass, nEvtsTotal, "binomial", eff, err );
+
+      // Update current histo bin to true eff value and error
+      histo->SetBinContent(bx, by, eff);
+      histo->SetBinError  (bx, by, err);
+
+    } // For-loop: y-axis bins
+
+  }// For-loop: x-axis bins
 
   return;
 }

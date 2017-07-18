@@ -17,8 +17,8 @@
 //#include "../Auxiliary/src/MCTools.C"
 #include "../Auxiliary/src/HistoTools.C"
 //#include "../Auxiliary/src/Datasets.C" 
-//#include "../DataFormat/src/L1TkTauParticle.C"
-//#include "../DataFormat/src/GenParticle.C"
+//#include "../DataFormat/src/L1TkEGParticle.C"
+#include "../DataFormat/src/GenParticle.C"
 //#include "../DataFormat/src/TrackingParticle.C"
 //#include "../DataFormat/interface/TTTrack.h"
 //#include "../DataFormat/interface/TTPixelTrack.h"
@@ -62,8 +62,9 @@ class TkCalo : public TreeAnalyserMC{
   
   // Public variables
   string mcSample;
-  bool cfg_AddL1Tks;  // Flag to enable sanity of TTTracks
-  bool cfg_AddEGs;    // Flag to enable sanity of all L1 EG objects
+  bool cfg_AddL1Tks;  
+  bool cfg_AddEGs; 
+  bool cfg_AddGenP;
   string cfg_tk_Collection;
   int cfg_tk_nFitParams;
   double cfg_tk_minPt;
@@ -82,7 +83,47 @@ class TkCalo : public TreeAnalyserMC{
   void InitVars_(void);
   float DeltaPhi(float phi1, float phi2);
   float deltaR(float eta1, float eta2, float phi1, float phi2);
-  
+  vector<L1TkEGParticle> GetMcMatchedL1TkEGs(vector<L1TkEGParticle> L1TkEGs);
+  double GetMatchingGenParticle(TTTrack track, GenParticle *genParticlePtr);
+  void FillTurnOn_Numerator_(vector<L1TkEGParticle> L1TkEGs, const double minEt, TH1D *hTurnOn);
+
+  void FillSingleTau_(vector<L1TkEGParticle> L1TkEGs,
+		      TH1D *hRate,
+		      TH1D *hEfficiency,
+		      double minEta=0.0,
+		      double maxEta=999.9);
+
+  void FillDiTau_(vector<L1TkEGParticle> L1TkEGs, 
+		  TH1D *hRate,
+		  TH1D *hEfficiency,
+		  double minEta=0.0,
+		  double maxEta=999.9);
+
+  void FillDiTau_(vector<L1TkEGParticle> L1TkEGs1,
+		  vector<L1TkEGParticle> L1TkEGs2,
+		  TH2D *hRate,
+		  TH2D *hEfficiency);
+
+  void FillEfficiency_(TH1D *hSignalEfficiency,
+		       const double ldgEt);
+
+  void FillEfficiency_(TH2D *hSignalEfficiency,
+		       const double ldgEt1,
+		       const double ldgEt2);  
+
+  void FillRate_(TH1D *hRate,
+		 const double ldgEt);
+
+  void FillRate_(TH2D *hRate,
+		 const double ldgEt1,
+		 const double ldgEt2);  
+
+  void FinaliseEffHisto_(TH1D *histo, 
+			 const int nEvtsTotal);
+
+  void FinaliseEffHisto_(TH2D *histo, 
+			 const int nEvtsTotal);  
+				   
   // Private variables
   
   // Old parameters
@@ -109,7 +150,8 @@ class TkCalo : public TreeAnalyserMC{
   float minEt_EG;     
   float minDeltaR_EG;   
   float maxDeltaR_EG;   
-  float maxInvMass_EG;   
+  float maxInvMass_EG;  
+  float maxDeltaR_MCmatch; 
   float minDeltaR_iso;  
   float maxDeltaR_iso;   
   float maxDeltaZ_iso;   
@@ -121,8 +163,13 @@ class TkCalo : public TreeAnalyserMC{
   vector< vector <TTTrack> > trackTauCandidates;
   vector<L1TkEGParticle> TauCandidates;
   vector<L1TkEGParticle> TauCandidatesIsolated;
-  
+  vector<GenParticle> GenTausHadronic;
+
+  int nMaxNumOfHTausPossible;  
+  bool bFoundAllTaus_;
+
   // Histogram declarations
+  TH1D* h_genTausHad_N;
   TH1D* h_leadTrks_Multiplicity;
   
   TH1D* h_leadTrks_Pt;
@@ -151,6 +198,26 @@ class TkCalo : public TreeAnalyserMC{
   TH1D* h_EGClusters_M;
 
   TH1D* h_trkClusters_relIso;
+  
+  TH1D* hTkEG_DeltaRmatch;
+  TH1D* hTkEG_VisEt;
+  TH1D* hMcHadronicTau_VisEt;
+  
+  TH1D* hTurnOn25_all;
+  TH1D* hTurnOn25_relIso;
+  TH1D* hTurnOn50_all;
+  TH1D* hTurnOn50_relIso;
+  
+  TH1D* hRateSingleTau; // Inclusive = C+I+F
+  TH1D* hRateSingleTau_C;
+  TH1D* hRateSingleTau_I;
+  TH1D* hRateSingleTau_F;
+
+  TH1D* hEffSingleTau;  // Inclusive = C+I+F
+  TH1D* hEffSingleTau_C;
+  TH1D* hEffSingleTau_I;
+  TH1D* hEffSingleTau_F;
+  
 };
 
 #endif

@@ -337,7 +337,7 @@ vector<TTTrack> TreeReaderMC::GetTTTracks(const double minPt,
     }
 
 //  if (bPrintList) PrintTTTrackCollection(theTTTracks);
-  if (true) PrintTTTrackCollection(theTTTracks);
+  if (bPrintList) PrintTTTrackCollection(theTTTracks);
   
   return theTTTracks;
 }
