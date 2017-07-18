@@ -160,22 +160,23 @@ void TkCalo::Loop()
 	  if (cfg_DEBUG) cout << "\n=== L1EGs (" << L1EGs.size() << ")" << endl;
 	}
 
-    // GenParticles
+    // GenParticles (skip for MinBias samples)
     vector<GenParticle> GenTaus;
-	GenTaus = GetGenParticles(15, false);
+	if (!isMinBias) GenTaus = GetGenParticles(15, false);
 	
-	// Hadronic GenTaus
+	// Hadronic GenTaus (skip for MinBias samples)
     GenTausHadronic.clear();
     if (cfg_AddGenP) {
       if (cfg_DEBUG) cout << "\n=== GenParticles (" << GenP_Pt->size() << ")" << endl;
-	  GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
+	  if (!isMinBias) GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
 	}
 
-    // Triggred GenTaus
+    // Triggred GenTaus (skip for MinBias samples)
     vector<GenParticle> GenTausTrigger;  
-    GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 2.4);  
+    if (!isMinBias) GenTausTrigger = GetHadronicGenTaus(GenTaus, 20.0, 2.4);  
     
-    // Ensure that all taus are found //TODO: what is the point?
+    // Ensure that all taus are found, needed by the current efficiency definition 
+    // E.g. for ttbar, only events iwth two taus within trigger acceptance are considered for efficiency calculation)
     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
     if (bFoundAllTaus_) nEvtsWithMaxHTaus++;
 
@@ -183,9 +184,9 @@ void TkCalo::Loop()
     // TkCalo algorithm
     ////////////////////////////////////////////////    
 
-    // Consider only events with at least one genuine hadronic tau
+    // Consider only events with at least one genuine hadronic tau (except for MinBias sample)
     h_genTausHad_N->Fill( GenTausHadronic.size() );
-    if (GenTausHadronic.size() < 1) continue;
+    if (GenTausHadronic.size() < 1 && !isMinBias) continue;
 
     // Select lead tracks  
     vector<unsigned short> leadTrackIndices;
