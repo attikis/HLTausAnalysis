@@ -86,7 +86,7 @@ L1EG::L1EG(unsigned short Index,
   theNTT         = NTT;
   theShape       = Shape;
   theTowerHoE    = TowerHoE;
-  theP4.SetPtEtaPhiE(Et, Eta, Phi, Et); // WARNING: Approximation since we need Pt and Not Et 
+  theP4.SetPtEtaPhiM( sqrt(Et*Et-pionMass*pionMass), Eta, Phi, pionMass); // WARNING: Assumes pion mass for EG clusters 
   
   if (0) PrintProperties();
 }
