@@ -183,18 +183,21 @@ class TkCalo : public TreeAnalyserMC{
   TH1D* h_clustTrks_Eta;
   TH1D* h_clustTrks_Phi;
   TH2D* h_clustTrks_Phi_Eta;
+  TH2D* h_clustTrks_counter;
 
   TH1D* h_trkClusters_MultiplicityPerCluster;
   TH1D* h_trkClusters_Pt;
   TH1D* h_trkClusters_PtResolution;
   TH1D* h_trkClusters_M;
 
-  TH1D* h_EGClusters_MultiplicityPerCluster;
   TH1D* h_clustEGs_Et;
   TH1D* h_clustEGs_Eta;
   TH1D* h_clustEGs_Phi;
   TH2D* h_clustEGs_Phi_Eta;
+  TH1D* h_clustEGs_M;
 
+  TH2D* h_clustEGs_counter;
+  TH1D* h_EGClusters_MultiplicityPerCluster;
   TH1D* h_EGClusters_Et;
   TH1D* h_EGClusters_EtResolution;
   TH1D* h_EGClusters_M;
@@ -215,10 +218,20 @@ class TkCalo : public TreeAnalyserMC{
   TH1D* hRateSingleTau_I;
   TH1D* hRateSingleTau_F;
 
+  TH1D* hRateDiTau; // Inclusive = C+I+F
+  TH1D* hRateDiTau_C;
+  TH1D* hRateDiTau_I;
+  TH1D* hRateDiTau_F;
+
   TH1D* hEffSingleTau;  // Inclusive = C+I+F
   TH1D* hEffSingleTau_C;
   TH1D* hEffSingleTau_I;
   TH1D* hEffSingleTau_F;
+
+  TH1D* hEffDiTau;  // Inclusive = C+I+F
+  TH1D* hEffDiTau_C;
+  TH1D* hEffDiTau_I;
+  TH1D* hEffDiTau_F;
   
 };
 

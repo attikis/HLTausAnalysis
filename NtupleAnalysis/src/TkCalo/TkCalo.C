@@ -243,17 +243,30 @@ void TkCalo::Loop()
     for (size_t i=0; i<trackTauCandidates.size(); i++) {
         leadTrackPtr = &(trackTauCandidates[i][0]);
         int Ntrks = 1;
+        // Track clustering counters
+        unsigned int trkcounter_allTracks = 0;
+        unsigned int trkcounter_allNonLeading = 0;
+        unsigned int trkcounter_passZ = 0;
+        unsigned int trkcounter_passDRmax = 0;
+        unsigned int trkcounter_passDRmin = 0;
+        unsigned int trkcounter_passInvMass = 0;    
+
         if (cfg_DEBUG*0) cout << "Starting to cluster lead track " << leadTrackPtr->index();
         // Loop over other tracks
         stopClustering = false;
         for (vector<TTTrack>::iterator trackIter = TTTracks.begin(); ( !stopClustering && (trackIter != TTTracks.end()) ); trackIter++) {
+          trkcounter_allTracks += 1;
           // Do not double-counts the lead track
           if (trackIter->index() == leadTrackPtr->index()) continue;
+          trkcounter_allNonLeading += 1;
           // Skip tracks that are not close in terms of deltaR and deltaZ
           if (abs (trackIter->getZ0() - leadTrackPtr->getZ0() ) > maxDeltaZ_trk) continue;
+          trkcounter_passZ += 1;
           deltaR = auxTools_.DeltaR(leadTrackPtr->getEta(), leadTrackPtr->getPhi(), trackIter->getEta(), trackIter->getPhi());
           if (deltaR > maxDeltaR_leadtrk) continue;
+          trkcounter_passDRmax += 1;
           if (deltaR < minDeltaR_leadtrk) continue;
+          trkcounter_passDRmin += 1;
           // Calculate invariant mass of already clustered tracks + new track
           invMass = 0.0;
           pT = 0.0;
@@ -270,6 +283,7 @@ void TkCalo::Loop()
             h_clustTrks_Eta->Fill( trackIter->getEta() );
             h_clustTrks_Phi->Fill( trackIter->getPhi() );
             h_clustTrks_Phi_Eta->Fill( trackIter->getPhi(),trackIter->getEta() );
+            trkcounter_passInvMass += 1;
           }  
           else {
             // Stop clustering and fill track cluster histograms
@@ -282,6 +296,13 @@ void TkCalo::Loop()
         }
         if (cfg_DEBUG) cout << "After clustering trackTauCandidates[" << i << "] with leadTrack " << leadTrackPtr->index() << ", it has " 
                             << trackTauCandidates[i].size() << " tracks and a mass of " << invMass << endl;
+        // Fill track clustering counter histogram
+        h_clustTrks_counter->Fill("allTracks",trkcounter_allTracks,1);
+        h_clustTrks_counter->Fill("allNonLeading",trkcounter_allNonLeading,1);
+        h_clustTrks_counter->Fill("passZ",trkcounter_passZ,1);
+        h_clustTrks_counter->Fill("passDRmax",trkcounter_passDRmax,1);
+        h_clustTrks_counter->Fill("passDRmin",trkcounter_passDRmin,1);
+        h_clustTrks_counter->Fill("passInvMass",trkcounter_passInvMass,1);
 
     }
 
@@ -290,40 +311,69 @@ void TkCalo::Loop()
     TauCandidates.clear();
     double ET;
     for (size_t i=0; i<trackTauCandidates.size(); i++) {
-        std::cout << "Clustering EGs around trackTauCandidates[" << i << "]" << endl;
+//        cout << "Clustering EGs around trackTauCandidates[" << i << "]" << endl;
         EGcluster.clear();
         ET = 0.0;
         invMass = 0.0;
         leadTrackPtr = &(trackTauCandidates[i][0]);
         stopClustering = false;
-        TLorentzVector p4sum; // initialized to (0,0,0,0)        
-	    for (auto eg = L1EGs.begin(); !stopClustering && eg != L1EGs.end(); eg++) {
+        TLorentzVector p4sum; // initialized to (0,0,0,0)  
+        // EG clustering counters
+        unsigned int counter_allEG = 0;
+        unsigned int counter_passEt = 0;
+        unsigned int counter_passDRmax = 0;
+        unsigned int counter_passDRmin = 0;
+        unsigned int counter_passInvMass = 0;    
+	    for (auto eg = L1EGs.begin(); ( !stopClustering && (eg != L1EGs.end()) ); eg++) {
           // Skip small-Et EGs and those not matching to lead track (in terms of DeltaR)
+          counter_allEG++;
           // TODO: Correct eta of EG based on vertex position of the leading track?
           if (eg->getEt() < minEt_EG) continue;
+          counter_passEt++;
           deltaR = auxTools_.DeltaR(leadTrackPtr->getEta(), leadTrackPtr->getPhi(), eg->getEta(), eg->getPhi());
           if (cfg_DEBUG*0) std::cout << "deltaR = " << deltaR << endl;
           if (deltaR > maxDeltaR_EG) continue;
+          counter_passDRmax++;
           if (deltaR < minDeltaR_EG) continue;
+          counter_passDRmin++;
           p4sum += eg->p4();
-          std::cout << "invMassTmp = " << p4sum.M() << endl;
           if (p4sum.M() < maxInvMass_EG){
             EGcluster.push_back(*eg);
-            ET = p4sum.Et();
-            invMass = p4sum.M();
+            counter_passInvMass++;
             // Fill EG histograms
             h_clustEGs_Et->Fill( eg->getEt() );
             h_clustEGs_Eta->Fill( eg->getEta() );
             h_clustEGs_Phi->Fill( eg->getPhi() );
             h_clustEGs_Phi_Eta->Fill( eg->getPhi(),eg->getEta() );
-            // Fill EG cluster histograms
-            h_EGClusters_Et->Fill( ET );            
-            h_EGClusters_M->Fill( invMass );            
+            h_clustEGs_M->Fill( eg->p4().M() );
+            // Update EG cluster variables
+            ET = p4sum.Et();
+            invMass = p4sum.M();
+//            cout << "Invariant mass of cluster is " << invMass << " and ET is " << ET << endl;
           }
           else {
             stopClustering = true;
+            // Fill EG cluster variables to histograms
+            h_EGClusters_Et->Fill( ET );            
+            h_EGClusters_M->Fill( invMass );
           }
         }
+
+        // Fill EG clustering counter histogram
+        h_clustEGs_counter->Fill("allEGs",counter_allEG,1);
+        h_clustEGs_counter->Fill("passEt",counter_passEt,1);
+        h_clustEGs_counter->Fill("passDRmax",counter_passDRmax,1);
+        h_clustEGs_counter->Fill("passDRmin",counter_passDRmin,1);
+        h_clustEGs_counter->Fill("passInvMass",counter_passInvMass,1);
+                
+/*        cout << "EG COUNTERS:" << endl;
+        cout << "allEG = " << counter_allEG << endl;
+        cout << "passEt = " << counter_passEt << endl;
+        cout << "passDRmax = " << counter_passDRmax << endl;
+        cout << "passDRmin = " << counter_passDRmin << endl;
+        cout << "passInvMass = " << counter_passInvMass << endl;                       
+        cout << "STOPPING EG clustering. Invariant mass of cluster is " << invMass << "and ET is " << ET << endl; */ 
+        
         // Fill the number of EGs in cluster
         h_EGClusters_MultiplicityPerCluster->Fill( EGcluster.size() );
 
@@ -384,12 +434,6 @@ void TkCalo::Loop()
         TauCandidatesIsolated.push_back(*tkeg);
       }
     }
-
-    ////////////////////////////////////////////////
-    // Print the properties of L1TkEMParticles
-    ////////////////////////////////////////////////
-
-    // TODO
     
     ////////////////////////////////////////////////
     // Fill Turn-On histograms
@@ -415,14 +459,16 @@ void TkCalo::Loop()
     ////////////////////////////////////////////////
     // Rates and efficiencies for ditau
     ////////////////////////////////////////////////
-/*    FillDiTau_(L1TkTaus_Calo, L1TkTaus_Tk    , hDiTau_Rate_Calo_Tk    , hDiTau_Eff_Calo_Tk    );
-    FillDiTau_(L1TkTaus_Calo, L1TkTaus_VtxIso, hDiTau_Rate_Calo_VtxIso, hDiTau_Eff_Calo_VtxIso);
-    FillDiTau_(L1TkTaus_Tk  , L1TkTaus_VtxIso, hDiTau_Rate_Tk_VtxIso  , hDiTau_Eff_Tk_VtxIso  );
+    FillDiTau_(TauCandidates, hRateDiTau, hEffDiTau);
+    FillDiTau_(TauCandidates, hRateDiTau_C, hEffDiTau_C, 0.0, 1.0);
+    FillDiTau_(TauCandidates, hRateDiTau_I, hEffDiTau_I, 1.0, 1.6);
+    FillDiTau_(TauCandidates, hRateDiTau_F, hEffDiTau_F, 1.6, 3.0); // 2.5 is max
+
 
     ////////////////////////////////////////////////
     // WARNING: Erases L1TkTaus from vector!
     ////////////////////////////////////////////////
-    ApplyDiTauZMatching(matchTk_Collection, L1TkTaus_Tk);
+/*    ApplyDiTauZMatching(matchTk_Collection, L1TkTaus_Tk);
     FillDiTau_(L1TkTaus_Tk, hDiTau_Rate_Tk  , hDiTau_Eff_Tk);
     FillDiTau_(L1TkTaus_Tk, hDiTau_Rate_Tk_C, hDiTau_Eff_Tk_C, 0.0, 1.0);
     FillDiTau_(L1TkTaus_Tk, hDiTau_Rate_Tk_I, hDiTau_Eff_Tk_I, 1.0, 1.6);
@@ -441,7 +487,7 @@ void TkCalo::Loop()
   
   
   ////////////////////////////////////////////////
-  // Convert/Finalise histogramss
+  // Convert/Finalise histograms
   ////////////////////////////////////////////////
 
   // Divide turn-on numerators by the denumerator
@@ -455,12 +501,20 @@ void TkCalo::Loop()
   histoTools_.ConvertToRateHisto_1D(hRateSingleTau_C, nEntries);
   histoTools_.ConvertToRateHisto_1D(hRateSingleTau_I, nEntries);
   histoTools_.ConvertToRateHisto_1D(hRateSingleTau_F, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRateDiTau, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRateDiTau_C, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRateDiTau_I, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRateDiTau_F, nEntries);
 
   // Finalise efficiency histograms
   FinaliseEffHisto_(hEffSingleTau  , nEvtsWithMaxHTaus);
   FinaliseEffHisto_(hEffSingleTau_C, nEvtsWithMaxHTaus);
   FinaliseEffHisto_(hEffSingleTau_I, nEvtsWithMaxHTaus);
   FinaliseEffHisto_(hEffSingleTau_F, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_(hRateDiTau  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_(hRateDiTau_C, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_(hRateDiTau_I, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_(hRateDiTau_F, nEvtsWithMaxHTaus);
 
 
   ////////////////////////////////////////////////
@@ -536,6 +590,16 @@ void TkCalo::BookHistos_(void)
   // Clustered tracks in Eta-Phi plane
   histoTools_.BookHisto_2D(h_clustTrks_Phi_Eta, "clustTrks_Phi_Eta",  ";#phi (rads);#eta", 230,  -3.15,  +3.15, 600,  -3.0,  +3.0);  			      
 
+  // Track clustering counter
+  histoTools_.BookHisto_2D(h_clustTrks_counter, "clustTrks_counter", ";Selection steps;clustered tracks / selection step", 6, 0., 6., 150, 0., 300.);
+  h_clustTrks_counter->GetXaxis()->SetBinLabel(1,"allTracks");
+  h_clustTrks_counter->GetXaxis()->SetBinLabel(2,"allNonLeading");
+  h_clustTrks_counter->GetXaxis()->SetBinLabel(3,"passZ");
+  h_clustTrks_counter->GetXaxis()->SetBinLabel(4,"passDRmax");
+  h_clustTrks_counter->GetXaxis()->SetBinLabel(5,"passDRmin");
+  h_clustTrks_counter->GetXaxis()->SetBinLabel(6,"passInvMass");
+  h_clustTrks_counter->SetMarkerStyle(24);
+
   // Number of clustered tracks (per cluster)
   histoTools_.BookHisto_1D(h_trkClusters_MultiplicityPerCluster, "trkClusters_MultiplicityPerCluster", ";Number of tracks in cluster;Clusters / bin", 15, 0., +15.);
 
@@ -546,19 +610,31 @@ void TkCalo::BookHistos_(void)
   histoTools_.BookHisto_1D(h_trkClusters_PtResolution, "trkClusters_PtResolution", ";Pt resolution (GeV);Clusters / bin", 50, -5.0, +5.0);
   
   // Invariant mass of track clusters
-  histoTools_.BookHisto_1D(h_trkClusters_M, "trkClusters_M", ";Invariant mass;Clusters / bin", 12, -2.0, +10.0);
+  histoTools_.BookHisto_1D(h_trkClusters_M, "trkClusters_M", ";Invariant mass;Clusters / bin", 40, 0.0, +4.0);
 
   // Clustered EGs Pt
   histoTools_.BookHisto_1D(h_clustEGs_Et, "clustEGs_Pt", ";Pt (GeV);Events / bin", 300, +0.0, +300.0);
 
   // Clustered EGs Eta
-  histoTools_.BookHisto_1D(h_clustEGs_Eta, "clustEGs_Eta", ";#eta;Events / bin", 600, -3.0, +3.0);
+  histoTools_.BookHisto_1D(h_clustEGs_Eta, "clustEGs_Eta", ";#eta;EGs / bin", 600, -3.0, +3.0);
 
   // Clustered EGs Phi
-  histoTools_.BookHisto_1D(h_clustEGs_Phi, "clustEGs_Phi", ";#phi (rads);Events / bin", 23,  -3.15,  +3.15);
+  histoTools_.BookHisto_1D(h_clustEGs_Phi, "clustEGs_Phi", ";#phi (rads);EGs / bin", 23,  -3.15,  +3.15);
 
   // Clustered EGs in Eta-Phi plane
   histoTools_.BookHisto_2D(h_clustEGs_Phi_Eta, "clustEGs_Phi_Eta",  ";#phi (rads);#eta", 230,  -3.15,  +3.15, 600,  -3.0,  +3.0);		      
+
+  // Mass of clustered EGs
+  histoTools_.BookHisto_1D(h_clustEGs_M, "clustEGs_M", ";Mass (GeV);clustered EGs / bin", 40, 0.0, +2.0);
+
+  // EG clustering counter
+  histoTools_.BookHisto_2D(h_clustEGs_counter, "clustEGs_counter", ";Selection steps;clustered EGs / selection step", 5, 0.0, +5.0, 15, 0., 15.);
+  h_clustEGs_counter->GetXaxis()->SetBinLabel(1,"allEGs");
+  h_clustEGs_counter->GetXaxis()->SetBinLabel(2,"passEt");
+  h_clustEGs_counter->GetXaxis()->SetBinLabel(3,"passDRmax");
+  h_clustEGs_counter->GetXaxis()->SetBinLabel(4,"passDRmin");
+  h_clustEGs_counter->GetXaxis()->SetBinLabel(5,"passInvMass");
+  h_clustEGs_counter->SetMarkerStyle(24);
 
   // Number of EGs (per cluster)
   histoTools_.BookHisto_1D(h_EGClusters_MultiplicityPerCluster, "EGClusters_MultiplicityPerCluster", ";Number of EGs in cluster;Clusters / bin", 15, -0., +15.);
@@ -570,7 +646,7 @@ void TkCalo::BookHistos_(void)
   histoTools_.BookHisto_1D(h_EGClusters_EtResolution, "EGClusters_EtResolution", ";Et resolution (GeV);Clusters / bin", 50, -5.0, +5.0);
   
   // Invariant mass of EG clusters
-  histoTools_.BookHisto_1D(h_EGClusters_M, "EGClusters_M", ";Invariant mass;Clusters / bin", 100, +0.0, +5.0);
+  histoTools_.BookHisto_1D(h_EGClusters_M, "EGClusters_M", ";Invariant mass (GeV);Clusters / bin", 40, +0.0, +4.0);
 
   // Track-based relative isolation of tau candidates
   histoTools_.BookHisto_1D(h_trkClusters_relIso, "trkClusters_relIso", ";Relative isolation;Clusters / bin", 100, 0.0, +5.0);
@@ -595,16 +671,27 @@ void TkCalo::BookHistos_(void)
   histoTools_.BookHisto_1D(hRateSingleTau_C  , "Rate_SingleTau_C"  , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hRateSingleTau_I  , "Rate_SingleTau_I"  , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hRateSingleTau_F  , "Rate_SingleTau_F"  , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);  
+
+  // Di-tau rates
+  histoTools_.BookHisto_1D(hRateDiTau    , "Rate_DiTau"    , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hRateDiTau_C  , "Rate_DiTau_C"  , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hRateDiTau_I  , "Rate_DiTau_I"  , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hRateDiTau_F  , "Rate_DiTau_F"  , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);  
   
   // Single-tau efficiencies
   histoTools_.BookHisto_1D(hEffSingleTau     , "Eff_SingleTau"     , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hEffSingleTau_C   , "Eff_SingleTau_C"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hEffSingleTau_I   , "Eff_SingleTau_I"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hEffSingleTau_F   , "Eff_SingleTau_F"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
+
+  // Di-tau efficiencies
+  histoTools_.BookHisto_1D(hEffDiTau     , "Eff_DiTau"     , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hEffDiTau_C   , "Eff_DiTau_C"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hEffDiTau_I   , "Eff_DiTau_I"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hEffDiTau_F   , "Eff_DiTau_F"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
   
   return;
 }
-
 
 
 //============================================================================
