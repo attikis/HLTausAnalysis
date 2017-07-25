@@ -5,15 +5,14 @@
 #
 # Usage:
 # cd HLTausAnalysis
-# source setup.csh
+# source setup.sh
 #
-# Note:
-# tested so far LOCATION="" and LOCATION="jade"
 #================================================================================================
+
 echo $HLTAUSANALYSIS_BASE
-if [ -n "$HLTAUSANALYSIS_BASE" ]; then
+if [ "x$HLTAUSANALYSIS_BASE" != "x" ]; then
     echo "Standalone environment already loaded"
-    #exit
+    return
 fi
 
 LOCATION="" 
@@ -38,9 +37,21 @@ if [ -z "$LOCATION" ] ; then
 fi
 echo "Location is $LOCATION"
 
-# Set the HLTausAnalysis base directory
-HLTAUSANALYSIS_BASE=`echo $PWD`
-echo " The analysis is $HLTAUSANALYSIS_BASE"
+# Detect lxplus and jade
+if [ "x$LOCATION" = "x" ]; then
+    case "$HOSTNAME" in
+        lxplus*) LOCATION="lxplus";;
+        jade*) LOCATION="jade";;
+    esac
+fi
+
+if [ "x$LOCATION" = "xlxplus" ]; then
+    echo "Sourcing lxplus environments for gcc 4.8 and ROOT 6.02"
+    source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/x86_64-slc6-gcc48-opt/setup.sh
+    pushd /afs/cern.ch/sw/lcg/app/releases/ROOT/6.04.00/x86_64-slc6-gcc48-opt/root >/dev/null
+    source bin/thisroot.sh
+    popd >/dev/null
+fi
 
 LD_LIBRARY_PATH_APPEND=""
 if [[ "$LOCATION" = "lxplus" ]] || [[ "$LOCATION" = "lxbatch" ]]; then
@@ -81,6 +92,13 @@ if [[ "$LOCATION" = "lxplus" ]] || [[ "$LOCATION" = "lxbatch" ]]; then
     else
 	PYTHONPATH="$ROOTSYS/lib" ; export PYTHONPATH 
     fi
+    LD_LIBRARY_PATH_APPEND=$GCC_BASE/lib64:$GCC_BASE/lib:$XROOTD_BASE/lib:$XZ_BASE/lib:$PYTHON_BASE/lib
+
+    export PATH=$ROOTSYS/bin:$GCC_BASE/bin:$XROOTD_BASE/bin:$PATH 
+
+    pushd $ROOTSYS >/dev/null
+    source bin/thisroot.sh
+    popd >/dev/null
 fi
 
 if [[ "$LOCATION" = "mac" ]]; then
@@ -95,94 +113,58 @@ if [[ "$LOCATION" = "mac" ]]; then
     fi
 fi
 
-
 echo "=== Appending to LD_LIBRARY_PATH"
-LD_LIBRARY_PATH_APPEND="$HLTAUSANALYSIS_BASE/NtupleAnalysis/lib:${LD_LIBRARY_PATH_APPEND}"
-if [ ! -n "$LD_LIBRARY_PATH" ] ; then
-    LD_LIBRARY_PATH="${LD_LIBRARY_PATH_APPEND}"; export LD_LIBRARY_PATH 
+export HLTAUSANALYSIS_BASE=$PWD
+LD_LIBRARY_PATH_APPEND=$HLTAUSANALYSIS_BASE/NtupleAnalysis/lib:$LD_LIBRARY_PATH_APPEND
+
+if [ "x$LD_LIBRARY_PATH" = "x" ]; then
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH_APPEND
 else
-    LD_LIBRARY_PATH="${LD_LIBRARY_PATH_APPEND}:${LD_LIBRARY_PATH}" ; export LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH_APPEND:$LD_LIBRARY_PATH
 fi
 
 echo "=== Creating symbolic links and hidden directories for $LOCATION"
-PATHPREFIX=.python
-
-if [[ "$LOCATION" = "CMSSW" ]]; then 
-    if [[ ! -n $CMSSW_BASE ]] || [[ ! -e $CMSSW_BASE/python/HLTausAnalysis/NtupleAnalysis ]]; then
+export PPATHPREFIX=.python
+if [ "x$LOCATION" = "xCMSSW" ]; then
+    if [ ! -e $CMSSW_BASE/python/HLTausAnalysis/NtupleAnalysis ]; then
         ln -s $HLTAUSANALYSIS_BASE/NtupleAnalysis/python $CMSSW_BASE/python/HLTausAnalysis/NtupleAnalysis
     fi
-
-else
-    if [[ ! -e $PATHPREFIX/HLTausAnalysis ]]; then
-	echo "=== Creating $PATHPREFIX directory under `pwd`. Creating __init__.py"
-        mkdir -p $PATHPREFIX/HLTausAnalysis
-        touch $PATHPREFIX/HLTausAnalysis/__init__.py
-    fi
-
-    echo "=== Loop over directories under NtupleAnalysis/ and HeavyChHLTausToTauNu/"
-    for DIR in NtupleAnalysis/*/ ; do
-	#echo "DIR=$DIR"
-
-        LINK_NAME=$PATHPREFIX/HLTausAnalysis/$DIR
-	TARGET=$HLTAUSANALYSIS_BASE/$DIR/python
-	PYINIT=$LINK_NAME/__init__.py
-
-	# If $PATHPREFIX/HLTausAnalysis/$DIR does not exist
-        if [[ ! -e $PATHPREFIX/HLTausAnalysis/$DIR ]] ; then
-
-            echo "Linking $TARGET with $LINK_NAME"
-	    ln -s $TARGET $LINK_NAME
-
-	    echo "Creating $PYINIT"
-            touch $PYINIT
-	    
-            for d in $PATHPREFIX/HLTausAnalysis/$DIR/* ; do
-                if [[ -d $d ]]; then  
-		    echo "Creating $d/__init__.py"
-                    touch $d/__init__.py
-                fi
-            done
-        fi
-    done
-
-
-    echo "=== Loop over directories under NtupleAnalysis/src"
-    for DIR in  `ls NtupleAnalysis/src` ;  do
-	#echo "DIR=$DIR"
-
-	# NOTE: Remove last "/" from directory name. The "/" at the end causes the linking to FAIL for some shells
-	DIR=`echo $DIR | sed 's/\(.*\)\//\1 /'`
-        LINK_NAME=$PATHPREFIX/HLTausAnalysis/$DIR
-	TARGET=$HLTAUSANALYSIS_BASE/NtupleAnalysis/src/$DIR/python
-	PYINIT=$LINK_NAME/__init__.py
-
-	# If $LINK_NAME does not exist and $TARGET exists
-        if [[ ! -e $LINK_NAME ]] && [[ -e $HLTAUSANALYSIS_BASE/NtupleAnalysis/src/$DIR/python ]]; then 
-            echo "Linking $TARGET with $LINK_NAME"
-            ln -s $TARGET $LINK_NAME
-
-            # echo "Creating $PYINIT"
-            touch $PYINIT
-
-            for d in  $PATHPREFIX/HLTausAnalysis/$DIR/* ; do
-                if [[ -d $d ]]; then 
-		    echo "Creating $d/__init__.py"
-                    touch $d/__init__.py
-                fi
-            done
-        fi
-    done
-
-    # Set PYTHONPATH
-    if [[ -n $PYTHONPATH ]] ; then
-        PYTHONPATH=${PWD}/${PATHPREFIX} ; export PYTHONPATH   #NOTE: Double quotes will NOT WORK for some shells!!!
-        echo "PYTHONPATH is $PYTHONPATH"
-    else
-        PYTHONPATH=${PWD}/${PATHPREFIX}:${PYTHONPATH}; export PYTHONPATH  #NOTE: Double quotes will NOT WORK for some shells!!!
-        echo "PYTHONPATH is $PYTHONPATH"
-    fi
+    export PPATHPREFIX="$CMSSW_BASE/python"
 fi
 
+# Need to create the following also on lxplus for limit calculation
+if [ ! -e $PPATHPREFIX/HLTausAnalysis ]; then
+    mkdir -p $PPATHPREFIX/HLTausAnalysis
+    touch $PPATHPREFIX/HLTausAnalysis/__init__.py
+fi
+for DIR in NtupleAnalysis; do
+    if [ ! -e $PPATHPREFIX/HLTausAnalysis/$DIR ]; then
+        ln -s $HLTAUSANALYSIS_BASE/$DIR/python $PPATHPREFIX/HLTausAnalysis/$DIR
+        touch $PPATHPREFIX/HLTausAnalysis/$DIR/__init__.py
+        for d in $PPATHPREFIX/HLTausAnalysis/$DIR/*; do
+            if [ -d $d ]; then
+                touch $d/__init__.py
+            fi
+        done
+    fi
+done
+for DIR in `ls NtupleAnalysis/src` ; do
+    if [[ ! -e $PPATHPREFIX/HLTausAnalysis/$DIR ]] && [[ -e $HLTAUSANALYSIS_BASE/NtupleAnalysis/src/$DIR/python ]]; then
+        ln -s $HLTAUSANALYSIS_BASE/NtupleAnalysis/src/$DIR/python $PPATHPREFIX/HLTausAnalysis/$DIR
+        touch $PPATHPREFIX/HLTausAnalysis/$DIR/__init__.py
+        for d in $PPATHPREFIX/HLTausAnalysis/$DIR/*; do
+            if [ -d $d ]; then
+                touch $d/__init__.py
+            fi
+        done
+    fi
+done
+
+if [ "x$PYTHONPATH" = "x" ]; then
+    export PYTHONPATH=$PWD/.python
+else
+    export PYTHONPATH=$PWD/.python:$PYTHONPATH
+fi
 
 #echo "=== Setting PATH variable"
 PATH="${HLTAUSANALYSIS_BASE}/NtupleAnalysis/scripts:${PATH}" ; export PATH
