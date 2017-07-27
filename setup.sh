@@ -5,7 +5,7 @@
 #
 # Usage:
 # cd HLTausAnalysis
-# source setup.csh
+# source setup.sh
 #
 # Note:
 # tested so far LOCATION="" and LOCATION="jade"
@@ -105,7 +105,7 @@ else
 fi
 
 echo "=== Creating symbolic links and hidden directories for $LOCATION"
-PATHPREFIX=.python
+export PATHPREFIX=.python
 
 if [[ "$LOCATION" = "CMSSW" ]]; then 
     if [[ ! -n $CMSSW_BASE ]] || [[ ! -e $CMSSW_BASE/python/HLTausAnalysis/NtupleAnalysis ]]; then
@@ -182,7 +182,6 @@ else
         echo "PYTHONPATH is $PYTHONPATH"
     fi
 fi
-
 
 #echo "=== Setting PATH variable"
 PATH="${HLTAUSANALYSIS_BASE}/NtupleAnalysis/scripts:${PATH}" ; export PATH

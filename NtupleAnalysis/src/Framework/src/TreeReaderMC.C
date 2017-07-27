@@ -14,8 +14,8 @@ void TreeReaderMC::InitVars_()
 //============================================================================
 {
 
-  cfg_DEBUG = true;
-  if (cfg_DEBUG) std::cout << "=== TreeReaderMC::InitVars_()" << std::endl;
+  cfg_DEBUG = false;
+  if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::InitVars_()" << std::endl;
   
   return;
 }
@@ -27,7 +27,7 @@ void TreeReaderMC::GetHadronicTauFinalDaughters(GenParticle p,
 //============================================================================
 {
 
-  if (cfg_DEBUG) std::cout << "=== TreeReaderMC::GetHadronicTauFinalDaughters()" << std::endl;
+  if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::GetHadronicTauFinalDaughters()" << std::endl;
   //
   // Description:
   // Keep only the detector-related particles (tracker/calo)
@@ -218,7 +218,7 @@ GenParticle TreeReaderMC::GetGenParticle(unsigned int Index)
 void TreeReaderMC::SetGenParticleMomsAndDads(GenParticle &p)
 //============================================================================
 {
-  if (cfg_DEBUG) std::cout << "=== TreeReaderMC::SetGenParticleMomsAndDads()" << std::endl;
+  if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::SetGenParticleMomsAndDads()" << std::endl;
   
   // Variable declaration
   vector<GenParticle> Mothers;
@@ -276,7 +276,7 @@ void TreeReaderMC::SetGenParticleFinalDaughters(GenParticle &p)
 //============================================================================
 {
 
-  if (cfg_DEBUG) std::cout << "=== TreeReaderMC::SetGenParticleFinalDaughters()" << std::endl;
+  if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::SetGenParticleFinalDaughters()" << std::endl;
   
   // Variable declaration
   vector<GenParticle> finalDaughters;
@@ -312,14 +312,14 @@ vector<TTTrack> TreeReaderMC::GetTTTracks(const double minPt,
 				      bool bPrintList)
 //============================================================================
 {
-  if (cfg_DEBUG) std::cout << "=== TreeReaderMC::GetTTTracks()" << std::endl;
+  if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::GetTTTracks()" << std::endl;
 
   vector<TTTrack> theTTTracks;
 
   // For-loop: All TTTracsk
   for (Size_t iTk = 0; iTk < L1Tks_Pt->size(); iTk++)
     { 
-      cout << "Getting TTTrack " << iTk << endl;
+      if (cfg_DEBUG*0) cout << "Getting TTTrack " << iTk << endl;
       TTTrack tk = GetTTTrack(iTk, nFitParams);
 
       // Apply selection criteria
@@ -353,7 +353,7 @@ TTTrack TreeReaderMC::GetTTTrack(unsigned int Index,
   // Initialise variables
   TVector3 p;  
 
-  cout << "Getting track properties" << endl;
+  if (cfg_DEBUG*0) cout << "Getting track properties" << endl;
 
   // Get the track properties
   double pt  = L1Tks_Pt->at(Index);
@@ -379,13 +379,13 @@ TTTrack TreeReaderMC::GetTTTrack(unsigned int Index,
   int  matchTP_index  = L1Tks_TP_Index->at(Index);
   // auxTools_.PrintVector(stubs_isPS);
   
-    cout << "Constructing the track TTTrack" << endl;
+  if (cfg_DEBUG*0)  cout << "Constructing the track TTTrack" << endl;
   
   // Construct the TTTrack
   TTTrack theTTTrack(Index, p, aPOCA,  aRInv, aChi2, aStubPtCons, isGenuine, isUnknown, isCombinatoric,
 		     isLoose, isFake, nStubs, nStubsPS, nStubsBarrel, nStubsEndcap, matchTP_index, nFitParams);
 
-    cout << "Getting TP with L1Tks_TP_Index->at(Index) = "<< L1Tks_TP_Index->at(Index) << endl;
+  if (cfg_DEBUG*0)  cout << "Getting TP with L1Tks_TP_Index->at(Index) = "<< L1Tks_TP_Index->at(Index) << endl;
  
   if (cfg_DEBUG*0) theTTTrack.PrintProperties();
 
@@ -395,7 +395,7 @@ TTTrack TreeReaderMC::GetTTTrack(unsigned int Index,
     theTP = GetTrackingParticle(matchTP_index);
     // theTTTrack.SetTP(theTP); // cannot implement. cyclic
     theTP.PrintProperties();
-    cout << "" << endl;
+  if (cfg_DEBUG*0)  cout << "" << endl;
     }
   
   return theTTTrack;
@@ -453,17 +453,17 @@ TrackingParticle TreeReaderMC::GetTrackingParticle(unsigned int Index)
   p.SetPtEtaPhi(pt, eta, phi);
   ROOT::Math::XYZVector poca(x0, y0, z0);
 
-  cout << "Constructing TP" << endl;
+  if (cfg_DEBUG*0) cout << "Constructing TP" << endl;
 
   // Construct the TP
   TrackingParticle theTrackingParticle(Index, p, poca, d0_propagated, z0_propagated, charge, pdgId, nMatch, ttTrackIndex, ttClusters, ttStubs, ttTracks, eventId);  
-  if (cfg_DEBUG) theTrackingParticle.PrintProperties();
+  if (cfg_DEBUG*0) theTrackingParticle.PrintProperties();
 
   // Get the uniquely matched TTTrack
   // TTTrack theTrack;
   // if (ttTrackIndex >= 0) theTrack= GetTTTrack(ttTrackIndex, 4);
   // theTrackingParticle.SetTTTTrack(theTrack); // cannot use! cyclic problems 
-  // if (cfg_DEBUG) theTrack.PrintProperties(); // cannot use! cyclic problems
+  // if (cfg_DEBUG*0) theTrack.PrintProperties(); // cannot use! cyclic problems
   
   return theTrackingParticle;
 }
@@ -473,7 +473,7 @@ TrackingParticle TreeReaderMC::GetTrackingParticle(unsigned int Index)
 void TreeReaderMC::PrintTrackingParticleCollection(vector<TrackingParticle> collection)
 //============================================================================
 {
-  if (cfg_DEBUG) std::cout << "=== TreeReaderMC::PrintTrackingParticleCollection()" << std::endl;
+  if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::PrintTrackingParticleCollection()" << std::endl;
   
   Table info("Index | Pt | Eta | Phi | PdgId | Q | x0 | y0 | z0 | d0 | d0-phi | NMatch | TTTrackIndex | TTClusters | TTStubs | TTTracks | Event-Id", "Text");
 
@@ -513,7 +513,7 @@ void TreeReaderMC::PrintTrackingParticleCollection(vector<TrackingParticle> coll
 void TreeReaderMC::PrintTTTrackCollection(vector<TTTrack> collection)
 //============================================================================
 {
-  if (cfg_DEBUG) std::cout << "=== TreeReaderMC::PrintTTTrackCollection()" << std::endl;
+  if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::PrintTTTrackCollection()" << std::endl;
 
   Table info("Index | Pt | Eta | Phi | x0 | y0 | z0 | d0 | Q | Chi2 | DOF | Chi2Red | Stubs (PS) | StubPtCons. | Genuine | Unknown | Comb.", "Text");
       
@@ -551,15 +551,15 @@ void TreeReaderMC::PrintTTTrackCollection(vector<TTTrack> collection)
 void TreeReaderMC::PrintGenParticleCollection(vector<GenParticle> collection)
 //============================================================================
 {
-  if (cfg_DEBUG) std::cout << "=== TreeReaderMC::PrintGenParticleCollection()" << std::endl;
+  if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::PrintGenParticleCollection()" << std::endl;
   
   for (vector<GenParticle>::iterator p = collection.begin(); p != collection.end(); p++)
     {
-      std::cout << "\nGenParticle:" << endl;
+      if (cfg_DEBUG*0) std::cout << "\nGenParticle:" << endl;
       p->PrintProperties();
 
       // For more information
-      if (0){
+      if (cfg_DEBUG*0){
 
 	std::cout << "\nDaughters:" << endl;
 	p->PrintDaughters();

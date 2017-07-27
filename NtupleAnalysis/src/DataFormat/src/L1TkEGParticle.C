@@ -38,7 +38,7 @@ void L1TkEGParticle::InitVars_(void)
 
 
 //****************************************************************************
-double L1TkEGParticle::GetTrackPtSum()
+double L1TkEGParticle::GetTrackBasedPt()
 //****************************************************************************
 {
   TLorentzVector sum; // initialized to (0,0,0,0)
@@ -98,7 +98,18 @@ double L1TkEGParticle::GetTrackBasedEt()
 {
   TLorentzVector sum; // initialized to (0,0,0,0)
   for (auto tk = theTracks.begin(); tk != theTracks.end(); tk++)
-    sum += tk->p4();
+    sum += tk->p4(); //NB! Assumes pion mass!
+  return sum.Et();
+}
+
+
+//****************************************************************************
+double L1TkEGParticle::GetEGBasedEt()
+//****************************************************************************
+{
+  TLorentzVector sum; // initialized to (0,0,0,0)
+  for (auto eg = theEGs.begin(); eg != theEGs.end(); eg++)
+    sum += eg->p4(); //NB! Approximation Pt ~ Et used in TLorentzVector!
   return sum.Et();
 }
 

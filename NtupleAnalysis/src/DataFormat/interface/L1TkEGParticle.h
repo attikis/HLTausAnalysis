@@ -28,13 +28,13 @@ class L1TkEGParticle{
   TTTrack GetLeadingTrack() const { return theTracks[0]; } 
   bool HasMatchingGenParticle(void) const{return theMatching;}
   
-  double GetTrackPtSum();  
+  double GetTrackBasedPt();  
   double GetTrackInvMass();
   double GetEGInvMass();
   double GetGenTauPt();
 
   double GetTrackBasedEt();
-//  double GetEGBasedEt(); //TODO
+  double GetEGBasedEt(); 
   double GetGenTauEt();  
   
  private:
