@@ -1,0 +1,16 @@
+*~
+*.dat
+*.DS_Store
+*.txt
+*.root
+*.pyc
+tools/*.pyc
+*.png
+*.pdf
+*.eps
+*.ps
+*_C.d
+*_cc.d
+Macros/MCSample/*.txt
+Macros/TauTrigger/*_C.d
+results/
