@@ -36,7 +36,7 @@ datasetsBs.append(Dataset('/BsToPhiPhi_SoftQCDnonD_TuneCUEP8M1_14TeV_Pythia8/Pha
 datasetsBs.append(Dataset('/BsToPhiPhi_SoftQCDnonD_TuneCUEP8M1_14TeV_Pythia8/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
 
 datasetsSingleE = []
-datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW' , dataVersion="90Xmc") ) 
 datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
 datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
 
@@ -68,13 +68,16 @@ datasetsSingleTau = []
 datasetsSingleTau.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
 datasetsSingleTau.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
 datasetsSingleTau.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
-datasetsSingleTau.append(Dataset('/SingleTauOneProngFlatPt10To100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
-datasetsSingleTau.append(Dataset('/SingleTauOneProngFlatPt10To100/PhaseIISpring17D-PU140_MB100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
-datasetsSingleTau.append(Dataset('/SingleTauOneProngFlatPt10To100/PhaseIISpring17D-PU200_MB100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
-datasetsSingleTau.append(Dataset('/TauThreeProngsEnriched/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
-datasetsSingleTau.append(Dataset('/TauThreeProngsEnriched/PhaseIISpring17D-PU140_MB100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
-datasetsSingleTau.append(Dataset('/TauThreeProngsEnriched/PhaseIISpring17D-PU200_MB100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
 
+datasetsSingleTau1pr = []
+datasetsSingleTau1pr.append(Dataset('/SingleTauOneProngFlatPt10To100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsSingleTau1pr.append(Dataset('/SingleTauOneProngFlatPt10To100/PhaseIISpring17D-PU140_MB100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsSingleTau1pr.append(Dataset('/SingleTauOneProngFlatPt10To100/PhaseIISpring17D-PU200_MB100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+
+datasetsSingleTau3pr = []
+datasetsSingleTau3pr.append(Dataset('/TauThreeProngsEnriched/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsSingleTau3pr.append(Dataset('/TauThreeProngsEnriched/PhaseIISpring17D-PU140_MB100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsSingleTau3pr.append(Dataset('/TauThreeProngsEnriched/PhaseIISpring17D-PU200_MB100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
 
 datasetsTTJpsiFilter = []
 datasetsTTJpsiFilter.append(Dataset('/TT_JpsiFilter_TuneCUETP8M1_mtop166_5_14TeV-powheg-tauola-pythia8/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
@@ -84,7 +87,6 @@ datasetsTT = []
 datasetsTT.append(Dataset('/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
 datasetsTT.append(Dataset('/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/PhaseIISpring17D-PU140_100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
 datasetsTT.append(Dataset('/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/PhaseIISpring17D-PU200_100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
-
 
 datasetsTT_pilot = []
 datasetsTT.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
@@ -96,17 +98,29 @@ datasetsTTbar.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpr
 datasetsTTbar.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
 datasetsTTbar.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-PU200_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
 
-datasetsSingleE = []
-datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
-datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
-datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsQCD = []
+datasetsQCD.append(Dataset('/QCD_Pt-15to3000_Tune4C_14TeV_pythia8/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsQCD.append(Dataset('/QCD_Pt-15to3000_Tune4C_14TeV_pythia8/PhaseIISpring17D-PU140_100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsQCD.append(Dataset('/QCD_Pt-15to3000_Tune4C_14TeV_pythia8/PhaseIISpring17D-PU200_100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
 
+datasetsHPlus = []
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIISpring17D-PU140_100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIISpring17D-PU200_100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIISpring17D-PU140_100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIISpring17D-PU200_100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIISpring17D-PU140_100M_90X_upgrade2023_realistic_v9-v1/GEN-DIGI-SIM-RAW', dataVersion="90Xmc") ) 
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIISpring17D-PU200_100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
 
 #================================================================================================ 
 # Dataset Grouping
 #================================================================================================ 
 Test92XDatasets = []
 Test92XDatasets.extend(datasetsSingleTau)
+# Test92XDatasets.extend(datasetsSingleTau1pr)
+# Test92XDatasets.extend(datasetsSingleTau3pr)
 Test92XDatasets.extend(datasetsSingleNu)
 
 L1TauDatasets = []
@@ -114,11 +128,15 @@ L1TauDatasets.extend(datasetsSingleE)
 L1TauDatasets.extend(datasetsSinglePion)
 L1TauDatasets.extend(datasetsSinglePion0)
 L1TauDatasets.extend(datasetsSingleTau)
+L1TauDatasets.extend(datasetsSingleTau1pr)
+L1TauDatasets.extend(datasetsSingleTau3pr)
 L1TauDatasets.extend(datasetsSingleNu)
 #L1TauDatasets.extend(datasetsTTJpsiFilter)
 L1TauDatasets.extend(datasetsTT)
+L1TauDatasets.extend(datasetsHPlus)
 #L1TauDatasets.extend(datasetsTT_pilot)
 #L1TauDatasets.extend(datasetsTTbar)
+#L1TauDatasets.extend(datasetsQCD)
 
 AllDatasets = []
 AllDatasets.extend(datasetsBs)
