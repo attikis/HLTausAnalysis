@@ -1,7 +1,6 @@
 #lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON.txt" # ICHEP dataset 271036-276811
 lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt"
 
-
 #================================================================================================ 
 # Class Definition
 #================================================================================================ 
@@ -26,95 +25,99 @@ class Dataset:
     def getName(self):
 	return self.name
 
-
-#================================================================================================ 
-# Data
-#================================================================================================ 
-datasetsTauData = []
-das = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset%3D%2FTau%2FRun2016*-PromptReco-v2%2FMINIAOD"
-datasetsTauData.append(Dataset('/Tau/Run2016B-03Feb2017_ver2-v2/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_273150-275376_13TeV_PromptReco_Collisions16_JSON_Tau_Run2016B.txt"))
-datasetsTauData.append(Dataset('/Tau/Run2016C-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_275420-276283_13TeV_PromptReco_Collisions16_JSON_Tau_Run2016C.txt"))
-datasetsTauData.append(Dataset('/Tau/Run2016D-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_276315-276437_13TeV_PromptReco_Collisions16_JSON_Tau_Run2016D_MET80.txt"))
-datasetsTauData.append(Dataset('/Tau/Run2016D-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_276453-276811_13TeV_PromptReco_Collisions16_JSON_Tau_Run2016D_noMET80.txt"))
-datasetsTauData.append(Dataset('/Tau/Run2016E-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_276824-277420_13TeV_PromptReco_Collisions16_JSON_NoL1T_Tau_Run2016E.txt"))
-datasetsTauData.append(Dataset('/Tau/Run2016F-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_277816-278800_13TeV_PromptReco_Collisions16_JSON_NoL1T_Tau_Run2016F_HIP.txt"))
-datasetsTauData.append(Dataset('/Tau/Run2016F-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_278801-278808_13TeV_PromptReco_Collisions16_JSON_NoL1T_Tau_Run2016F_HIPfixed.txt"))
-datasetsTauData.append(Dataset('/Tau/Run2016G-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_278816-280385_13TeV_PromptReco_Collisions16_JSON_NoL1T_Tau_Run2016G.txt"))
-#datasetsTauData.append(Dataset('/Tau/Run2016H-PromptReco-v1/MINIAOD', dataVersion="80Xdata2016H", dasQuery=das, lumiMask="Cert_281010-281202_13TeV_PromptReco_Collisions16_JSON_NoL1T_Tau_Run2016H.txt"))
-datasetsTauData.append(Dataset('/Tau/Run2016H-03Feb2017_ver2-v1/MINIAOD', dataVersion="80Xdata2016H", dasQuery=das, lumiMask="Cert_281207-284035_13TeV_PromptReco_Collisions16_JSON_NoL1T_Tau_Run2016H.txt"))
-datasetsTauData.append(Dataset('/Tau/Run2016H-03Feb2017_ver3-v1/MINIAOD', dataVersion="80Xdata2016H", dasQuery=das, lumiMask="Cert_284036-284068_13TeV_PromptReco_Collisions16_JSON_NoL1T_Tau_Run2016H.txt"))
-
 #================================================================================================ 
 # PhaseIISpring17D
 #================================================================================================ 
-dasAll  = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset+dataset%3D%2F*%2F*PhaseIISpring17D*%2F*+status%3D*"
-dasDone = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset+dataset%3D%2F*%2F*PhaseIISpring17D*%2F*"
-das     = dasAll
+das_PhaseIISpring17D = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset%3D%2F*%2F*PhaseIISpring17D*%2F*"
 
 datasetsBs = []
-datasetsBs.append(Dataset('/BsToPhiPhi_SoftQCDnonD_TuneCUEP8M1_14TeV_Pythia8/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
-datasetsBs.append(Dataset('/BsToPhiPhi_SoftQCDnonD_TuneCUEP8M1_14TeV_Pythia8/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
-datasetsBs.append(Dataset('/BsToPhiPhi_SoftQCDnonD_TuneCUEP8M1_14TeV_Pythia8/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
+datasetsBs.append(Dataset('/BsToPhiPhi_SoftQCDnonD_TuneCUEP8M1_14TeV_Pythia8/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsBs.append(Dataset('/BsToPhiPhi_SoftQCDnonD_TuneCUEP8M1_14TeV_Pythia8/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsBs.append(Dataset('/BsToPhiPhi_SoftQCDnonD_TuneCUEP8M1_14TeV_Pythia8/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
 
 datasetsSingleE = []
-datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
 
 datasetsSingleMu = []
-datasetsSingleMu.append(Dataset('/SingleMu_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsSingleMu.append(Dataset('/SingleMu_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsSingleMu.append(Dataset('/SingleMu_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSingleMu.append(Dataset('/SingleMu_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsSingleMu.append(Dataset('/SingleMu_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsSingleMu.append(Dataset('/SingleMu_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
 
 datasetsSingleNu = []
-datasetsSingleNu.append(Dataset('/SingleNeutrino/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
-datasetsSingleNu.append(Dataset('/SingleNeutrino/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSingleNu.append(Dataset('/SingleNeutrino/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsSingleNu.append(Dataset('/SingleNeutrino/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
 
 datasetsSinglePhoton = []
-datasetsSinglePhoton.append(Dataset('/SinglePhoton_FlatPt-8to150/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsSinglePhoton.append(Dataset('/SinglePhoton_FlatPt-8to150/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsSinglePhoton.append(Dataset('/SinglePhoton_FlatPt-8to150/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSinglePhoton.append(Dataset('/SinglePhoton_FlatPt-8to150/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsSinglePhoton.append(Dataset('/SinglePhoton_FlatPt-8to150/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsSinglePhoton.append(Dataset('/SinglePhoton_FlatPt-8to150/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
 
 datasetsSinglePion0 = []
-datasetsSinglePion0.append(Dataset('/SinglePion0_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsSinglePion0.append(Dataset('/SinglePion0_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsSinglePion0.append(Dataset('/SinglePion0_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSinglePion0.append(Dataset('/SinglePion0_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsSinglePion0.append(Dataset('/SinglePion0_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsSinglePion0.append(Dataset('/SinglePion0_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
 
 datasetsSinglePion = []
-datasetsSinglePion.append(Dataset('/SinglePion_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsSinglePion.append(Dataset('/SinglePion_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsSinglePion.append(Dataset('/SinglePion_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsSinglePion.append(Dataset('/SinglePion_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsSinglePion.append(Dataset('/SinglePion_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsSinglePion.append(Dataset('/SinglePion_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
 
 datasetsSingleTau = []
-datasetsSingleTau.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
-datasetsSingleTau.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
-datasetsSingleTau.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
+datasetsSingleTau.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsSingleTau.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsSingleTau.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsSingleTau.append(Dataset('/SingleTauOneProngFlatPt10To100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsSingleTau.append(Dataset('/SingleTauOneProngFlatPt10To100/PhaseIISpring17D-PU140_MB100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsSingleTau.append(Dataset('/SingleTauOneProngFlatPt10To100/PhaseIISpring17D-PU200_MB100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsSingleTau.append(Dataset('/TauThreeProngsEnriched/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsSingleTau.append(Dataset('/TauThreeProngsEnriched/PhaseIISpring17D-PU140_MB100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsSingleTau.append(Dataset('/TauThreeProngsEnriched/PhaseIISpring17D-PU200_MB100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+
 
 datasetsTTJpsiFilter = []
-datasetsTTJpsiFilter.append(Dataset('/TT_JpsiFilter_TuneCUETP8M1_mtop166_5_14TeV-powheg-tauola-pythia8/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsTTJpsiFilter.append(Dataset('/TT_JpsiFilter_TuneCUETP8M1_mtop166_5_14TeV-powheg-tauola-pythia8/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsTTJpsiFilter.append(Dataset('/TT_JpsiFilter_TuneCUETP8M1_mtop166_5_14TeV-powheg-tauola-pythia8/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsTTJpsiFilter.append(Dataset('/TT_JpsiFilter_TuneCUETP8M1_mtop166_5_14TeV-powheg-tauola-pythia8/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
 
 datasetsTT = []
-datasetsTT.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsTT.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
-datasetsTT.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-PU200_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
+datasetsTT.append(Dataset('/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsTT.append(Dataset('/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/PhaseIISpring17D-PU140_100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsTT.append(Dataset('/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/PhaseIISpring17D-PU200_100M_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+
+
+datasetsTT_pilot = []
+datasetsTT.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsTT.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
+datasetsTT.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-PU200_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") )
 
 datasetsTTbar = []
-datasetsTTbar.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsTTbar.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-datasetsTTbar.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-PU200_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
+datasetsTTbar.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsTTbar.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsTTbar.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-PU200_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+
+datasetsSingleE = []
+datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
+datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc") ) 
 
 
 #================================================================================================ 
 # Dataset Grouping
 #================================================================================================ 
+Test92XDatasets = []
+Test92XDatasets.extend(datasetsSingleTau)
+Test92XDatasets.extend(datasetsSingleNu)
+
 L1TauDatasets = []
-#L1TauDatasets.extend(datasetsSinglePion0)
-#L1TauDatasets.extend(datasetsSinglePion)
+L1TauDatasets.extend(datasetsSingleE)
+L1TauDatasets.extend(datasetsSinglePion)
+L1TauDatasets.extend(datasetsSinglePion0)
 L1TauDatasets.extend(datasetsSingleTau)
 L1TauDatasets.extend(datasetsSingleNu)
 #L1TauDatasets.extend(datasetsTTJpsiFilter)
 L1TauDatasets.extend(datasetsTT)
+#L1TauDatasets.extend(datasetsTT_pilot)
 #L1TauDatasets.extend(datasetsTTbar)
 
 AllDatasets = []
@@ -173,14 +176,15 @@ class DatasetGroup:
         '''
         Create dataset grouping in a dictionary for easy access.
         '''
-        analyses = ["CaloTk", "TkCalo", "PFTau", "CaloPix", "All"]
+        analyses = ["CaloTk", "TkCalo", "PFTau", "CaloPix", "All", "Test_92X"]
         if self.analysis not in analyses:
             raise Exception("Unknown analysis \"%s\". Please select one of the following: \"%s" % (self.analysis, "\", \"".join(analyses) + "\".") )
-        self.GroupDict["CaloTk"]  = L1TauDatasets
-        self.GroupDict["TkCalo"]  = L1TauDatasets
-        self.GroupDict["PFTau"]   = L1TauDatasets
-        self.GroupDict["CaloPix"] = L1TauDatasets
-        self.GroupDict["All"]     = AllDatasets
+        self.GroupDict["CaloTk"]   = L1TauDatasets
+        self.GroupDict["TkCalo"]   = L1TauDatasets
+        self.GroupDict["PFTau"]    = L1TauDatasets
+        self.GroupDict["CaloPix"]  = L1TauDatasets
+        self.GroupDict["All"]      = AllDatasets
+        self.GroupDict["Test_92X"] = Test92XDatasets
         return
 
 

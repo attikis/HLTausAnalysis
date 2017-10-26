@@ -1334,13 +1334,16 @@ def GetCMSSW():
     return version
 
 
-def GetAnalysis():
+def GetAnalysis(opts):
     '''
     Get the analysis type. This will later-on help determine the datasets to be used.
     https://docs.python.org/2/howto/regex.html
     '''
     Verbose("GetAnalysis()")
     
+    if opts.datasetGroup != None:
+        return opts.datasetGroup
+
     # Create a compiled regular expression object
     leg_re = re.compile("raw2TTree_(?P<leg>\S+)Skim_cfg.py")
     #leg_re = re.compile("miniAOD2TTree_(?P<leg>\S+)Skim_cfg.py")
@@ -1863,7 +1866,7 @@ def CreateJob(opts, args):
     
     # Get general info
     version      = GetCMSSW()
-    analysis     = GetAnalysis()
+    analysis     = GetAnalysis(opts)
     datasets     = DatasetGroup(analysis).GetDatasetList()
     taskDirName  = GetTaskDirName(analysis, version, datasets)
     opts.dirName = taskDirName
@@ -1912,14 +1915,18 @@ if __name__ == "__main__":
     '''
 
     # Default Values
-    VERBOSE = False
-    PSET    = "raw2TTree_CaloTk_cfg.py"
-    SITE    = "T2_CH_CERN" #"T2_FI_HIP"
-    DIRNAME = ""
+    VERBOSE      = False
+    PSET         = "raw2TTree_CaloTk_cfg.py"
+    SITE         = "T2_CH_CERN" #"T2_FI_HIP"
+    DIRNAME      = ""
+    DATASETGROUP = None
 
     parser = OptionParser(usage="Usage: %prog [options]")
     parser.add_option("--create", dest="create", default=False, action="store_true", 
                       help="Flag to create a CRAB job [default: False")
+
+    parser.add_option("--datasetGroup", dest="datasetGroup", type="string", 
+                      help="The group of datasets to run on [default: %s]" % (DATASETGROUP) )
 
     parser.add_option("--status", dest="status", default=False, action="store_true", 
                       help="Flag to check the status of all CRAB jobs [default: False")
