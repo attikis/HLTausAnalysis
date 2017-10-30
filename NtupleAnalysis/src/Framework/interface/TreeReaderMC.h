@@ -101,9 +101,9 @@ class TreeReaderMC : public TreeReaderReco, public virtual TREEDEFINITIONGENP
 
   vector<GenParticle> GetGenParticles(int pdgId, bool isLastCopy=false);
 
-  L1EG GetL1EG(unsigned int Index);
+  // L1EG GetL1EG(unsigned int Index);
   
-  vector<L1EG> GetL1EGs(bool bPrintList=false);
+  // vector<L1EG> GetL1EGs(bool bPrintList=false);
  
   void GetL1Muon(unsigned int Index);
   

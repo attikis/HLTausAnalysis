@@ -471,9 +471,13 @@ void CaloTk::Loop()
 
     // -------------------------------------- ALEX-START -------------------------------------- 
     // Jet Collections
-    vector<L1Jet> L1Jets = GetL1Jets(true);
-    vector<L1EG> L1EGs   = GetL1EGs(true);
-    vector<L1Sum> L1Sums = GetL1Sums(true);
+
+    /*
+      vector<L1Jet> L1Jets = GetL1Jets(true);
+      vector<L1EG> L1EGs   = GetL1EGs(true);
+      vector<L1Sum> L1Sums = GetL1Sums(true);
+    */
+
     // -------------------------------------- ALEX-END -------------------------------------- 
 
     // Ensure that all taus are found

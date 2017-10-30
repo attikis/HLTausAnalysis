@@ -35,7 +35,7 @@ TChain* FileOpener::OpenFiles(const string multicrabPath, const string dataset, 
   for (vector<string>::iterator f = dirs.begin(); f != dirs.end(); f++)
     {     
       rootFileName = *f;
-      cout << "\tAdding file " << rootFileName << " to the chain" << endl;
+      if (0) cout << "\tAdding file " << rootFileName << " to the chain" << endl;
       
 
       ifstream file(rootFileName);
@@ -64,7 +64,7 @@ vector<string> FileOpener::GetListOfFiles(const string fullPath)
   
   char* dir  = gSystem->ExpandPathName(fullPath.c_str()); // cast a "std::string" to a "char*" with c_str()
   void* dirp = gSystem->OpenDirectory(dir);
-  const char* filename[100];
+  const char* filename[140];
   TString str;
 
   // Get all files in the dir fullPath
@@ -79,7 +79,8 @@ vector<string> FileOpener::GetListOfFiles(const string fullPath)
     {
       // Printf("file -> %s", filename[i]);
       string fileName = string(filename[i]);
-      size_t found    = fileName.find("output-");
+      // size_t found    = fileName.find("output-");
+      size_t found    = fileName.find("raw2TTree_");
       if (found!=std::string::npos) dirs.push_back(fileName);
       else {} //cout << "\tSkipping " << fileName << endl;
 

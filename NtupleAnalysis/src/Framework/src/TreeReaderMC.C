@@ -648,6 +648,7 @@ L1Tau TreeReaderMC::GetL1Tau(unsigned int Index)
 
 
 
+/*
 //============================================================================
 vector<L1Jet> TreeReaderMC::GetL1Jets(bool bPrintList)
 //============================================================================
@@ -666,8 +667,10 @@ vector<L1Jet> TreeReaderMC::GetL1Jets(bool bPrintList)
   if (bPrintList) PrintL1JetCollection(theL1Jets); 
   return theL1Jets;
 }
+*/
 
 
+ /*
 //============================================================================
 L1Jet TreeReaderMC::GetL1Jet(unsigned int Index)
 //============================================================================
@@ -693,8 +696,9 @@ L1Jet TreeReaderMC::GetL1Jet(unsigned int Index)
 
   return theL1Jet;
 }
+ */
 
-
+/*
 //============================================================================
 vector<L1EG> TreeReaderMC::GetL1EGs(bool bPrintList)
 //============================================================================
@@ -712,7 +716,9 @@ vector<L1EG> TreeReaderMC::GetL1EGs(bool bPrintList)
   if (bPrintList) PrintL1EGCollection(theL1EGs); 
   return theL1EGs;
 }
+*/
 
+ /*
 //============================================================================
 L1EG TreeReaderMC::GetL1EG(unsigned int Index)
 //============================================================================
@@ -738,7 +744,9 @@ L1EG TreeReaderMC::GetL1EG(unsigned int Index)
     
     return theL1EG;
 }
+ */
 
+/*
 //============================================================================
 L1Sum TreeReaderMC::GetL1Sum(unsigned int Index)
 //============================================================================
@@ -754,8 +762,9 @@ L1Sum TreeReaderMC::GetL1Sum(unsigned int Index)
 
   return theL1Sum;
 }
+*/
 
-
+ /*
 //============================================================================
 vector<L1Sum> TreeReaderMC::GetL1Sums(bool bPrintList)
 //============================================================================
@@ -774,7 +783,7 @@ vector<L1Sum> TreeReaderMC::GetL1Sums(bool bPrintList)
   if (bPrintList) PrintL1SumCollection(theL1Sums); 
   return theL1Sums;
 }
-
+ */
 
 //============================================================================
 void TreeReaderMC::PrintL1TauCollection(vector<L1Tau> collection)
@@ -813,6 +822,7 @@ void TreeReaderMC::PrintL1TauCollection(vector<L1Tau> collection)
   return;
 }
 
+/*
 //============================================================================
 void TreeReaderMC::PrintL1JetCollection(vector<L1Jet> collection)
 //============================================================================
@@ -847,8 +857,9 @@ void TreeReaderMC::PrintL1JetCollection(vector<L1Jet> collection)
   info.Print();
   return;
 }
+*/
 
-
+ /*
 //============================================================================
 void TreeReaderMC::PrintL1EGCollection(vector<L1EG> collection)
 //============================================================================
@@ -884,8 +895,9 @@ void TreeReaderMC::PrintL1EGCollection(vector<L1EG> collection)
   info.Print();
   return;
 }
+ */
 
-
+/*
 //============================================================================
 void TreeReaderMC::PrintL1SumCollection(vector<L1Sum> collection)
 //============================================================================
@@ -910,7 +922,7 @@ void TreeReaderMC::PrintL1SumCollection(vector<L1Sum> collection)
   info.Print();
   return;
 }
-
+*/
 
 //============================================================================
 void TreeReaderMC::PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection)
