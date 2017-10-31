@@ -1,12 +1,12 @@
-#ifndef L1TkEGParticle_cxx
-#define L1TkEGParticle_cxx
+#ifndef L1TkEMParticle_cxx
+#define L1TkEMParticle_cxx
 
 // User
 #include "../../Auxiliary/interface/constants.h"
-#include "../interface/L1TkEGParticle.h"
+#include "../interface/L1TkEMParticle.h"
 
 //****************************************************************************
-L1TkEGParticle::L1TkEGParticle()
+L1TkEMParticle::L1TkEMParticle()
 //****************************************************************************
 {
 
@@ -16,20 +16,20 @@ L1TkEGParticle::L1TkEGParticle()
 
 
 //****************************************************************************
-L1TkEGParticle::L1TkEGParticle(vector<TTTrack> tracks, vector<L1EG> EGs,
+L1TkEMParticle::L1TkEMParticle(vector<TTTrack> tracks, vector<L1CaloTP> ecalTPs,
                                GenParticle genTau, bool matching)
 //****************************************************************************
 {
 
   theTracks = tracks;
-  theEGs = EGs;
+  theEcalTPs = ecalTPs;
   theGenTau = genTau;
   theMatching = matching;
 }
 
 
 //****************************************************************************
-void L1TkEGParticle::InitVars_(void)
+void L1TkEMParticle::InitVars_(void)
 //****************************************************************************
 {
   // theMatchingGenParticle_dR = 999.9;
@@ -38,7 +38,7 @@ void L1TkEGParticle::InitVars_(void)
 
 
 //****************************************************************************
-double L1TkEGParticle::GetTrackBasedPt()
+double L1TkEMParticle::GetTrackBasedPt()
 //****************************************************************************
 {
   TLorentzVector sum; // initialized to (0,0,0,0)
@@ -49,7 +49,7 @@ double L1TkEGParticle::GetTrackBasedPt()
 
 
 //****************************************************************************
-double L1TkEGParticle::GetTrackInvMass()
+double L1TkEMParticle::GetTrackInvMass()
 //****************************************************************************
 {
   TLorentzVector p4sum; // initialized to (0,0,0,0)
@@ -60,18 +60,18 @@ double L1TkEGParticle::GetTrackInvMass()
 
 
 //****************************************************************************
-double L1TkEGParticle::GetEGInvMass()
+double L1TkEMParticle::GetEGInvMass()
 //****************************************************************************
 {
   TLorentzVector p4sum; // initialized to (0,0,0,0)
-  for (auto eg = theEGs.begin(); eg != theEGs.end(); eg++)
-    p4sum += eg->p4();
+  for (auto tp = theEcalTPs.begin(); tp != theEcalTPs.end(); tp++)
+    p4sum += tp->p4();
   return p4sum.M();
 }
 
 
 //****************************************************************************
-double L1TkEGParticle::GetGenTauPt()
+double L1TkEMParticle::GetGenTauPt()
 //****************************************************************************
 {
   if (theMatching)
@@ -82,7 +82,7 @@ double L1TkEGParticle::GetGenTauPt()
 	
 	
 //****************************************************************************
-double L1TkEGParticle::GetGenTauEt()
+double L1TkEMParticle::GetGenTauEt()
 //****************************************************************************
 {
   if (theMatching)
@@ -93,7 +93,7 @@ double L1TkEGParticle::GetGenTauEt()
 
 
 //****************************************************************************
-double L1TkEGParticle::GetTrackBasedEt()
+double L1TkEMParticle::GetTrackBasedEt()
 //****************************************************************************
 {
   TLorentzVector sum; // initialized to (0,0,0,0)
@@ -104,18 +104,18 @@ double L1TkEGParticle::GetTrackBasedEt()
 
 
 //****************************************************************************
-double L1TkEGParticle::GetEGBasedEt()
+double L1TkEMParticle::GetEMBasedEt()
 //****************************************************************************
 {
   TLorentzVector sum; // initialized to (0,0,0,0)
-  for (auto eg = theEGs.begin(); eg != theEGs.end(); eg++)
-    sum += eg->p4(); //NB! Approximation Pt ~ Et used in TLorentzVector!
+  for (auto tp = theEcalTPs.begin(); tp != theEcalTPs.end(); tp++)
+    sum += tp->p4(); //NB! Approximation Pt ~ Et used in TLorentzVector!
   return sum.Et();
 }
 
 
 //****************************************************************************
-void L1TkEGParticle::PrintTTTracks()
+void L1TkEMParticle::PrintTTTracks()
 //****************************************************************************
 {
 
