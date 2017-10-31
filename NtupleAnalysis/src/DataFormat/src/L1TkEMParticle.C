@@ -60,7 +60,7 @@ double L1TkEMParticle::GetTrackInvMass()
 
 
 //****************************************************************************
-double L1TkEMParticle::GetEGInvMass()
+double L1TkEMParticle::GetEMInvMass()
 //****************************************************************************
 {
   TLorentzVector p4sum; // initialized to (0,0,0,0)
