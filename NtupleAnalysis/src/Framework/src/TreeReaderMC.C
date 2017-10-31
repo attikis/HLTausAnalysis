@@ -647,6 +647,40 @@ L1Tau TreeReaderMC::GetL1Tau(unsigned int Index)
 }
 
 
+//============================================================================
+vector<L1CaloTP> TreeReaderMC::GetL1EcalTPs(bool bPrintList)
+//============================================================================
+{
+  vector<L1CaloTP> theL1EcalTPs;
+  L1CaloTP theL1EcalTP;
+
+  // For-loop: All L1 Ecal trigger primitives (crystal granularity)
+  for (Size_t i = 0; i < CaloTP_ecalTPet->size(); i++)
+    {
+      theL1EcalTP = GetL1EcalTP(i);
+      theL1EcalTPs.push_back(theL1EcalTP);
+    }
+  
+//  if (bPrintList) PrintCaloTPCollection(theL1EcalTPs); //TODO
+  return theL1EcalTPs;
+}
+
+
+//============================================================================
+L1CaloTP TreeReaderMC::GetL1EcalTP(unsigned int Index)
+//============================================================================
+{
+  
+  L1CaloTP theL1EcalTP(Index,
+	       CaloTP_ecalTPet->at(Index),
+	       CaloTP_ecalTPcompEt->at(Index),
+	       CaloTP_ecalTPieta->at(Index),
+	       CaloTP_ecalTPiphi->at(Index),
+	       CaloTP_ecalTPCaliphi->at(Index));
+    
+    return theL1EcalTP;
+}
+
 
 /*
 //============================================================================

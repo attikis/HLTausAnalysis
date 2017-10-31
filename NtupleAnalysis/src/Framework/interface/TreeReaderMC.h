@@ -17,7 +17,7 @@
 #include "../../DataFormat/src/TrackingParticle.C"
 #include "../../DataFormat/interface/TTTrack.h"
 #include "../../DataFormat/interface/TTPixelTrack.h"
-#include "../../DataFormat/src/L1EG.C"
+#include "../../DataFormat/interface/L1CaloTP.h"
 #include "../../DataFormat/src/L1Jet.C"
 #include "../../DataFormat/src/L1Tau.C"
 #include "../../DataFormat/src/L1Sum.C"
@@ -54,8 +54,6 @@ class TreeReaderMC : public TreeReaderReco, public virtual TREEDEFINITIONGENP
   void PrintTTTrackCollection(vector<TTTrack> collection);
 
   void PrintL1SumCollection(vector<L1Sum> collection);
-
-  void PrintL1EGCollection(vector<L1EG> collection);
 
   void PrintL1JetCollection(vector<L1Jet> collection);
 
@@ -105,6 +103,10 @@ class TreeReaderMC : public TreeReaderReco, public virtual TREEDEFINITIONGENP
   
   // vector<L1EG> GetL1EGs(bool bPrintList=false);
  
+  L1CaloTP GetL1EcalTP(unsigned int Index);
+
+  vector<L1CaloTP> GetL1EcalTPs(bool bPrintList=false);
+
   void GetL1Muon(unsigned int Index);
   
   void GetL1Muons(bool bPrintList=false);

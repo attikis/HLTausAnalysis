@@ -9,15 +9,14 @@
 #include "../Framework/src/TreeAnalyserMC.C"
 #include "../Auxiliary/src/AuxTools.C"
 #include "../DataFormat/interface/TTTrack.h"
-#include "../DataFormat/src/L1EG.C"
-#include "../DataFormat/src//L1TkEGParticle.C"
+#include "../DataFormat/src/L1CaloTP.C"
 #include "../DataFormat/src/TrackingParticle.C" // for GetTTTrack function
 
 //#include "../Auxiliary/src/Table.C"
 //#include "../Auxiliary/src/MCTools.C"
 #include "../Auxiliary/src/HistoTools.C"
 //#include "../Auxiliary/src/Datasets.C" 
-//#include "../DataFormat/src/L1TkEGParticle.C"
+#include "../DataFormat/src/L1TkEMParticle.C"
 #include "../DataFormat/src/GenParticle.C"
 //#include "../DataFormat/src/TrackingParticle.C"
 //#include "../DataFormat/interface/TTTrack.h"
@@ -63,7 +62,7 @@ class TkCalo : public TreeAnalyserMC{
   // Public variables
   string mcSample;
   bool cfg_AddL1Tks;  
-  bool cfg_AddEGs; 
+  bool cfg_AddEcalTPs; 
   bool cfg_AddGenP;
   string cfg_tk_Collection;
   int cfg_tk_nFitParams;
@@ -83,24 +82,24 @@ class TkCalo : public TreeAnalyserMC{
   void InitVars_(void);
   float DeltaPhi(float phi1, float phi2);
   float deltaR(float eta1, float eta2, float phi1, float phi2);
-  vector<L1TkEGParticle> GetMcMatchedL1TkEGs(vector<L1TkEGParticle> L1TkEGs);
+  vector<L1TkEMParticle> GetMcMatchedL1TkEMs(vector<L1TkEMParticle> L1TkEcalTPs);
   double GetMatchingGenParticle(TTTrack track, GenParticle *genParticlePtr);
-  void FillTurnOn_Numerator_(vector<L1TkEGParticle> L1TkEGs, const double minEt, TH1D *hTurnOn);
+  void FillTurnOn_Numerator_(vector<L1TkEMParticle> L1TkEcalTPs, const double minEt, TH1D *hTurnOn);
 
-  void FillSingleTau_(vector<L1TkEGParticle> L1TkEGs,
+  void FillSingleTau_(vector<L1TkEMParticle> L1TkEcalTPs,
 		      TH1D *hRate,
 		      TH1D *hEfficiency,
 		      double minEta=0.0,
 		      double maxEta=999.9);
 
-  void FillDiTau_(vector<L1TkEGParticle> L1TkEGs, 
+  void FillDiTau_(vector<L1TkEMParticle> L1TkEcalTPs, 
 		  TH1D *hRate,
 		  TH1D *hEfficiency,
 		  double minEta=0.0,
 		  double maxEta=999.9);
 
-  void FillDiTau_(vector<L1TkEGParticle> L1TkEGs1,
-		  vector<L1TkEGParticle> L1TkEGs2,
+  void FillDiTau_(vector<L1TkEMParticle> L1TkEcalTPs1,
+		  vector<L1TkEMParticle> L1TkEcalTPs2,
 		  TH2D *hRate,
 		  TH2D *hEfficiency);
 
@@ -127,7 +126,7 @@ class TkCalo : public TreeAnalyserMC{
   // Private variables
   
   // Old parameters
-  float ETmin; // min ET in GeV of L1EG objects
+  float ETmin; // min ET in GeV of L1EcalTP objects
   float ZMAX; // |z_track| < ZMAX in cm
   float CHI2MAX;		
   float DRmin;
@@ -147,10 +146,10 @@ class TkCalo : public TreeAnalyserMC{
   float maxDeltaR_leadtrk; 
   float maxDeltaZ_trk; 
   float maxInvMass_trk;  
-  float minEt_EG;     
-  float minDeltaR_EG;   
-  float maxDeltaR_EG;   
-  float maxInvMass_EG;  
+  float minEt_EcalTP;     
+  float minDeltaR_EcalTP;   
+  float maxDeltaR_EcalTP;   
+  float maxInvMass_EcalTP;  
   float maxDeltaR_MCmatch; 
   float minDeltaR_iso;  
   float maxDeltaR_iso;   
@@ -159,10 +158,10 @@ class TkCalo : public TreeAnalyserMC{
   float maxRelIso;  
   
   vector<TTTrack> TTTracks;
-  vector<L1EG> L1EGs;
+  vector<L1CaloTP> L1EcalTPs;
   vector< vector <TTTrack> > trackTauCandidates;
-  vector<L1TkEGParticle> TauCandidates;
-  vector<L1TkEGParticle> TauCandidatesIsolated;
+  vector<L1TkEMParticle> TauCandidates;
+  vector<L1TkEMParticle> TauCandidatesIsolated;
   vector<GenParticle> GenTausHadronic;
 
   int nMaxNumOfHTausPossible;  
@@ -190,22 +189,22 @@ class TkCalo : public TreeAnalyserMC{
   TH1D* h_trkClusters_PtResolution;
   TH1D* h_trkClusters_M;
 
-  TH1D* h_clustEGs_Et;
-  TH1D* h_clustEGs_Eta;
-  TH1D* h_clustEGs_Phi;
-  TH2D* h_clustEGs_Phi_Eta;
-  TH1D* h_clustEGs_M;
+  TH1D* h_clustEcalTPs_Et;
+  TH1D* h_clustEcalTPs_Eta;
+  TH1D* h_clustEcalTPs_Phi;
+  TH2D* h_clustEcalTPs_Phi_Eta;
+  TH1D* h_clustEcalTPs_M;
 
-  TH2D* h_clustEGs_counter;
-  TH1D* h_EGClusters_MultiplicityPerCluster;
-  TH1D* h_EGClusters_Et;
-  TH1D* h_EGClusters_EtResolution;
-  TH1D* h_EGClusters_M;
+  TH2D* h_clustEcalTPs_counter;
+  TH1D* h_EcalTPClusters_MultiplicityPerCluster;
+  TH1D* h_EcalTPClusters_Et;
+  TH1D* h_EcalTPClusters_EtResolution;
+  TH1D* h_EcalTPClusters_M;
 
   TH1D* h_trkClusters_relIso;
   
-  TH1D* hTkEG_DeltaRmatch;
-  TH1D* hTkEG_VisEt;
+  TH1D* hTkEM_DeltaRmatch;
+  TH1D* hTkEM_VisEt;
   TH1D* hMcHadronicTau_VisEt;
   
   TH1D* hTurnOn25_all;
