@@ -7,16 +7,19 @@ lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13T
 import os
 
 class Dataset:
-    def __init__(self, url, dbs="global", dataVersion="80Xmc", dasQuery="", lumiMask=lumiMask, name=""):
+    def __init__(self, url, dbs="global", dataVersion="80Xmc", dasQuery="", lumiMask=lumiMask, name=None):
         self.URL = url
         self.DBS = dbs
         self.dataVersion = dataVersion
         if not os.path.dirname(lumiMask):
-            lumiMask = os.path.join(os.environ['CMSSW_BASE'],"src/HiggsAnalysis/MiniAOD2TTree/data",lumiMask)
+            lumiMask = os.path.join(os.environ['CMSSW_BASE'],"src/HiggsAnalysis/MiniAOD2TTree/data", lumiMask)
         self.lumiMask = lumiMask
         self.DASquery = dasQuery
-	self.name = name
-
+	if name != None:
+            self.name = name
+        else:
+            self.name = url
+            
     def isData(self):
         if "data" in self.dataVersion:
             return True
@@ -118,10 +121,19 @@ datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIISp
 # Dataset Grouping
 #================================================================================================ 
 Test92XDatasets = []
+# Test92XDatasets.extend(datasetsSingleE)
+Test92XDatasets.extend(datasetsSinglePion)
+Test92XDatasets.extend(datasetsSinglePion0)
 Test92XDatasets.extend(datasetsSingleTau)
-# Test92XDatasets.extend(datasetsSingleTau1pr)
-# Test92XDatasets.extend(datasetsSingleTau3pr)
+Test92XDatasets.extend(datasetsSingleTau1pr)
+Test92XDatasets.extend(datasetsSingleTau3pr)
 Test92XDatasets.extend(datasetsSingleNu)
+#Test92XDatasets.extend(datasetsTTJpsiFilter)
+Test92XDatasets.extend(datasetsTT)
+#Test92XDatasets.extend(datasetsHPlus)
+#Test92XDatasets.extend(datasetsTT_pilot)
+#Test92XDatasets.extend(datasetsTTbar)
+#Test92XDatasets.extend(datasetsQCD)
 
 L1TauDatasets = []
 L1TauDatasets.extend(datasetsSingleE)
