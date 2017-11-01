@@ -1,11 +1,18 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Usage:
+//
 // .x run.cc(<multicrab_dir>, <sample_alias>, <text_to_append_to_output>, <numberOfEvents>);
 //
 // Example:
 // root -l
 // root[0] .x run.cc("multicrab_CaloTk_v910p2_20170520T1958", "SingleTau-PU140", "", -1);
 //
+// macOS:
+// hltaus
+// ~/RootSetup.sh v6-10-08
+// cd HLTausAnalysis/NtupleAnalysis/src/CaloTk/work
+// root -l 
+// root[0] .x run.cc("multicrab_CaloTk_v920_20171030T1804", "TT_TuneCUETP8M1_14TeV_NoPU", "", 10);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "../CaloTk.C+" // how to compile macro in ROOT6 (compatible with ROOT5 as well)
 
@@ -16,8 +23,8 @@ void run(const std::string MulticrabDir = "",
 {
 
   // Alexandros' files
-  // const std::string absolutePath = "/Users/attikis/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X";
-  const std::string absolutePath = "/afs/cern.ch/user/a/attikis/workspace/multicrab/";
+  const std::string absolutePath = "/Users/attikis/hltaus/rootFiles/TTrees/P2L1T_HLTaus_92X";
+  // const std::string absolutePath = "/afs/cern.ch/user/a/attikis/workspace/multicrab/";
   // const std::string absolutePath = "/Users/attikis/disk/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X/";
   
   // Santeri's files

@@ -357,9 +357,12 @@ TTPixelTrack L1PixelTrackFit::FitPixelTrack(double rinv,
   TTPixelTrack aTrack;  
   bool success = false;
   double invrfit, phi0fit, d0fit, tfit, z0fit, chisqfit;
+  invrfit = phi0fit = d0fit = tfit = z0fit = chisqfit = 0;
   double sigmainvr, sigmaphi0, sigmad0, sigmat, sigmaz0;
+  sigmainvr = sigmaphi0 = sigmad0 = sigmat = sigmaz0;
+  
   sigmainvr = -1; // to prevent a non-initialized random number entering aTrack.init
-  int nhit;
+  int nhit  = 0;
   
   // Anders "hack"
   if (fabs(d0) < 10.0){ 

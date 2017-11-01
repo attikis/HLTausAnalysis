@@ -1,46 +1,64 @@
-/// \file
-/// \ingroup tutorial_tmva
-/// \notebook -nodraw
-/// This macro provides examples for the training and testing of the
-/// TMVA classifiers.
-///
-/// As input data is used a toy-MC sample consisting of four Gaussian-distributed
-/// and linearly correlated input variables.
-/// The methods to be used can be switched on and off by means of booleans, or
-/// via the prompt command, for example:
-///
-///     root -l ./TMVAClassification.C\(\"Fisher,Likelihood\"\)
-///
-/// (note that the backslashes are mandatory)
-/// If no method given, a default set of classifiers is used.
-/// The output file "TMVA.root" can be analysed with the use of dedicated
-/// macros (simply say: root -l <macro.C>), which can be conveniently
-/// invoked through a GUI that will appear at the end of the run of this macro.
-/// Launch the GUI via the command:
-///
-///     root -l ./TMVAGui.C
-///
-/// You can also compile and run the example with the following commands
-///
-///     make
-///     ./TMVAClassification <Methods>
-///
-/// where: `<Methods> = "method1 method2"` are the TMVA classifier names
-/// example:
-///
-///     ./TMVAClassification Fisher LikelihoodPCA BDT
-///
-/// If no method given, a default set is of classifiers is used
-///
-/// - Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis
-/// - Package   : TMVA
-/// - Root Macro: TMVAClassification
-///
-/// \macro_output
-/// \macro_code
-/// \author Andreas Hoecker
+// ================================================================================================
+// \file
+// \ingroup tutorial_tmva
+// \notebook -nodraw
+// This macro provides examples for the training and testing of the
+// TMVA classifiers.
+//
+// As input data is used a toy-MC sample consisting of four Gaussian-distributed
+// and linearly correlated input variables.
+// The methods to be used can be switched on and off by means of booleans, or
+// via the prompt command, for example:
+//
+//     root -l ./TMVAClassification.C\(\"Fisher,Likelihood\"\)
+//
+// (note that the backslashes are mandatory)
+// If no method given, a default set of classifiers is used.
+// The output file "TMVA.root" can be analysed with the use of dedicated
+// macros (simply say: root -l <macro.C>), which can be conveniently
+// invoked through a GUI that will appear at the end of the run of this macro.
+// Launch the GUI via the command:
+//
+//     root -l ./TMVAGui.C
+//
+// You can also compile and run the example with the following commands
+//
+//     make
+//     ./TMVAClassification <Methods>
+//
+// where: `<Methods> = "method1 method2"` are the TMVA classifier names
+// example:
+//
+//     ./TMVAClassification Fisher LikelihoodPCA BDT
+//
+// If no method given, a default set is of classifiers is used
+//
+// - Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis
+// - Package   : TMVA
+// - Root Macro: TMVAClassification
+//
+// \macro_output
+// \macro_code
+// \author Andreas Hoecker
+//
+// USAGE:
+// |\> root -l TMVAClassification.C\(\"myMethod1,myMethod2,myMethod3\"\)
+//
+// EXAMPLE: (using ROOT v6)
+// root -l TMVAClassification_v6.C
+// 
+// root -l
+// root[0].x TMVAClassification_v6.C("BDT", "BDTG")
+//
+// NOTES:
+// The explicit loading of the shared libTMVA is done in TMVAlogon.C, defined in .rootrc
+// if you use your private .rootrc, or run from a different directory, please copy the
+// corresponding lines from .rootrc
+// ================================================================================================
 
-
+// ================================================================================================
+// Includes
+// ================================================================================================
 #include <cstdlib>
 #include <iostream>
 #include <map>
@@ -61,112 +79,127 @@
 
 int TMVAClassification_v6( TString myMethodList = "" )
 {
-   // The explicit loading of the shared libTMVA is done in TMVAlogon.C, defined in .rootrc
-   // if you use your private .rootrc, or run from a different directory, please copy the
-   // corresponding lines from .rootrc
 
-   // Methods to be processed can be given as an argument; use format:
-   //
-   //     mylinux~> root -l TMVAClassification.C\(\"myMethod1,myMethod2,myMethod3\"\)
+  // This loads the library
+  TMVA::Tools::Instance();
+  
+  // Default MVA methods to be trained + tested
+  std::map<std::string,int> Use;
+  
+  // ================================================================================================
+  // Cut optimisation
+  // ================================================================================================
+  Use["Cuts"]            = 1;
+  Use["CutsD"]           = 0;
+  Use["CutsPCA"]         = 0;
+  Use["CutsGA"]          = 0;
+  Use["CutsSA"]          = 0;
+  
+  // ================================================================================================
+  // 1-dimensional likelihood ("naive Bayes estimator")
+  // ================================================================================================
+  Use["Likelihood"]      = 0;
+  Use["LikelihoodD"]     = 0; // the "D" extension indicates decorrelated input variables (see option strings)
+  Use["LikelihoodPCA"]   = 0; // the "PCA" extension indicates PCA-transformed input variables (see option strings)
+  Use["LikelihoodKDE"]   = 0;
+  Use["LikelihoodMIX"]   = 0;
 
-   //---------------------------------------------------------------
-   // This loads the library
-   TMVA::Tools::Instance();
+  // ================================================================================================
+  // Mutidimensional likelihood and Nearest-Neighbour methods
+  // ================================================================================================
+  Use["PDERS"]           = 0;
+  Use["PDERSD"]          = 0;
+  Use["PDERSPCA"]        = 0;
+  Use["PDEFoam"]         = 0;
+  Use["PDEFoamBoost"]    = 0; // uses generalised MVA method boosting
+  Use["KNN"]             = 0; // k-nearest neighbour method
 
-   // Default MVA methods to be trained + tested
-   std::map<std::string,int> Use;
+  // ================================================================================================
+  // Linear Discriminant Analysis
+  // ================================================================================================
+  Use["LD"]              = 0; // Linear Discriminant identical to Fisher
+  Use["Fisher"]          = 0;
+  Use["FisherG"]         = 0;
+  Use["BoostedFisher"]   = 0; // uses generalised MVA method boosting
+  Use["HMatrix"]         = 0;
+  
+  // ================================================================================================
+  // Function Discriminant analysis
+  // ================================================================================================
+  Use["FDA_GA"]          = 0; // minimisation of user-defined function using Genetics Algorithm
+  Use["FDA_SA"]          = 0;
+  Use["FDA_MC"]          = 0;
+  Use["FDA_MT"]          = 0;
+  Use["FDA_GAMT"]        = 0;
+  Use["FDA_MCMT"]        = 0;
 
-   // Cut optimisation
-   Use["Cuts"]            = 1;
-   Use["CutsD"]           = 1;
-   Use["CutsPCA"]         = 0;
-   Use["CutsGA"]          = 0;
-   Use["CutsSA"]          = 0;
-   //
-   // 1-dimensional likelihood ("naive Bayes estimator")
-   Use["Likelihood"]      = 1;
-   Use["LikelihoodD"]     = 0; // the "D" extension indicates decorrelated input variables (see option strings)
-   Use["LikelihoodPCA"]   = 1; // the "PCA" extension indicates PCA-transformed input variables (see option strings)
-   Use["LikelihoodKDE"]   = 0;
-   Use["LikelihoodMIX"]   = 0;
-   //
-   // Mutidimensional likelihood and Nearest-Neighbour methods
-   Use["PDERS"]           = 1;
-   Use["PDERSD"]          = 0;
-   Use["PDERSPCA"]        = 0;
-   Use["PDEFoam"]         = 1;
-   Use["PDEFoamBoost"]    = 0; // uses generalised MVA method boosting
-   Use["KNN"]             = 1; // k-nearest neighbour method
-   //
-   // Linear Discriminant Analysis
-   Use["LD"]              = 1; // Linear Discriminant identical to Fisher
-   Use["Fisher"]          = 0;
-   Use["FisherG"]         = 0;
-   Use["BoostedFisher"]   = 0; // uses generalised MVA method boosting
-   Use["HMatrix"]         = 0;
-   //
-   // Function Discriminant analysis
-   Use["FDA_GA"]          = 1; // minimisation of user-defined function using Genetics Algorithm
-   Use["FDA_SA"]          = 0;
-   Use["FDA_MC"]          = 0;
-   Use["FDA_MT"]          = 0;
-   Use["FDA_GAMT"]        = 0;
-   Use["FDA_MCMT"]        = 0;
-   //
-   // Neural Networks (all are feed-forward Multilayer Perceptrons)
-   Use["MLP"]             = 0; // Recommended ANN
-   Use["MLPBFGS"]         = 0; // Recommended ANN with optional training method
-   Use["MLPBNN"]          = 1; // Recommended ANN with BFGS training method and bayesian regulator
-   Use["CFMlpANN"]        = 0; // Depreciated ANN from ALEPH
-   Use["TMlpANN"]         = 0; // ROOT's own ANN
-   Use["DNN_GPU"]         = 0; // CUDA-accelerated DNN training.
-   Use["DNN_CPU"]         = 0; // Multi-core accelerated DNN.
-   //
-   // Support Vector Machine
-   Use["SVM"]             = 1;
-   //
-   // Boosted Decision Trees
-   Use["BDT"]             = 1; // uses Adaptive Boost
-   Use["BDTG"]            = 0; // uses Gradient Boost
-   Use["BDTB"]            = 0; // uses Bagging
-   Use["BDTD"]            = 0; // decorrelation + Adaptive Boost
-   Use["BDTF"]            = 0; // allow usage of fisher discriminant for node splitting
-   //
-   // Friedman's RuleFit method, ie, an optimised series of cuts ("rules")
-   Use["RuleFit"]         = 1;
-   // ---------------------------------------------------------------
+  // ================================================================================================
+  // Neural Networks (all are feed-forward Multilayer Perceptrons)
+  // ================================================================================================
+  Use["MLP"]             = 0; // Recommended ANN
+  Use["MLPBFGS"]         = 0; // Recommended ANN with optional training method
+  Use["MLPBNN"]          = 0; // Recommended ANN with BFGS training method and bayesian regulator
+  Use["CFMlpANN"]        = 0; // Depreciated ANN from ALEPH
+  Use["TMlpANN"]         = 0; // ROOT's own ANN
+  Use["DNN_GPU"]         = 0; // CUDA-accelerated DNN training.
+  Use["DNN_CPU"]         = 0; // Multi-core accelerated DNN.
 
-   std::cout << std::endl;
-   std::cout << "==> Start TMVAClassification" << std::endl;
+  // ================================================================================================
+  // Support Vector Machine
+  // ================================================================================================
+  Use["SVM"]             = 0;
+
+  // ================================================================================================
+  // Boosted Decision Trees (BDTs)
+  // ================================================================================================
+  Use["BDT"]             = 1; // uses Adaptive Boost
+  Use["BDTG"]            = 0; // uses Gradient Boost
+  Use["BDTB"]            = 0; // uses Bagging
+  Use["BDTD"]            = 0; // decorrelation + Adaptive Boost
+  Use["BDTF"]            = 0; // allow usage of fisher discriminant for node splitting
+
+  // ================================================================================================
+  // Friedman's RuleFit method, ie, an optimised series of cuts ("rules")
+  // ================================================================================================
+   Use["RuleFit"]         = 0;
+
+
+   // ================================================================================================
+   // Classification
+   // ================================================================================================
+   std::cout << "\n=== TMVAClassification_v6.C:\n\tStart TMVAClassification" << std::endl;
 
    // Select methods (don't look at this code - not of interest)
-   if (myMethodList != "") {
-      for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) it->second = 0;
+   if (myMethodList != "")
+     {
+       for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) it->second = 0;
+       
+       std::vector<TString> mlist = TMVA::gTools().SplitString( myMethodList, ',' );
 
-      std::vector<TString> mlist = TMVA::gTools().SplitString( myMethodList, ',' );
-      for (UInt_t i=0; i<mlist.size(); i++) {
-         std::string regMethod(mlist[i]);
+       // For-loop: All list entries
+       for (UInt_t i=0; i<mlist.size(); i++)
+	 {
+	   std::string regMethod(mlist[i]);
+	   
+	   if (Use.find(regMethod) == Use.end())
+	     {
+	       std::cout << "Method \"" << regMethod << "\" not known in TMVA under this name. Choose among the following:" << std::endl;
+	       for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) std::cout << it->first << " ";
+	       std::cout << std::endl;
+	       return 1;
+	     }
+	   Use[regMethod] = 1;
+	 }
+     }//endif
 
-         if (Use.find(regMethod) == Use.end()) {
-            std::cout << "Method \"" << regMethod << "\" not known in TMVA under this name. Choose among the following:" << std::endl;
-            for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) std::cout << it->first << " ";
-            std::cout << std::endl;
-            return 1;
-         }
-         Use[regMethod] = 1;
-      }
-   }
 
-   // --------------------------------------------------------------------------------------------------
+   // ================================================================================================
+   // Preparation phase begins
+   // ================================================================================================
 
-   // Here the preparation phase begins
-
-   // Read training and test data
-   // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
+   // Read training and test data (it is also possible to use ASCII format as input -> see TMVA Users Guide)
    TFile *sigInput(0);
    TFile *bkgInput(0);
-   
-   // TString fname       = "./tmva_class_example.root";
    TString crabDirPath = "/Users/attikis/hltaus/rootFiles/TTrees/P2L1T_HLTaus_92X/multicrab_CaloTk_v920_20171030T1804/";
    TString sigFileName = crabDirPath + "SingleTau_FlatPt_8to150/results/raw2TTree_1.root";
    TString bkgFileName = crabDirPath + "SingleNeutrino/results/raw2TTree_1.root";

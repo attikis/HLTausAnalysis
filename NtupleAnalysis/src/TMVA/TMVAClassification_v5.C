@@ -2,7 +2,7 @@
 /**********************************************************************************
  * Project   : TMVA - a ROOT-integrated toolkit for multivariate data analysis    *
  * Package   : TMVA                                                               *
- * Root Macro: TMVAClassification                                                 *
+ * Root Macro: TMVAClassification_v5                                              *
  *                                                                                *
  * This macro provides examples for the training and testing of the               *
  * TMVA classifiers.                                                              *
@@ -13,7 +13,7 @@
  * The methods to be used can be switched on and off by means of booleans, or     *
  * via the prompt command, for example:                                           *
  *                                                                                *
- *    root -l ./TMVAClassification.C\(\"Fisher,Likelihood\"\)                     *
+ *    root -l ./TMVAClassification_v5.C\(\"Fisher,Likelihood\"\)                  *
  *                                                                                *
  * (note that the backslashes are mandatory)                                      *
  * If no method given, a default set of classifiers is used.                      *
@@ -31,7 +31,7 @@
 // Tested with ROOT v5-34-22
 // source /cvmfs/cms.cern.ch/slc6_amd64_gcc491//lcg/root/5.34.22/bin/thisroot.csh 
 // root -l 
-// root[0] .x TMVAClassification.C
+// root[0] .x TMVAClassification_v5.C
 // root[0] .x variables.C
 ///////////////////////////////////////////////////////////////////////////////////
 #include <cstdlib>
@@ -55,7 +55,7 @@
 // #include "TMVAGui.C" 
 #endif
 
-void TMVAClassification( TString myMethodList = "", TString fout = "TMVA.root")
+void TMVAClassification_v5( TString myMethodList = "", TString fout = "TMVA.root")
 
 {
   // The explicit loading of the shared libTMVA is done in TMVAlogon.C, defined in .rootrc
@@ -64,11 +64,11 @@ void TMVAClassification( TString myMethodList = "", TString fout = "TMVA.root")
 
   // methods to be processed can be given as an argument; use format:
   //
-  // mylinux~> root -l TMVAClassification.C\(\"myMethod1,myMethod2,myMethod3\"\)
+  // mylinux~> root -l TMVAClassification_v5.C\(\"myMethod1,myMethod2,myMethod3\"\)
   //
   // if you like to use a method via the plugin mechanism, we recommend using
   //
-  // mylinux~> root -l TMVAClassification.C\(\"P_myMethod\"\)
+  // mylinux~> root -l TMVAClassification_v5.C\(\"P_myMethod\"\)
   // (an example is given for using the BDT as plugin (see below),
   // but of course the real application is when you write your own
   // method based)
@@ -145,7 +145,7 @@ void TMVAClassification( TString myMethodList = "", TString fout = "TMVA.root")
   // ---------------------------------------------------------------
 
   std::cout << std::endl;
-  std::cout << "==> Start TMVAClassification" << std::endl;
+  std::cout << "==> Start TMVAClassification_v5" << std::endl;
 
   // Select methods (don't look at this code - not of interest)
   if (myMethodList != "") {
@@ -225,7 +225,8 @@ void TMVAClassification( TString myMethodList = "", TString fout = "TMVA.root")
 
   // Read training and test data
   // (it is also possible to use ASCII format as input -> see TMVA Users Guide)OA
-  TString crabDirPath = "/afs/cern.ch/user/a/attikis/workspace/multicrab/multicrab_CaloTk_v920_20171030T1804/";
+  // TString crabDirPath = "/afs/cern.ch/user/a/attikis/workspace/multicrab/multicrab_CaloTk_v920_20171030T1804/";
+  TString crabDirPath = "/Users/attikis/hltaus/rootFiles/TTrees/P2L1T_HLTaus_92X/multicrab_CaloTk_v920_20171030T1804/";
   TString sigFileName = crabDirPath + "SingleNeutrino/results/raw2TTree_1.root";
   TString bkgFileName = crabDirPath + "SingleTau_FlatPt_8to150/results/raw2TTree_1.root";
   // TString sigFileName = "/afs/cern.ch/user/a/attikis/scratch0/CMSSW_9_2_0/src/L1Trigger/L1TCommon/test/raw2TTree.root";
@@ -237,7 +238,7 @@ void TMVAClassification( TString myMethodList = "", TString fout = "TMVA.root")
   TFile *sigFile = TFile::Open(sigFileName);
   TFile *bkgFile = TFile::Open(bkgFileName);
    
-  std::cout << "--- TMVAClassification: Using input files: " << sigFile->GetName() << ", "<<bkgFile->GetName()<<std::endl;
+  std::cout << "--- TMVAClassification_v5: Using input files: " << sigFile->GetName() << ", "<<bkgFile->GetName()<<std::endl;
 
   // --- Register the training and test trees
 

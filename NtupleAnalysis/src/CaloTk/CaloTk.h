@@ -19,6 +19,7 @@
 #include "../DataFormat/src/GenParticle.C"
 #include "../DataFormat/src/TrackingParticle.C"
 #include "../DataFormat/interface/TTTrack.h"
+#include "../DataFormat/src/L1CaloTP.C"
 #include "../DataFormat/interface/TTPixelTrack.h"
 #include "../DataFormat/src/L1EG.C"
 #include "../DataFormat/src/L1Jet.C"

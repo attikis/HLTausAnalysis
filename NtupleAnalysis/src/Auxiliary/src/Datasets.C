@@ -249,6 +249,7 @@ void Datasets::CreateMcProductions_(void)
 
 
   // PhaseIISpring17D
+  // mcm link: https://cms-pdmv.cern.ch/mcm/requests?page=2&member_of_campaign=PhaseIISpring17D&status=done&shown=536872961
   string path_NoPU  = "/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW";
   string path_PU140 = "/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW";
   string path_PU200 = "/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW";
@@ -269,14 +270,46 @@ void Datasets::CreateMcProductions_(void)
   Datasets SinglePionPU140_PhaseIISpring17D("SinglePion_PU140", "SinglePion_PU140", "/SinglePion_FlatPt-8to100" + path_PU140, CP, cmssw, geometry, 140, 499850, 0, 0);
   Datasets SinglePionPU200_PhaseIISpring17D("SinglePion_PU200", "SinglePion_PU200", "/SinglePion_FlatPt-8to100" + path_PU200, CP, cmssw, geometry, 200, 498400, 0, 0);
   
-  Datasets SingleTauNoPU_PhaseIISpring17D("SingleTau_NoPU"  , "SingleTau_NoPU" , "/SingleTau_FlatPt-8to150" + path_NoPU , CP, cmssw, geometry, 0, 242578, 0, 1);
-  Datasets SingleTauPU140_PhaseIISpring17D("SingleTau_PU140", "SingleTau_PU140", "/SingleTau_FlatPt-8to150" + path_PU140, CP, cmssw, geometry, 0, 244605, 0, 1);
-  Datasets SingleTauPU200_PhaseIISpring17D("SingleTau_PU200", "SingleTau_PU200", "/SingleTau_FlatPt-8to150" + path_PU200, CP, cmssw, geometry, 0, 245355, 0, 1);
+  Datasets SingleTauNoPU_PhaseIISpring17D( "SingleTau_FlatPt_8to150_NoPU" , "SingleTau_FlatPt_8to150_NoPU" , "/SingleTau_FlatPt-8to150" + path_NoPU , CP, cmssw, geometry, 0, 242578, 0, 1);
+  Datasets SingleTauPU140_PhaseIISpring17D("SingleTau_FlatPt_8to150_PU140", "SingleTau_FlatPt_8to150_PU140", "/SingleTau_FlatPt-8to150" + path_PU140, CP, cmssw, geometry, 140, 244605, 0, 1);
+  Datasets SingleTauPU200_PhaseIISpring17D("SingleTau_FlatPt_8to150_PU200", "SingleTau_FlatPt_8to150_PU200", "/SingleTau_FlatPt-8to150" + path_PU200, CP, cmssw, geometry, 200, 245355, 0, 1);
   
-  Datasets TTNoPU_PhaseIISpring17D("TT_TuneCUETP8M1_14TeV_NoPU"  , "TT_TuneCUETP8M1_14TeV_NoPU", "/TT_TuneCUETP8M1_14TeV-powheg-pythia8/" + path_NoPU , CP, cmssw, geometry, 0, 5000, 24, 2);
-  Datasets TTPU140_PhaseIISpring17D("TT_TuneCUETP8M1_14TeV_PU140", "TT_TuneCUETP8M1_14TeV_PU140", "/TT_TuneCUETP8M1_14TeV-powheg-pythia8/" + path_PU140, CP, cmssw, geometry, 0, 5000, 24, 2);
-  Datasets TTPU200_PhaseIISpring17D("TT_TuneCUETP8M1_14TeV_PU200", "TT_TuneCUETP8M1_14TeV_PU200", "/TT_TuneCUETP8M1_14TeV-powheg-pythia8/" + path_PU200, CP, cmssw, geometry, 0, 5000, 24, 2);
-    
+  Datasets TTpilotNoPU_PhaseIISpring17D("TT_TuneCUETP8M1_14TeV_NoPU"  , "TT_TuneCUETP8M1_14TeV_NoPU", "/TT_TuneCUETP8M1_14TeV-powheg-pythia8/" + path_NoPU , CP, cmssw, geometry, 0, 5000, 24, 2);
+  Datasets TTpilotPU140_PhaseIISpring17D("TT_TuneCUETP8M1_14TeV_PU140", "TT_TuneCUETP8M1_14TeV_PU140", "/TT_TuneCUETP8M1_14TeV-powheg-pythia8/" + path_PU140, CP, cmssw, geometry, 140, 5000, 24, 2);
+  Datasets TTpilotPU200_PhaseIISpring17D("TT_TuneCUETP8M1_14TeV_PU200", "TT_TuneCUETP8M1_14TeV_PU200", "/TT_TuneCUETP8M1_14TeV-powheg-pythia8/" + path_PU200, CP, cmssw, geometry, 200, 5000, 24, 2);
+
+  Datasets TTNoPU_PhaseIISpring17D("TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_NoPU", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_NoPU", "/TT_TuneCUETP8M2T4_14TeV_powheg_pythia8" + path_NoPU, CP, cmssw, geometry, 0, 100000, 24, 2);
+  Datasets TTPU140_PhaseIISpring17D("TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PU140", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PU140", "/TT_TuneCUETP8M2T4_14TeV_powheg_pythia8/" + path_PU140, CP, cmssw, geometry, 0, 100000, 24, 2);
+  Datasets TTPU200_PhaseIISpring17D("TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PU140", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PU140", "/TT_TuneCUETP8M2T4_14TeV_powheg_pythia8/" + path_PU200, CP, cmssw, geometry, 0, 99800, 24, 2);
+
+  Datasets HPlus200NoPU_PhaseIISpring17D("PYTHIA_Tauola_TB_ChargedHiggs200_14TeV_NoPU", "PYTHIA_Tauola_TB_ChargedHiggs200_14TeV_NoPU", "/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/" + path_NoPU, CP, cmssw, geometry, 0, 100000, 37, 1);
+  Datasets HPlus200PU140_PhaseIISpring17D("PYTHIA_Tauola_TB_ChargedHiggs200_14TeV_PU140", "PYTHIA_Tauola_TB_ChargedHiggs200_14TeV_PU140", "/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/" + path_PU140, CP, cmssw, geometry, 0, 99800, 37, 1);
+  Datasets HPlus200PU200_PhaseIISpring17D("PYTHIA_Tauola_TB_ChargedHiggs200_14TeV_PU200", "PYTHIA_Tauola_TB_ChargedHiggs200_14TeV_PU200", "/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/" + path_PU200, CP, cmssw, geometry, 0, 100000, 37, 1);
+ 
+  Datasets HPlus500NoPU_PhaseIISpring17D("PYTHIA_Tauola_TB_ChargedHiggs500_14TeV_NoPU", "PYTHIA_Tauola_TB_ChargedHiggs500_14TeV_NoPU", "/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/" + path_NoPU, CP, cmssw, geometry, 0, 99095, 37, 1);
+  Datasets HPlus500PU140_PhaseIISpring17D("PYTHIA_Tauola_TB_ChargedHiggs500_14TeV_PU140", "PYTHIA_Tauola_TB_ChargedHiggs500_14TeV_PU140", "/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/" + path_PU140, CP, cmssw, geometry, 0, 99095, 37, 1);
+  Datasets HPlus500PU200_PhaseIISpring17D("PYTHIA_Tauola_TB_ChargedHiggs500_14TeV_PU200", "PYTHIA_Tauola_TB_ChargedHiggs500_14TeV_PU200", "/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/" + path_PU200, CP, cmssw, geometry, 0, 99095, 37, 1);
+
+  Datasets HPlus1000NoPU_PhaseIISpring17D("PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_NoPU", "PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_NoPU", "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/" + path_NoPU, CP, cmssw, geometry, 0, 100000, 37, 1);
+  Datasets HPlus1000PU140_PhaseIISpring17D("PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PU140", "PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PU140", "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/" + path_PU140, CP, cmssw, geometry, 0, 99840, 37, 1);
+  Datasets HPlus1000PU200_PhaseIISpring17D("PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PU200", "PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PU200", "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/" + path_PU200, CP, cmssw, geometry, 0, 99840, 37, 1);
+
+  Datasets Tau3prNoPU_PhaseIISpring17D("TauThreeProngsEnriched_NoPU", "TauThreeProngsEnriched_NoPU", "/TauThreeProngsEnriched/" + path_NoPU, CP, cmssw, geometry, 0, 250000, 0, 1);
+  Datasets Tau3prPU140_PhaseIISpring17D("TauThreeProngsEnriched_PU140", "TauThreeProngsEnriched_PU140", "/TauThreeProngsEnriched/" + path_PU140, CP, cmssw, geometry, 247600, 0, 0, 1);
+  Datasets Tau3prPU200_PhaseIISpring17D("TauThreeProngsEnriched_PU200", "TauThreeProngsEnriched_PU200", "/TauThreeProngsEnriched/" + path_PU200, CP, cmssw, geometry, 248200, 0, 0, 1);
+
+  Datasets Tau1prNoPU_PhaseIISpring17D("SingleTauOneProngFlatPt10To100_NoPU", "SingleTauOneProngFlatPt10To100_NoPU", "/SingleTauOneProngFlatPt10To100/" + path_NoPU, CP, cmssw, geometry, 0, 250000, 0, 1);
+  Datasets Tau1prPU140_PhaseIISpring17D("SingleTauOneProngFlatPt10To100_PU140", "SingleTauOneProngFlatPt10To100_PU140", "/SingleTauOneProngFlatPt10To100/" + path_PU140, CP, cmssw, geometry, 0, 246800, 0, 1);
+  Datasets Tau1prPU200_PhaseIISpring17D("SingleTauOneProngFlatPt10To100_PU200", "SingleTauOneProngFlatPt10To100_PU200", "/SingleTauOneProngFlatPt10To100/" + path_PU200, CP, cmssw, geometry, 0, 247600, 0, 1);
+
+  Datasets PionNoPU_PhaseIISpring17D("SinglePion_FlatPt_8to100_NoPU" , "SinglePion_FlatPt_8to100_NoPU" , "/SinglePion_FlatPt-8to100/" + path_NoPU , CP, cmssw, geometry, 0, 492588, 0, 0);
+  Datasets PionPU140_PhaseIISpring17D("SinglePion_FlatPt_8to100_PU140", "SinglePion_FlatPt_8to100_PU140", "/SinglePion_FlatPt-8to100/" + path_PU140, CP, cmssw, geometry, 0, 499850, 0, 0);
+  Datasets PionPU200_PhaseIISpring17D("SinglePion_FlatPt_8to100_PU200", "SinglePion_FlatPt_8to100_PU200", "/SinglePion_FlatPt-8to100/" + path_PU200, CP, cmssw, geometry, 0, 498400, 0, 0);
+
+  Datasets Pion0NoPU_PhaseIISpring17D("SinglePion0_FlatPt_8to100_NoPU" , "SinglePion0_FlatPt_8to100_NoPU" , "/SinglePion0_FlatPt-8to100/" + path_NoPU , CP, cmssw, geometry, 0, 500000, 0, 0);
+  Datasets Pion0PU140_PhaseIISpring17D("SinglePion0_FlatPt_8to100_PU140", "SinglePion0_FlatPt_8to100_PU140", "/SinglePion0_FlatPt-8to100/" + path_PU140, CP, cmssw, geometry, 0, 500000, 0, 0);
+  Datasets Pion0PU200_PhaseIISpring17D("SinglePion0_FlatPt_8to100_PU200", "SinglePion0_FlatPt_8to100_PU200", "/SinglePion0_FlatPt-8to100/" + path_PU200, CP, cmssw, geometry, 0, 499400, 0, 0);
+
   datasets_PhaseIISpring17D.push_back(SingleNeutrinoPU140_PhaseIISpring17D);
   datasets_PhaseIISpring17D.push_back(SingleNeutrinoPU200_PhaseIISpring17D);
   datasets_PhaseIISpring17D.push_back(SinglePion0NoPU_PhaseIISpring17D);
@@ -288,10 +321,34 @@ void Datasets::CreateMcProductions_(void)
   datasets_PhaseIISpring17D.push_back(SingleTauNoPU_PhaseIISpring17D);
   datasets_PhaseIISpring17D.push_back(SingleTauPU140_PhaseIISpring17D);
   datasets_PhaseIISpring17D.push_back(SingleTauPU200_PhaseIISpring17D);  
+  datasets_PhaseIISpring17D.push_back(TTpilotNoPU_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(TTpilotPU140_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(TTpilotPU200_PhaseIISpring17D);
   datasets_PhaseIISpring17D.push_back(TTNoPU_PhaseIISpring17D);
   datasets_PhaseIISpring17D.push_back(TTPU140_PhaseIISpring17D);
   datasets_PhaseIISpring17D.push_back(TTPU200_PhaseIISpring17D);
-  
+  datasets_PhaseIISpring17D.push_back(HPlus200NoPU_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(HPlus200PU140_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(HPlus200PU200_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(HPlus500NoPU_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(HPlus500PU140_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(HPlus500PU200_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(HPlus1000NoPU_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(HPlus1000PU140_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(HPlus1000PU200_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(Tau3prNoPU_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(Tau3prPU140_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(Tau3prPU200_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(Tau1prNoPU_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(Tau1prPU140_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(Tau1prPU200_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(PionNoPU_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(PionPU140_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(PionPU200_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(Pion0NoPU_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(Pion0PU140_PhaseIISpring17D);
+  datasets_PhaseIISpring17D.push_back(Pion0PU200_PhaseIISpring17D);
+
   return;
 }
 
@@ -309,25 +366,28 @@ Datasets Datasets::GetDataset(const string datasetAlias)
   if (datasets_PhaseIISpring17D.size() < 1 ) CreateMcProductions_();
   
   // Check if the selected MC Prodution is valid
-  for( int iD = 0 ; iD < (int) datasets_TTI2023Updg14D.size(); iD++){
-
-    if ( datasetAlias.compare( datasets_TTI2023Updg14D.at(iD).alias_) != 0) continue;
-    bSuccess = true;
-    d = datasets_TTI2023Updg14D.at(iD);
-  }
+  for( int iD = 0 ; iD < (int) datasets_TTI2023Updg14D.size(); iD++)
+    {
+      
+      if ( datasetAlias.compare( datasets_TTI2023Updg14D.at(iD).alias_) != 0) continue;
+      bSuccess = true;
+      d = datasets_TTI2023Updg14D.at(iD);
+    }
 
   // Check if the selected MC Prodution is valid
-  for( int iD = 0 ; iD < (int) datasets_PhaseIISpring17D.size(); iD++){
-
-    if ( datasetAlias.compare( datasets_PhaseIISpring17D.at(iD).alias_) != 0) continue;
-    bSuccess = true;
-    d = datasets_PhaseIISpring17D.at(iD);
-  }
+  for( int iD = 0 ; iD < (int) datasets_PhaseIISpring17D.size(); iD++)
+    {
+      
+      if ( datasetAlias.compare( datasets_PhaseIISpring17D.at(iD).alias_) != 0) continue;
+      bSuccess = true;
+      d = datasets_PhaseIISpring17D.at(iD);
+    }
     
-  if(!bSuccess){
-    cout << "\nE R R O R ! Datasets::GetDataset(...) - Unexpected error! Could not find dataset alias \"" << datasetAlias << "\"." << endl;
-    exit(1);
-  }
+  if(!bSuccess)
+    {
+      cout << "=== Datasets::GetDataset() - Could not find dataset alias \"" << datasetAlias << "\". EXIT" << endl;
+      exit(1);
+    }
 
   return d;
 }
@@ -349,12 +409,15 @@ const string Datasets::GetDatasetPathFromAlias(const string datasetAlias)
 
   // Check if the selected MC Prodution is valid
   for( int iD = 0 ; iD < (int) datasets_TTI2023Updg14D.size(); iD++){
-
+    
     if ( datasetAlias.compare( datasets_TTI2023Updg14D.at(iD).alias_) == 0)
       {
       datasetPath = datasets_TTI2023Updg14D.at(iD).datasetPath_;
       return datasetPath;
     }
+  }
+  
+  for( int iD = 0 ; iD < (int) datasets_PhaseIISpring17D.size(); iD++){  
 
     if ( datasetAlias.compare( datasets_PhaseIISpring17D.at(iD).alias_) == 0)
       {
@@ -365,8 +428,7 @@ const string Datasets::GetDatasetPathFromAlias(const string datasetAlias)
   }
   
   // If this is reached then the dataset sample is invalid
-  cout << "\nE R R O R ! Datasets::GetDatasetPathFromAlias(...) - Unexpected error! Could not find dataset path for dataset alias \"" << datasetAlias << "\"." << endl;
-  cout << "EXIT" << endl;
+  cout << "=== Datasets::GetDatasetPathFromAlias() - Could not find dataset path for dataset alias \"" << datasetAlias << "\". EXIT" << endl;
   exit(1);
 
   return datasetPath;

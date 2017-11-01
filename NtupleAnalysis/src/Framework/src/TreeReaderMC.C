@@ -661,7 +661,11 @@ vector<L1CaloTP> TreeReaderMC::GetL1EcalTPs(bool bPrintList)
       theL1EcalTPs.push_back(theL1EcalTP);
     }
   
-//  if (bPrintList) PrintCaloTPCollection(theL1EcalTPs); //TODO
+  if (bPrintList)
+    {
+      std::cout << "WARNING! Printing L1 ECAL TP collection under construction... Skipping!" << std::endl;
+      //  PrintCaloTPCollection(theL1EcalTPs); //TODO
+    }
   return theL1EcalTPs;
 }
 
