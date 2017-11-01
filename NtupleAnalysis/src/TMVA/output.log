@@ -1,0 +1,627 @@
+
+Processing ./TMVAClassificationTopRec.C...
+
+==> Start TMVAClassification
+Output File:TMVA_TopRec.root
+--- Factory                  : You are running ROOT Version: 5.34/36, Apr 5, 2016
+--- Factory                  : 
+--- Factory                  : _/_/_/_/_/ _|      _|  _|      _|    _|_|   
+--- Factory                  :    _/      _|_|  _|_|  _|      _|  _|    _| 
+--- Factory                  :   _/       _|  _|  _|  _|      _|  _|_|_|_| 
+--- Factory                  :  _/        _|      _|    _|  _|    _|    _| 
+--- Factory                  : _/         _|      _|      _|      _|    _| 
+--- Factory                  : 
+--- Factory                  : ___________TMVA Version 4.2.0, Sep 19, 2013
+--- Factory                  : 
+--- TMVAClassification       : Using input files: histograms_TTnewMatching.root, histograms_TTnewMatching.root
+--- DataSetInfo              : Added class "Signal"	 with internal class number 0
+--- Factory                  : Add Tree treeS of type Signal with 90519 events
+--- DataSetInfo              : Added class "Background"	 with internal class number 1
+--- Factory                  : Add Tree treeB of type Background with 4012045 events
+--- Factory                  : Preparing trees for training and testing...
+--- Factory                  : Booking method: [1mBDTG[0m
+[1;31m--- <WARNING> BDTG                     : the option *InverseBoostNegWeights* does not exist for BoostType=Grad --> change to *IgnoreNegWeightsInTraining*[0m
+--- DataSetFactory           : Splitmode is: "RANDOM" the mixmode is: "SAMEASSPLITMODE"
+--- DataSetFactory           : Create training and testing trees -- looping over class "Signal" ...
+--- DataSetFactory           : Weight expression for class 'Signal': "eventWeight"
+--- DataSetFactory           : Create training and testing trees -- looping over class "Background" ...
+--- DataSetFactory           : Weight expression for class 'Background': "eventWeight"
+--- DataSetFactory           : Number of events in input trees (after possible flattening of arrays):
+--- DataSetFactory           :     Signal          -- number of events       : 90519  / sum of weights: 85681.1
+--- DataSetFactory           :     Background      -- number of events       : 4012045  / sum of weights: 3.84742e+06
+--- DataSetFactory           :     Signal     tree -- total number of entries: 90519
+--- DataSetFactory           :     Background tree -- total number of entries: 4012045
+--- DataSetFactory           : Preselection: (will NOT affect number of requested training and testing events)
+--- DataSetFactory           :     No preselection cuts applied on event classes
+--- DataSetFactory           : Weight renormalisation mode: "NumEvents": renormalises all event classes 
+--- DataSetFactory           :  such that the effective (weighted) number of events in each class equals the respective 
+--- DataSetFactory           :  number of events (entries) that you demanded in PrepareTrainingAndTestTree("","nTrain_Signal=.. )
+--- DataSetFactory           :  ... i.e. such that Sum[i=1..N_j]{w_i} = N_j, j=0,1,2...
+--- DataSetFactory           :  ... (note that N_j is the sum of TRAINING events (nTrain_j...with j=Signal,Background..
+--- DataSetFactory           :  ..... Testing events are not renormalised nor included in the renormalisation factor! )
+--- DataSetFactory           : --> Rescale Signal     event weights by factor: 1.05614
+--- DataSetFactory           : --> Rescale Background event weights by factor: 1.04082
+--- DataSetFactory           : Number of training and testing events after rescaling:
+--- DataSetFactory           : ------------------------------------------------------
+--- DataSetFactory           : Signal     -- training events            : 45000 (sum of weights: 45000) - requested were 45000 events
+--- DataSetFactory           : Signal     -- testing events             : 45000 (sum of weights: 42583.7) - requested were 45000 events
+--- DataSetFactory           : Signal     -- training and testing events: 90000 (sum of weights: 87583.7)
+--- DataSetFactory           : Background -- training events            : 45000 (sum of weights: 45000) - requested were 45000 events
+--- DataSetFactory           : Background -- testing events             : 45000 (sum of weights: 43222.3) - requested were 45000 events
+--- DataSetFactory           : Background -- training and testing events: 90000 (sum of weights: 88222.3)
+--- DataSetFactory           : Create internal training tree
+--- DataSetFactory           : Create internal testing tree
+--- DataSetInfo              : Correlation matrix (Signal):
+--- DataSetInfo              : -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--- DataSetInfo              :                          TrijetPtDR TrijetDijetPtDR TrijetBjetMass TrijetLdgJetBDisc TrijetSubldgJetBDisc TrijetBJetLdgJetMass TrijetBJetSubldgJetMass TrijetMass TrijetDijetMass TrijetBJetBDisc TrijetSoftDrop_n2
+--- DataSetInfo              :              TrijetPtDR:     +1.000          +0.449         +0.020            +0.029               -0.008               +0.466                  +0.157     +0.445          +0.270          +0.020            +0.364
+--- DataSetInfo              :         TrijetDijetPtDR:     +0.449          +1.000         -0.015            +0.032               -0.005               +0.479                  +0.100     +0.618          +0.732          +0.003            -0.075
+--- DataSetInfo              :          TrijetBjetMass:     +0.020          -0.015         +1.000            +0.022               +0.016               +0.224                  +0.303     +0.259          +0.012          -0.063            -0.057
+--- DataSetInfo              :       TrijetLdgJetBDisc:     +0.029          +0.032         +0.022            +1.000               -0.011               +0.044                  -0.024     +0.027          +0.030          -0.003            +0.003
+--- DataSetInfo              :    TrijetSubldgJetBDisc:     -0.008          -0.005         +0.016            -0.011               +1.000               -0.010                  +0.008     -0.004          -0.001          -0.006            -0.009
+--- DataSetInfo              :    TrijetBJetLdgJetMass:     +0.466          +0.479         +0.224            +0.044               -0.010               +1.000                  -0.074     +0.777          +0.498          +0.006            -0.072
+--- DataSetInfo              : TrijetBJetSubldgJetMass:     +0.157          +0.100         +0.303            -0.024               +0.008               -0.074                  +1.000     +0.463          +0.277          +0.001            -0.015
+--- DataSetInfo              :              TrijetMass:     +0.445          +0.618         +0.259            +0.027               -0.004               +0.777                  +0.463     +1.000          +0.821          +0.004            -0.151
+--- DataSetInfo              :         TrijetDijetMass:     +0.270          +0.732         +0.012            +0.030               -0.001               +0.498                  +0.277     +0.821          +1.000          -0.000            -0.213
+--- DataSetInfo              :         TrijetBJetBDisc:     +0.020          +0.003         -0.063            -0.003               -0.006               +0.006                  +0.001     +0.004          -0.000          +1.000            +0.005
+--- DataSetInfo              :       TrijetSoftDrop_n2:     +0.364          -0.075         -0.057            +0.003               -0.009               -0.072                  -0.015     -0.151          -0.213          +0.005            +1.000
+--- DataSetInfo              : -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--- DataSetInfo              : Correlation matrix (Background):
+--- DataSetInfo              : -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--- DataSetInfo              :                          TrijetPtDR TrijetDijetPtDR TrijetBjetMass TrijetLdgJetBDisc TrijetSubldgJetBDisc TrijetBJetLdgJetMass TrijetBJetSubldgJetMass TrijetMass TrijetDijetMass TrijetBJetBDisc TrijetSoftDrop_n2
+--- DataSetInfo              :              TrijetPtDR:     +1.000          +0.506         +0.398            +0.063               +0.017               +0.634                  +0.390     +0.611          +0.299          -0.034            +0.024
+--- DataSetInfo              :         TrijetDijetPtDR:     +0.506          +1.000         +0.075            +0.069               +0.013               +0.475                  +0.171     +0.640          +0.729          -0.006            -0.264
+--- DataSetInfo              :          TrijetBjetMass:     +0.398          +0.075         +1.000            +0.030               +0.012               +0.461                  +0.417     +0.393          +0.023          -0.037            +0.001
+--- DataSetInfo              :       TrijetLdgJetBDisc:     +0.063          +0.069         +0.030            +1.000               +0.006               +0.073                  +0.025     +0.078          +0.065          -0.009            -0.010
+--- DataSetInfo              :    TrijetSubldgJetBDisc:     +0.017          +0.013         +0.012            +0.006               +1.000               +0.011                  +0.025     +0.023          +0.018          -0.003            +0.004
+--- DataSetInfo              :    TrijetBJetLdgJetMass:     +0.634          +0.475         +0.461            +0.073               +0.011               +1.000                  +0.380     +0.853          +0.375          -0.041            -0.061
+--- DataSetInfo              : TrijetBJetSubldgJetMass:     +0.390          +0.171         +0.417            +0.025               +0.025               +0.380                  +1.000     +0.612          +0.278          -0.031            +0.019
+--- DataSetInfo              :              TrijetMass:     +0.611          +0.640         +0.393            +0.078               +0.023               +0.853                  +0.612     +1.000          +0.738          -0.036            -0.168
+--- DataSetInfo              :         TrijetDijetMass:     +0.299          +0.729         +0.023            +0.065               +0.018               +0.375                  +0.278     +0.738          +1.000          -0.004            -0.345
+--- DataSetInfo              :         TrijetBJetBDisc:     -0.034          -0.006         -0.037            -0.009               -0.003               -0.041                  -0.031     -0.036          -0.004          +1.000            -0.001
+--- DataSetInfo              :       TrijetSoftDrop_n2:     +0.024          -0.264         +0.001            -0.010               +0.004               -0.061                  +0.019     -0.168          -0.345          -0.001            +1.000
+--- DataSetInfo              : -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--- DataSetFactory           :  
+--- Factory                  : Booking method: [1mBDT[0m
+--- Factory                  : 
+--- Factory                  : current transformation string: 'I'
+--- Factory                  : Create Transformation "I" with events from all classes.
+--- Id                       : Transformation, Variable selection : 
+--- Id                       : Input : variable 'TrijetPtDR' (index=0).   <---> Output : variable 'TrijetPtDR' (index=0).
+--- Id                       : Input : variable 'TrijetDijetPtDR' (index=1).   <---> Output : variable 'TrijetDijetPtDR' (index=1).
+--- Id                       : Input : variable 'TrijetBjetMass' (index=2).   <---> Output : variable 'TrijetBjetMass' (index=2).
+--- Id                       : Input : variable 'TrijetLdgJetBDisc' (index=3).   <---> Output : variable 'TrijetLdgJetBDisc' (index=3).
+--- Id                       : Input : variable 'TrijetSubldgJetBDisc' (index=4).   <---> Output : variable 'TrijetSubldgJetBDisc' (index=4).
+--- Id                       : Input : variable 'TrijetBJetLdgJetMass' (index=5).   <---> Output : variable 'TrijetBJetLdgJetMass' (index=5).
+--- Id                       : Input : variable 'TrijetBJetSubldgJetMass' (index=6).   <---> Output : variable 'TrijetBJetSubldgJetMass' (index=6).
+--- Id                       : Input : variable 'TrijetMass' (index=7).   <---> Output : variable 'TrijetMass' (index=7).
+--- Id                       : Input : variable 'TrijetDijetMass' (index=8).   <---> Output : variable 'TrijetDijetMass' (index=8).
+--- Id                       : Input : variable 'TrijetBJetBDisc' (index=9).   <---> Output : variable 'TrijetBJetBDisc' (index=9).
+--- Id                       : Input : variable 'TrijetSoftDrop_n2' (index=10).   <---> Output : variable 'TrijetSoftDrop_n2' (index=10).
+--- Factory                  : 
+--- Factory                  : current transformation string: 'D'
+--- Factory                  : Create Transformation "D" with events from all classes.
+--- Deco                     : Transformation, Variable selection : 
+--- Deco                     : Input : variable 'TrijetPtDR' (index=0).   <---> Output : variable 'TrijetPtDR' (index=0).
+--- Deco                     : Input : variable 'TrijetDijetPtDR' (index=1).   <---> Output : variable 'TrijetDijetPtDR' (index=1).
+--- Deco                     : Input : variable 'TrijetBjetMass' (index=2).   <---> Output : variable 'TrijetBjetMass' (index=2).
+--- Deco                     : Input : variable 'TrijetLdgJetBDisc' (index=3).   <---> Output : variable 'TrijetLdgJetBDisc' (index=3).
+--- Deco                     : Input : variable 'TrijetSubldgJetBDisc' (index=4).   <---> Output : variable 'TrijetSubldgJetBDisc' (index=4).
+--- Deco                     : Input : variable 'TrijetBJetLdgJetMass' (index=5).   <---> Output : variable 'TrijetBJetLdgJetMass' (index=5).
+--- Deco                     : Input : variable 'TrijetBJetSubldgJetMass' (index=6).   <---> Output : variable 'TrijetBJetSubldgJetMass' (index=6).
+--- Deco                     : Input : variable 'TrijetMass' (index=7).   <---> Output : variable 'TrijetMass' (index=7).
+--- Deco                     : Input : variable 'TrijetDijetMass' (index=8).   <---> Output : variable 'TrijetDijetMass' (index=8).
+--- Deco                     : Input : variable 'TrijetBJetBDisc' (index=9).   <---> Output : variable 'TrijetBJetBDisc' (index=9).
+--- Deco                     : Input : variable 'TrijetSoftDrop_n2' (index=10).   <---> Output : variable 'TrijetSoftDrop_n2' (index=10).
+--- Factory                  : 
+--- Factory                  : current transformation string: 'P'
+--- Factory                  : Create Transformation "P" with events from all classes.
+--- PCA                      : Transformation, Variable selection : 
+--- PCA                      : Input : variable 'TrijetPtDR' (index=0).   <---> Output : variable 'TrijetPtDR' (index=0).
+--- PCA                      : Input : variable 'TrijetDijetPtDR' (index=1).   <---> Output : variable 'TrijetDijetPtDR' (index=1).
+--- PCA                      : Input : variable 'TrijetBjetMass' (index=2).   <---> Output : variable 'TrijetBjetMass' (index=2).
+--- PCA                      : Input : variable 'TrijetLdgJetBDisc' (index=3).   <---> Output : variable 'TrijetLdgJetBDisc' (index=3).
+--- PCA                      : Input : variable 'TrijetSubldgJetBDisc' (index=4).   <---> Output : variable 'TrijetSubldgJetBDisc' (index=4).
+--- PCA                      : Input : variable 'TrijetBJetLdgJetMass' (index=5).   <---> Output : variable 'TrijetBJetLdgJetMass' (index=5).
+--- PCA                      : Input : variable 'TrijetBJetSubldgJetMass' (index=6).   <---> Output : variable 'TrijetBJetSubldgJetMass' (index=6).
+--- PCA                      : Input : variable 'TrijetMass' (index=7).   <---> Output : variable 'TrijetMass' (index=7).
+--- PCA                      : Input : variable 'TrijetDijetMass' (index=8).   <---> Output : variable 'TrijetDijetMass' (index=8).
+--- PCA                      : Input : variable 'TrijetBJetBDisc' (index=9).   <---> Output : variable 'TrijetBJetBDisc' (index=9).
+--- PCA                      : Input : variable 'TrijetSoftDrop_n2' (index=10).   <---> Output : variable 'TrijetSoftDrop_n2' (index=10).
+--- Factory                  : 
+--- Factory                  : current transformation string: 'G,D'
+--- Factory                  : Create Transformation "G" with events from all classes.
+--- Gauss                    : Transformation, Variable selection : 
+--- Gauss                    : Input : variable 'TrijetPtDR' (index=0).   <---> Output : variable 'TrijetPtDR' (index=0).
+--- Gauss                    : Input : variable 'TrijetDijetPtDR' (index=1).   <---> Output : variable 'TrijetDijetPtDR' (index=1).
+--- Gauss                    : Input : variable 'TrijetBjetMass' (index=2).   <---> Output : variable 'TrijetBjetMass' (index=2).
+--- Gauss                    : Input : variable 'TrijetLdgJetBDisc' (index=3).   <---> Output : variable 'TrijetLdgJetBDisc' (index=3).
+--- Gauss                    : Input : variable 'TrijetSubldgJetBDisc' (index=4).   <---> Output : variable 'TrijetSubldgJetBDisc' (index=4).
+--- Gauss                    : Input : variable 'TrijetBJetLdgJetMass' (index=5).   <---> Output : variable 'TrijetBJetLdgJetMass' (index=5).
+--- Gauss                    : Input : variable 'TrijetBJetSubldgJetMass' (index=6).   <---> Output : variable 'TrijetBJetSubldgJetMass' (index=6).
+--- Gauss                    : Input : variable 'TrijetMass' (index=7).   <---> Output : variable 'TrijetMass' (index=7).
+--- Gauss                    : Input : variable 'TrijetDijetMass' (index=8).   <---> Output : variable 'TrijetDijetMass' (index=8).
+--- Gauss                    : Input : variable 'TrijetBJetBDisc' (index=9).   <---> Output : variable 'TrijetBJetBDisc' (index=9).
+--- Gauss                    : Input : variable 'TrijetSoftDrop_n2' (index=10).   <---> Output : variable 'TrijetSoftDrop_n2' (index=10).
+--- Factory                  : Create Transformation "D" with events from all classes.
+--- Deco                     : Transformation, Variable selection : 
+--- Deco                     : Input : variable 'TrijetPtDR' (index=0).   <---> Output : variable 'TrijetPtDR' (index=0).
+--- Deco                     : Input : variable 'TrijetDijetPtDR' (index=1).   <---> Output : variable 'TrijetDijetPtDR' (index=1).
+--- Deco                     : Input : variable 'TrijetBjetMass' (index=2).   <---> Output : variable 'TrijetBjetMass' (index=2).
+--- Deco                     : Input : variable 'TrijetLdgJetBDisc' (index=3).   <---> Output : variable 'TrijetLdgJetBDisc' (index=3).
+--- Deco                     : Input : variable 'TrijetSubldgJetBDisc' (index=4).   <---> Output : variable 'TrijetSubldgJetBDisc' (index=4).
+--- Deco                     : Input : variable 'TrijetBJetLdgJetMass' (index=5).   <---> Output : variable 'TrijetBJetLdgJetMass' (index=5).
+--- Deco                     : Input : variable 'TrijetBJetSubldgJetMass' (index=6).   <---> Output : variable 'TrijetBJetSubldgJetMass' (index=6).
+--- Deco                     : Input : variable 'TrijetMass' (index=7).   <---> Output : variable 'TrijetMass' (index=7).
+--- Deco                     : Input : variable 'TrijetDijetMass' (index=8).   <---> Output : variable 'TrijetDijetMass' (index=8).
+--- Deco                     : Input : variable 'TrijetBJetBDisc' (index=9).   <---> Output : variable 'TrijetBJetBDisc' (index=9).
+--- Deco                     : Input : variable 'TrijetSoftDrop_n2' (index=10).   <---> Output : variable 'TrijetSoftDrop_n2' (index=10).
+--- Id                       : Preparing the Identity transformation...
+--- TFHandler_Factory        : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_Factory        :                Variable                       Mean                       RMS               [        Min                       Max ]
+--- TFHandler_Factory        : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_Factory        :              TrijetPtDR:                   298.75                   202.31   [                   1.9693                   4055.3 ]
+--- TFHandler_Factory        :         TrijetDijetPtDR:                   216.01                   191.43   [                  0.16602                   5239.8 ]
+--- TFHandler_Factory        :          TrijetBjetMass:                   14.468                   9.8355   [                   2.1719                   234.27 ]
+--- TFHandler_Factory        :       TrijetLdgJetBDisc:                  0.26356                  0.22645   [                  -1.0000                  0.84838 ]
+--- TFHandler_Factory        :    TrijetSubldgJetBDisc:                  0.26180                  0.24558   [                  -1.0000                  0.84837 ]
+--- TFHandler_Factory        :    TrijetBJetLdgJetMass:                   176.96                   145.56   [                   21.131                   4872.1 ]
+--- TFHandler_Factory        : TrijetBJetSubldgJetMass:                   127.52                   84.630   [                   19.529                   1459.4 ]
+--- TFHandler_Factory        :              TrijetMass:                   273.17                   188.57   [                   46.713                   5115.8 ]
+--- TFHandler_Factory        :         TrijetDijetMass:                   140.65                   123.58   [                   19.050                   4129.9 ]
+--- TFHandler_Factory        :         TrijetBJetBDisc:                  0.95129                 0.045761   [                  0.84840                  0.99964 ]
+--- TFHandler_Factory        :       TrijetSoftDrop_n2:                  0.27411                  0.34480   [                0.0017601                   3.0884 ]
+--- TFHandler_Factory        : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_Factory        : Plot event variables for Id
+--- TFHandler_Factory        : Create scatter and profile plots in target-file directory: 
+--- TFHandler_Factory        : TMVA_TopRec.root:/InputVariables_Id/CorrelationPlots
+--- Deco                     : Preparing the Decorrelation transformation...
+--- TFHandler_Factory        : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_Factory        :                Variable                       Mean                       RMS               [        Min                       Max ]
+--- TFHandler_Factory        : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_Factory        :              TrijetPtDR:                   1.0920                   1.0000   [                  -8.3869                   20.886 ]
+--- TFHandler_Factory        :         TrijetDijetPtDR:                  0.52375                   1.0000   [                  -6.8204                   30.913 ]
+--- TFHandler_Factory        :          TrijetBjetMass:                  0.96155                   1.0000   [                  -5.0416                   20.641 ]
+--- TFHandler_Factory        :       TrijetLdgJetBDisc:                   1.0721                   1.0000   [                  -4.8372                   3.7232 ]
+--- TFHandler_Factory        :    TrijetSubldgJetBDisc:                   1.0456                   1.0000   [                  -4.2912                   3.4672 ]
+--- TFHandler_Factory        :    TrijetBJetLdgJetMass:                  0.77514                   1.0000   [                  -32.845                   18.828 ]
+--- TFHandler_Factory        : TrijetBJetSubldgJetMass:                   1.2711                   1.0000   [                  -22.071                   15.777 ]
+--- TFHandler_Factory        :              TrijetMass:                  0.13419                   1.0000   [                  -3.7836                   46.827 ]
+--- TFHandler_Factory        :         TrijetDijetMass:                  0.89117                   1.0000   [                  -27.089                   19.488 ]
+--- TFHandler_Factory        :         TrijetBJetBDisc:                   21.065                   1.0000   [                   18.471                   24.112 ]
+--- TFHandler_Factory        :       TrijetSoftDrop_n2:                   1.1325                   1.0000   [                  -4.0213                   9.6753 ]
+--- TFHandler_Factory        : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_Factory        : Plot event variables for Deco
+--- TFHandler_Factory        : Create scatter and profile plots in target-file directory: 
+--- TFHandler_Factory        : TMVA_TopRec.root:/InputVariables_Deco/CorrelationPlots
+--- PCA                      : Preparing the Principle Component (PCA) transformation...
+--- TFHandler_Factory        : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_Factory        :                Variable                       Mean                       RMS               [        Min                       Max ]
+--- TFHandler_Factory        : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_Factory        :              TrijetPtDR:                 0.048598                   327.95   [                  -6859.0                   420.05 ]
+--- TFHandler_Factory        :         TrijetDijetPtDR:                  0.81076                   151.90   [                  -2267.5                   2726.9 ]
+--- TFHandler_Factory        :          TrijetBjetMass:                   1.0317                   126.39   [                  -3307.5                   2921.9 ]
+--- TFHandler_Factory        :       TrijetLdgJetBDisc:                0.0069076                   81.234   [                  -1675.3                   1963.4 ]
+--- TFHandler_Factory        :    TrijetSubldgJetBDisc:                  0.26392                   58.770   [                  -1615.4                   1220.7 ]
+--- TFHandler_Factory        :    TrijetBJetLdgJetMass:               -0.0010157                   11.304   [                  -540.20                   210.44 ]
+--- TFHandler_Factory        : TrijetBJetSubldgJetMass:                -0.058583                   8.4163   [                  -164.70                   50.259 ]
+--- TFHandler_Factory        :              TrijetMass:               -0.0035528                  0.31446   [                  -1.7089                   2.6771 ]
+--- TFHandler_Factory        :         TrijetDijetMass:               0.00095463                  0.24545   [                  -1.3141                  0.60824 ]
+--- TFHandler_Factory        :         TrijetBJetBDisc:                0.0010989                  0.22580   [                  -1.3336                  0.60505 ]
+--- TFHandler_Factory        :       TrijetSoftDrop_n2:              -4.1182e-05                 0.045432   [                 -0.14087                  0.11982 ]
+--- TFHandler_Factory        : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_Factory        : Plot event variables for PCA
+--- TFHandler_Factory        : Create scatter and profile plots in target-file directory: 
+--- TFHandler_Factory        : TMVA_TopRec.root:/InputVariables_PCA/CorrelationPlots
+--- Gauss                    : Preparing the Gaussian transformation...
+--- Deco                     : Preparing the Decorrelation transformation...
+--- TFHandler_Factory        : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_Factory        :                Variable                       Mean                       RMS               [        Min                       Max ]
+--- TFHandler_Factory        : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_Factory        :              TrijetPtDR:               0.00091679                   1.0000   [                  -4.8237                   6.0877 ]
+--- TFHandler_Factory        :         TrijetDijetPtDR:               0.00077104                   1.0000   [                  -5.6596                   6.3644 ]
+--- TFHandler_Factory        :          TrijetBjetMass:                0.0035137                   1.0000   [                  -3.7876                   5.5940 ]
+--- TFHandler_Factory        :       TrijetLdgJetBDisc:               -0.0094546                   1.0000   [                  -3.3573                   5.6718 ]
+--- TFHandler_Factory        :    TrijetSubldgJetBDisc:                -0.034585                   1.0000   [                  -3.2407                   5.4896 ]
+--- TFHandler_Factory        :    TrijetBJetLdgJetMass:               0.00097758                   1.0000   [                  -5.4926                   4.0480 ]
+--- TFHandler_Factory        : TrijetBJetSubldgJetMass:               0.00090041                   1.0000   [                  -4.3298                   5.8613 ]
+--- TFHandler_Factory        :              TrijetMass:                0.0025811                   1.0000   [                  -3.0485                   7.1987 ]
+--- TFHandler_Factory        :         TrijetDijetMass:                0.0030250                   1.0000   [                  -4.4236                   7.4072 ]
+--- TFHandler_Factory        :         TrijetBJetBDisc:                0.0024584                   1.0000   [                  -3.3046                   5.8281 ]
+--- TFHandler_Factory        :       TrijetSoftDrop_n2:                0.0026576                   1.0000   [                  -3.8178                   7.7800 ]
+--- TFHandler_Factory        : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_Factory        : Plot event variables for Gauss_Deco
+--- TFHandler_Factory        : Create scatter and profile plots in target-file directory: 
+--- TFHandler_Factory        : TMVA_TopRec.root:/InputVariables_Gauss_Deco/CorrelationPlots
+--- TFHandler_Factory        :  
+--- TFHandler_Factory        : Ranking input variables (method unspecific)...
+--- IdTransformation         : Ranking result (top variable is best ranked)
+--- IdTransformation         : ----------------------------------------------
+--- IdTransformation         : Rank : Variable              : Separation
+--- IdTransformation         : ----------------------------------------------
+--- IdTransformation         :    1 : m_{t}                 : 4.631e-01
+--- IdTransformation         :    2 : m_{W}                 : 3.923e-01
+--- IdTransformation         :    3 : SoftDrop_n2           : 2.935e-01
+--- IdTransformation         :    4 : m_{b, leading jet}    : 2.891e-01
+--- IdTransformation         :    5 : p_{T} #Delta R_{W}    : 2.333e-01
+--- IdTransformation         :    6 : m_{b, subleading jet} : 1.874e-01
+--- IdTransformation         :    7 : p_{T} #Delta R_{T}    : 1.422e-01
+--- IdTransformation         :    8 : b-tagged jet CSV      : 3.278e-02
+--- IdTransformation         :    9 : m_{b-tagged jet}      : 1.061e-02
+--- IdTransformation         :   10 : Leading jet CSV       : 2.680e-03
+--- IdTransformation         :   11 : Subleading jet CSV    : 2.296e-03
+--- IdTransformation         : ----------------------------------------------
+--- Factory                  :  
+--- Factory                  : Train all methods for Classification ...
+--- Factory                  : Train method: BDTG for Classification
+--- BDTG                     : 
+--- BDTG                     : [1m================================================================[0m
+--- BDTG                     : [1mH e l p   f o r   M V A   m e t h o d   [ BDTG ] :[0m
+--- BDTG                     : 
+--- BDTG                     : [1m--- Short description:[0m
+--- BDTG                     : 
+--- BDTG                     : Boosted Decision Trees are a collection of individual decision
+--- BDTG                     : trees which form a multivariate classifier by (weighted) majority 
+--- BDTG                     : vote of the individual trees. Consecutive decision trees are  
+--- BDTG                     : trained using the original training data set with re-weighted 
+--- BDTG                     : events. By default, the AdaBoost method is employed, which gives 
+--- BDTG                     : events that were misclassified in the previous tree a larger 
+--- BDTG                     : weight in the training of the following tree.
+--- BDTG                     : 
+--- BDTG                     : Decision trees are a sequence of binary splits of the data sample
+--- BDTG                     : using a single descriminant variable at a time. A test event 
+--- BDTG                     : ending up after the sequence of left-right splits in a final 
+--- BDTG                     : ("leaf") node is classified as either signal or background
+--- BDTG                     : depending on the majority type of training events in that node.
+--- BDTG                     : 
+--- BDTG                     : [1m--- Performance optimisation:[0m
+--- BDTG                     : 
+--- BDTG                     : By the nature of the binary splits performed on the individual
+--- BDTG                     : variables, decision trees do not deal well with linear correlations
+--- BDTG                     : between variables (they need to approximate the linear split in
+--- BDTG                     : the two dimensional space by a sequence of splits on the two 
+--- BDTG                     : variables individually). Hence decorrelation could be useful 
+--- BDTG                     : to optimise the BDT performance.
+--- BDTG                     : 
+--- BDTG                     : [1m--- Performance tuning via configuration options:[0m
+--- BDTG                     : 
+--- BDTG                     : The two most important parameters in the configuration are the  
+--- BDTG                     : minimal number of events requested by a leaf node as percentage of the 
+--- BDTG                     :    number of training events (option "MinNodeSize"  replacing the actual number 
+--- BDTG                     :  of events "nEventsMin" as given in earlier versions
+--- BDTG                     : If this number is too large, detailed features 
+--- BDTG                     : in the parameter space are hard to be modelled. If it is too small, 
+--- BDTG                     : the risk to overtrain rises and boosting seems to be less effective
+--- BDTG                     :   typical values from our current expericience for best performance  
+--- BDTG                     :   are between 0.5(%) and 10(%) 
+--- BDTG                     : 
+--- BDTG                     : The default minimal number is currently set to 
+--- BDTG                     :    max(20, (N_training_events / N_variables^2 / 10)) 
+--- BDTG                     : and can be changed by the user.
+--- BDTG                     : 
+--- BDTG                     : The other crucial parameter, the pruning strength ("PruneStrength"),
+--- BDTG                     : is also related to overtraining. It is a regularisation parameter 
+--- BDTG                     : that is used when determining after the training which splits 
+--- BDTG                     : are considered statistically insignificant and are removed. The
+--- BDTG                     : user is advised to carefully watch the BDT screen output for
+--- BDTG                     : the comparison between efficiencies obtained on the training and
+--- BDTG                     : the independent test sample. They should be equal within statistical
+--- BDTG                     : errors, in order to minimize statistical fluctuations in different samples.
+--- BDTG                     : 
+--- BDTG                     : <Suppress this message by specifying "!H" in the booking option>
+--- BDTG                     : [1m================================================================[0m
+--- BDTG                     : 
+--- BDTG                     : Begin training
+--- BDTG                     :  found and suggest the following possible pre-selection cuts 
+--- BDTG                     : as option DoPreselection was not used, these cuts however will not be performed, but the training will see the full sample
+--- BDTG                     : <InitEventSample> For classification trees, 
+--- BDTG                     :  the effective number of backgrounds is scaled to match 
+--- BDTG                     :  the signal. Othersise the first boosting step would do 'just that'!
+--- BDTG                     : re-normlise events such that Sig and Bkg have respective sum of weights = 1
+--- BDTG                     :   sig->sig*1ev. bkg->bkg*1ev.
+--- BDTG                     : #events: (reweighted) sig: 45000 bkg: 45000
+--- BDTG                     : #events: (unweighted) sig: 45000 bkg: 45000
+--- BDTG                     : Training 1000 Decision Trees ... patience please
+--- BDTG                     : [1;42m[33m[[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m][0m[0m ([1;31m0%[0m, time left: [1;31munknown[0m[0m) --- BinaryTree               : The minimal node size MinNodeSize=2.5 fMinNodeSize=2.5% is translated to an actual number of events = 1122.15 for the training sample size of 44886
+--- BinaryTree               : Note: This number will be taken as absolute minimum in the node, 
+--- BinaryTree               :       in terms of 'weighted events' and unweighted ones !! 
+--- BDTG                     : [1;42m[33m[[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42[1;42m[33m][0m[0m ([1;31m100%[0m, time left: [1;31m0 sec[0m[0m) --- BDTG                     : <Train> elapsed time: [1;31m197 sec[0m                              
+--- BDTG                     : <Train> average number of nodes (w/o pruning) : 13
+--- BDTG                     : End of training                                              
+--- BDTG                     : Elapsed time for training with 90000 events: [1;31m199 sec[0m         
+--- BDTG                     : Create MVA output for classification on training sample
+--- BDTG                     : Evaluation of BDTG on training sample (90000 events)
+--- BDTG                     : [1;42m[33m[[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42[1;42m[33m>[0m[1;42m[33m>[0m[1;42m[33m][0m[0m ([1;31m99%[0m, time left: [1;31m0 sec[0m[0m) --- BDTG                     : Elapsed time for evaluation of 90000 events: [1;31m32.8 sec[0m       
+--- BDTG                     : Creating weight file in xml format: [0;36mweights/TMVAClassification_BDTG.weights.xml[0m
+--- BDTG                     : Creating standalone response class: [0;36mweights/TMVAClassification_BDTG.class.C[0m
+--- BDTG                     : Write monitoring histograms to file: TMVA_TopRec.root:/Method_BDT/BDTG
+--- Factory                  : Training finished
+--- Factory                  : Train method: BDT for Classification
+--- BDT                      : 
+--- BDT                      : [1m================================================================[0m
+--- BDT                      : [1mH e l p   f o r   M V A   m e t h o d   [ BDT ] :[0m
+--- BDT                      : 
+--- BDT                      : [1m--- Short description:[0m
+--- BDT                      : 
+--- BDT                      : Boosted Decision Trees are a collection of individual decision
+--- BDT                      : trees which form a multivariate classifier by (weighted) majority 
+--- BDT                      : vote of the individual trees. Consecutive decision trees are  
+--- BDT                      : trained using the original training data set with re-weighted 
+--- BDT                      : events. By default, the AdaBoost method is employed, which gives 
+--- BDT                      : events that were misclassified in the previous tree a larger 
+--- BDT                      : weight in the training of the following tree.
+--- BDT                      : 
+--- BDT                      : Decision trees are a sequence of binary splits of the data sample
+--- BDT                      : using a single descriminant variable at a time. A test event 
+--- BDT                      : ending up after the sequence of left-right splits in a final 
+--- BDT                      : ("leaf") node is classified as either signal or background
+--- BDT                      : depending on the majority type of training events in that node.
+--- BDT                      : 
+--- BDT                      : [1m--- Performance optimisation:[0m
+--- BDT                      : 
+--- BDT                      : By the nature of the binary splits performed on the individual
+--- BDT                      : variables, decision trees do not deal well with linear correlations
+--- BDT                      : between variables (they need to approximate the linear split in
+--- BDT                      : the two dimensional space by a sequence of splits on the two 
+--- BDT                      : variables individually). Hence decorrelation could be useful 
+--- BDT                      : to optimise the BDT performance.
+--- BDT                      : 
+--- BDT                      : [1m--- Performance tuning via configuration options:[0m
+--- BDT                      : 
+--- BDT                      : The two most important parameters in the configuration are the  
+--- BDT                      : minimal number of events requested by a leaf node as percentage of the 
+--- BDT                      :    number of training events (option "MinNodeSize"  replacing the actual number 
+--- BDT                      :  of events "nEventsMin" as given in earlier versions
+--- BDT                      : If this number is too large, detailed features 
+--- BDT                      : in the parameter space are hard to be modelled. If it is too small, 
+--- BDT                      : the risk to overtrain rises and boosting seems to be less effective
+--- BDT                      :   typical values from our current expericience for best performance  
+--- BDT                      :   are between 0.5(%) and 10(%) 
+--- BDT                      : 
+--- BDT                      : The default minimal number is currently set to 
+--- BDT                      :    max(20, (N_training_events / N_variables^2 / 10)) 
+--- BDT                      : and can be changed by the user.
+--- BDT                      : 
+--- BDT                      : The other crucial parameter, the pruning strength ("PruneStrength"),
+--- BDT                      : is also related to overtraining. It is a regularisation parameter 
+--- BDT                      : that is used when determining after the training which splits 
+--- BDT                      : are considered statistically insignificant and are removed. The
+--- BDT                      : user is advised to carefully watch the BDT screen output for
+--- BDT                      : the comparison between efficiencies obtained on the training and
+--- BDT                      : the independent test sample. They should be equal within statistical
+--- BDT                      : errors, in order to minimize statistical fluctuations in different samples.
+--- BDT                      : 
+--- BDT                      : <Suppress this message by specifying "!H" in the booking option>
+--- BDT                      : [1m================================================================[0m
+--- BDT                      : 
+--- BDT                      : Begin training
+--- BDT                      :  found and suggest the following possible pre-selection cuts 
+--- BDT                      : as option DoPreselection was not used, these cuts however will not be performed, but the training will see the full sample
+--- BDT                      : <InitEventSample> For classification trees, 
+--- BDT                      :  the effective number of backgrounds is scaled to match 
+--- BDT                      :  the signal. Othersise the first boosting step would do 'just that'!
+--- BDT                      : re-normlise events such that Sig and Bkg have respective sum of weights = 1
+--- BDT                      :   sig->sig*1ev. bkg->bkg*1ev.
+--- BDT                      : #events: (reweighted) sig: 45000 bkg: 45000
+--- BDT                      : #events: (unweighted) sig: 45000 bkg: 45000
+--- BDT                      : Training 850 Decision Trees ... patience please
+--- BDT                      : [1;42m[33m[[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m][0m[0m ([1;31m0%[0m, time left: [1;31munknown[0m[0m) --- BinaryTree               : The minimal node size MinNodeSize=2.5 fMinNodeSize=2.5% is translated to an actual number of events = 1122.15 for the training sample size of 44886
+--- BinaryTree               : Note: This number will be taken as absolute minimum in the node, 
+--- BinaryTree               :       in terms of 'weighted events' and unweighted ones !! 
+--- BDT                      : [1;42m[33m[[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42--- BDT                      : <Train> average number of nodes (w/o pruning) : 9
+--- BDT                      : End of training                                              
+--- BDT                      : Elapsed time for training with 90000 events: [1;31m90.7 sec[0m         
+--- BDT                      : Create MVA output for classification on training sample
+--- BDT                      : Evaluation of BDT on training sample (90000 events)
+--- BDT                      : [1;42m[33m[[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;42m[33m.[0m[1;4233m>[0m[1;42m[33m>[0m[1;42m[33m][0m[0m ([1;31m99%[0m, time left: [1;31m0 sec[0m[0m) --- BDT                      : Elapsed time for evaluation of 90000 events: [1;31m24.9 sec[0m       
+--- BDT                      : Creating weight file in xml format: [0;36mweights/TMVAClassification_BDT.weights.xml[0m
+--- BDT                      : Creating standalone response class: [0;36mweights/TMVAClassification_BDT.class.C[0m
+--- BDT                      : Write monitoring histograms to file: TMVA_TopRec.root:/Method_BDT/BDT
+--- Factory                  : Training finished
+--- Factory                  : 
+--- Factory                  : Ranking input variables (method specific)...
+--- BDTG                     : Ranking result (top variable is best ranked)
+--- BDTG                     : ---------------------------------------------------------
+--- BDTG                     : Rank : Variable                : Variable Importance
+--- BDTG                     : ---------------------------------------------------------
+--- BDTG                     :    1 : TrijetBJetBDisc         : 1.172e-01
+--- BDTG                     :    2 : TrijetDijetMass         : 9.887e-02
+--- BDTG                     :    3 : TrijetSubldgJetBDisc    : 9.713e-02
+--- BDTG                     :    4 : TrijetSoftDrop_n2       : 9.242e-02
+--- BDTG                     :    5 : TrijetMass              : 9.179e-02
+--- BDTG                     :    6 : TrijetLdgJetBDisc       : 8.949e-02
+--- BDTG                     :    7 : TrijetBjetMass          : 8.891e-02
+--- BDTG                     :    8 : TrijetDijetPtDR         : 8.203e-02
+--- BDTG                     :    9 : TrijetPtDR              : 8.200e-02
+--- BDTG                     :   10 : TrijetBJetSubldgJetMass : 8.174e-02
+--- BDTG                     :   11 : TrijetBJetLdgJetMass    : 7.847e-02
+--- BDTG                     : ---------------------------------------------------------
+--- BDT                      : Ranking result (top variable is best ranked)
+--- BDT                      : ---------------------------------------------------------
+--- BDT                      : Rank : Variable                : Variable Importance
+--- BDT                      : ---------------------------------------------------------
+--- BDT                      :    1 : TrijetMass              : 1.262e-01
+--- BDT                      :    2 : TrijetDijetMass         : 1.001e-01
+--- BDT                      :    3 : TrijetBJetSubldgJetMass : 9.720e-02
+--- BDT                      :    4 : TrijetBJetBDisc         : 9.719e-02
+--- BDT                      :    5 : TrijetSoftDrop_n2       : 9.692e-02
+--- BDT                      :    6 : TrijetBJetLdgJetMass    : 8.938e-02
+--- BDT                      :    7 : TrijetBjetMass          : 8.601e-02
+--- BDT                      :    8 : TrijetSubldgJetBDisc    : 8.031e-02
+--- BDT                      :    9 : TrijetDijetPtDR         : 7.889e-02
+--- BDT                      :   10 : TrijetLdgJetBDisc       : 7.492e-02
+--- BDT                      :   11 : TrijetPtDR              : 7.292e-02
+--- BDT                      : ---------------------------------------------------------
+--- Factory                  : 
+--- Factory                  : === Destroy and recreate all methods via weight files for testing ===
+--- Factory                  : 
+--- MethodBase               : Reading weight file: [0;36mweights/TMVAClassification_BDTG.weights.xml[0m
+--- BDTG                     : Read method "BDTG" of type "BDT"
+--- BDTG                     : MVA method was trained with TMVA Version: 4.2.0
+--- BDTG                     : MVA method was trained with ROOT Version: 5.34/36
+--- MethodBase               : Reading weight file: [0;36mweights/TMVAClassification_BDT.weights.xml[0m
+--- BDT                      : Read method "BDT" of type "BDT"
+--- BDT                      : MVA method was trained with TMVA Version: 4.2.0
+--- BDT                      : MVA method was trained with ROOT Version: 5.34/36
+--- Factory                  : Test all methods...
+--- Factory                  : Test method: BDTG for Classification performance
+--- BDTG                     : Evaluation of BDTG on testing sample (90000 events)
+
+--- Factory                  : Evaluate all methods...
+--- Factory                  : Evaluate classifier: BDTG
+--- BDTG                     : Loop over test events and fill histograms with classifier response...
+--- Factory                  : Write evaluation histograms to file
+--- TFHandler_BDTG           : Plot event variables for BDTG
+--- TFHandler_BDTG           : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_BDTG           :                Variable                       Mean                       RMS               [        Min                       Max ]
+--- TFHandler_BDTG           : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_BDTG           :              TrijetPtDR:                   299.35                   206.27   [                   2.1974                   6390.5 ]
+--- TFHandler_BDTG           :         TrijetDijetPtDR:                   217.37                   193.91   [                   1.7970                   4794.6 ]
+--- TFHandler_BDTG           :          TrijetBjetMass:                   14.470                   9.7262   [                   2.6500                   189.68 ]
+--- TFHandler_BDTG           :       TrijetLdgJetBDisc:                  0.26169                  0.22618   [                  -1.0000                  0.84839 ]
+--- TFHandler_BDTG           :    TrijetSubldgJetBDisc:                  0.26321                  0.24557   [                  -1.0000                  0.84838 ]
+--- TFHandler_BDTG           :    TrijetBJetLdgJetMass:                   177.42                   145.41   [                   21.434                   3446.3 ]
+--- TFHandler_BDTG           : TrijetBJetSubldgJetMass:                   127.89                   85.981   [                   17.395                   1905.0 ]
+--- TFHandler_BDTG           :              TrijetMass:                   274.49                   189.39   [                   45.234                   3569.3 ]
+--- TFHandler_BDTG           :         TrijetDijetMass:                   141.78                   124.67   [                   17.563                   2589.3 ]
+--- TFHandler_BDTG           :         TrijetBJetBDisc:                  0.95121                 0.045731   [                  0.84840                   1.0000 ]
+--- TFHandler_BDTG           :       TrijetSoftDrop_n2:                  0.27552                  0.34966   [                0.0026592                   2.9963 ]
+--- TFHandler_BDTG           : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_BDTG           : Create scatter and profile plots in target-file directory: 
+--- TFHandler_BDTG           : TMVA_TopRec.root:/Method_BDT/BDTG/CorrelationPlots
+--- Factory                  : Evaluate classifier: BDT
+--- BDT                      : Loop over test events and fill histograms with classifier response...
+--- Factory                  : Write evaluation histograms to file
+--- TFHandler_BDT            : Plot event variables for BDT
+--- TFHandler_BDT            : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_BDT            :                Variable                       Mean                       RMS               [        Min                       Max ]
+--- TFHandler_BDT            : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_BDT            :              TrijetPtDR:                   299.35                   206.27   [                   2.1974                   6390.5 ]
+--- TFHandler_BDT            :         TrijetDijetPtDR:                   217.37                   193.91   [                   1.7970                   4794.6 ]
+--- TFHandler_BDT            :          TrijetBjetMass:                   14.470                   9.7262   [                   2.6500                   189.68 ]
+--- TFHandler_BDT            :       TrijetLdgJetBDisc:                  0.26169                  0.22618   [                  -1.0000                  0.84839 ]
+--- TFHandler_BDT            :    TrijetSubldgJetBDisc:                  0.26321                  0.24557   [                  -1.0000                  0.84838 ]
+--- TFHandler_BDT            :    TrijetBJetLdgJetMass:                   177.42                   145.41   [                   21.434                   3446.3 ]
+--- TFHandler_BDT            : TrijetBJetSubldgJetMass:                   127.89                   85.981   [                   17.395                   1905.0 ]
+--- TFHandler_BDT            :              TrijetMass:                   274.49                   189.39   [                   45.234                   3569.3 ]
+--- TFHandler_BDT            :         TrijetDijetMass:                   141.78                   124.67   [                   17.563                   2589.3 ]
+--- TFHandler_BDT            :         TrijetBJetBDisc:                  0.95121                 0.045731   [                  0.84840                   1.0000 ]
+--- TFHandler_BDT            :       TrijetSoftDrop_n2:                  0.27552                  0.34966   [                0.0026592                   2.9963 ]
+--- TFHandler_BDT            : --------------------------------------------------------------------------------------------------------------------------------------
+--- TFHandler_BDT            : Create scatter and profile plots in target-file directory: 
+--- TFHandler_BDT            : TMVA_TopRec.root:/Method_BDT/BDT/CorrelationPlots
+--- Factory                  : 
+--- Factory                  : Inter-MVA correlation matrix (signal):
+--- Factory                  : ------------------------
+--- Factory                  :             BDTG     BDT
+--- Factory                  :    BDTG:  +1.000  +0.884
+--- Factory                  :     BDT:  +0.884  +1.000
+--- Factory                  : ------------------------
+--- Factory                  : 
+--- Factory                  : Inter-MVA correlation matrix (background):
+--- Factory                  : ------------------------
+--- Factory                  :             BDTG     BDT
+--- Factory                  :    BDTG:  +1.000  +0.864
+--- Factory                  :     BDT:  +0.864  +1.000
+--- Factory                  : ------------------------
+--- Factory                  : 
+--- Factory                  : Correlations between input variables and MVA response (signal):
+--- Factory                  : ------------------------
+--- Factory                  :                             BDTG     BDT
+--- Factory                  :              TrijetPtDR:  +0.065  +0.167
+--- Factory                  :         TrijetDijetPtDR:  -0.224  -0.128
+--- Factory                  :          TrijetBjetMass:  -0.010  +0.024
+--- Factory                  :       TrijetLdgJetBDisc:  -0.012  -0.015
+--- Factory                  :    TrijetSubldgJetBDisc:  -0.024  -0.036
+--- Factory                  :    TrijetBJetLdgJetMass:  -0.363  -0.272
+--- Factory                  : TrijetBJetSubldgJetMass:  -0.210  -0.171
+--- Factory                  :              TrijetMass:  -0.549  -0.440
+--- Factory                  :         TrijetDijetMass:  -0.525  -0.413
+--- Factory                  :         TrijetBJetBDisc:  +0.132  +0.176
+--- Factory                  :       TrijetSoftDrop_n2:  +0.325  +0.496
+--- Factory                  : ------------------------
+--- Factory                  : 
+--- Factory                  : Correlations between input variables and MVA response (background):
+--- Factory                  : ------------------------
+--- Factory                  :                             BDTG     BDT
+--- Factory                  :              TrijetPtDR:  -0.212  -0.305
+--- Factory                  :         TrijetDijetPtDR:  -0.287  -0.347
+--- Factory                  :          TrijetBjetMass:  -0.082  -0.094
+--- Factory                  :       TrijetLdgJetBDisc:  -0.004  -0.042
+--- Factory                  :    TrijetSubldgJetBDisc:  -0.012  -0.040
+--- Factory                  :    TrijetBJetLdgJetMass:  -0.352  -0.473
+--- Factory                  : TrijetBJetSubldgJetMass:  -0.311  -0.473
+--- Factory                  :              TrijetMass:  -0.458  -0.615
+--- Factory                  :         TrijetDijetMass:  -0.376  -0.464
+--- Factory                  :         TrijetBJetBDisc:  +0.137  +0.200
+--- Factory                  :       TrijetSoftDrop_n2:  +0.186  +0.158
+--- Factory                  : ------------------------
+--- Factory                  : 
+--- Factory                  : The following "overlap" matrices contain the fraction of events for which 
+--- Factory                  : the MVAs 'i' and 'j' have returned conform answers about "signal-likeness"
+--- Factory                  : An event is signal-like, if its MVA output exceeds the following value:
+--- Factory                  : --------------------
+--- Factory                  :  Method:  Cut value:
+--- Factory                  : --------------------
+--- Factory                  :    BDTG:     +0.043
+--- Factory                  :     BDT:     +0.005
+--- Factory                  : --------------------
+--- Factory                  : which correspond to the working point: eff(signal) = 1 - eff(background)
+--- Factory                  : 
+--- Factory                  : Inter-MVA overlap matrix (signal):
+--- Factory                  : ------------------------
+--- Factory                  :             BDTG     BDT
+--- Factory                  :    BDTG:  +1.000  +0.977
+--- Factory                  :     BDT:  +0.977  +1.000
+--- Factory                  : ------------------------
+--- Factory                  : 
+--- Factory                  : Inter-MVA overlap matrix (background):
+--- Factory                  : ------------------------
+--- Factory                  :             BDTG     BDT
+--- Factory                  :    BDTG:  +1.000  +0.978
+--- Factory                  :     BDT:  +0.978  +1.000
+--- Factory                  : ------------------------
+--- Factory                  : 
+--- Factory                  : Evaluation results ranked by best signal efficiency and purity (area)
+--- Factory                  : --------------------------------------------------------------------------------
+--- Factory                  : MVA              Signal efficiency at bkg eff.(error):       | Sepa-    Signifi- 
+--- Factory                  : Method:          @B=0.01    @B=0.10    @B=0.30    ROC-integ. | ration:  cance:   
+--- Factory                  : --------------------------------------------------------------------------------
+--- Factory                  : BDTG           : 0.433(02)  0.862(01)  0.966(00)    0.950    | 0.656    1.943
+--- Factory                  : BDT            : 0.431(02)  0.856(01)  0.964(00)    0.948    | 0.646    1.710
+--- Factory                  : --------------------------------------------------------------------------------
+--- Factory                  : 
+--- Factory                  : Testing efficiency compared to training efficiency (overtraining check)
+--- Factory                  : --------------------------------------------------------------------------------
+--- Factory                  : MVA              Signal efficiency: from test sample (from training sample) 
+--- Factory                  : Method:          @B=0.01             @B=0.10            @B=0.30   
+--- Factory                  : --------------------------------------------------------------------------------
+--- Factory                  : BDTG           : 0.433 (0.471)       0.862 (0.869)      0.966 (0.966)
+--- Factory                  : BDT            : 0.431 (0.469)       0.856 (0.861)      0.964 (0.964)
+--- Factory                  : --------------------------------------------------------------------------------
+--- Factory                  : 
+--- Dataset:Default          : Created tree 'TestTree' with 90000 events
+--- Dataset:Default          : Created tree 'TrainTree' with 90000 events
+--- Factory                  :   
+--- Factory                  : [1mThank you for using TMVA![0m
+--- Factory                  : [1mFor citation information, please visit: http://tmva.sf.net/citeTMVA.html[0m
+==> Wrote root file: TMVA_TopRec.root
+==> TMVAClassification is done!
+--- Launch TMVA GUI to view input file: TMVA_TopRec.root
+=== Note: inactive buttons indicate classifiers that were not trained, ===
+===       or functionalities that were not invoked during the training ===
+--- Opening root file TMVA_TopRec.root in read mode
+libGL error: failed to open drm device: No such file or directory
+libGL error: failed to load driver: vboxvideo
+--- --------------------------------------------------------------------
+--- If you want to save the image as eps, gif or png, please comment out 
+--- the corresponding lines (line no. 239-241) in tmvaglob.C
+--- --------------------------------------------------------------------
+Info in <TCanvas::Print>: eps file plots/CorrelationMatrixS.eps has been created
+Info in <TCanvas::Print>: pdf file plots/CorrelationMatrixS.pdf has been created
+--- --------------------------------------------------------------------
+--- If you want to save the image as eps, gif or png, please comment out 
+--- the corresponding lines (line no. 239-241) in tmvaglob.C
+--- --------------------------------------------------------------------
+Info in <TCanvas::Print>: eps file plots/CorrelationMatrixB.eps has been created
+Info in <TCanvas::Print>: pdf file plots/CorrelationMatrixB.pdf has been created
