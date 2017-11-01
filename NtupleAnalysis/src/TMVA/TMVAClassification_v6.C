@@ -196,7 +196,6 @@ int TMVAClassification_v6( TString myMethodList = "" )
    // ================================================================================================
    // Preparation phase begins
    // ================================================================================================
-
    // Read training and test data (it is also possible to use ASCII format as input -> see TMVA Users Guide)
    TFile *sigInput(0);
    TFile *bkgInput(0);
@@ -224,9 +223,9 @@ int TMVAClassification_v6( TString myMethodList = "" )
       std::cout << "ERROR: could not open signal data file" << std::endl;
       exit(1);
    }
-
-   std::cout << "--- TMVAClassification       : Using signal input file: " << sigInput->GetName() << std::endl;
-   std::cout << "--- TMVAClassification       : Using background input file: " << bkgInput->GetName() << std::endl;
+   
+   std::cout << "--- TMVAClassification_v6.C:\n\tUsing signal input file: " << sigInput->GetName() << std::endl;
+   std::cout << "--- TMVAClassification_v6.C:\n\tUsing background input file: " << bkgInput->GetName() << std::endl;
 
    // Register the training and test trees
    TTree *signalTree     = (TTree*)sigInput->Get("Raw2TTreeMaker/EvtTree");
@@ -249,6 +248,9 @@ int TMVAClassification_v6( TString myMethodList = "" )
    TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification", outputFile,
                                                "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
 
+   // ================================================================================================
+   // Define Variables 
+   // ================================================================================================
    TMVA::DataLoader *dataloader=new TMVA::DataLoader("dataset");
    // If you wish to modify default settings
    // (please check "src/Config.h" to see all available global options)
@@ -298,6 +300,10 @@ int TMVAClassification_v6( TString myMethodList = "" )
    dataloader->AddSignalTree    ( signalTree,     signalWeight );
    dataloader->AddBackgroundTree( background, backgroundWeight );
 
+   
+   // ================================================================================================
+   // Training/Test customisations (optional)
+   // ================================================================================================
    // To give different trees for training and testing, do as follows:
    //
    //     dataloader->AddSignalTree( signalTrainingTree, signalTrainWeight, "Training" );
@@ -346,7 +352,10 @@ int TMVAClassification_v6( TString myMethodList = "" )
        dataloader->SetSignalWeightExpression("eventWeight");
        dataloader->SetBackgroundWeightExpression("eventWeight");
      }
-   
+
+   // ================================================================================================
+   // Cuts to Signal and Background
+   // ================================================================================================
    // Apply additional cuts on the signal and background samples (can be different)
    TCut mycuts = ""; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
    TCut mycutb = ""; // for example: TCut mycutb = "abs(var1)<0.5";
@@ -365,8 +374,9 @@ int TMVAClassification_v6( TString myMethodList = "" )
    dataloader->PrepareTrainingAndTestTree( mycuts, mycutb,
                                         "nTrain_Signal=1000:nTrain_Background=1000:SplitMode=Random:NormMode=NumEvents:!V" );
 
-   // ### Book MVA methods
-   //
+   // ================================================================================================
+   // Book MVA methods
+   // ================================================================================================
    // Please lookup the various method configuration options in the corresponding cxx files, eg:
    // src/MethoCuts.cxx, etc, or here: http://tmva.sourceforge.net/optionRef.html
    // it is possible to preset ranges in the option string in which the cut optimisation should be done:
@@ -583,8 +593,9 @@ int TMVAClassification_v6( TString myMethodList = "" )
       factory->BookMethod( dataloader, TMVA::Types::kRuleFit, "RuleFit",
                            "H:!V:RuleFitModule=RFTMVA:Model=ModRuleLinear:MinImp=0.001:RuleMinDist=0.001:NTrees=20:fEventsMin=0.01:fEventsMax=0.5:GDTau=-1.0:GDTauPrec=0.01:GDStep=0.01:GDNSteps=10000:GDErrScale=1.02" );
 
-   // For an example of the category classifier usage, see: TMVAClassificationCategory
-   //
+   
+   // NOTE: For an example of the category classifier usage, see: TMVAClassificationCategory
+   
    // --------------------------------------------------------------------------------------------------
    //  Now you can optimize the setting (configuration) of the MVAs using the set of training events
    // STILL EXPERIMENTAL and only implemented for BDT's !
@@ -594,8 +605,10 @@ int TMVAClassification_v6( TString myMethodList = "" )
    //
    // --------------------------------------------------------------------------------------------------
 
-   // Now you can tell the factory to train, test, and evaluate the MVAs
-   //
+
+   // ================================================================================================
+   // Train, test, and evaluate the MVAs
+   // ================================================================================================
    // Train MVAs using the set of training events
    factory->TrainAllMethods();
 
@@ -605,12 +618,14 @@ int TMVAClassification_v6( TString myMethodList = "" )
    // Evaluate and compare performance of all configured MVAs
    factory->EvaluateAllMethods();
 
-   // --------------------------------------------------------------
-
+   // ================================================================================================
    // Save the output
+   // ================================================================================================
    outputFile->Close();
 
-   std::cout << "==> Wrote root file: " << outputFile->GetName() << std::endl;
+   std::cout << "=== TMVAClassification_v6.C:\n\tWrote root file: " << outputFile->GetName() << std::endl;
+      std::cout << "=== TMVAClassification_v6.C:\n\tDONE!" << std::endl;
+
    std::cout << "==> TMVAClassification is done!" << std::endl;
 
    delete factory;
@@ -621,15 +636,16 @@ int TMVAClassification_v6( TString myMethodList = "" )
    return 0;
 }
 
+
 int main( int argc, char** argv )
 {
-   // Select methods (don't look at this code - not of interest)
-   TString methodList;
-   for (int i=1; i<argc; i++) {
-      TString regMethod(argv[i]);
-      if(regMethod=="-b" || regMethod=="--batch") continue;
-      if (!methodList.IsNull()) methodList += TString(",");
-      methodList += regMethod;
-   }
-   return TMVAClassification_v6(methodList);
+  // Select methods (don't look at this code - not of interest)
+  TString methodList;
+  for (int i=1; i<argc; i++) {
+    TString regMethod(argv[i]);
+    if(regMethod=="-b" || regMethod=="--batch") continue;
+    if (!methodList.IsNull()) methodList += TString(",");
+    methodList += regMethod;
+  }
+  return TMVAClassification_v6(methodList);
 }
