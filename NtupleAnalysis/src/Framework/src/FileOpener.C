@@ -14,80 +14,96 @@
 
 TChain* FileOpener::OpenFiles(const string multicrabPath, const string dataset, TChain* mychain)
 {
-
-  cout << "=== FileOpener::OpenFile()" << endl;
+  cout << "=== FileOpener::OpenFiles()" << endl;
 
   // Get the dataset attributes
   string rootFileName;
   const string datasetPath = datasets_.GetDatasetPathFromAlias(dataset);
   const string fullPath    = multicrabPath + "/" + datasetPath + "/results/";
-  vector<string> dirs      = GetListOfFiles(fullPath);
-
+  const string filePrefix  = "raw2TTree_";
+  vector<string> dirs      = GetListOfFiles(fullPath, filePrefix);
+  
   // Sanity check
-  if (dirs.size() < 1)
+  cout << "\tFound " << dirs.size() << " files of type " << filePrefix << "*.root under " << fullPath << endl;
+  if (dirs.size() < 1) exit(1);
+  else
     {
-      cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << "! EXIT" << endl;
-      exit(1);      
+      // cout << "\tAdding " << dirs.size() << " files to the TChain" << endl;
     }
-  else cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << endl;
-
+  
   // For-loop: All ROOT files
   for (vector<string>::iterator f = dirs.begin(); f != dirs.end(); f++)
-    {     
+    {
       rootFileName = *f;
-      if (0) cout << "\tAdding file " << rootFileName << " to the chain" << endl;
-      
-
       ifstream file(rootFileName);
       
       if (!file.good() )
 	{
-   	  if(0) cout << "\tFile \"" << rootFileName << "\" also does not exist. EXIT" << endl;
+	  cout << "\tFile \"" << rootFileName << "\" does not exist" << endl;
    	  exit(1);
    	}
-      else mychain -> Add(rootFileName.c_str());
+      else
+	{
+	  // cout << "\tAdding file " << rootFileName << " to the chain" << endl;
+	  mychain -> Add(rootFileName.c_str());
+	}
     }
   
   return mychain; 
 }
 
 
-vector<string> FileOpener::GetListOfFiles(const string fullPath)
+vector<string> FileOpener::GetListOfFiles(const string fullPath, const string filePrefix)
 {
 
+  // std::cout << "=== FileOpener::GetListOfFiles()" << std::endl;
+  
   // Declare variables
   const char* entry;
   std::vector<string> dirs;
-  
-  Int_t n = 0;
   const char* ext = ".root";
-  
+  TString str;  
   char* dir  = gSystem->ExpandPathName(fullPath.c_str()); // cast a "std::string" to a "char*" with c_str()
   void* dirp = gSystem->OpenDirectory(dir);
-  const char* filename[140];
-  TString str;
+  vector<string> fileNames;
+
 
   // Get all files in the dir fullPath
   while((entry = (char*)gSystem->GetDirEntry(dirp)))
     {
       str = entry;
-      if(str.EndsWith(ext)) filename[n++] = gSystem->ConcatFileName(dir, entry);
+      if(str.EndsWith(ext)) fileNames.push_back((string)str);
     }
-
-  // For-loop: All files
-  for (Int_t i = 0; i < n; i++)
+ 
+  // For-loop: All ROOT files 
+  for (auto f = fileNames.begin(); f != fileNames.end(); f++)
     {
-      // Printf("file -> %s", filename[i]);
-      string fileName = string(filename[i]);
-      // size_t found    = fileName.find("output-");
-      size_t found    = fileName.find("raw2TTree_");
-      if (found!=std::string::npos) dirs.push_back(fileName);
-      else {} //cout << "\tSkipping " << fileName << endl;
+      // cout << "\tProcessing file " << *f << endl;
 
+      // Skip all not-ROOT files 
+      if (!EndsWith(*f, ".root")) continue;
+
+      // Look for files containing the prefix
+      size_t found = f->find(filePrefix);
+
+      // If prefix found in string add it for use as input ROOT file
+      if (found!=std::string::npos) dirs.push_back(fullPath + "/" + *f);
+      else std::cout << "\tSkipping " << *f << endl;
     }
-  
+
+  // cout << "\tFound " << dirs.size() << " files of type " << filePrefix << "*.root under directory " << fullPath << endl;
   return dirs;
 }
 
+bool FileOpener::EndsWith(const std::string &str, const std::string &suffix)
+{
+  // cout << "=== FileOpener::EndsWith()" << endl;
+  bool sizeOk   = str.size() >= suffix.size();
+  if (!sizeOk) return false;
+
+  // cout << "\tstr = " << str << ", suffix  = " << suffix << endl;
+  bool suffixOk = str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+  return suffixOk;
+}
 
 #endif // FileOpener_cxx

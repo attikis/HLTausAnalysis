@@ -377,7 +377,6 @@ Datasets Datasets::GetDataset(const string datasetAlias)
   // Check if the selected MC Prodution is valid
   for( int iD = 0 ; iD < (int) datasets_PhaseIISpring17D.size(); iD++)
     {
-      
       if ( datasetAlias.compare( datasets_PhaseIISpring17D.at(iD).alias_) != 0) continue;
       bSuccess = true;
       d = datasets_PhaseIISpring17D.at(iD);
@@ -418,6 +417,9 @@ const string Datasets::GetDatasetPathFromAlias(const string datasetAlias)
   }
   
   for( int iD = 0 ; iD < (int) datasets_PhaseIISpring17D.size(); iD++){  
+
+    // std::cout << "datasetAlias = " << datasetAlias << std::endl;
+    // std::cout << "datasets_PhaseIISpring17D.at(iD).alias_ = " << datasets_PhaseIISpring17D.at(iD).alias_ << std::endl;
 
     if ( datasetAlias.compare( datasets_PhaseIISpring17D.at(iD).alias_) == 0)
       {

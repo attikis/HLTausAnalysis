@@ -46,7 +46,7 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
     TChain* chain = new TChain("Raw2TTreeMaker/EvtTree");
 
     // Associated the ROOT files to the TChain
-    std::cout << "\tGetting ROOT files for dataset " << SampleName << " from dir " << SamplePath << " and adding them to the chain." << std::endl;
+    std::cout << "\tGetting ROOT files for dataset " << SampleName << " from dir " << SamplePath << "/" << std::endl;
     OpenFiles(SamplePath, SampleName, chain);
 
     // Set the Tree
