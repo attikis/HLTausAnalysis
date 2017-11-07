@@ -2994,7 +2994,8 @@ class Dataset:
                     print "bin %d, label: %s, content: = %s"%(i, counter.GetXaxis().GetBinLabel(i), counter.GetBinContent(i))
                 print "\n\n"
             # Normalization check (to spot e.g. PROOF problems), based on weighted counters
-            (counter, realName) = self.getRootHisto(self.counterDir+"/weighted/counter") # weighted
+            # (counter, realName) = self.getRootHisto(self.counterDir+"/weighted/counter") # weighted counters  #fixme: obsolete if ROOT files not merged
+            (counter, realName) = self.getRootHisto(self.counterDir+"/Counters") #fixme-alex: use if ROOT files not merged
             allEventsBin = None
             for i in range(counter.GetNbinsX()+1):
                 if counter.GetXaxis().GetBinLabel(i) == "Base::AllEvents":
@@ -3022,7 +3023,8 @@ class Dataset:
         if self._weightedCounters:
             self.counterDir = self._weightedCounterDir
             try:
-                (counter, realName) = self.getRootHisto(self.counterDir+"/counter") # weighted
+                # (counter, realName) = self.getRootHisto(self.counterDir+"/counter") # weighted counters #fixme: obsolete if ROOT files not merged
+                (counter, realName) = self.getRootHisto("Counters") #fixme-alex: use if ROOT files not merged
                 ctr = _histoToCounter(counter)
                 self.nAllEventsWeighted = ctr[0][1].value() # first counter, second element of the tuple, corresponds to ttree: skimCounterAll
             except HistogramNotFoundException, e:

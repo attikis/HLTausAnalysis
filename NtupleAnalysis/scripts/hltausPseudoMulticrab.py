@@ -583,7 +583,7 @@ def CreateJob(opts, args):
 
         writeConfigInfoToRootFile(resultsPath, opts)
         moveAllHistosIntoAnalysisFolder(resultsPath, opts)
-#        writeCounters(resultsPath, opts)
+        #  writeCounters(resultsPath, opts)
 
     Print("Successfully created pseudo-multicrab directory \"%s\" " % (taskDirName), False)
     multicrabCfg.close()
@@ -615,9 +615,9 @@ if __name__ == "__main__":
     PSET         = "raw2TTree_CaloTkSkim_cfg.py"
     DIRNAME      = ""
     DATASET      = None #"VBF_HToTauTau_125_14TeV_powheg_pythia6"
-    CMSSW        = "910pre2" #"61XSLHC6"
+    CMSSW        = "92X" #"910pre2" #"61XSLHC6"
     ANALYSIS     = "HLTausAnalysis"
-    DATAERA      = "ID2017"
+    DATAERA      = "TDR2019" #"ID2017"
     DATAVERSION  = CMSSW + "mc"
     ROOTFILE     = "test.root"
     NOMINALLUMI  = 5 # 5e34 (<PU>=140)
@@ -701,9 +701,9 @@ if __name__ == "__main__":
     # For-loop: All data-era datasets
     datasets     = DatasetGroup(opts.dataEra).GetDatasetList()
     datasetNames = [GetRequestName(d) for d in datasets]
-    if opts.dataset not in datasetNames:
-        Print("Invalid dataset \"%s\". Please select one of the following:\n\t%s" % (opts.dataset, "\n\t".join(datasetNames)), True)
-        sys.exit()
+    #if opts.dataset not in datasetNames:
+    #    Print("Invalid dataset \"%s\". Please select one of the following:\n\t%s" % (opts.dataset, "\n\t".join(datasetNames)), True)
+    #    sys.exit()
     
     # Create the pseudo-multicrab dir (if the ROOT file exists)
     if os.path.exists(opts.rootFile):
