@@ -17,10 +17,11 @@ hltausPseudoMulticrab.py -f test.root -r <multicrab_dir>
 Examples:
 hltausPseudoMulticrab.py -f histograms-SingleTau_PU140.root
 hltausPseudoMulticrab.py -f histograms-SingleTau_PU200.root --dir <multicrab_dir>
-
-Last Used:
 hltausPseudoMulticrab.py -f CaloPlusTracks_Histograms_VBF.root
 hltausPseudoMulticrab.py -f CaloPlusTracks_Histograms_MinBias.root --dataset Neutrino_Pt2to20_gun --dir multicrab_CaloPlusTracks_v61XSLHC6_20170421T1554
+
+Last Used:
+hltausPseudoMulticrab.py -f histograms-SinglePion0_FlatPt_8to100_NoPU.root --dataEra ID2017
 '''
 
 #================================================================================================
