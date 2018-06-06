@@ -20,7 +20,7 @@ void TreeReaderMC::InitVars_()
   return;
 }
 
-
+/* marina
 //============================================================================
 void TreeReaderMC::GetHadronicTauFinalDaughters(GenParticle p,
 					    vector<unsigned short> &Daug)
@@ -185,7 +185,7 @@ vector<GenParticle> TreeReaderMC::GetGenParticles(int pdgId, bool isLastCopy)
   return myGenParticles;
 }
 
-      
+
 //============================================================================
 GenParticle TreeReaderMC::GetGenParticle(unsigned int Index)
 //============================================================================
@@ -299,7 +299,9 @@ void TreeReaderMC::SetGenParticleFinalDaughters(GenParticle &p)
   return;
 }
 
-/* marina
+
+
+
 //============================================================================
 vector<TTTrack> TreeReaderMC::GetTTTracks(const double minPt,
 				      const double minEta,

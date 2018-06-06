@@ -8,7 +8,7 @@
 
 short int ObjectMCAssociator::FindTauMCProvenance(const unsigned short iTau)
 {
-  int idGenTau = GenP_PdgId->at(iTau);
+  int idGenTau = GenP_PdgId.at(iTau);
   if (abs(idGenTau) != 15 ) {
     std::cout << " E R R O R ! The Method FindTauMCProvenance can be called"
               << " only for generated muons \n";

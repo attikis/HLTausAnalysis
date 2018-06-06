@@ -374,26 +374,13 @@ void CaloTk::PrintSettings(void)
 void CaloTk::Loop()
 //============================================================================
 {
-  cout << "************4*************"<<endl;
   // Sanity check
   if (fChain == 0) return;
-  cout << "************4a*************"<<endl;
-
-  cout << fChain->GetEntries()<<endl;
-
-  cout << "************4b*************"<<endl;
-
-
-
+  
+  //cout << "No of ENTRIES=" << fChain->GetEntries()<<endl;
 
   const Long64_t nEntries = (MaxEvents == -1) ? fChain->GetEntries() : min((int)fChain->GetEntries(), MaxEvents);
   
-
-  cout << nEntries<<endl;
-
-  cout << "************5*************"<<endl;
-
-
   cout << "=== CaloTk:\n\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
   // Initialisations
   InitVars_();
@@ -428,51 +415,51 @@ void CaloTk::Loop()
     
     if(DEBUG) cout << "\tEntry = " << jentry << endl;
     
-    cout << "************6*************"<<endl;
-    
-    
+    //cout << "************1*************"<<endl;
+        
     // Init variables
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
     
-
-    cout << "************6a*************"<<endl;
+    //cout << "************2*************"<<endl;
 
 
     nb = fChain->GetEntry(jentry);
     nbytes += nb;
     
-    cout << "************7*************"<<endl;
+    cout << "*****************ENTRY******************"<<endl;
 
-    std::cout<<jentry<<std::endl; 
+    cout<<jentry<<endl; 
 
-    cout << "************7a*************"<<endl;
+    cout << "****************************************"<<endl;
+
+    cout<<"run=  "<<run<<endl; 
+    cout<<"lumi=  "<<lumi<<endl; 
 
     
-    std::cout<<"rin=  "<<run<<std::endl; 
-    std::cout<<"lumi=  "<<lumi<<std::endl; 
+    cout<<"nECALTP=  "<<nECALTP<<endl; 
+    cout<<"nVtx=  "<<nVtx<<endl; 
+    
+    cout << "******************************"<<endl;
 
-    
-    std::cout<<"nECALTP=  "<<nECALTP<<std::endl; 
-    std::cout<<"nVtx=  "<<nVtx<<std::endl; 
-    
-    
-    std::cout<<"iEtaSIZE=  "<<ecalTP_iEta.size()<<std::endl; 
-    //std::cout<<"iEtaSIZE"<<ecalTP_iEta->size()<<std::endl;
+    cout<<"ECALTP_iEta_SIZE=  "<<ecalTP_iEta.size()<<endl; 
+    cout << "***********Values*************"<<endl;
 
-    for (unsigned int i=0; i<5 ;i++)
-      { std::cout<<ecalTP_iEta.at(i)<<std::endl;}
-    //{ std::cout<<ecalTP_iEta->at(i)<<std::endl;}
+    for (unsigned int i=0; i<5 ;i++){
+      cout<<ecalTP_iEta.at(i)<<endl;
+    }
     
-    cout << "************7b*************"<<endl;
+    cout << "******************************"<<endl;
     
-    std::cout<<"partSIZE=   "<<Part_Pt.size()<<std::endl; 
+    cout<<"GenP_PT_SIZE=   "<<GenP_Pt.size()<<endl; 
+    cout << "***********Values*************"<<endl;
+
     for(unsigned int i=0; i<5; i++)
     {
-    float genP_Pt = Part_Pt.at(i);
-    std::cout<<genP_Pt<<std::endl;
+    float genP_Pt = GenP_Pt.at(i);
+    cout<<genP_Pt<<endl;
     }
-    cout << "************8*************"<<endl;
+    cout << "**************END*************"<<endl;
 
 
     //======================================================================================================

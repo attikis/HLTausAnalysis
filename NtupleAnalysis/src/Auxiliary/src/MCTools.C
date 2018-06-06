@@ -7,9 +7,9 @@
 //#define DEBUG
 
 
-//****************************************************************************
+// ****************************************************************************
 bool MCTools::IsNeutrino(const int pdgId){
-//****************************************************************************
+// ****************************************************************************
   //
   // Description:
   // Returns true if genParticle is neutrino (v_e, v_mu, v_tau), else false.
@@ -20,9 +20,9 @@ bool MCTools::IsNeutrino(const int pdgId){
 }
 
 
-//****************************************************************************
+// ****************************************************************************
 bool MCTools::IsBoson(const int pdgId){
-//****************************************************************************
+// ****************************************************************************
   //
   // Description:
   // Returns true if genParticle is boson, else false.
@@ -36,9 +36,9 @@ bool MCTools::IsBoson(const int pdgId){
 }
 
 
-//****************************************************************************
+// ****************************************************************************
 bool MCTools::IsLepton(const int pdgId){
-//****************************************************************************  
+// ****************************************************************************  
   //
   // Description:
   // Returns true if genParticle is a lepton (e, mu, tau & associated neutrinos), else false.
@@ -51,9 +51,9 @@ bool MCTools::IsLepton(const int pdgId){
 }
 
 
-//****************************************************************************
+// ****************************************************************************
 bool MCTools::IsChargedLepton(const int pdgId){
-//****************************************************************************
+// ****************************************************************************
   //
   // Description:
   // Returns true if genParticle is a charged lepton (e, mu, tau), else false.
@@ -64,9 +64,9 @@ bool MCTools::IsChargedLepton(const int pdgId){
 }
 
 
-//****************************************************************************
+// ****************************************************************************
 bool MCTools::IsQuark(const int pdgId){
-//****************************************************************************
+// ****************************************************************************
 
   //
   // Description:
@@ -80,12 +80,12 @@ bool MCTools::IsQuark(const int pdgId){
 }
 
 
-
-//****************************************************************************
+/* marina1
+// ****************************************************************************
 bool MCTools::RecursivelyLookForMotherId(Int_t Indx,
 					 Int_t MoId,
 					 const bool posn)
-//****************************************************************************
+// ****************************************************************************
 {
   unsigned short nMoms = GenP_Mothers->at(Indx).size();
   if (nMoms == 0)return false;
@@ -112,11 +112,11 @@ bool MCTools::RecursivelyLookForMotherId(Int_t Indx,
 }
 
 
-//*****************************************************************
+// *****************************************************************
 Int_t MCTools::PosOfMotherId(Int_t Indx,
 			   Int_t MoId,
 			   const bool posn)
-//*****************************************************************
+// *****************************************************************
 {
   unsigned short nMoms = GenP_Mothers->at(Indx).size();
   if (nMoms == 0)return 65535;
@@ -156,11 +156,11 @@ Int_t MCTools::PosOfMotherId(Int_t Indx,
   return 65535;
 }
 
-//*****************************************************************
+// *****************************************************************
 bool MCTools::LookForMotherId(Int_t Indx,
 			      Int_t MoId,
 			      const bool posn)
-//*****************************************************************
+// *****************************************************************
 {
   unsigned short nMoms = GenP_Mothers->at(Indx).size();
   if (nMoms == 0)
@@ -183,9 +183,9 @@ bool MCTools::LookForMotherId(Int_t Indx,
 }
 
 
-//****************************************************************************
+// ****************************************************************************
 TLorentzVector MCTools::GetP4(const Int_t iGenP)
-//****************************************************************************
+// ****************************************************************************
 {
 
   // Sanity check on 4-momentum
@@ -199,18 +199,18 @@ TLorentzVector MCTools::GetP4(const Int_t iGenP)
 
 
 
-//****************************************************************************
+// ****************************************************************************
 TLorentzVector MCTools::GetVisibleP4(const std::vector<unsigned short>& Daug)
-//****************************************************************************
+// ****************************************************************************
 {
 
-  /*
-    Returns the 4-vector sum of all visible daughters. If one would use this
-    to calculate the visible eT from a hadronic tau then the eT calculated would 
-    correcpond to the vector-sum eT of all decay products (and NOT the scalar eT sum)
-    In fact, the eT calculated using this 4-vector would be identical to the eT of 
-    the tau itself or that of the intermediate resonance (e.g. rho, alpha_1)
-  */
+  
+  //  Returns the 4-vector sum of all visible daughters. If one would use this
+  //  to calculate the visible eT from a hadronic tau then the eT calculated would 
+  //  correcpond to the vector-sum eT of all decay products (and NOT the scalar eT sum)
+  //  In fact, the eT calculated using this 4-vector would be identical to the eT of 
+  //  the tau itself or that of the intermediate resonance (e.g. rho, alpha_1)
+ 
 
   TLorentzVector p4;
   if (Daug.size() == 0) return p4;
@@ -239,9 +239,9 @@ TLorentzVector MCTools::GetVisibleP4(const std::vector<unsigned short>& Daug)
   return p4;
 }
 
-//****************************************************************************
+// ****************************************************************************
 Int_t MCTools::GetLdgDaughterIndex(std::vector<unsigned short> Daug, bool bOnlyChargedDaughters)
-//****************************************************************************
+// ****************************************************************************
 {
 
   // Declarations
@@ -276,11 +276,11 @@ Int_t MCTools::GetLdgDaughterIndex(std::vector<unsigned short> Daug, bool bOnlyC
 }
 
 
-//****************************************************************************
+// ****************************************************************************
 Double_t MCTools::GetHadronicTauMaxSignalCone(std::vector<unsigned short> Daug, 
 					      bool bOnlyChargedDaughters, 
 					      double minPt)
-//****************************************************************************
+// ****************************************************************************
 {
 
   if (Daug.size() <= 1) return -1;
@@ -329,11 +329,11 @@ Double_t MCTools::GetHadronicTauMaxSignalCone(std::vector<unsigned short> Daug,
 }
 
 
-//****************************************************************************
+// ****************************************************************************
 void MCTools::GetHadronicTauChargedOrNeutralPions(Int_t tauIndex, 
 						  Int_t charge,
 						  std::vector<unsigned short> &chargedPions)
-//****************************************************************************
+// ****************************************************************************
 {
   
   if (GenP_Daughters->at(tauIndex).size() == 0) return;
@@ -361,10 +361,10 @@ void MCTools::GetHadronicTauChargedOrNeutralPions(Int_t tauIndex,
 }
 
 
-//****************************************************************************
+// ****************************************************************************
 void MCTools::GetHadronicTauChargedPions(Int_t tauIndex, 
 					 std::vector<unsigned short> &chargedPions)
-//****************************************************************************
+// ****************************************************************************
 {
   
   GetHadronicTauChargedOrNeutralPions(tauIndex, 1, chargedPions);
@@ -372,10 +372,10 @@ void MCTools::GetHadronicTauChargedPions(Int_t tauIndex,
 }
 
 
-//****************************************************************************
+// ****************************************************************************
 void MCTools::GetHadronicTauNeutralPions(Int_t tauIndex, 
 					 std::vector<unsigned short> &neutralPions)
-//****************************************************************************
+// ****************************************************************************
 {
   
   GetHadronicTauChargedOrNeutralPions(tauIndex, 0, neutralPions);
@@ -383,10 +383,10 @@ void MCTools::GetHadronicTauNeutralPions(Int_t tauIndex,
 }
 
 
-//****************************************************************************
+// ****************************************************************************
 void MCTools::GetHadronicTauFinalDaughters(Int_t Indx,
 					   std::vector<unsigned short>& Daug)
-//****************************************************************************
+// ****************************************************************************
 {
 
   std::cout << "GenP_PdgId->size() = " << GenP_PdgId->size() << std::endl;
@@ -425,9 +425,9 @@ void MCTools::GetHadronicTauFinalDaughters(Int_t Indx,
   return;
 }
 
-// //**************************************************************************
+// // **************************************************************************
 // bool MCTools::IsHadronicTauDecay(Int_t Indx)
-// //**************************************************************************
+// // **************************************************************************
 // {
 //   std::vector<unsigned short> Daug_tmp;
 //   GetHadronicTauFinalDaughters(Indx, Daug_tmp);
@@ -437,9 +437,9 @@ void MCTools::GetHadronicTauFinalDaughters(Int_t Indx,
 // }
 
 
-//**************************************************************************
+// **************************************************************************
 bool MCTools::IsFinalStateTau(const std::vector<unsigned short>& Daug)
-//**************************************************************************
+// **************************************************************************
 {
   
   for (unsigned short i = 0; i < Daug.size(); i++){
@@ -454,9 +454,9 @@ bool MCTools::IsFinalStateTau(const std::vector<unsigned short>& Daug)
 }
 
 
-//*************************************************************************
+// *************************************************************************
 Bool_t MCTools::IsFinalStateHadronicTau(Int_t indx)
-//*************************************************************************
+// *************************************************************************
  {
 
    // Only consider taus
@@ -476,13 +476,13 @@ Bool_t MCTools::IsFinalStateHadronicTau(Int_t indx)
 
 
 
-//****************************************************************************
+// ****************************************************************************
 Bool_t MCTools::IsTriggerHadronicTau(const int iGenP, 
 				     const bool bApplyTkAcceptanceCut, 
 				     const int trueMomId, 
 				     const bool bUseAbsMomId,
 				     const double visEt)
-//****************************************************************************
+// ****************************************************************************
 {
     
   // Only consider final state hadronic taus
@@ -510,9 +510,9 @@ Bool_t MCTools::IsTriggerHadronicTau(const int iGenP,
 }
 
 
-//*************************************************************************
+// *************************************************************************
 Int_t MCTools::GetGenTauDecayMode(std::vector<unsigned short> Daug)
-//*************************************************************************
+// *************************************************************************
 {
   unsigned int nPipm = 0;
   unsigned int nPi0s = 0;
@@ -566,11 +566,11 @@ Int_t MCTools::GetGenTauDecayMode(std::vector<unsigned short> Daug)
 }
 
 
-//******************************************************************************
+// ******************************************************************************
 void MCTools::PrintTauDecayStatistics(const unsigned int NTaus,
 				      const unsigned int Decay[][7],
 				      const unsigned int Nrows)
-//******************************************************************************
+// ******************************************************************************
 {
   double HadDecaysFrac = 0.6476; // The total tau->hadrons from PDG 
                           // The number is derived from total (1) 
@@ -604,9 +604,9 @@ void MCTools::PrintTauDecayStatistics(const unsigned int NTaus,
   std::cout << "=========================================" << std::endl;
 }
 
-//********************************************************
+// ********************************************************
 void MCTools::PrintAllDaughters(Int_t Indx)
-//********************************************************
+// ********************************************************
 {
 
   if (GenP_Daughters->at(Indx).size() == 0) return;
@@ -627,9 +627,9 @@ void MCTools::PrintAllDaughters(Int_t Indx)
 }
 
 
-//********************************************************
+// ********************************************************
 void MCTools::PrintAllDaughtersMinimalInfo(Int_t Indx)
-//********************************************************
+// ********************************************************
 {
 
   if (GenP_Daughters->at(Indx).size() == 0) return;
@@ -643,9 +643,9 @@ void MCTools::PrintAllDaughtersMinimalInfo(Int_t Indx)
   return;
 }
 
-//********************************************************
+// ********************************************************
 void MCTools::PrintGenpDaughters(Int_t Indx, bool bPrintHeaders)
-//********************************************************
+// ********************************************************
 {
 
   if (GenP_Daughters->at(Indx).size() == 0) return;
@@ -658,9 +658,9 @@ void MCTools::PrintGenpDaughters(Int_t Indx, bool bPrintHeaders)
   return;
 }
 
-//******************************************************
+// ******************************************************
 void MCTools::PrintAllMothers(Int_t Indx)
-//******************************************************
+// ******************************************************
 {
 
   if (GenP_Mothers->at(Indx).size() == 0) return;
@@ -676,9 +676,9 @@ void MCTools::PrintAllMothers(Int_t Indx)
   return;
 }
 
-//**************************************************
+// **************************************************
 void MCTools::PrintGenp(Int_t Indx, bool bPrintHeaders)
-//**************************************************
+// **************************************************
 {
   unsigned int moth1 = 0;
   unsigned int moth2 = 0;
@@ -756,9 +756,9 @@ void MCTools::PrintGenp(Int_t Indx, bool bPrintHeaders)
 }
 
 
-//**************************************************
+// **************************************************
 void MCTools::PrintGenpFullInfo(Int_t Indx, bool bPrintHeaders)
-//**************************************************
+// **************************************************
 {
 
   // std::cout << "*** GenpFullInfo (" << Indx << ") " << std::endl;
@@ -772,9 +772,9 @@ void MCTools::PrintGenpFullInfo(Int_t Indx, bool bPrintHeaders)
 }
 
 
-//**************************************************
+// **************************************************
 void MCTools::PrintGenpMinimalInfo(Int_t Indx, bool bPrintHeaders)
-//**************************************************
+// **************************************************
 {
 
   double pt    = GenP_Pt->at(Indx);
@@ -818,9 +818,9 @@ void MCTools::PrintGenpMinimalInfo(Int_t Indx, bool bPrintHeaders)
 }
 
 
-//****************************************************************************
+// ****************************************************************************
 TLorentzVector MCTools::GetGenpP4(const Int_t Index)
-//****************************************************************************
+// ****************************************************************************
 {
 
   // Construct the 4-momentum of the gen-particles
@@ -836,11 +836,11 @@ TLorentzVector MCTools::GetGenpP4(const Int_t Index)
 
 
 
-//****************************************************************************
+// ****************************************************************************
 double MCTools::GetLxy(const Int_t iGenP,
 		       double refPoint_X,
 		       double refPoint_Y)
-//****************************************************************************
+// ****************************************************************************
 {
 
   // The distance traversed by a long-lived particle is Lxy (decay length).
@@ -859,10 +859,10 @@ double MCTools::GetLxy(const Int_t iGenP,
 }
 
 
-//****************************************************************************
+// ****************************************************************************
 double MCTools::GetD0Mag(const Int_t iGenP,
 			 const Int_t iMom)
-//****************************************************************************
+// ****************************************************************************
 {
 
   // The distance traversed by a long-lived particle is Lxy (decay length).
@@ -880,7 +880,7 @@ double MCTools::GetD0Mag(const Int_t iGenP,
 
   return d0Mag;
 }
-
+*/ //marina1
 
 #endif  // MCTools_cxx
 

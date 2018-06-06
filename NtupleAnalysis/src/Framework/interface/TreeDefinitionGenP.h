@@ -9,101 +9,41 @@ class TreeDefinitionGenP : public virtual TreeDefinitionBase
  public:
 
   //marina
-  unsigned int nVtx;
-  std::vector<float>   Part_Pt;
-  
-  Int_t           RunNumber;
-  Int_t           EvtNumber;
-  Double_t        HepMCEvt_VtxX;
-  Double_t        HepMCEvt_VtxY;
-  Double_t        HepMCEvt_VtxZ;
+  float          weight;
+  float          pthat;
+  unsigned int   nVtx;
+  unsigned int   nMeanPU;
 
   // GenParticles
-  std::vector<double>  *GenP_Pt;
-  std::vector<double>  *GenP_Eta;
-  std::vector<double>  *GenP_Phi;
-  std::vector<double>  *GenP_Mass;
-  std::vector<int>     *GenP_Charge;
-  std::vector<int>     *GenP_PdgId;
-  std::vector<int>     *GenP_Status;
-  std::vector<double>  *GenP_VertexX;
-  std::vector<double>  *GenP_VertexY;
-  std::vector<double>  *GenP_VertexZ;
-  std::vector<std::vector<unsigned short> > *GenP_Mothers;
-  std::vector<std::vector<unsigned short> > *GenP_Daughters;
-
-  /*
-  // Tracking Particles
-  std::vector<double>  *TP_Pt;
-  std::vector<double>  *TP_Eta;
-  std::vector<double>  *TP_Phi;
-  std::vector<int>     *TP_Charge;
-  std::vector<int>     *TP_PdgId;
-  std::vector<double>  *TP_d0_propagated;
-  std::vector<double>  *TP_z0_propagated;
-  std::vector<int>     *TP_NMatch;
-  std::vector<int>     *TP_TTTrackIndex;
-  std::vector<int>     *TP_NClusters; 
-  std::vector<int>     *TP_NStubs;
-  std::vector<int>     *TP_NTracks; 
-  std::vector<double>  *TP_d0_produced;
-  std::vector<double>  *TP_x0_produced;
-  std::vector<double>  *TP_y0_produced;
-  std::vector<double>  *TP_z0_produced;
-  std::vector<int>     *TP_EventId;
-  */
+  unsigned int        GenP_N;
+  std::vector<int>    GenP_PdgId;
+  std::vector<int>    GenP_Status;
+  std::vector<int>    GenP_Parent;
+  std::vector<float>  GenP_Pt;
+  std::vector<float>  GenP_Eta;
+  std::vector<float>  GenP_Phi;
+  std::vector<float>  GenP_E;
+  std::vector<int>    GenP_Charge;
+  
 
   //marina
+  TBranch *b_weight;
+  TBranch *b_pthat;
   TBranch *b_nVtx;
-  TBranch *b_Part_Pt;
-
-
-
-  // List of branches
-  TBranch *b_RunNumber;
-  TBranch *b_EvtNumber;
-  TBranch *b_HepMCEvt_VtxX;
-  TBranch *b_HepMCEvt_VtxY;
-  TBranch *b_HepMCEvt_VtxZ;
+  TBranch *b_nMeanPU;
 
   // GenParticles
+  TBranch *b_GenP_N;
+  TBranch *b_GenP_PdgId;
+  TBranch *b_GenP_Status;
+  TBranch *b_GenP_Parent;
   TBranch *b_GenP_Pt;
   TBranch *b_GenP_Eta;
   TBranch *b_GenP_Phi;
-  TBranch *b_GenP_Mass;
+  TBranch *b_GenP_E;
   TBranch *b_GenP_Charge;
-  TBranch *b_GenP_PdgId;
-  TBranch *b_GenP_Status;
-  TBranch *b_GenP_VertexX;
-  TBranch *b_GenP_VertexY;
-  TBranch *b_GenP_VertexZ;
-  TBranch *b_GenP_Mothers;
-  TBranch *b_GenP_Daughters;
 
 
-  /*
-  // Tracking Particles
-  TBranch *b_TP_Pt;
-  TBranch *b_TP_Eta;
-  TBranch *b_TP_Phi;
-  TBranch *b_TP_Charge;
-  TBranch *b_TP_PdgId;
-  TBranch *b_TP_d0_propagated;
-  TBranch *b_TP_z0_propagated;
-  TBranch *b_TP_NMatch;
-  TBranch *b_TP_TTTrackIndex;
-  TBranch *b_TP_NClusters;
-  TBranch *b_TP_NStubs;
-  TBranch *b_TP_NTracks;
-  TBranch *b_TP_d0_produced;
-  TBranch *b_TP_x0_produced;
-  TBranch *b_TP_y0_produced;
-  TBranch *b_TP_z0_produced;
-  TBranch *b_TP_EventId;
-  */ 
-
-
-  //virtual void InitGenP(TTree *tree);
   virtual void InitGenP(TChain *chain);
 
 };
@@ -121,123 +61,50 @@ void TreeDefinitionGenP::InitGenP(TChain *chain)
   std::cout << "=== TreeDefinitionGenP::InitGenP()" << std::endl;
    
 
-  //marina
-  nVtx = 0;
+
+  weight  = 0;
+  pthat   = 0;
+  nVtx    = 0;
+  nMeanPU = 0;
   
+  /*
   // GenParticles
+  GenP_N          = 0;
   GenP_Pt         = 0;
   GenP_Eta        = 0;
   GenP_Phi        = 0;
-  GenP_Mass       = 0;
+  GenP_E          = 0;
+  //GenP_Mass       = 0;
   GenP_Charge     = 0;
   GenP_PdgId      = 0;
   GenP_Status     = 0;
-  GenP_VertexX    = 0;
-  GenP_VertexY    = 0;
-  GenP_VertexZ    = 0;
-  GenP_Mothers    = 0;
-  GenP_Daughters  = 0;
-
-  /*
-  // Tracking Particles
-  TP_Pt           = 0;
-  TP_Eta          = 0;
-  TP_Phi          = 0;
-  TP_Charge       = 0;
-  TP_PdgId        = 0;
-  TP_d0_propagated= 0;
-  TP_z0_propagated= 0;
-  TP_NMatch       = 0;
-  TP_TTTrackIndex = 0;
-  TP_NClusters    = 0;
-  TP_NStubs       = 0;
-  TP_NTracks      = 0;
-  TP_d0_produced  = 0;
-  TP_x0_produced  = 0;
-  TP_y0_produced  = 0;
-  TP_z0_produced  = 0;
-  TP_x0_produced  = 0;
-  TP_EventId      = 0;
   */
 
 
-
   // Set branch addresses and branch pointers
-  //if (!tree) return;
-  //fChain = tree;
   if (!chain) return;
   fChain = chain;
   fCurrent = -1;
   fChain->SetMakeClass(1);
 
-  // L1 info (marina)
+  // L1 GEN info
   if (1)
     {
-      fChain->SetBranchAddress("partPt", &Part_Pt, &b_Part_Pt);
-      fChain->SetBranchAddress("nVtx", &nVtx, &b_nVtx);
+      fChain->SetBranchAddress("weight"       , &weight      , &b_weight);
+      fChain->SetBranchAddress("pthat"        , &pthat       , &b_pthat);
+      fChain->SetBranchAddress("nVtx"         , &nVtx        , &b_nVtx);
+      fChain->SetBranchAddress("nMeanPU"      , &nMeanPU     , &b_nMeanPU);
+      fChain->SetBranchAddress("nPart"        , &GenP_N      , &b_GenP_N);
+      fChain->SetBranchAddress("partId"       , &GenP_PdgId  , &b_GenP_PdgId);
+      fChain->SetBranchAddress("partStat"     , &GenP_Status , &b_GenP_Status);
+      fChain->SetBranchAddress("partPt"       , &GenP_Pt     , &b_GenP_Pt);
+      fChain->SetBranchAddress("partEta"      , &GenP_Eta    , &b_GenP_Eta);
+      fChain->SetBranchAddress("partPhi"      , &GenP_Phi    , &b_GenP_Phi);
+      fChain->SetBranchAddress("partE"        , &GenP_E      , &b_GenP_E);
+      fChain->SetBranchAddress("partCh"       , &GenP_Charge , &b_GenP_Charge);
+
+
     }
-
-
-
-
-
-
-
-  /*
-  if (1)
-    {
-      fChain->SetBranchAddress("RunNumber", &RunNumber, &b_RunNumber);
-      fChain->SetBranchAddress("EvtNumber", &EvtNumber, &b_EvtNumber);
-    }
-   
-  if (1)
-    {
-      std::cout << "\tSetting HepMC addresses." << std::endl;
-      fChain->SetBranchAddress("HepMCEvt_VtxX", &HepMCEvt_VtxX, &b_HepMCEvt_VtxX);
-      fChain->SetBranchAddress("HepMCEvt_VtxY", &HepMCEvt_VtxY, &b_HepMCEvt_VtxY);
-      fChain->SetBranchAddress("HepMCEvt_VtxZ", &HepMCEvt_VtxZ, &b_HepMCEvt_VtxZ);
-    }
-
-  // GenParticles
-  if (1)
-    {
-      std::cout << "\tSetting GenParticles addresses." << std::endl;
-      fChain->SetBranchAddress("GenP_Pt"       , &GenP_Pt       , &b_GenP_Pt);
-      fChain->SetBranchAddress("GenP_Eta"      , &GenP_Eta      , &b_GenP_Eta);
-      fChain->SetBranchAddress("GenP_Phi"      , &GenP_Phi      , &b_GenP_Phi);
-      fChain->SetBranchAddress("GenP_Mass"     , &GenP_Mass     , &b_GenP_Mass);
-      fChain->SetBranchAddress("GenP_Charge"   , &GenP_Charge   , &b_GenP_Charge);
-      fChain->SetBranchAddress("GenP_PdgId"    , &GenP_PdgId    , &b_GenP_PdgId);
-      fChain->SetBranchAddress("GenP_Status"   , &GenP_Status   , &b_GenP_Status);
-      fChain->SetBranchAddress("GenP_VertexX"  , &GenP_VertexX  , &b_GenP_VertexX);
-      fChain->SetBranchAddress("GenP_VertexY"  , &GenP_VertexY  , &b_GenP_VertexY);
-      fChain->SetBranchAddress("GenP_VertexZ"  , &GenP_VertexZ  , &b_GenP_VertexZ);
-      fChain->SetBranchAddress("GenP_Mothers"  , &GenP_Mothers  , &b_GenP_Mothers);
-      fChain->SetBranchAddress("GenP_Daughters", &GenP_Daughters, &b_GenP_Daughters);
-    }
-
-  // Tracking Particles
-  if (1)
-    {
-      std::cout << "\tSetting Tracking Particles addresses." << std::endl;
-      fChain->SetBranchAddress("TP_Pt"           , &TP_Pt           , &b_TP_Pt);
-      fChain->SetBranchAddress("TP_Eta"          , &TP_Eta          , &b_TP_Eta);
-      fChain->SetBranchAddress("TP_Phi"          , &TP_Phi          , &b_TP_Phi);
-      fChain->SetBranchAddress("TP_Charge"       , &TP_Charge       , &b_TP_Charge);
-      fChain->SetBranchAddress("TP_PdgId"        , &TP_PdgId        , &b_TP_PdgId);
-      fChain->SetBranchAddress("TP_d0_propagated", &TP_d0_propagated, &b_TP_d0_propagated);
-      fChain->SetBranchAddress("TP_z0_propagated", &TP_z0_propagated, &b_TP_z0_propagated);
-      fChain->SetBranchAddress("TP_NMatch"       , &TP_NMatch       , &b_TP_NMatch);
-      fChain->SetBranchAddress("TP_TTTrackIndex" , &TP_TTTrackIndex , &b_TP_TTTrackIndex);
-      fChain->SetBranchAddress("TP_NClusters"    , &TP_NClusters    , &b_TP_NClusters);
-      fChain->SetBranchAddress("TP_NStubs"       , &TP_NStubs       , &b_TP_NStubs);
-      fChain->SetBranchAddress("TP_NTracks"      , &TP_NTracks      , &b_TP_NTracks);
-      fChain->SetBranchAddress("TP_x0_produced"  , &TP_x0_produced  , &b_TP_x0_produced);
-      fChain->SetBranchAddress("TP_y0_produced"  , &TP_y0_produced  , &b_TP_y0_produced);
-      fChain->SetBranchAddress("TP_z0_produced"  , &TP_z0_produced  , &b_TP_z0_produced);
-      fChain->SetBranchAddress("TP_EventId"      , &TP_EventId      , &b_TP_EventId);
-    }
-  */
 
   return;
 

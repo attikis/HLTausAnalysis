@@ -46,8 +46,9 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
   //if (tree == 0) {
   if (chain == 0) {
   
+
+    // Fix me - Check that tree exists *************************************
     // Creat a new TChain pointer with the TTree name
-    //TChain* chain = new TChain("Raw2TTreeMaker/EvtTree");
     TChain* fMainChain    = new TChain("l1EventTree/L1EventTree");
     TChain* fCaloTower        = new TChain("l1CaloTowerTree/L1CaloTowerTree");
     TChain* fUpgradeTfMuon    = new TChain("l1UpgradeTfMuonTree/L1UpgradeTfMuonTree");
@@ -60,13 +61,13 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
     TChain* fuGTEmu           = new TChain("l1uGTEmuTree/L1uGTTree");
     TChain* fGenerator        = new TChain("l1GeneratorTree/L1GenTree");
     
+
+    
+    //std::cout<<"********OPENFILES-1*********"<<std::endl;
+
     // Associated the ROOT files to the TChain
     std::cout << "\tGetting ROOT files for dataset " << SampleName << " and adding them to the chain." << std::endl;
     OpenFiles(SamplePath, SampleName, fMainChain);
-
-    std::cout<<"********OPENFILES-1*********"<<std::endl;
-
-    // Fix me: check that trees exist
     OpenFiles(SamplePath, SampleName, fCaloTower        );
     OpenFiles(SamplePath, SampleName, fUpgradeTfMuon    );
     OpenFiles(SamplePath, SampleName, fUpgrade          );
@@ -78,20 +79,19 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
     OpenFiles(SamplePath, SampleName, fuGTEmu           );
     OpenFiles(SamplePath, SampleName, fGenerator);
 
-    std::cout<<"********OPENFILES-2*********"<<std::endl;
+    //std::cout<<"********OPENFILES-2*********"<<std::endl;
 
     
     // Set the Tree
-    //tree = chain;
     chain = fMainChain;
 
-    std::cout<<"********friends1*********"<<std::endl;
+    //std::cout<<"********friends1*********"<<std::endl;
 
     // Set friendships
     //chain -> AddFriend(fCaloTower);
-    chain -> AddFriend(fUpgradeTfMuon);
-    chain -> AddFriend(fUpgrade);
-    chain -> AddFriend(fuGT);
+    //chain -> AddFriend(fUpgradeTfMuon);
+    //chain -> AddFriend(fUpgrade);
+    //chain -> AddFriend(fuGT);
     chain -> AddFriend(fHO);
     chain -> AddFriend(fUpgradeTfMuonEmu);
     chain -> AddFriend(fCaloTowerEmu);
@@ -99,11 +99,10 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
     chain -> AddFriend(fuGTEmu);
     chain -> AddFriend(fGenerator);
 
-    std::cout<<"********friends2*********"<<std::endl;
+    //std::cout<<"********friends2*********"<<std::endl;
 
     
     std::cout << "=== TreeReaderReco::TreeReaderReco()" << std::endl;
-    //std::cout << "\tSet tree with name \"" << tree->GetName() << "\" as the principal tree." << std::endl;
     std::cout << "\tSet tree with name \"" << chain->GetName() << "\" as the principal tree." << std::endl;
 
   }
