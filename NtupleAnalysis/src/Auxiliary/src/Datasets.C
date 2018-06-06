@@ -66,6 +66,7 @@ void Datasets::IsValidMcProduction_(const string mcProduction,
   // Declare currently supported MC-Productions
   mcProductions.push_back("2023TTIUpg14");
   mcProductions.push_back("PhaseIISpring17D");
+  mcProductions.push_back("PhaseIIFall17D");
 
   // Check if the selected MC Prodution is valid
   for( int i = 0 ; i < (int) mcProductions.size(); i++){
@@ -121,6 +122,8 @@ void Datasets::IsValidDatasetAlias(const string datasetName)
   // First create the tables for the known MC Productions
   if (datasets_TTI2023Updg14D.size() < 1 )   CreateMcProductions_();
   if (datasets_PhaseIISpring17D.size() < 1 ) CreateMcProductions_();
+  if (datasets_PhaseIIFall17D.size() < 1 ) CreateMcProductions_();
+
 
   // Check if the selected MC Prodution is valid
   for( int iD = 0 ; iD < (int) datasets_TTI2023Updg14D.size(); iD++)
@@ -134,11 +137,22 @@ void Datasets::IsValidDatasetAlias(const string datasetName)
       if ( datasetName.compare( datasets_PhaseIISpring17D.at(iD).alias_) == 0) return;
     }
 
+  // Check if the selected MC Prodution is valid                                                                                                                        
+  for( int iD = 0 ; iD < (int) datasets_PhaseIIFall17D.size(); iD++)
+    {
+      if ( datasetName.compare( datasets_PhaseIIFall17D.at(iD).alias_) == 0) return;
+    }
+
+
+
+
   // If this is reached then the dataset sample is invalid
   cout << "\nE R R O R ! Datasets::IsValidDatasetAlias(...) - Unknown dataset alias \"" << datasetName << "\". See below all available dataset aliases. EXIT" << endl;
   PrintDatasetsVector_(datasets_TTI2023Updg14D, "Text", true);
   cout << "" << endl;
   PrintDatasetsVector_(datasets_PhaseIISpring17D, "Text", true);
+  cout << "EXIT" << endl;
+  PrintDatasetsVector_(datasets_PhaseIIFall17D, "Text", true);
   cout << "EXIT" << endl;
   exit(1);
   
@@ -291,6 +305,22 @@ void Datasets::CreateMcProductions_(void)
   datasets_PhaseIISpring17D.push_back(TTNoPU_PhaseIISpring17D);
   datasets_PhaseIISpring17D.push_back(TTPU140_PhaseIISpring17D);
   datasets_PhaseIISpring17D.push_back(TTPU200_PhaseIISpring17D);
+
+
+
+  // PhaseIIFall17D                                                                                                                                                     
+  string path1_NoPU  = "/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW";
+  string path1_PU140 = "/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW";
+  string path1_PU200 = "/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW";
+  cmssw    = "10_1_5";
+  geometry = "Phase2";
+
+  Datasets SinglePionNoPU_PhaseIIFall17D("SinglePion_FlatPt_2to100_NoPU", "SinglePion_FlatPt_2to100_NoPU", "/SinglePion_FlatPt-2to100" + path1_NoPU , CP, cmssw, geometry, 140, 500000, 0, 0);
+
+
+
+  datasets_PhaseIIFall17D.push_back(SinglePionNoPU_PhaseIIFall17D);
+
   
   return;
 }
@@ -307,7 +337,9 @@ Datasets Datasets::GetDataset(const string datasetAlias)
   // First create the tables for the known MC Productions
   if (datasets_TTI2023Updg14D.size() < 1 ) CreateMcProductions_();
   if (datasets_PhaseIISpring17D.size() < 1 ) CreateMcProductions_();
-  
+  if (datasets_PhaseIIFall17D.size() < 1 ) CreateMcProductions_();
+
+
   // Check if the selected MC Prodution is valid
   for( int iD = 0 ; iD < (int) datasets_TTI2023Updg14D.size(); iD++){
 
@@ -323,6 +355,16 @@ Datasets Datasets::GetDataset(const string datasetAlias)
     bSuccess = true;
     d = datasets_PhaseIISpring17D.at(iD);
   }
+
+  // Check if the selected MC Prodution is valid
+  for( int iD = 0 ; iD < (int) datasets_PhaseIIFall17D.size(); iD++){
+
+    if ( datasetAlias.compare( datasets_PhaseIIFall17D.at(iD).alias_) != 0) continue;
+    bSuccess = true;
+    d = datasets_PhaseIIFall17D.at(iD);
+  }
+
+
     
   if(!bSuccess){
     cout << "\nE R R O R ! Datasets::GetDataset(...) - Unexpected error! Could not find dataset alias \"" << datasetAlias << "\"." << endl;
@@ -343,6 +385,7 @@ const string Datasets::GetDatasetPathFromAlias(const string datasetAlias)
   // First create the tables for the known MC Productions
   if (datasets_TTI2023Updg14D.size() < 1 )   CreateMcProductions_();
   if (datasets_PhaseIISpring17D.size() < 1 ) CreateMcProductions_();
+  if (datasets_PhaseIIFall17D.size() < 1 ) CreateMcProductions_();
 
   // Ensure that the supplied sample name is valids
   IsValidDatasetAlias(datasetAlias);  
@@ -361,6 +404,13 @@ const string Datasets::GetDatasetPathFromAlias(const string datasetAlias)
 	datasetPath = datasets_PhaseIISpring17D.at(iD).datasetPath_;
 	return datasetPath;
       }
+
+    if ( datasetAlias.compare( datasets_PhaseIIFall17D.at(iD).alias_) == 0)
+      {
+	datasetPath = datasets_PhaseIIFall17D.at(iD).datasetPath_;
+	return datasetPath;
+      }
+
 
   }
   

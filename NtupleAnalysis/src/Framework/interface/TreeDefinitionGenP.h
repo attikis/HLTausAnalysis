@@ -8,6 +8,10 @@ class TreeDefinitionGenP : public virtual TreeDefinitionBase
 {
  public:
 
+  //marina
+  unsigned int nVtx;
+  std::vector<float>   Part_Pt;
+  
   Int_t           RunNumber;
   Int_t           EvtNumber;
   Double_t        HepMCEvt_VtxX;
@@ -28,6 +32,7 @@ class TreeDefinitionGenP : public virtual TreeDefinitionBase
   std::vector<std::vector<unsigned short> > *GenP_Mothers;
   std::vector<std::vector<unsigned short> > *GenP_Daughters;
 
+  /*
   // Tracking Particles
   std::vector<double>  *TP_Pt;
   std::vector<double>  *TP_Eta;
@@ -46,7 +51,14 @@ class TreeDefinitionGenP : public virtual TreeDefinitionBase
   std::vector<double>  *TP_y0_produced;
   std::vector<double>  *TP_z0_produced;
   std::vector<int>     *TP_EventId;
-  
+  */
+
+  //marina
+  TBranch *b_nVtx;
+  TBranch *b_Part_Pt;
+
+
+
   // List of branches
   TBranch *b_RunNumber;
   TBranch *b_EvtNumber;
@@ -68,6 +80,8 @@ class TreeDefinitionGenP : public virtual TreeDefinitionBase
   TBranch *b_GenP_Mothers;
   TBranch *b_GenP_Daughters;
 
+
+  /*
   // Tracking Particles
   TBranch *b_TP_Pt;
   TBranch *b_TP_Eta;
@@ -86,12 +100,16 @@ class TreeDefinitionGenP : public virtual TreeDefinitionBase
   TBranch *b_TP_y0_produced;
   TBranch *b_TP_z0_produced;
   TBranch *b_TP_EventId;
+  */ 
 
-  virtual void InitGenP(TTree *tree);
+
+  //virtual void InitGenP(TTree *tree);
+  virtual void InitGenP(TChain *chain);
 
 };
 
-void TreeDefinitionGenP::InitGenP(TTree *tree)
+//void TreeDefinitionGenP::InitGenP(TTree *tree)
+void TreeDefinitionGenP::InitGenP(TChain *chain)
 {
   // The Init() function is called when the selector needs to initialize
   // a new tree or chain. Typically here the branch addresses and branch
@@ -102,6 +120,10 @@ void TreeDefinitionGenP::InitGenP(TTree *tree)
   // (once per file to be processed).
   std::cout << "=== TreeDefinitionGenP::InitGenP()" << std::endl;
    
+
+  //marina
+  nVtx = 0;
+  
   // GenParticles
   GenP_Pt         = 0;
   GenP_Eta        = 0;
@@ -116,6 +138,7 @@ void TreeDefinitionGenP::InitGenP(TTree *tree)
   GenP_Mothers    = 0;
   GenP_Daughters  = 0;
 
+  /*
   // Tracking Particles
   TP_Pt           = 0;
   TP_Eta          = 0;
@@ -135,13 +158,32 @@ void TreeDefinitionGenP::InitGenP(TTree *tree)
   TP_z0_produced  = 0;
   TP_x0_produced  = 0;
   TP_EventId      = 0;
+  */
+
+
 
   // Set branch addresses and branch pointers
-  if (!tree) return;
-  fChain = tree;
+  //if (!tree) return;
+  //fChain = tree;
+  if (!chain) return;
+  fChain = chain;
   fCurrent = -1;
   fChain->SetMakeClass(1);
 
+  // L1 info (marina)
+  if (1)
+    {
+      fChain->SetBranchAddress("partPt", &Part_Pt, &b_Part_Pt);
+      fChain->SetBranchAddress("nVtx", &nVtx, &b_nVtx);
+    }
+
+
+
+
+
+
+
+  /*
   if (1)
     {
       fChain->SetBranchAddress("RunNumber", &RunNumber, &b_RunNumber);
@@ -195,8 +237,10 @@ void TreeDefinitionGenP::InitGenP(TTree *tree)
       fChain->SetBranchAddress("TP_z0_produced"  , &TP_z0_produced  , &b_TP_z0_produced);
       fChain->SetBranchAddress("TP_EventId"      , &TP_EventId      , &b_TP_EventId);
     }
+  */
 
   return;
+
 }
 
 #endif  // TreeDefinitionGenP_h

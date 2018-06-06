@@ -4,6 +4,8 @@
 // User
 #include "../Auxiliary/interface/constants.h"
 #include "CaloTk.h"
+//#include "../Framework/interface/TreeReaderReco.h"
+
 
 // ROOT
 #include "TFitResult.h"
@@ -372,11 +374,26 @@ void CaloTk::PrintSettings(void)
 void CaloTk::Loop()
 //============================================================================
 {
-
+  cout << "************4*************"<<endl;
   // Sanity check
   if (fChain == 0) return;
+  cout << "************4a*************"<<endl;
+
+  cout << fChain->GetEntries()<<endl;
+
+  cout << "************4b*************"<<endl;
+
+
+
+
   const Long64_t nEntries = (MaxEvents == -1) ? fChain->GetEntries() : min((int)fChain->GetEntries(), MaxEvents);
   
+
+  cout << nEntries<<endl;
+
+  cout << "************5*************"<<endl;
+
+
   cout << "=== CaloTk:\n\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
   // Initialisations
   InitVars_();
@@ -388,33 +405,79 @@ void CaloTk::Loop()
   unsigned int nAllEvts = fChain->GetEntries();
   bool isMinBias        = false;  
   // L1PixelTrackFit f(3.8112); // Bz in Tesla (for pixel re-fitting)
-
+  
   // Determine what sample this is
   std::size_t found = mcSample.find("SingleNeutrino");
-    if (found!=std::string::npos)
-      {
-	isMinBias = true;
-	std::cout << "Minimum Bias sample" << std::endl;
-      }
-    else
-      {
-	std::cout << "Not a Minimum Bias sample." << std::endl;
-      }
-    
+  if (found!=std::string::npos)
+    {
+      isMinBias = true;
+      std::cout << "Minimum Bias sample" << std::endl;
+    }
+  else
+    {
+      std::cout << "Not a Minimum Bias sample." << std::endl;
+    }
+  
   
   ////////////////////////////////////////////////
   // For-loop: Entries
   ////////////////////////////////////////////////
-  for (int jentry = 0; jentry < nEntries; jentry++, nEvts++){
   
+  
+  for (int jentry = 0; jentry < nEntries; jentry++, nEvts++){
+    
     if(DEBUG) cout << "\tEntry = " << jentry << endl;
+    
+    cout << "************6*************"<<endl;
+    
     
     // Init variables
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
+    
+
+    cout << "************6a*************"<<endl;
+
+
     nb = fChain->GetEntry(jentry);
     nbytes += nb;
+    
+    cout << "************7*************"<<endl;
 
+    std::cout<<jentry<<std::endl; 
+
+    cout << "************7a*************"<<endl;
+
+    
+    std::cout<<"rin=  "<<run<<std::endl; 
+    std::cout<<"lumi=  "<<lumi<<std::endl; 
+
+    
+    std::cout<<"nECALTP=  "<<nECALTP<<std::endl; 
+    std::cout<<"nVtx=  "<<nVtx<<std::endl; 
+    
+    
+    std::cout<<"iEtaSIZE=  "<<ecalTP_iEta.size()<<std::endl; 
+    //std::cout<<"iEtaSIZE"<<ecalTP_iEta->size()<<std::endl;
+
+    for (unsigned int i=0; i<5 ;i++)
+      { std::cout<<ecalTP_iEta.at(i)<<std::endl;}
+    //{ std::cout<<ecalTP_iEta->at(i)<<std::endl;}
+    
+    cout << "************7b*************"<<endl;
+    
+    std::cout<<"partSIZE=   "<<Part_Pt.size()<<std::endl; 
+    for(unsigned int i=0; i<5; i++)
+    {
+    float genP_Pt = Part_Pt.at(i);
+    std::cout<<genP_Pt<<std::endl;
+    }
+    cout << "************8*************"<<endl;
+
+
+    //======================================================================================================
+
+    /* //marina
     // Gen-Collections
     vector<GenParticle> GenParticles;
     vector<GenParticle> GenTaus;
@@ -790,6 +853,8 @@ void CaloTk::Loop()
     // Progress bar
     if (!DEBUG) auxTools_.ProgressBar(jentry, nEntries, 100, 100);
     
+    */ //marina
+
   }// For-loop: Entries
 
   // Fill counters

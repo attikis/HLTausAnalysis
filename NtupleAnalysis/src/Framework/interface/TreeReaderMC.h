@@ -43,8 +43,10 @@ class TreeReaderMC : public TreeReaderReco, public virtual TREEDEFINITIONGENP
   TreeReaderMC() { 
     std::cout << " TreeReaderMC : The constructor needs some arguments \n"; 
   };
-  TreeReaderMC(const std::string SamplePath, const std::string SampleName, TTree *tree=0) :
-  TreeReaderReco(SamplePath, SampleName, tree) { InitGenP(fChain); };
+  //TreeReaderMC(const std::string SamplePath, const std::string SampleName, TTree *tree=0) :
+  TreeReaderMC(const std::string SamplePath, const std::string SampleName, TChain *chain=0) :
+  //TreeReaderReco(SamplePath, SampleName, tree) { InitGenP(fChain); };
+  TreeReaderReco(SamplePath, SampleName, chain) { InitGenP(fChain); };
 
   // Public functions
   void PrintGenParticleCollection(vector<GenParticle> collection);

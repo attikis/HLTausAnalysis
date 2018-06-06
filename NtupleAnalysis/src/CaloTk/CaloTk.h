@@ -7,6 +7,8 @@
 
 // User
 #include "../Framework/src/TreeAnalyserMC.C"
+//#include "../Framework/src/TreeReaderMC.C"
+
 
 #include "../Auxiliary/src/AuxTools.C"
 #include "../Auxiliary/src/Table.C"
@@ -35,6 +37,9 @@
 #include "Math/Point3D.h"
 #include "Math/Vector4D.h"
 
+//marina
+#include <vector>
+#include <iostream>
 
 using namespace std;
 
@@ -46,9 +51,10 @@ class CaloTk : public TreeAnalyserMC{
 		const string SampleName,
 		const string text_, 
 		const int maxEvents_ = -1, 
-		TTree* tree=0) : 
-  
-  TreeAnalyserMC("", SamplePath, SampleName, text_, maxEvents_, tree) 
+	//TTree* tree=0) : 
+	TChain* chain=0) :
+  //TreeAnalyserMC("", SamplePath, SampleName, text_, maxEvents_, tree) 
+  TreeAnalyserMC("", SamplePath, SampleName, text_, maxEvents_, chain)
     { 
       auxTools_.StopwatchStart();
       mcSample = SampleName;

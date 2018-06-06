@@ -7,7 +7,8 @@
 class TreeDefinitionBase 
 {
    public:
-     TTree   *fChain;   //! pointer to the analysed Tree or Chain
+  //TTree   *fChain;   //! pointer to the analysed Tree or Chain
+     TChain  *fChain;
      Int_t   fCurrent;  //! Current Tree number in a Chain
      virtual Bool_t  Notify();
      virtual void    Show(Long64_t entry = -1);

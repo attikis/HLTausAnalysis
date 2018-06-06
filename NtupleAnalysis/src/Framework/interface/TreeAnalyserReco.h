@@ -18,9 +18,11 @@ class TreeAnalyserReco : public TreeAnalyserBase, public TreeReaderReco
 		     const std::string SampleName, 
 		     const std::string text_, 
 		     const int maxEvents_ = -1,
-		     TTree* tree=0) : 
+		     //TTree* tree=0) : 
+                     TChain* chain=0) :
                      TreeAnalyserBase(MyName_, SampleName, text_, maxEvents_), 
-                     TreeReaderReco(SampleName, tree) { InitSelector(); };
+		     //TreeReaderReco(SampleName, tree) { InitSelector(); };
+		     TreeReaderReco(SampleName, chain) { InitSelector(); };
   
     friend class L1Tracks;
     friend class L1PixelTrackFit;

@@ -4,6 +4,7 @@
 // User
 #include "TreeDefinitionBase.h"
 #include <TFriendElement.h>
+#include <TList.h>
 
 using namespace std;
 
@@ -11,6 +12,22 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
 {
  public:
   
+  //marina
+  unsigned int run;
+  unsigned int lumi;
+  short nECALTP;
+  vector<short> ecalTP_iEta;
+  vector<short> hcalTP_iEta;
+
+  
+  TBranch* b_run;
+  TBranch* b_lumi;
+  TBranch   *b_nECALTP;
+  TBranch   *b_ecalTP_iEta;
+  TBranch   *b_hcalTP_iEta;
+
+
+  /*
   // TTTracks
   vector<double>  *L1Tks_Pt;
   vector<double>  *L1Tks_Eta;
@@ -186,12 +203,15 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch *b_L1Sum_IET;
   TBranch *b_L1Sum_IPhi;
   TBranch *b_L1Sum_Bx;
-     
+  */
 
-  virtual void InitReco(TTree *tree);
+  //virtual void InitReco(TTree *tree);
+  virtual void InitReco(TChain *chain);
+  
 };
 
-void TreeDefinitionReco::InitReco(TTree *tree)
+//void TreeDefinitionReco::InitReco(TTree *tree)
+void TreeDefinitionReco::InitReco(TChain *chain)
 {
   // The Init() function is called when the selector needs to initialize
   // a new tree or chain. Typically here the branch addresses and branch
@@ -203,6 +223,13 @@ void TreeDefinitionReco::InitReco(TTree *tree)
 
   cout << "=== TreeDefinitionReco::InitReco()" << endl;
   
+  //marina
+  run     = 0;
+  lumi    = 0;
+  nECALTP = 0;
+
+
+  /*
   // TTTracks
   L1Tks_Pt                = 0;
   L1Tks_Eta               = 0;
@@ -290,16 +317,48 @@ void TreeDefinitionReco::InitReco(TTree *tree)
   L1Sum_IET  = 0;
   L1Sum_IPhi = 0;
   L1Sum_Bx   = 0;
+  */
 
   cout << "\tSetting branch addresses and branch pointers." << endl;
-  if (!tree) return;
-  fChain = tree;
+  //if (!tree) return;
+  //fChain = tree;
+  if (!chain) return;
+  fChain = chain ;
   fCurrent = -1;
 
+  
   fChain->SetMakeClass(1);
+
+  cout << "**********************SETMAKECLASS-1**********************" << endl;
+  TList *friendTreeElement2 = fChain->GetListOfFriends();                                                                                                 
+  friendTreeElement2->ls();
+  
+  //marina                                                                                                                                                            
+  TFriendElement *friendTreeElement = (TFriendElement*)fChain->GetListOfFriends()->First();
+  //friendTreeElement->GetTree()->SetMakeClass(1);                                                           
+  while (friendTreeElement){
+    friendTreeElement->GetTree()->SetMakeClass(1);
+    friendTreeElement = (TFriendElement*)fChain->GetListOfFriends()->After(friendTreeElement);
+  }                                                                                                                                                                      
+
+  cout << "**********************SETMAKECLASS-2**********************" << endl;
+  
+
   //TFriendElement *friendTreeElement = (TFriendElement*)tree->GetListOfFriends()->Last();
   //friendTreeElement->GetTree()->SetMakeClass(1); //for some reason, friendChain->SetMakeClass(1); does not do the trick
 
+  
+  if(1)                                                                                                                                                                 
+    { 
+      fChain->SetBranchAddress("run"                , &run                , &b_run);
+      fChain->SetBranchAddress("lumi"               , &lumi               , &b_lumi);
+      fChain->SetBranchAddress("nECALTP"            , &nECALTP            , &b_nECALTP);
+      fChain->SetBranchAddress("ecalTPieta"         , &ecalTP_iEta        , &b_ecalTP_iEta);
+      fChain->SetBranchAddress("hcalTPieta"         , &hcalTP_iEta        , &b_hcalTP_iEta);
+    }
+  
+
+  /* 
   if(1)
     {
       cout << "\tSetting TTTracks addresses." << endl;
@@ -404,7 +463,7 @@ void TreeDefinitionReco::InitReco(TTree *tree)
       fChain->SetBranchAddress("L1Sum_IPhi" , &L1Sum_IPhi , &b_L1Sum_IPhi);
       fChain->SetBranchAddress("L1Sum_Bx"   , &L1Sum_Bx   , &b_L1Sum_Bx);
     }
-
+  */
   
   Notify();
 }

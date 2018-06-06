@@ -299,7 +299,7 @@ void TreeReaderMC::SetGenParticleFinalDaughters(GenParticle &p)
   return;
 }
 
-
+/* marina
 //============================================================================
 vector<TTTrack> TreeReaderMC::GetTTTracks(const double minPt,
 				      const double minEta,
@@ -423,7 +423,8 @@ vector<TrackingParticle> TreeReaderMC::GetTrackingParticles(bool bPrintList)
   return theTrackingParticles;
 }
 
-
+*/
+/*
 //============================================================================
 TrackingParticle TreeReaderMC::GetTrackingParticle(unsigned int Index)
 //============================================================================
@@ -775,7 +776,6 @@ vector<L1Sum> TreeReaderMC::GetL1Sums(bool bPrintList)
   return theL1Sums;
 }
 
-
 //============================================================================
 void TreeReaderMC::PrintL1TauCollection(vector<L1Tau> collection)
 //============================================================================
@@ -945,5 +945,5 @@ void TreeReaderMC::PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collec
   info.Print();
   return;
 }
-
+*/
 #endif //TreeReaderMC_cxx 

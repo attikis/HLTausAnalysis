@@ -79,7 +79,7 @@ vector<string> FileOpener::GetListOfFiles(const string fullPath)
     {
       // Printf("file -> %s", filename[i]);
       string fileName = string(filename[i]);
-      size_t found    = fileName.find("output-");
+      size_t found    = fileName.find("L1Ntuple");
       if (found!=std::string::npos) dirs.push_back(fileName);
       else {} //cout << "\tSkipping " << fileName << endl;
 
