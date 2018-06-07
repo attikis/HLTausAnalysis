@@ -437,16 +437,17 @@ void CaloTk::Loop()
     cout<<"lumi=  "<<lumi<<endl; 
 
     
-    cout<<"nECALTP=  "<<nECALTP<<endl; 
+    cout<<"nECALTP=  "<<ecalTPEmu_N<<endl; 
     cout<<"nVtx=  "<<nVtx<<endl; 
     
     cout << "******************************"<<endl;
 
-    cout<<"ECALTP_iEta_SIZE=  "<<ecalTP_iEta.size()<<endl; 
+    cout<<"ECALTP_iEta_SIZE=  "<<ecalTPEmu_ieta.size()<<endl; 
     cout << "***********Values*************"<<endl;
 
+
     for (unsigned int i=0; i<5 ;i++){
-      cout<<ecalTP_iEta.at(i)<<endl;
+      cout<<ecalTPEmu_ieta.at(i)<<endl;
     }
     
     cout << "******************************"<<endl;

@@ -50,16 +50,16 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
     // Fix me - Check that tree exists *************************************
     // Creat a new TChain pointer with the TTree name
     TChain* fMainChain    = new TChain("l1EventTree/L1EventTree");
-    TChain* fCaloTower        = new TChain("l1CaloTowerTree/L1CaloTowerTree");
-    TChain* fUpgradeTfMuon    = new TChain("l1UpgradeTfMuonTree/L1UpgradeTfMuonTree");
-    TChain* fUpgrade          = new TChain("l1UpgradeTree/L1UpgradeTree");
-    TChain* fuGT              = new TChain("l1uGTTree/L1uGTTree");
-    TChain* fHO               = new TChain("l1HOTree/L1HOTree");
-    TChain* fUpgradeTfMuonEmu = new TChain("l1UpgradeTfMuonEmuTree/L1UpgradeTfMuonTree");
-    TChain* fCaloTowerEmu     = new TChain("l1CaloTowerEmuTree/L1CaloTowerTree");
-    TChain* fUpgradeEmu       = new TChain("l1UpgradeEmuTree/L1UpgradeTree");
-    TChain* fuGTEmu           = new TChain("l1uGTEmuTree/L1uGTTree");
-    TChain* fGenerator        = new TChain("l1GeneratorTree/L1GenTree");
+    fCaloTower        = new TChain("l1CaloTowerTree/L1CaloTowerTree");
+    fUpgradeTfMuon    = new TChain("l1UpgradeTfMuonTree/L1UpgradeTfMuonTree");
+    fUpgrade          = new TChain("l1UpgradeTree/L1UpgradeTree");
+    fuGT              = new TChain("l1uGTTree/L1uGTTree");
+    fHO               = new TChain("l1HOTree/L1HOTree");
+    fUpgradeTfMuonEmu = new TChain("l1UpgradeTfMuonEmuTree/L1UpgradeTfMuonTree");
+    fCaloTowerEmu     = new TChain("l1CaloTowerEmuTree/L1CaloTowerTree");
+    fUpgradeEmu       = new TChain("l1UpgradeEmuTree/L1UpgradeTree");
+    fuGTEmu           = new TChain("l1uGTEmuTree/L1uGTTree");
+    fGenerator        = new TChain("l1GeneratorTree/L1GenTree");
     
 
     
@@ -92,12 +92,12 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
     //chain -> AddFriend(fUpgradeTfMuon);
     //chain -> AddFriend(fUpgrade);
     //chain -> AddFriend(fuGT);
-    chain -> AddFriend(fHO);
-    chain -> AddFriend(fUpgradeTfMuonEmu);
-    chain -> AddFriend(fCaloTowerEmu);
-    chain -> AddFriend(fUpgradeEmu);
-    chain -> AddFriend(fuGTEmu);
-    chain -> AddFriend(fGenerator);
+    //chain -> AddFriend(fHO);
+    //chain -> AddFriend(fUpgradeTfMuonEmu);
+    //chain -> AddFriend(fCaloTowerEmu);
+    //chain -> AddFriend(fUpgradeEmu);
+    //chain -> AddFriend(fuGTEmu);
+    //chain -> AddFriend(fGenerator);
 
     //std::cout<<"********friends2*********"<<std::endl;
 

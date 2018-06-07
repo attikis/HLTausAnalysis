@@ -9,6 +9,16 @@ class TreeDefinitionBase
    public:
   //TTree   *fChain;   //! pointer to the analysed Tree or Chain
      TChain  *fChain;
+     TChain  *fCaloTower;
+     TChain  *fUpgradeTfMuon;
+     TChain  *fUpgrade;
+     TChain  *fuGT;
+     TChain  *fHO;
+     TChain  *fUpgradeTfMuonEmu;
+     TChain  *fCaloTowerEmu;
+     TChain  *fUpgradeEmu;
+     TChain  *fuGTEmu;
+     TChain  *fGenerator;
      Int_t   fCurrent;  //! Current Tree number in a Chain
      virtual Bool_t  Notify();
      virtual void    Show(Long64_t entry = -1);
