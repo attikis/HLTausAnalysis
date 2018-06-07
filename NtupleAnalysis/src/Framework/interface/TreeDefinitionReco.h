@@ -65,10 +65,8 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<float>   caloTower_eta;
   vector<float>   caloTower_phi;
 
-  // UpgradeTf Muon
-  
-  // Fix me 
-
+  // UpgradeTfMuon
+  // ****Fix me
  
 
   // Upgrade
@@ -179,6 +177,8 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<int>     hcalQIESample_Dv;
   vector<int>     hcalQIESample_Er;
 
+  // =========================================== EMULATOR TREES =============================================
+
 
   // Calo Towers Emulator
   //==Calo TPs (Emu)
@@ -220,11 +220,117 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<float>   caloTowerEmu_eta;
   vector<float>   caloTowerEmu_phi;
 
-  
+  //==Calo Clusters (Emu)
+  Short_t         caloClusterEmu_N;
+  vector<short>   caloClusterEmu_ieta;
+  vector<short>   caloClusterEmu_iphi;
+  vector<short>   caloClusterEmu_iet;
+  vector<short>   caloClusterEmu_iqual;
+  vector<float>   caloClusterEmu_et;
+  vector<float>   caloClusterEmu_eta;
+  vector<float>   caloClusterEmu_phi;
+
+
+  // Upgrade Emulator
+  UShort_t        egEmu_N;
+  vector<float>   egEmu_Et;
+  vector<float>   egEmu_Eta;
+  vector<float>   egEmu_Phi;
+  vector<short>   egEmu_IEt;
+  vector<short>   egEmu_IEta;
+  vector<short>   egEmu_IPhi;
+  vector<short>   egEmu_Iso;
+  vector<short>   egEmu_Bx;
+  vector<short>   egEmu_TowerIPhi;
+  vector<short>   egEmu_TowerIEta;
+  vector<short>   egEmu_RawEt;
+  vector<short>   egEmu_IsoEt;
+  vector<short>   egEmu_FootprintEt;
+  vector<short>   egEmu_NTT;
+  vector<short>   egEmu_Shape;
+  vector<short>   egEmu_TowerHoE;
+
+  UShort_t        tauEmu_N;
+  vector<float>   tauEmu_Et;
+  vector<float>   tauEmu_Eta;
+  vector<float>   tauEmu_Phi;
+  vector<short>   tauEmu_IEt;
+  vector<short>   tauEmu_IEta;
+  vector<short>   tauEmu_IPhi;
+  vector<short>   tauEmu_Iso;
+  vector<short>   tauEmu_Bx;
+  vector<short>   tauEmu_TowerIPhi;
+  vector<short>   tauEmu_TowerIEta;
+  vector<short>   tauEmu_RawEt;
+  vector<short>   tauEmu_IsoEt;
+  vector<short>   tauEmu_NTT;
+  vector<short>   tauEmu_HasEM;
+  vector<short>   tauEmu_IsMerged;
+  vector<short>   tauEmu_HwQual;
+
+  UShort_t        jetEmu_N;
+  vector<float>   jetEmu_Et;
+  vector<float>   jetEmu_Eta;
+  vector<float>   jetEmu_Phi;
+  vector<short>   jetEmu_IEt;
+  vector<short>   jetEmu_IEta;
+  vector<short>   jetEmu_IPhi;
+  vector<short>   jetEmu_Bx;
+  vector<short>   jetEmu_TowerIPhi;
+  vector<short>   jetEmu_TowerIEta;
+  vector<short>   jetEmu_RawEt;
+  vector<short>   jetEmu_SeedEt;
+  vector<short>   jetEmu_PUEt;
+  vector<short>   jetEmu_PUDonutEt0;
+  vector<short>   jetEmu_PUDonutEt1;
+  vector<short>   jetEmu_PUDonutEt2;
+  vector<short>   jetEmu_PUDonutEt3;
+
+  UShort_t        muonEmu_N;
+  vector<float>   muonEmu_Et;
+  vector<float>   muonEmu_Eta;
+  vector<float>   muonEmu_Phi;
+  vector<float>   muonEmu_EtaAtVtx;
+  vector<float>   muonEmu_PhiAtVtx;
+  vector<short>   muonEmu_IEt;
+  vector<short>   muonEmu_IEta;
+  vector<short>   muonEmu_IPhi;
+  vector<short>   muonEmu_IEtaAtVtx;
+  vector<short>   muonEmu_IPhiAtVtx;
+  vector<short>   muonEmu_IDEta;
+  vector<short>   muonEmu_IDPhi;
+  vector<short>   muonEmu_Chg;
+  vector<unsigned short> muonEmu_Iso;
+  vector<unsigned short> muonEmu_Qual;
+  vector<unsigned short> muonEmu_TfMuon_Idx;
+  vector<short>   muonEmu_Bx;
+
+  UShort_t        sumEmu_N;
+  vector<short>   sumEmu_Type;
+  vector<float>   sumEmu_Et;
+  vector<float>   sumEmu_Phi;
+  vector<short>   sumEmu_IEt;
+  vector<short>   sumEmu_IPhi;
+  vector<float>   sumEmu_Bx;
+
+
+  // uGT Emulator
+  Int_t           mEmu_orbitNr;
+  Int_t           mEmu_bxNr;
+  Int_t           mEmu_bxInEvent;
+  Bool_t          mEmu_finalOR;
+  Bool_t          mEmu_finalORPreVeto;
+  Bool_t          mEmu_finalORVeto;
+  Int_t           mEmu_preScColumn;
+  vector<bool>    mEmu_algoDecisionInitial;
+  vector<bool>    mEmu_algoDecisionPreScaled;
+  vector<bool>    mEmu_algoDecisionFinal;
+
+
   
 
 
-  //********* List of branches *********
+  //********* List of branches **********
 
   // Event
   TBranch        *b_Event_run;
@@ -281,108 +387,110 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
 
 
   // Upgrade
-  TBranch        *b_eg_N;   //!
-  TBranch        *b_eg_Et;   //!
-  TBranch        *b_eg_Eta;   //!
-  TBranch        *b_eg_Phi;   //!
-  TBranch        *b_eg_IEt;   //!
-  TBranch        *b_eg_IEta;   //!
-  TBranch        *b_eg_IPhi;   //!
-  TBranch        *b_eg_Iso;   //!
-  TBranch        *b_eg_Bx;   //!
-  TBranch        *b_eg_TowerIPhi;   //!
-  TBranch        *b_eg_TowerIEta;   //!
-  TBranch        *b_eg_RawEt;   //!
-  TBranch        *b_eg_IsoEt;   //!
-  TBranch        *b_eg_FootprintEt;   //!
-  TBranch        *b_eg_NTT;   //!
-  TBranch        *b_eg_Shape;   //!
-  TBranch        *b_eg_TowerHoE;   //!
-  TBranch        *b_tau_N;   //!
-  TBranch        *b_tau_Et;   //!
-  TBranch        *b_tau_Eta;   //!
-  TBranch        *b_tau_Phi;   //!
-  TBranch        *b_tau_IEt;   //!
-  TBranch        *b_tau_IEta;   //!
-  TBranch        *b_tau_IPhi;   //!
-  TBranch        *b_tau_Iso;   //!
-  TBranch        *b_tau_Bx;   //!
-  TBranch        *b_tau_TowerIPhi;   //!
-  TBranch        *b_tau_TowerIEta;   //!
-  TBranch        *b_tau_RawEt;   //!
-  TBranch        *b_tau_IsoEt;   //!
-  TBranch        *b_tau_NTT;   //!
-  TBranch        *b_tau_HasEM;   //!
-  TBranch        *b_tau_IsMerged;   //!
-  TBranch        *b_tau_HwQual;   //!
-  TBranch        *b_jet_N;   //!
-  TBranch        *b_jet_Et;   //!
-  TBranch        *b_jet_Eta;   //!
-  TBranch        *b_jet_Phi;   //!
-  TBranch        *b_jet_IEt;   //!
-  TBranch        *b_jet_IEta;   //!
-  TBranch        *b_jet_IPhi;   //!
-  TBranch        *b_jet_Bx;   //!
-  TBranch        *b_jet_TowerIPhi;   //!
-  TBranch        *b_jet_TowerIEta;   //!
-  TBranch        *b_jet_RawEt;   //!
-  TBranch        *b_jet_SeedEt;   //!
-  TBranch        *b_jet_PUEt;   //!
-  TBranch        *b_jet_PUDonutEt0;   //!
-  TBranch        *b_jet_PUDonutEt1;   //!
-  TBranch        *b_jet_PUDonutEt2;   //!
-  TBranch        *b_jet_PUDonutEt3;   //!
-  TBranch        *b_muon_N;   //!
-  TBranch        *b_muon_Et;   //!
-  TBranch        *b_muon_Eta;   //!
-  TBranch        *b_muon_Phi;   //!
-  TBranch        *b_muon_EtaAtVtx;   //!
-  TBranch        *b_muon_PhiAtVtx;   //!
-  TBranch        *b_muon_IEt;   //!
-  TBranch        *b_muon_IEta;   //!
-  TBranch        *b_muon_IPhi;   //!
-  TBranch        *b_muon_IEtaAtVtx;   //!
-  TBranch        *b_muon_IPhiAtVtx;   //!
-  TBranch        *b_muon_IDEta;   //!
-  TBranch        *b_muon_IDPhi;   //!
-  TBranch        *b_muon_Chg;   //!
-  TBranch        *b_muon_Iso;   //!
-  TBranch        *b_muon_Qual;   //!
-  TBranch        *b_muon_TfMuon_Idx;   //!
-  TBranch        *b_muon_Bx;   //!
-  TBranch        *b_sum_N;   //!
-  TBranch        *b_sum_Type;   //!
-  TBranch        *b_sum_Et;   //!
-  TBranch        *b_sum_Phi;   //!
-  TBranch        *b_sum_IEt;   //!
-  TBranch        *b_sum_IPhi;   //!
-  TBranch        *b_sum_Bx;   //!
+  TBranch        *b_eg_N;   
+  TBranch        *b_eg_Et;   
+  TBranch        *b_eg_Eta;   
+  TBranch        *b_eg_Phi;   
+  TBranch        *b_eg_IEt;   
+  TBranch        *b_eg_IEta;   
+  TBranch        *b_eg_IPhi;   
+  TBranch        *b_eg_Iso;   
+  TBranch        *b_eg_Bx;   
+  TBranch        *b_eg_TowerIPhi;   
+  TBranch        *b_eg_TowerIEta;   
+  TBranch        *b_eg_RawEt;   
+  TBranch        *b_eg_IsoEt;   
+  TBranch        *b_eg_FootprintEt;   
+  TBranch        *b_eg_NTT;   
+  TBranch        *b_eg_Shape;   
+  TBranch        *b_eg_TowerHoE;   
+  TBranch        *b_tau_N;   
+  TBranch        *b_tau_Et;   
+  TBranch        *b_tau_Eta;   
+  TBranch        *b_tau_Phi;   
+  TBranch        *b_tau_IEt;   
+  TBranch        *b_tau_IEta;   
+  TBranch        *b_tau_IPhi;   
+  TBranch        *b_tau_Iso;   
+  TBranch        *b_tau_Bx;   
+  TBranch        *b_tau_TowerIPhi;   
+  TBranch        *b_tau_TowerIEta;   
+  TBranch        *b_tau_RawEt;   
+  TBranch        *b_tau_IsoEt;   
+  TBranch        *b_tau_NTT;   
+  TBranch        *b_tau_HasEM;   
+  TBranch        *b_tau_IsMerged;   
+  TBranch        *b_tau_HwQual;   
+  TBranch        *b_jet_N;   
+  TBranch        *b_jet_Et;   
+  TBranch        *b_jet_Eta;   
+  TBranch        *b_jet_Phi;   
+  TBranch        *b_jet_IEt;   
+  TBranch        *b_jet_IEta;   
+  TBranch        *b_jet_IPhi;   
+  TBranch        *b_jet_Bx;   
+  TBranch        *b_jet_TowerIPhi;   
+  TBranch        *b_jet_TowerIEta;   
+  TBranch        *b_jet_RawEt;   
+  TBranch        *b_jet_SeedEt;   
+  TBranch        *b_jet_PUEt;   
+  TBranch        *b_jet_PUDonutEt0;   
+  TBranch        *b_jet_PUDonutEt1;   
+  TBranch        *b_jet_PUDonutEt2;   
+  TBranch        *b_jet_PUDonutEt3;   
+  TBranch        *b_muon_N;   
+  TBranch        *b_muon_Et;   
+  TBranch        *b_muon_Eta;   
+  TBranch        *b_muon_Phi;   
+  TBranch        *b_muon_EtaAtVtx;   
+  TBranch        *b_muon_PhiAtVtx;   
+  TBranch        *b_muon_IEt;   
+  TBranch        *b_muon_IEta;   
+  TBranch        *b_muon_IPhi;   
+  TBranch        *b_muon_IEtaAtVtx;   
+  TBranch        *b_muon_IPhiAtVtx;   
+  TBranch        *b_muon_IDEta;   
+  TBranch        *b_muon_IDPhi;   
+  TBranch        *b_muon_Chg;   
+  TBranch        *b_muon_Iso;   
+  TBranch        *b_muon_Qual;   
+  TBranch        *b_muon_TfMuon_Idx;   
+  TBranch        *b_muon_Bx;   
+  TBranch        *b_sum_N;   
+  TBranch        *b_sum_Type;   
+  TBranch        *b_sum_Et;   
+  TBranch        *b_sum_Phi;   
+  TBranch        *b_sum_IEt;   
+  TBranch        *b_sum_IPhi;   
+  TBranch        *b_sum_Bx;   
 
 
   // uGT
-  TBranch        *b_m_orbitNr;   //!
-  TBranch        *b_m_bxNr;   //!
-  TBranch        *b_m_bxInEvent;   //!
-  TBranch        *b_m_finalOR;   //!
-  TBranch        *b_m_finalORPreVeto;   //!
-  TBranch        *b_m_finalORVeto;   //!
-  TBranch        *b_m_preScColumn;   //!
-  TBranch        *b_m_algoDecisionInitial;   //!
-  TBranch        *b_m_algoDecisionPreScaled;   //!
-  TBranch        *b_m_algoDecisionFinal;   //!
+  TBranch        *b_m_orbitNr;   
+  TBranch        *b_m_bxNr;   
+  TBranch        *b_m_bxInEvent;   
+  TBranch        *b_m_finalOR;   
+  TBranch        *b_m_finalORPreVeto;   
+  TBranch        *b_m_finalORVeto;   
+  TBranch        *b_m_preScColumn;   
+  TBranch        *b_m_algoDecisionInitial;   
+  TBranch        *b_m_algoDecisionPreScaled;   
+  TBranch        *b_m_algoDecisionFinal;   
 
 
   
   // HO
-  TBranch        *b_hcalDetId_N;   //!
-  TBranch        *b_hcalQIESample_N;   //!
-  TBranch        *b_hcalDetId_IEta;   //!
-  TBranch        *b_hcalDetId_IPhi;   //!
-  TBranch        *b_hcalQIESample;   //!
-  TBranch        *b_hcalQIESample_Adc;   //!
-  TBranch        *b_hcalQIESample_Dv;   //!
-  TBranch        *b_hcalQIESample_Er;   //!
-  
+  TBranch        *b_hcalDetId_N;   
+  TBranch        *b_hcalQIESample_N;   
+  TBranch        *b_hcalDetId_IEta;   
+  TBranch        *b_hcalDetId_IPhi;   
+  TBranch        *b_hcalQIESample;   
+  TBranch        *b_hcalQIESample_Adc;   
+  TBranch        *b_hcalQIESample_Dv;   
+  TBranch        *b_hcalQIESample_Er;   
+
+
+  // =========================================== EMULATOR TREES =============================================
 
 
   // Calo Tower Emulator
@@ -424,6 +532,108 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_caloTowerEmu_et;   
   TBranch        *b_caloTowerEmu_eta;  
   TBranch        *b_caloTowerEmu_phi;  
+
+  //==Calo Clusters (Emu)
+  TBranch        *b_caloClusterEmu_N;   
+  TBranch        *b_caloClusterEmu_ieta;   
+  TBranch        *b_caloClusterEmu_iphi;   
+  TBranch        *b_caloClusterEmu_iet;   
+  TBranch        *b_caloClusterEmu_iqual;   
+  TBranch        *b_caloClusterEmu_et;   
+  TBranch        *b_caloClusterEmu_eta;   
+  TBranch        *b_caloClusterEmu_phi;   
+  
+
+  // Upgrade Emulator
+  TBranch        *b_egEmu_N;  
+  TBranch        *b_egEmu_Et;   
+  TBranch        *b_egEmu_Eta;   
+  TBranch        *b_egEmu_Phi;   
+  TBranch        *b_egEmu_IEt;   
+  TBranch        *b_egEmu_IEta;   
+  TBranch        *b_egEmu_IPhi;   
+  TBranch        *b_egEmu_Iso;   
+  TBranch        *b_egEmu_Bx;   
+  TBranch        *b_egEmu_TowerIPhi;   
+  TBranch        *b_egEmu_TowerIEta;   
+  TBranch        *b_egEmu_RawEt;   
+  TBranch        *b_egEmu_IsoEt;   
+  TBranch        *b_egEmu_FootprintEt;   
+  TBranch        *b_egEmu_NTT;   
+  TBranch        *b_egEmu_Shape;   
+  TBranch        *b_egEmu_TowerHoE;   
+  TBranch        *b_tauEmu_N;   
+  TBranch        *b_tauEmu_Et;   
+  TBranch        *b_tauEmu_Eta;   
+  TBranch        *b_tauEmu_Phi;   
+  TBranch        *b_tauEmu_IEt;   
+  TBranch        *b_tauEmu_IEta;   
+  TBranch        *b_tauEmu_IPhi;   
+  TBranch        *b_tauEmu_Iso;   
+  TBranch        *b_tauEmu_Bx;   
+  TBranch        *b_tauEmu_TowerIPhi;   
+  TBranch        *b_tauEmu_TowerIEta;   
+  TBranch        *b_tauEmu_RawEt;   
+  TBranch        *b_tauEmu_IsoEt;   
+  TBranch        *b_tauEmu_NTT;   
+  TBranch        *b_tauEmu_HasEM;   
+  TBranch        *b_tauEmu_IsMerged;   
+  TBranch        *b_tauEmu_HwQual;   
+  TBranch        *b_jetEmu_N;   
+  TBranch        *b_jetEmu_Et;   
+  TBranch        *b_jetEmu_Eta;   
+  TBranch        *b_jetEmu_Phi;   
+  TBranch        *b_jetEmu_IEt;   
+  TBranch        *b_jetEmu_IEta;   
+  TBranch        *b_jetEmu_IPhi;   
+  TBranch        *b_jetEmu_Bx;   
+  TBranch        *b_jetEmu_TowerIPhi;   
+  TBranch        *b_jetEmu_TowerIEta;   
+  TBranch        *b_jetEmu_RawEt;   
+  TBranch        *b_jetEmu_SeedEt;   
+  TBranch        *b_jetEmu_PUEt;   
+  TBranch        *b_jetEmu_PUDonutEt0;   
+  TBranch        *b_jetEmu_PUDonutEt1;   
+  TBranch        *b_jetEmu_PUDonutEt2;   
+  TBranch        *b_jetEmu_PUDonutEt3;   
+  TBranch        *b_muonEmu_N;   
+  TBranch        *b_muonEmu_Et;   
+  TBranch        *b_muonEmu_Eta;   
+  TBranch        *b_muonEmu_Phi;   
+  TBranch        *b_muonEmu_EtaAtVtx;   
+  TBranch        *b_muonEmu_PhiAtVtx;   
+  TBranch        *b_muonEmu_IEt;   
+  TBranch        *b_muonEmu_IEta;   
+  TBranch        *b_muonEmu_IPhi;   
+  TBranch        *b_muonEmu_IEtaAtVtx;   
+  TBranch        *b_muonEmu_IPhiAtVtx;   
+  TBranch        *b_muonEmu_IDEta;   
+  TBranch        *b_muonEmu_IDPhi;   
+  TBranch        *b_muonEmu_Chg;   
+  TBranch        *b_muonEmu_Iso;   
+  TBranch        *b_muonEmu_Qual;   
+  TBranch        *b_muonEmu_TfMuon_Idx;   
+  TBranch        *b_muonEmu_Bx;   
+  TBranch        *b_sumEmu_N;   
+  TBranch        *b_sumEmu_Type;   
+  TBranch        *b_sumEmu_Et;   
+  TBranch        *b_sumEmu_Phi;   
+  TBranch        *b_sumEmu_IEt;   
+  TBranch        *b_sumEmu_IPhi;   
+  TBranch        *b_sumEmu_Bx;   
+
+
+  // uGT Emulator
+  TBranch        *b_mEmu_orbitNr;   
+  TBranch        *b_mEmu_bxNr;   
+  TBranch        *b_mEmu_bxInEvent;   
+  TBranch        *b_mEmu_finalOR;   
+  TBranch        *b_mEmu_finalORPreVeto;   
+  TBranch        *b_mEmu_finalORVeto;   
+  TBranch        *b_mEmu_preScColumn;   
+  TBranch        *b_mEmu_algoDecisionInitial;   
+  TBranch        *b_mEmu_algoDecisionPreScaled;   
+  TBranch        *b_mEmu_algoDecisionFinal;   
 
 
 
@@ -485,12 +695,34 @@ void TreeDefinitionReco::InitReco(TChain *chain)
   hcalDetId_N     = 0;
   hcalQIESample_N = 0;
 
+  // =========================================== EMULATOR TREES =============================================
+
 
   // Calo Towers Emulator
-  hcalTPEmu_N    = 0;
-  ecalTPEmu_N    = 0;
-  ecalEBTPEmu_N  = 0;
-  caloTowerEmu_N = 0;
+  hcalTPEmu_N      = 0;
+  ecalTPEmu_N      = 0;
+  ecalEBTPEmu_N    = 0;
+  caloTowerEmu_N   = 0;
+  caloClusterEmu_N = 0;
+
+
+  // Upgrade Emulator
+  egEmu_N    = 0;
+  tauEmu_N   = 0;
+  jetEmu_N   = 0;
+  muonEmu_N  = 0;
+  sumEmu_N   = 0;
+
+
+  // uGT Emulator
+  mEmu_orbitNr        = 0;
+  mEmu_bxNr           = 0;
+  mEmu_bxInEvent      = 0;
+  mEmu_finalOR        = false; //CHECK (MARINA)
+  mEmu_finalORPreVeto = false; //CHECK (MARINA)
+  mEmu_finalORVeto    = false; //CHECK (MARINA)
+  mEmu_preScColumn    = 0;
+
 
 
   cout << "\tSetting branch addresses and branch pointers." << endl;
@@ -498,10 +730,9 @@ void TreeDefinitionReco::InitReco(TChain *chain)
   fChain = chain ;
   fCurrent = -1;
 
-  cout << "**********************1**********************" << endl;
 
 
-  // Event
+  // Event (MainChain)
   if(1)                                                                                                                                                                 
     { 
       fChain->SetBranchAddress("run", &run, &b_Event_run);
@@ -516,7 +747,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fChain->SetBranchAddress("puWeight", &puWeight, &b_Event_puWeight);
     }
 
-  cout << "*********************2***********************" << endl;
+
 
   // Calo Towers
   if(1)
@@ -587,6 +818,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fUpgrade->SetBranchAddress("egNTT", &eg_NTT, &b_eg_NTT);
       fUpgrade->SetBranchAddress("egShape", &eg_Shape, &b_eg_Shape);
       fUpgrade->SetBranchAddress("egTowerHoE", &eg_TowerHoE, &b_eg_TowerHoE);
+
       fUpgrade->SetBranchAddress("nTaus", &tau_N, &b_tau_N);
       fUpgrade->SetBranchAddress("tauEt", &tau_Et, &b_tau_Et);
       fUpgrade->SetBranchAddress("tauEta", &tau_Eta, &b_tau_Eta);
@@ -604,6 +836,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fUpgrade->SetBranchAddress("tauHasEM", &tau_HasEM, &b_tau_HasEM);
       fUpgrade->SetBranchAddress("tauIsMerged", &tau_IsMerged, &b_tau_IsMerged);
       fUpgrade->SetBranchAddress("tauHwQual", &tau_HwQual, &b_tau_HwQual);
+
       fUpgrade->SetBranchAddress("nJets", &jet_N, &b_jet_N);
       fUpgrade->SetBranchAddress("jetEt", &jet_Et, &b_jet_Et);
       fUpgrade->SetBranchAddress("jetEta", &jet_Eta, &b_jet_Eta);
@@ -621,6 +854,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fUpgrade->SetBranchAddress("jetPUDonutEt1", &jet_PUDonutEt1, &b_jet_PUDonutEt1);
       fUpgrade->SetBranchAddress("jetPUDonutEt2", &jet_PUDonutEt2, &b_jet_PUDonutEt2);
       fUpgrade->SetBranchAddress("jetPUDonutEt3", &jet_PUDonutEt3, &b_jet_PUDonutEt3);
+
       fUpgrade->SetBranchAddress("nMuons", &muon_N, &b_muon_N);
       fUpgrade->SetBranchAddress("muonEt", &muon_Et, &b_muon_Et);
       fUpgrade->SetBranchAddress("muonEta", &muon_Eta, &b_muon_Eta);
@@ -639,6 +873,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fUpgrade->SetBranchAddress("muonQual", &muon_Qual, &b_muon_Qual);
       fUpgrade->SetBranchAddress("muonTfMuonIdx", &muon_TfMuon_Idx, &b_muon_TfMuon_Idx);
       fUpgrade->SetBranchAddress("muonBx", &muon_Bx, &b_muon_Bx);
+
       fUpgrade->SetBranchAddress("nSums", &sum_N, &b_sum_N);
       fUpgrade->SetBranchAddress("sumType", &sum_Type, &b_sum_Type);
       fUpgrade->SetBranchAddress("sumEt", &sum_Et, &b_sum_Et);
@@ -690,9 +925,10 @@ void TreeDefinitionReco::InitReco(TChain *chain)
   // Add friend (HOTree)
   fChain -> AddFriend(fHO);
   
-
-
     
+  // =========================================== EMULATOR TREES =============================================
+
+
   // Calo Towers Emulator
   if(1)
     {
@@ -735,19 +971,135 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fCaloTowerEmu->SetBranchAddress("et", &caloTowerEmu_et, &b_caloTowerEmu_et);
       fCaloTowerEmu->SetBranchAddress("eta", &caloTowerEmu_eta, &b_caloTowerEmu_eta);
       fCaloTowerEmu->SetBranchAddress("phi", &caloTowerEmu_phi, &b_caloTowerEmu_phi);
-    }
 
-  cout << "**********************4**********************" << endl;
+
+      // Calo Clusters (Emu)
+      fCaloTowerEmu->SetBranchAddress("ieta", &caloClusterEmu_ieta, &b_caloClusterEmu_ieta);
+      fCaloTowerEmu->SetBranchAddress("iphi", &caloClusterEmu_iphi, &b_caloClusterEmu_iphi);
+      fCaloTowerEmu->SetBranchAddress("iet", &caloClusterEmu_iet, &b_caloClusterEmu_iet);
+      fCaloTowerEmu->SetBranchAddress("iqual", &caloClusterEmu_iqual, &b_caloClusterEmu_iqual);
+      fCaloTowerEmu->SetBranchAddress("et", &caloClusterEmu_et, &b_caloClusterEmu_et);
+      fCaloTowerEmu->SetBranchAddress("eta", &caloClusterEmu_eta, &b_caloClusterEmu_eta);
+      fCaloTowerEmu->SetBranchAddress("phi", &caloClusterEmu_phi, &b_caloClusterEmu_phi);
+
+
+    }
 
   // Add Friend (CaloTowerEmuTree) 
   fChain -> AddFriend(fCaloTowerEmu);
 
-  cout << "**********************4a**********************" << endl;
+
+  // Upgrade Emulator
+  if(1)
+    {
+      fUpgradeEmu->SetBranchAddress("nEGs", &egEmu_N, &b_egEmu_N);
+      fUpgradeEmu->SetBranchAddress("egEt", &egEmu_Et, &b_egEmu_Et);
+      fUpgradeEmu->SetBranchAddress("egEta", &egEmu_Eta, &b_egEmu_Eta);
+      fUpgradeEmu->SetBranchAddress("egPhi", &egEmu_Phi, &b_egEmu_Phi);
+      fUpgradeEmu->SetBranchAddress("egIEt", &egEmu_IEt, &b_egEmu_IEt);
+      fUpgradeEmu->SetBranchAddress("egIEta", &egEmu_IEta, &b_egEmu_IEta);
+      fUpgradeEmu->SetBranchAddress("egIPhi", &egEmu_IPhi, &b_egEmu_IPhi);
+      fUpgradeEmu->SetBranchAddress("egIso", &egEmu_Iso, &b_egEmu_Iso);
+      fUpgradeEmu->SetBranchAddress("egBx", &egEmu_Bx, &b_egEmu_Bx);
+      fUpgradeEmu->SetBranchAddress("egTowerIPhi", &egEmu_TowerIPhi, &b_egEmu_TowerIPhi);
+      fUpgradeEmu->SetBranchAddress("egTowerIEta", &egEmu_TowerIEta, &b_egEmu_TowerIEta);
+      fUpgradeEmu->SetBranchAddress("egRawEt", &egEmu_RawEt, &b_egEmu_RawEt);
+      fUpgradeEmu->SetBranchAddress("egIsoEt", &egEmu_IsoEt, &b_egEmu_IsoEt);
+      fUpgradeEmu->SetBranchAddress("egFootprintEt", &egEmu_FootprintEt, &b_egEmu_FootprintEt);
+      fUpgradeEmu->SetBranchAddress("egNTT", &egEmu_NTT, &b_egEmu_NTT);
+      fUpgradeEmu->SetBranchAddress("egShape", &egEmu_Shape, &b_egEmu_Shape);
+      fUpgradeEmu->SetBranchAddress("egTowerHoE", &egEmu_TowerHoE, &b_egEmu_TowerHoE);
+      fUpgradeEmu->SetBranchAddress("nTaus", &tauEmu_N, &b_tauEmu_N);
+      fUpgradeEmu->SetBranchAddress("tauEt", &tauEmu_Et, &b_tauEmu_Et);
+      fUpgradeEmu->SetBranchAddress("tauEta", &tauEmu_Eta, &b_tauEmu_Eta);
+      fUpgradeEmu->SetBranchAddress("tauPhi", &tauEmu_Phi, &b_tauEmu_Phi);
+      fUpgradeEmu->SetBranchAddress("tauIEt", &tauEmu_IEt, &b_tauEmu_IEt);
+      fUpgradeEmu->SetBranchAddress("tauIEta", &tauEmu_IEta, &b_tauEmu_IEta);
+      fUpgradeEmu->SetBranchAddress("tauIPhi", &tauEmu_IPhi, &b_tauEmu_IPhi);
+      fUpgradeEmu->SetBranchAddress("tauIso", &tauEmu_Iso, &b_tauEmu_Iso);
+      fUpgradeEmu->SetBranchAddress("tauBx", &tauEmu_Bx, &b_tauEmu_Bx);
+      fUpgradeEmu->SetBranchAddress("tauTowerIPhi", &tauEmu_TowerIPhi, &b_tauEmu_TowerIPhi);
+      fUpgradeEmu->SetBranchAddress("tauTowerIEta", &tauEmu_TowerIEta, &b_tauEmu_TowerIEta);
+      fUpgradeEmu->SetBranchAddress("tauRawEt", &tauEmu_RawEt, &b_tauEmu_RawEt);
+      fUpgradeEmu->SetBranchAddress("tauIsoEt", &tauEmu_IsoEt, &b_tauEmu_IsoEt);
+      fUpgradeEmu->SetBranchAddress("tauNTT", &tauEmu_NTT, &b_tauEmu_NTT);
+      fUpgradeEmu->SetBranchAddress("tauHasEM", &tauEmu_HasEM, &b_tauEmu_HasEM);
+      fUpgradeEmu->SetBranchAddress("tauIsMerged", &tauEmu_IsMerged, &b_tauEmu_IsMerged);
+      fUpgradeEmu->SetBranchAddress("tauHwQual", &tauEmu_HwQual, &b_tauEmu_HwQual);
+      fUpgradeEmu->SetBranchAddress("nJets", &jetEmu_N, &b_jetEmu_N);
+      fUpgradeEmu->SetBranchAddress("jetEt", &jetEmu_Et, &b_jetEmu_Et);
+      fUpgradeEmu->SetBranchAddress("jetEta", &jetEmu_Eta, &b_jetEmu_Eta);
+      fUpgradeEmu->SetBranchAddress("jetPhi", &jetEmu_Phi, &b_jetEmu_Phi);
+      fUpgradeEmu->SetBranchAddress("jetIEt", &jetEmu_IEt, &b_jetEmu_IEt);
+      fUpgradeEmu->SetBranchAddress("jetIEta", &jetEmu_IEta, &b_jetEmu_IEta);
+      fUpgradeEmu->SetBranchAddress("jetIPhi", &jetEmu_IPhi, &b_jetEmu_IPhi);
+      fUpgradeEmu->SetBranchAddress("jetBx", &jetEmu_Bx, &b_jetEmu_Bx);
+      fUpgradeEmu->SetBranchAddress("jetTowerIPhi", &jetEmu_TowerIPhi, &b_jetEmu_TowerIPhi);
+      fUpgradeEmu->SetBranchAddress("jetTowerIEta", &jetEmu_TowerIEta, &b_jetEmu_TowerIEta);
+      fUpgradeEmu->SetBranchAddress("jetRawEt", &jetEmu_RawEt, &b_jetEmu_RawEt);
+      fUpgradeEmu->SetBranchAddress("jetSeedEt", &jetEmu_SeedEt, &b_jetEmu_SeedEt);
+      fUpgradeEmu->SetBranchAddress("jetPUEt", &jetEmu_PUEt, &b_jetEmu_PUEt);
+      fUpgradeEmu->SetBranchAddress("jetPUDonutEt0", &jetEmu_PUDonutEt0, &b_jetEmu_PUDonutEt0);
+      fUpgradeEmu->SetBranchAddress("jetPUDonutEt1", &jetEmu_PUDonutEt1, &b_jetEmu_PUDonutEt1);
+      fUpgradeEmu->SetBranchAddress("jetPUDonutEt2", &jetEmu_PUDonutEt2, &b_jetEmu_PUDonutEt2);
+      fUpgradeEmu->SetBranchAddress("jetPUDonutEt3", &jetEmu_PUDonutEt3, &b_jetEmu_PUDonutEt3);
+      fUpgradeEmu->SetBranchAddress("nMuons", &muonEmu_N, &b_muonEmu_N);
+      fUpgradeEmu->SetBranchAddress("muonEt", &muonEmu_Et, &b_muonEmu_Et);
+      fUpgradeEmu->SetBranchAddress("muonEta", &muonEmu_Eta, &b_muonEmu_Eta);
+      fUpgradeEmu->SetBranchAddress("muonPhi", &muonEmu_Phi, &b_muonEmu_Phi);
+      fUpgradeEmu->SetBranchAddress("muonEtaAtVtx", &muonEmu_EtaAtVtx, &b_muonEmu_EtaAtVtx);
+      fUpgradeEmu->SetBranchAddress("muonPhiAtVtx", &muonEmu_PhiAtVtx, &b_muonEmu_PhiAtVtx);
+      fUpgradeEmu->SetBranchAddress("muonIEt", &muonEmu_IEt, &b_muonEmu_IEt);
+      fUpgradeEmu->SetBranchAddress("muonIEta", &muonEmu_IEta, &b_muonEmu_IEta);
+      fUpgradeEmu->SetBranchAddress("muonIPhi", &muonEmu_IPhi, &b_muonEmu_IPhi);
+      fUpgradeEmu->SetBranchAddress("muonIEtaAtVtx", &muonEmu_IEtaAtVtx, &b_muonEmu_IEtaAtVtx);
+      fUpgradeEmu->SetBranchAddress("muonIPhiAtVtx", &muonEmu_IPhiAtVtx, &b_muonEmu_IPhiAtVtx);
+      fUpgradeEmu->SetBranchAddress("muonIDEta", &muonEmu_IDEta, &b_muonEmu_IDEta);
+      fUpgradeEmu->SetBranchAddress("muonIDPhi", &muonEmu_IDPhi, &b_muonEmu_IDPhi);
+      fUpgradeEmu->SetBranchAddress("muonChg", &muonEmu_Chg, &b_muonEmu_Chg);
+      fUpgradeEmu->SetBranchAddress("muonIso", &muonEmu_Iso, &b_muonEmu_Iso);
+      fUpgradeEmu->SetBranchAddress("muonQual", &muonEmu_Qual, &b_muonEmu_Qual);
+      fUpgradeEmu->SetBranchAddress("muonTfMuonIdx", &muonEmu_TfMuon_Idx, &b_muonEmu_TfMuon_Idx);
+      fUpgradeEmu->SetBranchAddress("muonBx", &muonEmu_Bx, &b_muonEmu_Bx);
+      fUpgradeEmu->SetBranchAddress("nSums", &sumEmu_N, &b_sumEmu_N);
+      fUpgradeEmu->SetBranchAddress("sumType", &sumEmu_Type, &b_sumEmu_Type);
+      fUpgradeEmu->SetBranchAddress("sumEt", &sumEmu_Et, &b_sumEmu_Et);
+      fUpgradeEmu->SetBranchAddress("sumPhi", &sumEmu_Phi, &b_sumEmu_Phi);
+      fUpgradeEmu->SetBranchAddress("sumIEt", &sumEmu_IEt, &b_sumEmu_IEt);
+      fUpgradeEmu->SetBranchAddress("sumIPhi", &sumEmu_IPhi, &b_sumEmu_IPhi);
+      fUpgradeEmu->SetBranchAddress("sumBx", &sumEmu_Bx, &b_sumEmu_Bx);
+    }
+  
+  // Add friend (UpgradeEmuTree)
+  fChain -> AddFriend(fUpgradeEmu);
 
 
 
-  cout << "**********************SETMAKECLASS-1**********************" << endl;
+  // uGT Emulator
+  if(1)
+    {
+      fuGTEmu->SetBranchAddress("m_orbitNr", &mEmu_orbitNr, &b_mEmu_orbitNr);
+      fuGTEmu->SetBranchAddress("m_bxNr", &mEmu_bxNr, &b_mEmu_bxNr);
+      fuGTEmu->SetBranchAddress("m_bxInEvent", &mEmu_bxInEvent, &b_mEmu_bxInEvent);
+      fuGTEmu->SetBranchAddress("m_finalOR", &mEmu_finalOR, &b_mEmu_finalOR);
+      fuGTEmu->SetBranchAddress("m_finalORPreVeto", &mEmu_finalORPreVeto, &b_mEmu_finalORPreVeto);
+      fuGTEmu->SetBranchAddress("m_finalORVeto", &mEmu_finalORVeto, &b_mEmu_finalORVeto);
+      fuGTEmu->SetBranchAddress("m_preScColumn", &mEmu_preScColumn, &b_mEmu_preScColumn);
+      fuGTEmu->SetBranchAddress("m_algoDecisionInitial", &mEmu_algoDecisionInitial, &b_mEmu_algoDecisionInitial);
+      fuGTEmu->SetBranchAddress("m_algoDecisionPreScaled", &mEmu_algoDecisionPreScaled, &b_mEmu_algoDecisionPreScaled);
+      fuGTEmu->SetBranchAddress("m_algoDecisionFinal", &mEmu_algoDecisionFinal, &b_mEmu_algoDecisionFinal);
+    }
 
+
+  // Add friend (uGTEmuTree) 
+  fChain -> AddFriend(fuGTEmu);
+
+
+
+
+
+  //cout << "**********************SETMAKECLASS-1**********************" << endl;
+  
   fChain->SetMakeClass(1);
   
   //TList *friendTreeElement2 = fChain->GetListOfFriends();                                                                                                 
@@ -760,7 +1112,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
     friendTreeElement = (TFriendElement*)fChain->GetListOfFriends()->After(friendTreeElement);
   }                                                                                                                                                                      
 
-  cout << "**********************SETMAKECLASS-2**********************" << endl;
+  //  cout << "**********************SETMAKECLASS-2**********************" << endl;
 
 
 
