@@ -11,7 +11,6 @@ class TreeDefinitionGenP : public virtual TreeDefinitionBase
 {
  public:
 
-
   Float_t    weight;
   Float_t    pthat;
   UInt_t   nVtx;
@@ -27,7 +26,6 @@ class TreeDefinitionGenP : public virtual TreeDefinitionBase
   std::vector<float>  GenP_Phi;
   std::vector<float>  GenP_E;
   std::vector<int>    GenP_Charge;
-  
 
   // GenJets 
   Int_t           GenJet_N;
@@ -35,8 +33,6 @@ class TreeDefinitionGenP : public virtual TreeDefinitionBase
   vector<float>   GenJet_Eta;
   vector<float>   GenJet_Phi;
   vector<float>   GenJet_M;
-
-  
 
   // **************List of branches***************
 
@@ -63,13 +59,10 @@ class TreeDefinitionGenP : public virtual TreeDefinitionBase
   TBranch *b_GenJet_Phi;
   TBranch *b_GenJet_M;  
 
-
-
   virtual void InitGenP(TChain *chain);
 
 };
 
-//void TreeDefinitionGenP::InitGenP(TTree *tree)
 void TreeDefinitionGenP::InitGenP(TChain *chain)
 {
   // The Init() function is called when the selector needs to initialize
@@ -80,21 +73,17 @@ void TreeDefinitionGenP::InitGenP(TChain *chain)
   // Init() will be called many times when running on PROOF
   // (once per file to be processed).
   std::cout << "=== TreeDefinitionGenP::InitGenP()" << std::endl;
-   
-
 
   weight  = 0;
   pthat   = 0;
   nVtx    = 0;
   nMeanPU = 0;
-  
-  
+
   // GenParticles
   GenP_N    = 0;
   
   // GenJets
   GenJet_N  = 0;
-
 
   // Set branch addresses and branch pointers
   if (!chain) return;
@@ -103,7 +92,7 @@ void TreeDefinitionGenP::InitGenP(TChain *chain)
   fChain->SetMakeClass(1);
 
   // L1 GEN info
-  if (1)
+  if (doGenerator)
     {
       fGenerator->SetBranchAddress("weight"       , &weight      , &b_weight);
       fGenerator->SetBranchAddress("pthat"        , &pthat       , &b_pthat);
@@ -126,18 +115,14 @@ void TreeDefinitionGenP::InitGenP(TChain *chain)
       fGenerator->SetBranchAddress("jetEta"       , &GenJet_Eta  , &b_GenJet_Eta);
       fGenerator->SetBranchAddress("jetPhi"       , &GenJet_Phi  , &b_GenJet_Phi);
       fGenerator->SetBranchAddress("jetM"         , &GenJet_M    , &b_GenJet_M);
-
-
+      
+      // Add friend (GeneratorTree)
+      fChain -> AddFriend(fGenerator);
     }
 
-  // Add friend (GeneratorTree)
-  //fChain     -> AddFriend(fGenerator);
-  fChain     -> AddFriend(fGenerator);
-
+  // Set Make Class for Generator tree
   TFriendElement *friendTreeElement = (TFriendElement*)fChain->GetListOfFriends()->Last();
   friendTreeElement->GetTree()->SetMakeClass(1);
-
-
 
   return;
 

@@ -1,3 +1,4 @@
+
 #ifndef TreeDefinitionBase_h
 #define TreeDefinitionBase_h
 
@@ -30,7 +31,7 @@ class TreeDefinitionBase
      bool doUpgradeEmu;
      bool douGTEmu;
      bool doGenerator;
-     bool doCheck; // CHECK!
+     //bool doCheck; // CHECK!
      
      virtual Bool_t  Notify();
      virtual void    Show(Long64_t entry = -1);

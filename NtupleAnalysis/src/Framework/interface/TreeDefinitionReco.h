@@ -68,7 +68,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   // UpgradeTfMuon
   // ****Fix me
  
-
   // Upgrade
   UShort_t        eg_N;
   vector<float>   eg_Et;
@@ -151,8 +150,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<short>   sum_IPhi;
   vector<float>   sum_Bx;
 
-
-
   // uGT
   Int_t           m_orbitNr;
   Int_t           m_bxNr;
@@ -165,8 +162,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<bool>    m_algoDecisionPreScaled;
   vector<bool>    m_algoDecisionFinal;
 
-
-
   // HO
   UInt_t          hcalDetId_N;
   UInt_t          hcalQIESample_N;
@@ -178,7 +173,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<int>     hcalQIESample_Er;
 
   // =========================================== EMULATOR TREES =============================================
-
 
   // Calo Towers Emulator
   //==Calo TPs (Emu)
@@ -229,7 +223,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<float>   caloClusterEmu_et;
   vector<float>   caloClusterEmu_eta;
   vector<float>   caloClusterEmu_phi;
-
 
   // Upgrade Emulator
   UShort_t        egEmu_N;
@@ -313,7 +306,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<short>   sumEmu_IPhi;
   vector<float>   sumEmu_Bx;
 
-
   // uGT Emulator
   Int_t           mEmu_orbitNr;
   Int_t           mEmu_bxNr;
@@ -326,11 +318,7 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<bool>    mEmu_algoDecisionPreScaled;
   vector<bool>    mEmu_algoDecisionFinal;
 
-
-  
-
-
-  //********* List of branches **********
+ //********* List of branches **********
 
   // Event
   TBranch        *b_Event_run;
@@ -384,8 +372,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_caloTower_eta;  
   TBranch        *b_caloTower_phi;  
 
-
-
   // Upgrade
   TBranch        *b_eg_N;   
   TBranch        *b_eg_Et;   
@@ -404,6 +390,7 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_eg_NTT;   
   TBranch        *b_eg_Shape;   
   TBranch        *b_eg_TowerHoE;   
+
   TBranch        *b_tau_N;   
   TBranch        *b_tau_Et;   
   TBranch        *b_tau_Eta;   
@@ -421,6 +408,7 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_tau_HasEM;   
   TBranch        *b_tau_IsMerged;   
   TBranch        *b_tau_HwQual;   
+
   TBranch        *b_jet_N;   
   TBranch        *b_jet_Et;   
   TBranch        *b_jet_Eta;   
@@ -438,6 +426,7 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_jet_PUDonutEt1;   
   TBranch        *b_jet_PUDonutEt2;   
   TBranch        *b_jet_PUDonutEt3;   
+
   TBranch        *b_muon_N;   
   TBranch        *b_muon_Et;   
   TBranch        *b_muon_Eta;   
@@ -456,6 +445,7 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_muon_Qual;   
   TBranch        *b_muon_TfMuon_Idx;   
   TBranch        *b_muon_Bx;   
+
   TBranch        *b_sum_N;   
   TBranch        *b_sum_Type;   
   TBranch        *b_sum_Et;   
@@ -463,7 +453,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_sum_IEt;   
   TBranch        *b_sum_IPhi;   
   TBranch        *b_sum_Bx;   
-
 
   // uGT
   TBranch        *b_m_orbitNr;   
@@ -476,8 +465,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_m_algoDecisionInitial;   
   TBranch        *b_m_algoDecisionPreScaled;   
   TBranch        *b_m_algoDecisionFinal;   
-
-
   
   // HO
   TBranch        *b_hcalDetId_N;   
@@ -489,9 +476,7 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_hcalQIESample_Dv;   
   TBranch        *b_hcalQIESample_Er;   
 
-
   // =========================================== EMULATOR TREES =============================================
-
 
   // Calo Tower Emulator
   //==CaloTP (Emu)
@@ -542,7 +527,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_caloClusterEmu_et;   
   TBranch        *b_caloClusterEmu_eta;   
   TBranch        *b_caloClusterEmu_phi;   
-  
 
   // Upgrade Emulator
   TBranch        *b_egEmu_N;  
@@ -562,6 +546,7 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_egEmu_NTT;   
   TBranch        *b_egEmu_Shape;   
   TBranch        *b_egEmu_TowerHoE;   
+
   TBranch        *b_tauEmu_N;   
   TBranch        *b_tauEmu_Et;   
   TBranch        *b_tauEmu_Eta;   
@@ -579,6 +564,7 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_tauEmu_HasEM;   
   TBranch        *b_tauEmu_IsMerged;   
   TBranch        *b_tauEmu_HwQual;   
+
   TBranch        *b_jetEmu_N;   
   TBranch        *b_jetEmu_Et;   
   TBranch        *b_jetEmu_Eta;   
@@ -596,6 +582,7 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_jetEmu_PUDonutEt1;   
   TBranch        *b_jetEmu_PUDonutEt2;   
   TBranch        *b_jetEmu_PUDonutEt3;   
+
   TBranch        *b_muonEmu_N;   
   TBranch        *b_muonEmu_Et;   
   TBranch        *b_muonEmu_Eta;   
@@ -614,6 +601,7 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_muonEmu_Qual;   
   TBranch        *b_muonEmu_TfMuon_Idx;   
   TBranch        *b_muonEmu_Bx;   
+
   TBranch        *b_sumEmu_N;   
   TBranch        *b_sumEmu_Type;   
   TBranch        *b_sumEmu_Et;   
@@ -621,7 +609,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_sumEmu_IEt;   
   TBranch        *b_sumEmu_IPhi;   
   TBranch        *b_sumEmu_Bx;   
-
 
   // uGT Emulator
   TBranch        *b_mEmu_orbitNr;   
@@ -635,14 +622,10 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_mEmu_algoDecisionPreScaled;   
   TBranch        *b_mEmu_algoDecisionFinal;   
 
-
-
-
   virtual void InitReco(TChain *chain);
   
 };
 
-//void TreeDefinitionReco::InitReco(TTree *tree)
 void TreeDefinitionReco::InitReco(TChain *chain)
 {
   // The Init() function is called when the selector needs to initialize
@@ -655,7 +638,6 @@ void TreeDefinitionReco::InitReco(TChain *chain)
 
   cout << "=== TreeDefinitionReco::InitReco()" << endl;
   
-
   // Event
   run      = 0;
   event    = 0;
@@ -666,7 +648,6 @@ void TreeDefinitionReco::InitReco(TChain *chain)
   nPV      = 0;
   nPV_True = 0;
   puWeight = 0;
-
 
   // Calo Towers
   hcalTP_N    = 0;
@@ -690,13 +671,11 @@ void TreeDefinitionReco::InitReco(TChain *chain)
   m_finalORVeto    = false; //CHECK (MARINA)
   m_preScColumn    = 0;
   
-  
   // HO
   hcalDetId_N     = 0;
   hcalQIESample_N = 0;
 
   // =========================================== EMULATOR TREES =============================================
-
 
   // Calo Towers Emulator
   hcalTPEmu_N      = 0;
@@ -705,7 +684,6 @@ void TreeDefinitionReco::InitReco(TChain *chain)
   caloTowerEmu_N   = 0;
   caloClusterEmu_N = 0;
 
-
   // Upgrade Emulator
   egEmu_N    = 0;
   tauEmu_N   = 0;
@@ -713,24 +691,19 @@ void TreeDefinitionReco::InitReco(TChain *chain)
   muonEmu_N  = 0;
   sumEmu_N   = 0;
 
-
   // uGT Emulator
   mEmu_orbitNr        = 0;
   mEmu_bxNr           = 0;
   mEmu_bxInEvent      = 0;
-  mEmu_finalOR        = false; //CHECK (MARINA)
-  mEmu_finalORPreVeto = false; //CHECK (MARINA)
-  mEmu_finalORVeto    = false; //CHECK (MARINA)
+  mEmu_finalOR        = false; 
+  mEmu_finalORPreVeto = false; 
+  mEmu_finalORVeto    = false; 
   mEmu_preScColumn    = 0;
-
-
 
   cout << "\tSetting branch addresses and branch pointers." << endl;
   if (!chain) return;
   fChain = chain ;
   fCurrent = -1;
-
-
 
   // Event (MainChain)
   if(1)                                                                                                                                                                 
@@ -746,8 +719,6 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fChain->SetBranchAddress("hlt", &hlt, &b_Event_hlt);
       fChain->SetBranchAddress("puWeight", &puWeight, &b_Event_puWeight);
     }
-
-
   
   // Calo Towers
   if(doCaloTower)
@@ -778,7 +749,6 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fCaloTower->SetBranchAddress("ecalEBTPspike", &ecalEBTP_spike, &b_ecalEBTP_spike);
       fCaloTower->SetBranchAddress("ecalEBTPtime", &ecalEBTP_time, &b_ecalEBTP_time);
 
-
       // Calo Towers
       fCaloTower->SetBranchAddress("nTower", &caloTower_N, &b_caloTower_N);
       fCaloTower->SetBranchAddress("ieta", &caloTower_ieta, &b_caloTower_ieta);
@@ -792,14 +762,9 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fCaloTower->SetBranchAddress("eta", &caloTower_eta, &b_caloTower_eta);
       fCaloTower->SetBranchAddress("phi", &caloTower_phi, &b_caloTower_phi);
 
-
       // Add friend (CaloTowerTree)
       fChain -> AddFriend(fCaloTower);
-
     }
-
-  
-
 
   // Upgrade 
   if(doUpgrade)
@@ -884,15 +849,10 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fUpgrade->SetBranchAddress("sumIEt", &sum_IEt, &b_sum_IEt);
       fUpgrade->SetBranchAddress("sumIPhi", &sum_IPhi, &b_sum_IPhi);
       fUpgrade->SetBranchAddress("sumBx", &sum_Bx, &b_sum_Bx);
-      
 
       // Add friend (UpgradeTree)
       fChain -> AddFriend(fUpgrade);
-
     }
-  
-
-
 
   // uGT
   if(douGT)
@@ -908,15 +868,9 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fuGT->SetBranchAddress("m_algoDecisionPreScaled", &m_algoDecisionPreScaled, &b_m_algoDecisionPreScaled);
       fuGT->SetBranchAddress("m_algoDecisionFinal", &m_algoDecisionFinal, &b_m_algoDecisionFinal);
 
-
       // Add friend (uGTTree) 
       fChain -> AddFriend(fuGT);
-
     }
-
-
-
-
   
   // HO
   if(doHO)
@@ -932,13 +886,9 @@ void TreeDefinitionReco::InitReco(TChain *chain)
 
       // Add friend (HOTree)
       fChain -> AddFriend(fHO);
-
     }
-  
-  
     
   // =========================================== EMULATOR TREES =============================================
-
 
   // Calo Towers Emulator
   if(doCaloTowerEmu)
@@ -969,7 +919,6 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fCaloTowerEmu->SetBranchAddress("ecalEBTPspike", &ecalEBTPEmu_spike, &b_ecalEBTPEmu_spike);
       fCaloTowerEmu->SetBranchAddress("ecalEBTPtime", &ecalEBTPEmu_time, &b_ecalEBTPEmu_time);
 
-
       // Calo Towers (Emu)
       fCaloTowerEmu->SetBranchAddress("nTower", &caloTowerEmu_N, &b_caloTowerEmu_N);
       fCaloTowerEmu->SetBranchAddress("ieta", &caloTowerEmu_ieta, &b_caloTowerEmu_ieta);
@@ -983,7 +932,6 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fCaloTowerEmu->SetBranchAddress("eta", &caloTowerEmu_eta, &b_caloTowerEmu_eta);
       fCaloTowerEmu->SetBranchAddress("phi", &caloTowerEmu_phi, &b_caloTowerEmu_phi);
 
-
       // Calo Clusters (Emu)
       fCaloTowerEmu->SetBranchAddress("ieta", &caloClusterEmu_ieta, &b_caloClusterEmu_ieta);
       fCaloTowerEmu->SetBranchAddress("iphi", &caloClusterEmu_iphi, &b_caloClusterEmu_iphi);
@@ -995,10 +943,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
 
       // Add Friend (CaloTowerEmuTree) 
       fChain -> AddFriend(fCaloTowerEmu);
-
     }
-
-
 
   // Upgrade Emulator
   if(doUpgradeEmu)
@@ -1086,11 +1031,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
 
       // Add friend (UpgradeEmuTree)
       fChain -> AddFriend(fUpgradeEmu);
-
     }
-  
-
-
 
   // uGT Emulator
   if(douGTEmu)
@@ -1108,34 +1049,16 @@ void TreeDefinitionReco::InitReco(TChain *chain)
 
       // Add friend (uGTEmuTree) 
       fChain -> AddFriend(fuGTEmu);
-
     }
 
-
-
-
-
-
-
-  //cout << "**********************SETMAKECLASS-1**********************" << endl;
-  
+  // Set Make Class for all trees 
   fChain->SetMakeClass(1);
   
-  //TList *friendTreeElement2 = fChain->GetListOfFriends();                                                                                                 
-  //friendTreeElement2->ls();
-  
-
   TFriendElement *friendTreeElement = (TFriendElement*)fChain->GetListOfFriends()->First();
   while (friendTreeElement){
     friendTreeElement->GetTree()->SetMakeClass(1);
     friendTreeElement = (TFriendElement*)fChain->GetListOfFriends()->After(friendTreeElement);
   }                                                                                                                                                                      
-
-  //  cout << "**********************SETMAKECLASS-2**********************" << endl;
-
-
-
-
   
   Notify();
 }
