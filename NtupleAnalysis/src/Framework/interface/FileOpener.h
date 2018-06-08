@@ -9,6 +9,7 @@ class FileOpener
 
  public:
   TChain* OpenFiles(const std::string multicrabPath, const std::string dataset, TChain* tree = 0);
+  std::string GetFirstFileName(const std::string multicrabPath, const std::string dataset);
   vector<string> GetListOfFiles(const string inDir);
     
  private:

@@ -7,8 +7,7 @@
 class TreeDefinitionBase 
 {
    public:
-  //TTree   *fChain;   //! pointer to the analysed Tree or Chain
-     TChain  *fChain;
+     TChain  *fChain; //! pointer to the analysed Tree or Chain
      TChain  *fCaloTower;
      TChain  *fUpgradeTfMuon;
      TChain  *fUpgrade;
@@ -20,6 +19,19 @@ class TreeDefinitionBase
      TChain  *fuGTEmu;
      TChain  *fGenerator;
      Int_t   fCurrent;  //! Current Tree number in a Chain
+
+     bool doCaloTower;
+     bool doUpgradeTfMuon;
+     bool doUpgrade;
+     bool douGT;
+     bool doHO;
+     bool doUpgradeTfMuonEmu;
+     bool doCaloTowerEmu;
+     bool doUpgradeEmu;
+     bool douGTEmu;
+     bool doGenerator;
+     bool doCheck; // CHECK!
+     
      virtual Bool_t  Notify();
      virtual void    Show(Long64_t entry = -1);
      virtual Int_t   GetEntry(Long64_t entry);

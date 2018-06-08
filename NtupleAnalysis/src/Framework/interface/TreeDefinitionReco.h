@@ -748,9 +748,9 @@ void TreeDefinitionReco::InitReco(TChain *chain)
     }
 
 
-
+  
   // Calo Towers
-  if(1)
+  if(doCaloTower)
     {
       // Calo TPs
       fCaloTower->SetBranchAddress("nHCALTP", &hcalTP_N, &b_hcalTP_N);
@@ -791,15 +791,18 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fCaloTower->SetBranchAddress("et", &caloTower_et, &b_caloTower_et);
       fCaloTower->SetBranchAddress("eta", &caloTower_eta, &b_caloTower_eta);
       fCaloTower->SetBranchAddress("phi", &caloTower_phi, &b_caloTower_phi);
+
+
+      // Add friend (CaloTowerTree)
+      fChain -> AddFriend(fCaloTower);
+
     }
 
   
-  // Add friend (CaloTowerTree)
-  fChain -> AddFriend(fCaloTower);
 
 
   // Upgrade 
-  if(1)
+  if(doUpgrade)
     {
       fUpgrade->SetBranchAddress("nEGs", &eg_N, &b_eg_N);
       fUpgrade->SetBranchAddress("egEt", &eg_Et, &b_eg_Et);
@@ -881,15 +884,18 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fUpgrade->SetBranchAddress("sumIEt", &sum_IEt, &b_sum_IEt);
       fUpgrade->SetBranchAddress("sumIPhi", &sum_IPhi, &b_sum_IPhi);
       fUpgrade->SetBranchAddress("sumBx", &sum_Bx, &b_sum_Bx);
+      
+
+      // Add friend (UpgradeTree)
+      fChain -> AddFriend(fUpgrade);
+
     }
   
-  // Add friend (UpgradeTree)
-  fChain -> AddFriend(fUpgrade);
 
 
 
   // uGT
-  if(1)
+  if(douGT)
     {
       fuGT->SetBranchAddress("m_orbitNr", &m_orbitNr, &b_m_orbitNr);
       fuGT->SetBranchAddress("m_bxNr", &m_bxNr, &b_m_bxNr);
@@ -901,16 +907,19 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fuGT->SetBranchAddress("m_algoDecisionInitial", &m_algoDecisionInitial, &b_m_algoDecisionInitial);
       fuGT->SetBranchAddress("m_algoDecisionPreScaled", &m_algoDecisionPreScaled, &b_m_algoDecisionPreScaled);
       fuGT->SetBranchAddress("m_algoDecisionFinal", &m_algoDecisionFinal, &b_m_algoDecisionFinal);
+
+
+      // Add friend (uGTTree) 
+      fChain -> AddFriend(fuGT);
+
     }
 
 
-  // Add friend (uGTTree) 
-  fChain -> AddFriend(fuGT);
 
 
   
   // HO
-  if(1)
+  if(doHO)
     {
       fHO->SetBranchAddress("nHcalDetIds", &hcalDetId_N, &b_hcalDetId_N);
       fHO->SetBranchAddress("nHcalQIESamples", &hcalQIESample_N, &b_hcalQIESample_N);
@@ -920,17 +929,19 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fHO->SetBranchAddress("hcalQIESampleAdc", &hcalQIESample_Adc, &b_hcalQIESample_Adc);
       fHO->SetBranchAddress("hcalQIESampleDv", &hcalQIESample_Dv, &b_hcalQIESample_Dv);
       fHO->SetBranchAddress("hcalQIESampleEr", &hcalQIESample_Er, &b_hcalQIESample_Er);
+
+      // Add friend (HOTree)
+      fChain -> AddFriend(fHO);
+
     }
   
-  // Add friend (HOTree)
-  fChain -> AddFriend(fHO);
   
     
   // =========================================== EMULATOR TREES =============================================
 
 
   // Calo Towers Emulator
-  if(1)
+  if(doCaloTowerEmu)
     {
       // Calo TPs (Emu)
       fCaloTowerEmu->SetBranchAddress("nHCALTP", &hcalTPEmu_N, &b_hcalTPEmu_N);
@@ -982,15 +993,15 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fCaloTowerEmu->SetBranchAddress("eta", &caloClusterEmu_eta, &b_caloClusterEmu_eta);
       fCaloTowerEmu->SetBranchAddress("phi", &caloClusterEmu_phi, &b_caloClusterEmu_phi);
 
+      // Add Friend (CaloTowerEmuTree) 
+      fChain -> AddFriend(fCaloTowerEmu);
 
     }
 
-  // Add Friend (CaloTowerEmuTree) 
-  fChain -> AddFriend(fCaloTowerEmu);
 
 
   // Upgrade Emulator
-  if(1)
+  if(doUpgradeEmu)
     {
       fUpgradeEmu->SetBranchAddress("nEGs", &egEmu_N, &b_egEmu_N);
       fUpgradeEmu->SetBranchAddress("egEt", &egEmu_Et, &b_egEmu_Et);
@@ -1009,6 +1020,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fUpgradeEmu->SetBranchAddress("egNTT", &egEmu_NTT, &b_egEmu_NTT);
       fUpgradeEmu->SetBranchAddress("egShape", &egEmu_Shape, &b_egEmu_Shape);
       fUpgradeEmu->SetBranchAddress("egTowerHoE", &egEmu_TowerHoE, &b_egEmu_TowerHoE);
+
       fUpgradeEmu->SetBranchAddress("nTaus", &tauEmu_N, &b_tauEmu_N);
       fUpgradeEmu->SetBranchAddress("tauEt", &tauEmu_Et, &b_tauEmu_Et);
       fUpgradeEmu->SetBranchAddress("tauEta", &tauEmu_Eta, &b_tauEmu_Eta);
@@ -1026,6 +1038,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fUpgradeEmu->SetBranchAddress("tauHasEM", &tauEmu_HasEM, &b_tauEmu_HasEM);
       fUpgradeEmu->SetBranchAddress("tauIsMerged", &tauEmu_IsMerged, &b_tauEmu_IsMerged);
       fUpgradeEmu->SetBranchAddress("tauHwQual", &tauEmu_HwQual, &b_tauEmu_HwQual);
+
       fUpgradeEmu->SetBranchAddress("nJets", &jetEmu_N, &b_jetEmu_N);
       fUpgradeEmu->SetBranchAddress("jetEt", &jetEmu_Et, &b_jetEmu_Et);
       fUpgradeEmu->SetBranchAddress("jetEta", &jetEmu_Eta, &b_jetEmu_Eta);
@@ -1043,6 +1056,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fUpgradeEmu->SetBranchAddress("jetPUDonutEt1", &jetEmu_PUDonutEt1, &b_jetEmu_PUDonutEt1);
       fUpgradeEmu->SetBranchAddress("jetPUDonutEt2", &jetEmu_PUDonutEt2, &b_jetEmu_PUDonutEt2);
       fUpgradeEmu->SetBranchAddress("jetPUDonutEt3", &jetEmu_PUDonutEt3, &b_jetEmu_PUDonutEt3);
+
       fUpgradeEmu->SetBranchAddress("nMuons", &muonEmu_N, &b_muonEmu_N);
       fUpgradeEmu->SetBranchAddress("muonEt", &muonEmu_Et, &b_muonEmu_Et);
       fUpgradeEmu->SetBranchAddress("muonEta", &muonEmu_Eta, &b_muonEmu_Eta);
@@ -1061,6 +1075,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fUpgradeEmu->SetBranchAddress("muonQual", &muonEmu_Qual, &b_muonEmu_Qual);
       fUpgradeEmu->SetBranchAddress("muonTfMuonIdx", &muonEmu_TfMuon_Idx, &b_muonEmu_TfMuon_Idx);
       fUpgradeEmu->SetBranchAddress("muonBx", &muonEmu_Bx, &b_muonEmu_Bx);
+
       fUpgradeEmu->SetBranchAddress("nSums", &sumEmu_N, &b_sumEmu_N);
       fUpgradeEmu->SetBranchAddress("sumType", &sumEmu_Type, &b_sumEmu_Type);
       fUpgradeEmu->SetBranchAddress("sumEt", &sumEmu_Et, &b_sumEmu_Et);
@@ -1068,15 +1083,17 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fUpgradeEmu->SetBranchAddress("sumIEt", &sumEmu_IEt, &b_sumEmu_IEt);
       fUpgradeEmu->SetBranchAddress("sumIPhi", &sumEmu_IPhi, &b_sumEmu_IPhi);
       fUpgradeEmu->SetBranchAddress("sumBx", &sumEmu_Bx, &b_sumEmu_Bx);
+
+      // Add friend (UpgradeEmuTree)
+      fChain -> AddFriend(fUpgradeEmu);
+
     }
   
-  // Add friend (UpgradeEmuTree)
-  fChain -> AddFriend(fUpgradeEmu);
 
 
 
   // uGT Emulator
-  if(1)
+  if(douGTEmu)
     {
       fuGTEmu->SetBranchAddress("m_orbitNr", &mEmu_orbitNr, &b_mEmu_orbitNr);
       fuGTEmu->SetBranchAddress("m_bxNr", &mEmu_bxNr, &b_mEmu_bxNr);
@@ -1088,11 +1105,13 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fuGTEmu->SetBranchAddress("m_algoDecisionInitial", &mEmu_algoDecisionInitial, &b_mEmu_algoDecisionInitial);
       fuGTEmu->SetBranchAddress("m_algoDecisionPreScaled", &mEmu_algoDecisionPreScaled, &b_mEmu_algoDecisionPreScaled);
       fuGTEmu->SetBranchAddress("m_algoDecisionFinal", &mEmu_algoDecisionFinal, &b_mEmu_algoDecisionFinal);
+
+      // Add friend (uGTEmuTree) 
+      fChain -> AddFriend(fuGTEmu);
+
     }
 
 
-  // Add friend (uGTEmuTree) 
-  fChain -> AddFriend(fuGTEmu);
 
 
 

@@ -52,6 +52,55 @@ TChain* FileOpener::OpenFiles(const string multicrabPath, const string dataset, 
 }
 
 
+string FileOpener::GetFirstFileName(const string multicrabPath, const string dataset)
+{
+
+  cout << "=== FileOpener::GetFirstFileName()" << endl;
+
+  // Get the dataset attributes
+  string rootFileName;
+  const string datasetPath = datasets_.GetDatasetPathFromAlias(dataset);
+  const string fullPath    = multicrabPath + "/" + datasetPath + "/results/";
+  vector<string> dirs      = GetListOfFiles(fullPath);
+
+  // Sanity check
+  if (dirs.size() < 1)
+    {
+      cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << "! EXIT" << endl;
+      exit(1);      
+    }
+  else cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << endl;
+
+  // For-loop: All ROOT files
+  //for (vector<string>::iterator f = dirs.begin(); f != dirs.end(); f++)
+  //{     
+  vector<string>::iterator f = dirs.begin();
+  rootFileName = *f;
+  cout << "\tOpening file " << rootFileName << endl;
+      
+
+  ifstream file(rootFileName);
+  
+  if (!file.good() )
+    {
+      if(0) cout << "\tFile \"" << rootFileName << "\" also does not exist. EXIT" << endl;
+      exit(1);
+    }
+  // else 
+  //{
+      //fileName = TFile::Open(rootFileName.c_str());
+  //  fileName = rootFileName;
+  // }
+  cout << rootFileName<<endl;
+  //cout << fileName<<endl;
+  
+  return rootFileName; 
+}
+
+
+
+
+
 vector<string> FileOpener::GetListOfFiles(const string fullPath)
 {
 

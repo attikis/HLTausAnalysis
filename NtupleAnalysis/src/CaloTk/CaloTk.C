@@ -427,6 +427,7 @@ void CaloTk::Loop()
     nb = fChain->GetEntry(jentry);
     nbytes += nb;
     
+    /*
     cout << "*****************ENTRY******************"<<endl;
 
     cout<<jentry<<endl; 
@@ -461,7 +462,7 @@ void CaloTk::Loop()
     cout<<genP_Pt<<endl;
     }
     cout << "**************END*************"<<endl;
-
+    */
 
     //======================================================================================================
 
