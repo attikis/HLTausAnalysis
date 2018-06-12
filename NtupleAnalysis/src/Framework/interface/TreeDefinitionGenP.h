@@ -103,6 +103,7 @@ void TreeDefinitionGenP::InitGenP(TChain *chain)
       fGenerator->SetBranchAddress("nPart"        , &GenP_N      , &b_GenP_N);
       fGenerator->SetBranchAddress("partId"       , &GenP_PdgId  , &b_GenP_PdgId);
       fGenerator->SetBranchAddress("partStat"     , &GenP_Status , &b_GenP_Status);
+      fGenerator->SetBranchAddress("partParent"   , &GenP_Parent , &b_GenP_Parent);
       fGenerator->SetBranchAddress("partPt"       , &GenP_Pt     , &b_GenP_Pt);
       fGenerator->SetBranchAddress("partEta"      , &GenP_Eta    , &b_GenP_Eta);
       fGenerator->SetBranchAddress("partPhi"      , &GenP_Phi    , &b_GenP_Phi);
