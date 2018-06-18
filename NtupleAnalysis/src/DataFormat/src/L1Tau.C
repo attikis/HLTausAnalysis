@@ -22,7 +22,7 @@ void L1Tau::_InitVars(void)
   theEt        = 0.0;
   theEta       = 0.0;
   thePhi       = 0.0;
-  theIET       = 0;
+  theIEt       = 0;
   theIEta      = 0;
   theIPhi      = 0;
   theIso       = 0;
@@ -52,7 +52,7 @@ L1Tau::L1Tau(unsigned short Index,
 			     double Et,
 			     double Eta,
 			     double Phi,
-			     short int IET,
+			     short int IEt,
 			     short int IEta,
 			     short int IPhi,
 			     short int Iso,
@@ -73,7 +73,7 @@ L1Tau::L1Tau(unsigned short Index,
   theEt        = Et;
   theEta       = Eta;
   thePhi       = Phi;
-  theIET       = IET;
+  theIEt       = IEt;
   theIEta      = IEta;
   theIPhi      = IPhi;
   theIso       = Iso;
@@ -104,7 +104,7 @@ void L1Tau::PrintProperties(bool printHeader)
   info.AddRowColumn(0, auxTools.ToString( getEt(), 3)        );
   info.AddRowColumn(0, auxTools.ToString( getEta(), 3)       );
   info.AddRowColumn(0, auxTools.ToString( getPhi(), 3)       );
-  info.AddRowColumn(0, auxTools.ToString( getIET() , 3)      );
+  info.AddRowColumn(0, auxTools.ToString( getIEt() , 3)      );
   info.AddRowColumn(0, auxTools.ToString( getIEta(), 3)      );
   info.AddRowColumn(0, auxTools.ToString( getIPhi(), 3)      );
   info.AddRowColumn(0, auxTools.ToString( getIso() , 3)      );

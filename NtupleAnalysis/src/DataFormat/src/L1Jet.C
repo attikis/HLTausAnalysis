@@ -22,7 +22,7 @@ void L1Jet::_InitVars(void)
   theEt         = 0.0;
   theEta        = 0.0;
   thePhi        = 0.0;
-  theIET        = 0;
+  theIEt        = 0;
   theIEta       = 0;
   theIPhi       = 0;
   theBx         = 0;
@@ -52,7 +52,7 @@ L1Jet::L1Jet(unsigned short Index,
 	     float Et,
 	     float Eta,
 	     float Phi,
-	     short IET,
+	     short IEt,
 	     short IEta,
 	     short IPhi,
 	     short Bx,
@@ -73,7 +73,7 @@ L1Jet::L1Jet(unsigned short Index,
   theEt         = Et;
   theEta        = Eta;
   thePhi        = Phi;
-  theIET        = IET;
+  theIEt        = IEt;
   theIEta       = IEta;
   theIPhi       = IPhi;
   theBx         = Bx;
@@ -103,7 +103,7 @@ void L1Jet::PrintProperties(bool printHeader)
   info.AddRowColumn(0, auxTools.ToString( getEt(), 3)         );
   info.AddRowColumn(0, auxTools.ToString( getEta(), 3)        );
   info.AddRowColumn(0, auxTools.ToString( getPhi(), 3)        );
-  info.AddRowColumn(0, auxTools.ToString( getIET() , 3)       );
+  info.AddRowColumn(0, auxTools.ToString( getIEt() , 3)       );
   info.AddRowColumn(0, auxTools.ToString( getIEta(), 3)       );
   info.AddRowColumn(0, auxTools.ToString( getIPhi(), 3)       );
   info.AddRowColumn(0, auxTools.ToString( getBx() , 3)        );

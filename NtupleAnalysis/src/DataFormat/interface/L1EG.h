@@ -50,7 +50,7 @@ class L1EG{
   double getEt(void) const {return theEt;}
   double getEta(void) const {return theEta;}
   double getPhi(void) const {return thePhi;}
-  int getIET(void) const {return theIEt;}
+  int getIEt(void) const {return theIEt;}
   int getIEta(void) const {return theIEta;}
   int getIPhi(void) const {return theIPhi;}
   int getIso(void) const {return theIso;}

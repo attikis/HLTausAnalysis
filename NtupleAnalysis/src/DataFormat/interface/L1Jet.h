@@ -24,7 +24,7 @@ class L1Jet{
 	float Et,
 	float Eta,
 	float Phi,
-	short IET,
+	short IEt,
 	short IEta,
 	short IPhi,
 	short Bx,
@@ -51,7 +51,7 @@ class L1Jet{
   double getEt(void) const {return theEt;}
   double getEta(void) const {return theEta;}
   double getPhi(void) const {return thePhi;}
-  short getIET(void) const {return theIET;}
+  short getIEt(void) const {return theIEt;}
   short getIEta(void) const {return theIEta;}
   short getIPhi(void) const {return theIPhi;}
   short getBx(void) const {return theBx;}
@@ -75,7 +75,7 @@ class L1Jet{
   float theEt;
   float theEta;
   float thePhi;
-  short theIET;
+  short theIEt;
   short theIEta;
   short theIPhi;
   short theBx;

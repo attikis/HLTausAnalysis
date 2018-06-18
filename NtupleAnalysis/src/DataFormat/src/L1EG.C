@@ -102,7 +102,7 @@ void L1EG::PrintProperties(bool printHeader)
   info.AddRowColumn(0, auxTools.ToString( getEt()         , 3) );
   info.AddRowColumn(0, auxTools.ToString( getEta()        , 3) );
   info.AddRowColumn(0, auxTools.ToString( getPhi()        , 3) );
-  info.AddRowColumn(0, auxTools.ToString( getIET()        , 3) );
+  info.AddRowColumn(0, auxTools.ToString( getIEt()        , 3) );
   info.AddRowColumn(0, auxTools.ToString( getIEta()       , 3) );
   info.AddRowColumn(0, auxTools.ToString( getIPhi()       , 3) );
   info.AddRowColumn(0, auxTools.ToString( getIso()        , 3) );

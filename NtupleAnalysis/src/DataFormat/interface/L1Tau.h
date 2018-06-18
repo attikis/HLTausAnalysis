@@ -24,7 +24,7 @@ class L1Tau{
 		double Et,
 		double Eta,
 		double Phi,
-		short int IET,
+		short int IEt,
 		short int IEta,
 		short int IPhi,
 		short int Iso,
@@ -50,7 +50,7 @@ class L1Tau{
   double getEt(void) const {return theEt;}
   double getEta(void) const {return theEta;}
   double getPhi(void) const {return thePhi;}
-  short int getIET(void) const {return theIET;}
+  short int getIEt(void) const {return theIEt;}
   short int getIEta(void) const {return theIEta;}
   short int getIPhi(void) const {return theIPhi;}
   short int getIso(void) const {return theIso;}
@@ -74,7 +74,7 @@ class L1Tau{
   double theEt;
   double theEta;
   double thePhi;
-  short int theIET;
+  short int theIEt;
   short int theIEta;
   short int theIPhi;
   short int theIso;
