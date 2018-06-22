@@ -20,7 +20,7 @@ void TreeReaderMC::InitVars_()
   return;
 }
 
-/* marina
+
 //============================================================================
 void TreeReaderMC::GetHadronicTauFinalDaughters(GenParticle p,
 					    vector<unsigned short> &Daug)
@@ -93,9 +93,9 @@ vector<GenParticle> TreeReaderMC::GetGenParticles(bool bPrintList)
     
   vector<GenParticle> theGenParticles;
   Table info("Index | PdgId | Status | Charge | Pt | Eta | Phi | E | Vertex (mm) | Mothers | Daughters |", "Text"); //LaTeX or Text    
-
+  
   // For-loop: All GenParticles
-  for (Size_t genP_index = 0; genP_index < GenP_Pt->size(); genP_index++)
+  for (Size_t genP_index = 0; genP_index < GenP_Pt.size(); genP_index++)
     {
       GenParticle p = GetGenParticle(genP_index);
       SetGenParticleMomsAndDads(p);
@@ -145,11 +145,11 @@ vector<GenParticle> TreeReaderMC::GetGenParticles(int pdgId, bool isLastCopy)
   vector<GenParticle> myGenParticles;
 
   // For-lool: All GenParticles
-  for (unsigned int genP_index = 0; genP_index < GenP_Pt->size(); genP_index++)
+  for (unsigned int genP_index = 0; genP_index < GenP_Pt.size(); genP_index++)
     {
 
       // Only examine particles of specific pdgId
-      if ( abs(GenP_PdgId->at(genP_index) ) != pdgId) continue;
+      if ( abs(GenP_PdgId.at(genP_index) ) != pdgId) continue;
 
       // Get the genParticle
       GenParticle p = GetGenParticle(genP_index);
@@ -193,21 +193,23 @@ GenParticle TreeReaderMC::GetGenParticle(unsigned int Index)
   if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::GetGenParticle()" << std::endl;
 
   // Get the GenParticle properties
-  double Pt      = GenP_Pt->at(Index);
-  double Eta     = GenP_Eta->at(Index);
-  double Phi     = GenP_Phi->at(Index);
-  double Mass    = GenP_Mass->at(Index);
-  int Charge     = GenP_Charge->at(Index);
-  int PdgId      = GenP_PdgId->at(Index);
-  int Status     = GenP_Status->at(Index);
-  double VertexX = GenP_VertexX->at(Index);
-  double VertexY = GenP_VertexY->at(Index);
-  double VertexZ = GenP_VertexZ->at(Index);
-  vector<unsigned short> MothersIndex   = GenP_Mothers->at(Index);
-  vector<unsigned short> DaughtersIndex = GenP_Daughters->at(Index);
+  double Pt      = GenP_Pt.at(Index);
+  double Eta     = GenP_Eta.at(Index);
+  double Phi     = GenP_Phi.at(Index);
+  double Mass    = GenP_Mass.at(Index);
+  int Charge     = GenP_Charge.at(Index);
+  int PdgId      = GenP_PdgId.at(Index);
+  int Status     = GenP_Status.at(Index);
+  double VertexX = GenP_VertexX.at(Index);
+  double VertexY = GenP_VertexY.at(Index);
+  double VertexZ = GenP_VertexZ.at(Index);
+  vector<unsigned short> MothersIndex   = GenP_Mothers.at(Index);
+  vector<unsigned short> DaughtersIndex = GenP_Daughters.at(Index);
 
   // Construct the GenParticle
   GenParticle theGenParticle(Index, Pt, Eta, Phi, Mass, Charge, PdgId, Status, VertexX, VertexY, VertexZ, MothersIndex, DaughtersIndex);
+  
+  if (cfg_DEBUG*0) theGenParticle.PrintProperties();
   
   return theGenParticle;
 }
@@ -301,15 +303,14 @@ void TreeReaderMC::SetGenParticleFinalDaughters(GenParticle &p)
 
 
 
-
 //============================================================================
 vector<TTTrack> TreeReaderMC::GetTTTracks(const double minPt,
 				      const double minEta,
 				      const double maxEta,
 				      const double maxChiSqRed,
 				      const unsigned int minStubs,
-				      const unsigned int minStubsPS,
-				      const unsigned int maxStubsPS,
+					  //const unsigned int minStubsPS,
+					  //const unsigned int maxStubsPS,
 				      const unsigned nFitParams,
 				      bool bPrintList)
 //============================================================================
@@ -330,15 +331,12 @@ vector<TTTrack> TreeReaderMC::GetTTTracks(const double minPt,
       if (abs(tk.getEta()) < minEta) continue;
       if (tk.getChi2Red() > maxChiSqRed) continue;
       if (tk.getNumOfStubs() < minStubs) continue;
-      if (tk.getNumOfStubsPS() < minStubsPS) continue;
-      if (tk.getNumOfStubsPS() > maxStubsPS) continue;
-      // double z0 = tk.getZ0();
-      // double d0 = tk.getD0();
+      double z0 = tk.getZ0();
+      double d0 = tk.getD0();
       theTTTracks.push_back( tk );
 
     }
 
-//  if (bPrintList) PrintTTTrackCollection(theTTTracks);
   if (bPrintList) PrintTTTrackCollection(theTTTracks);
   
   return theTTTracks;
@@ -358,39 +356,35 @@ TTTrack TreeReaderMC::GetTTTrack(unsigned int Index,
   if (cfg_DEBUG*0) cout << "Getting track properties" << endl;
 
   // Get the track properties
-  double pt  = L1Tks_Pt->at(Index);
-  double eta = L1Tks_Eta->at(Index);
-  double phi = L1Tks_Phi->at(Index);
-  double x0  = L1Tks_POCAx->at(Index); // 1e6 if nFitParams == 4 
-  double y0  = L1Tks_POCAy->at(Index); // 1e6 if nFitParams == 4    
-  double z0  = L1Tks_POCAz->at(Index);
+  float pt  = L1Tks_Pt->at(Index);
+  float eta = L1Tks_Eta->at(Index);
+  float phi = L1Tks_Phi->at(Index);
+  float d0  = L1Tks_d0->at(Index);
+  float z0  = L1Tks_z0->at(Index);
   p.SetPtEtaPhi(pt, eta, phi);
-  ROOT::Math::XYZVector aPOCA(x0, y0, z0);
-  double aRInv        = L1Tks_RInv->at(Index);
-  double aChi2        = L1Tks_ChiSquared->at(Index);
-  double aStubPtCons  = L1Tks_StubPtConsistency->at(Index);
+  //float aRInv        = L1Tks_RInv->at(Index);
+  float aChi2         = L1Tks_ChiSquared->at(Index);
   bool isGenuine      = L1Tks_IsGenuine->at(Index);
   bool isUnknown      = L1Tks_IsUnknown->at(Index);
   bool isCombinatoric = L1Tks_IsCombinatoric->at(Index);
   bool isLoose        = L1Tks_IsLoose->at(Index);
   bool isFake         = L1Tks_IsFake->at(Index);
   int  nStubs         = L1Tks_NStubs->at(Index);
-  int  nStubsPS       = L1Tks_NStubsPS->at(Index);
-  int  nStubsBarrel   = L1Tks_NStubsBarrel->at(Index);
-  int  nStubsEndcap   = L1Tks_NStubsEndcap->at(Index);
-  int  matchTP_index  = L1Tks_TP_Index->at(Index);
-  // auxTools_.PrintVector(stubs_isPS);
+  int  matchTP_pdgId  = L1Tks_TP_PdgId->at(Index);
+  float  matchTP_pt   = L1Tks_TP_Pt   ->at(Index);
+  float  matchTP_eta  = L1Tks_TP_Eta  ->at(Index);
+  float  matchTP_phi  = L1Tks_TP_Phi  ->at(Index);
+  float  matchTP_z0   = L1Tks_TP_z0   ->at(Index);
+  float  matchTP_dxy  = L1Tks_TP_dxy  ->at(Index);
   
   if (cfg_DEBUG*0)  cout << "Constructing the track TTTrack" << endl;
   
   // Construct the TTTrack
-  TTTrack theTTTrack(Index, p, aPOCA,  aRInv, aChi2, aStubPtCons, isGenuine, isUnknown, isCombinatoric,
-		     isLoose, isFake, nStubs, nStubsPS, nStubsBarrel, nStubsEndcap, matchTP_index, nFitParams);
+  TTTrack theTTTrack(Index, p, d0, z0, aChi2, isGenuine, isUnknown, isCombinatoric, isLoose, isFake, nStubs, matchTP_pdgId, matchTP_pt, matchTP_eta, matchTP_phi, matchTP_z0, matchTP_dxy, nFitParams);
 
-  if (cfg_DEBUG*0)  cout << "Getting TP with L1Tks_TP_Index->at(Index) = "<< L1Tks_TP_Index->at(Index) << endl;
- 
   if (cfg_DEBUG*0) theTTTrack.PrintProperties();
 
+  /* //marina
   // Get the uniquely matched TP and print its properties
   if (cfg_DEBUG*0 && matchTP_index >= 0) {
     TrackingParticle theTP;
@@ -399,7 +393,7 @@ TTTrack TreeReaderMC::GetTTTrack(unsigned int Index,
     theTP.PrintProperties();
   if (cfg_DEBUG*0)  cout << "" << endl;
     }
-  
+  */ //marina
   return theTTTrack;
 }
 
@@ -425,8 +419,8 @@ vector<TrackingParticle> TreeReaderMC::GetTrackingParticles(bool bPrintList)
   return theTrackingParticles;
 }
 
-*/
-/*
+
+
 //============================================================================
 TrackingParticle TreeReaderMC::GetTrackingParticle(unsigned int Index)
 //============================================================================
@@ -434,33 +428,36 @@ TrackingParticle TreeReaderMC::GetTrackingParticle(unsigned int Index)
   if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::GetTrackingParticle()" << std::endl;
   
   // Get the track properties
-  double pt            = TP_Pt->at(Index);
-  double eta           = TP_Eta->at(Index);
-  double phi           = TP_Phi->at(Index);
-  int charge           = TP_Charge->at(Index);
-  int pdgId            = TP_PdgId->at(Index);
-  double d0_propagated = TP_d0_propagated->at(Index);
-  double z0_propagated = TP_z0_propagated->at(Index);
-  int nMatch           = TP_NMatch->at(Index);
-  int ttTrackIndex     = TP_TTTrackIndex->at(Index);
-  int ttClusters       = TP_NClusters->at(Index);
-  int ttStubs          = TP_NStubs->at(Index);
-  int ttTracks         = TP_NTracks->at(Index);
-  double x0            = TP_x0_produced->at(Index);
-  double y0            = TP_y0_produced->at(Index);
-  double z0            = TP_z0_produced->at(Index);
-  int eventId          = TP_EventId->at(Index);
-      
+  float pt            = TP_Pt->at(Index);
+  float eta           = TP_Eta->at(Index);
+  float phi           = TP_Phi->at(Index);
+  int charge          = TP_Charge->at(Index);
+  int pdgId           = TP_PdgId->at(Index);
+  float d0_propagated = TP_d0->at(Index);
+  float z0_propagated = TP_z0->at(Index);
+  int nMatch          = TP_NMatch->at(Index);
+  float ttTrackPt     = TP_Trk_Pt->at(Index);
+  float ttTrackEta    = TP_Trk_Eta->at(Index);
+  float ttTrackPhi    = TP_Trk_Phi->at(Index);
+  float ttTrackZ0     = TP_Trk_z0->at(Index);
+  float ttTrackD0     = TP_Trk_d0->at(Index);
+  float ttTrackChi2   = TP_Trk_ChiSquared->at(Index);
+  int ttTrackNstubs   = TP_Trk_NStubs->at(Index);
+  int nStubs          = TP_NStubs->at(Index);
+  float z0_produced   = TP_z0_produced->at(Index);
+  float d0_produced   = TP_d0_produced->at(Index);
+  float dxy           = TP_dxy->at(Index);
+  int eventId         = TP_EventId->at(Index);  
+
   // Construct higher-level variables
   TVector3 p;
   p.SetPtEtaPhi(pt, eta, phi);
-  ROOT::Math::XYZVector poca(x0, y0, z0);
 
   if (cfg_DEBUG*0) cout << "Constructing TP" << endl;
 
   // Construct the TP
-  TrackingParticle theTrackingParticle(Index, p, poca, d0_propagated, z0_propagated, charge, pdgId, nMatch, ttTrackIndex, ttClusters, ttStubs, ttTracks, eventId);  
-  if (cfg_DEBUG*0) theTrackingParticle.PrintProperties();
+  TrackingParticle theTrackingParticle(Index, p, d0_propagated, z0_propagated, d0_produced, z0_produced, dxy, charge, pdgId, nMatch, nStubs, ttTrackPt, ttTrackEta, ttTrackPhi, ttTrackZ0, ttTrackD0, ttTrackChi2, ttTrackNstubs, eventId);  
+  if (cfg_DEBUG*0*0) theTrackingParticle.PrintProperties();
 
   // Get the uniquely matched TTTrack
   // TTTrack theTrack;
@@ -478,7 +475,7 @@ void TreeReaderMC::PrintTrackingParticleCollection(vector<TrackingParticle> coll
 {
   if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::PrintTrackingParticleCollection()" << std::endl;
   
-  Table info("Index | Pt | Eta | Phi | PdgId | Q | x0 | y0 | z0 | d0 | d0-phi | NMatch | TTTrackIndex | TTClusters | TTStubs | TTTracks | Event-Id", "Text");
+  Table info("Index | Pt | Eta | Phi | PdgId | Q | z0 prop | d0 prop | z0 prod | d0 prod | dxy | NMatch | NStubs | TTTrkPt | TTTrkEta | TTTrkPhi | TTTrkZ0 | TTTrkD0 | TTTrkChi2 | TTTrkNStubs | Event-Id", "Text");
 
   // For-loop: Tracking Particles
   int row=0;
@@ -491,16 +488,21 @@ void TreeReaderMC::PrintTrackingParticleCollection(vector<TrackingParticle> coll
       info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Phi() , 3) );
       info.AddRowColumn(row, auxTools_.ToString( p->getPdgId()) );
       info.AddRowColumn(row, p->getQ());
-      info.AddRowColumn(row, auxTools_.ToString( p->getX0()   , 3) );
-      info.AddRowColumn(row, auxTools_.ToString( p->getY0()   , 3) );
-      info.AddRowColumn(row, auxTools_.ToString( p->getZ0()   , 3) );
-      info.AddRowColumn(row, auxTools_.ToString( p->getD0()   , 3) );
-      info.AddRowColumn(row, auxTools_.ToString( p->getD0Phi(), 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getZ0propagated()   , 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getD0propagated()   , 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getZ0produced()   , 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getD0produced()   , 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getDxy()   , 3) );
+      //info.AddRowColumn(row, auxTools_.ToString( p->getD0Phi(), 3) );
       info.AddRowColumn(row, auxTools_.ToString( p->getNMatch())       );
-      info.AddRowColumn(row, auxTools_.ToString( p->getTTTrackIndex()) );
-      info.AddRowColumn(row, auxTools_.ToString( p->getTTClusters())   );
-      info.AddRowColumn(row, auxTools_.ToString( p->getTTStubs())      );
-      info.AddRowColumn(row, auxTools_.ToString( p->getTTTracks())     );
+      info.AddRowColumn(row, auxTools_.ToString( p->getNStubs())       );
+      info.AddRowColumn(row, auxTools_.ToString( p->getTTTrackPt()) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getTTTrackEta()) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getTTTrackPhi()) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getTTTrackZ0()) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getTTTrackD0()) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getTTTrackChi2()) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getTTTrackNStubs()) );
       info.AddRowColumn(row, auxTools_.ToString( p->getEventId())     );
       row++;
     }
@@ -518,7 +520,7 @@ void TreeReaderMC::PrintTTTrackCollection(vector<TTTrack> collection)
 {
   if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::PrintTTTrackCollection()" << std::endl;
 
-  Table info("Index | Pt | Eta | Phi | x0 | y0 | z0 | d0 | Q | Chi2 | DOF | Chi2Red | Stubs (PS) | StubPtCons. | Genuine | Unknown | Comb.", "Text");
+  Table info("Index | Pt | Eta | Phi | z0 | d0 | Chi2 | DOF | Chi2Red | Stubs | Genuine | Unknown | Comb.", "Text");
       
   // For-loop: All TTTracsk
   int row=0;
@@ -529,16 +531,13 @@ void TreeReaderMC::PrintTTTrackCollection(vector<TTTrack> collection)
       info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Perp(), 3) );
       info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Eta() , 3) );  
       info.AddRowColumn(row, auxTools_.ToString( p->getMomentum().Phi() , 3) );
-      info.AddRowColumn(row, auxTools_.ToString( p->getX0(), 3) );
-      info.AddRowColumn(row, auxTools_.ToString( p->getY0(), 3) );
       info.AddRowColumn(row, auxTools_.ToString( p->getZ0(), 3) );
       info.AddRowColumn(row, auxTools_.ToString( p->getD0(), 3) );  
-      info.AddRowColumn(row, p->getQ());
+      //info.AddRowColumn(row, p->getQ());
       info.AddRowColumn(row, auxTools_.ToString( p->getChi2(),3 ));
       info.AddRowColumn(row, auxTools_.ToString( p->getDOF()) );
       info.AddRowColumn(row, auxTools_.ToString( p->getChi2Red(), 3) );
-      info.AddRowColumn(row, auxTools_.ToString( p->getNumOfStubs()) + " (" + auxTools_.ToString(p->getNumOfStubsPS()) + ")");
-      info.AddRowColumn(row, auxTools_.ToString( p->getStubPtConsistency(), 3) );
+      info.AddRowColumn(row, auxTools_.ToString( p->getNumOfStubs()) );// + " (" + auxTools_.ToString(p->getNumOfStubsPS()) + ")");
       info.AddRowColumn(row, auxTools_.ToString( p->getIsGenuine()) );
       info.AddRowColumn(row, auxTools_.ToString( p->getIsUnknown()) );
       info.AddRowColumn(row, auxTools_.ToString( p->getIsCombinatoric()) );
@@ -555,6 +554,7 @@ void TreeReaderMC::PrintGenParticleCollection(vector<GenParticle> collection)
 //============================================================================
 {
   if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::PrintGenParticleCollection()" << std::endl;
+  
   
   for (vector<GenParticle>::iterator p = collection.begin(); p != collection.end(); p++)
     {
@@ -590,10 +590,10 @@ vector<L1Tau> TreeReaderMC::GetL1Taus(bool bPrintList)
   L1Tau theL1Tau;
 
   // For-loop: All L1Taus
-  for (Size_t iCalo = 0; iCalo < L1Tau_Et->size(); iCalo++)
+  for (Size_t iCalo = 0; iCalo < L1TauEmu_Et.size(); iCalo++)
     { 
       theL1Tau = GetL1Tau(iCalo);
-      // if (bPrintList) theL1Tau.PrintProperties(false);
+      //if (bPrintList) theL1Tau.PrintProperties(false);
       theL1Taus.push_back( theL1Tau );
     }
   
@@ -609,41 +609,41 @@ L1Tau TreeReaderMC::GetL1Tau(unsigned int Index)
 
   if (0)
     {
-      std::cout << " 1: " << L1Tau_Et->at(Index) << std::endl;
-      std::cout << " 2: " << L1Tau_Eta->at(Index) << std::endl;
-      std::cout << " 3: " << L1Tau_Phi->at(Index) << std::endl;
-      std::cout << " 4: " << L1Tau_IET->at(Index) << std::endl;
-      std::cout << " 5: " << L1Tau_IEta->at(Index) << std::endl;
-      std::cout << " 6: " << L1Tau_IPhi->at(Index) << std::endl;
-      std::cout << " 7: " << L1Tau_Iso->at(Index) << std::endl;
-      std::cout << " 8: " << L1Tau_Bx->at(Index) << std::endl;
-      // std::cout << " 9: " << L1Tau_TowerIPhi->at(Index) << std::endl;
-      // std::cout << "10: " << L1Tau_TowerIEta->at(Index) << std::endl;
-      std::cout << "11: " << L1Tau_RawEt->at(Index) << std::endl;
-      std::cout << "12: " << L1Tau_IsoEt->at(Index) << std::endl;
-      std::cout << "13: " << L1Tau_NTT->at(Index) << std::endl;
-      std::cout << "14: " << L1Tau_HasEM->at(Index) << std::endl;
-      std::cout << "15: " << L1Tau_IsMerged->at(Index) << std::endl;
-      std::cout << "16: " << L1Tau_HwQual->at(Index) << std::endl;
+      std::cout << " 1: " << L1TauEmu_Et.at(Index) << std::endl;
+      std::cout << " 2: " << L1TauEmu_Eta.at(Index) << std::endl;
+      std::cout << " 3: " << L1TauEmu_Phi.at(Index) << std::endl;
+      std::cout << " 4: " << L1TauEmu_IEt.at(Index) << std::endl;
+      std::cout << " 5: " << L1TauEmu_IEta.at(Index) << std::endl;
+      std::cout << " 6: " << L1TauEmu_IPhi.at(Index) << std::endl;
+      std::cout << " 7: " << L1TauEmu_Iso.at(Index) << std::endl;
+      std::cout << " 8: " << L1TauEmu_Bx.at(Index) << std::endl;
+      std::cout << " 9: " << L1TauEmu_TowerIPhi.at(Index) << std::endl;
+      std::cout << "10: " << L1TauEmu_TowerIEta.at(Index) << std::endl;
+      std::cout << "11: " << L1TauEmu_RawEt.at(Index) << std::endl;
+      std::cout << "12: " << L1TauEmu_IsoEt.at(Index) << std::endl;
+      std::cout << "13: " << L1TauEmu_NTT.at(Index) << std::endl;
+      std::cout << "14: " << L1TauEmu_HasEM.at(Index) << std::endl;
+      std::cout << "15: " << L1TauEmu_IsMerged.at(Index) << std::endl;
+      std::cout << "16: " << L1TauEmu_HwQual.at(Index) << std::endl;
     }
   
   L1Tau theL1Tau(Index,
-			 L1Tau_Et->at(Index),
-			 L1Tau_Eta->at(Index),
-			 L1Tau_Phi->at(Index),
-			 L1Tau_IET->at(Index),
-			 L1Tau_IEta->at(Index),
-			 L1Tau_IPhi->at(Index),
-			 L1Tau_Iso->at(Index),
-			 L1Tau_Bx->at(Index),
-			 0, //L1Tau_TowerIPhi->at(Index),
-			 0, //L1Tau_TowerIEta->at(Index),
-			 L1Tau_RawEt->at(Index),
-			 L1Tau_IsoEt->at(Index),
-			 L1Tau_NTT->at(Index),
-			 L1Tau_HasEM->at(Index),
-			 L1Tau_IsMerged->at(Index),
-			 L1Tau_HwQual->at(Index)
+			 L1TauEmu_Et.at(Index),
+			 L1TauEmu_Eta.at(Index),
+			 L1TauEmu_Phi.at(Index),
+			 L1TauEmu_IEt.at(Index),
+			 L1TauEmu_IEta.at(Index),
+			 L1TauEmu_IPhi.at(Index),
+			 L1TauEmu_Iso.at(Index),
+		         L1TauEmu_Bx.at(Index),
+			 L1TauEmu_TowerIPhi.at(Index),
+			 L1TauEmu_TowerIEta.at(Index),
+			 L1TauEmu_RawEt.at(Index),
+			 L1TauEmu_IsoEt.at(Index),
+			 L1TauEmu_NTT.at(Index),
+			 L1TauEmu_HasEM.at(Index),
+			 L1TauEmu_IsMerged.at(Index),
+			 L1TauEmu_HwQual.at(Index)
 			 );
 
   return theL1Tau;
@@ -660,7 +660,7 @@ vector<L1Jet> TreeReaderMC::GetL1Jets(bool bPrintList)
   L1Jet theL1Jet;
 
   // For-loop: All L1 Jets
-  for (Size_t i = 0; i < L1Jet_Et->size(); i++)
+  for (Size_t i = 0; i < L1JetEmu_Et.size(); i++)
     {
       theL1Jet = GetL1Jet(i);
       theL1Jets.push_back(theL1Jet);
@@ -677,22 +677,22 @@ L1Jet TreeReaderMC::GetL1Jet(unsigned int Index)
 {
 
   L1Jet theL1Jet(Index,
-		 L1Jet_Et->at(Index),
-		 L1Jet_Eta->at(Index),
-		 L1Jet_Phi->at(Index),
-		 L1Jet_IET->at(Index),
-		 L1Jet_IEta->at(Index),
-		 L1Jet_IPhi->at(Index),
-		 L1Jet_Bx->at(Index),
-		 L1Jet_RawEt->at(Index),
-		 L1Jet_SeedEt->at(Index),
-		 0,//L1Jet_TowerIEta->at(Index),
-		 0,//L1Jet_TowerIPhi->at(Index),
-		 L1Jet_PUEt->at(Index),
-		 L1Jet_PUDonutEt0->at(Index),
-		 L1Jet_PUDonutEt1->at(Index),
-		 L1Jet_PUDonutEt2->at(Index),
-		 L1Jet_PUDonutEt3->at(Index));
+		 L1JetEmu_Et.at(Index),
+		 L1JetEmu_Eta.at(Index),
+		 L1JetEmu_Phi.at(Index),
+		 L1JetEmu_IEt.at(Index),
+		 L1JetEmu_IEta.at(Index),
+		 L1JetEmu_IPhi.at(Index),
+		 L1JetEmu_Bx.at(Index),
+		 L1JetEmu_RawEt.at(Index),
+		 L1JetEmu_SeedEt.at(Index),
+		 L1JetEmu_TowerIEta.at(Index),
+		 L1JetEmu_TowerIPhi.at(Index),
+		 L1JetEmu_PUEt.at(Index),
+		 L1JetEmu_PUDonutEt0.at(Index),
+		 L1JetEmu_PUDonutEt1.at(Index),
+		 L1JetEmu_PUDonutEt2.at(Index),
+		 L1JetEmu_PUDonutEt3.at(Index));
 
   return theL1Jet;
 }
@@ -706,7 +706,7 @@ vector<L1EG> TreeReaderMC::GetL1EGs(bool bPrintList)
   L1EG theL1EG;
 
   // For-loop: All L1 EG
-  for (Size_t i = 0; i < L1EG_Et->size(); i++)
+  for (Size_t i = 0; i < L1EGEmu_Et.size(); i++)
     {
       theL1EG = GetL1EG(i);
       theL1EGs.push_back(theL1EG);
@@ -722,22 +722,22 @@ L1EG TreeReaderMC::GetL1EG(unsigned int Index)
 {
   
   L1EG theL1EG(Index,
-	       L1EG_Et->at(Index),
-	       L1EG_Eta->at(Index),
-	       L1EG_Phi->at(Index),
-	       L1EG_IET->at(Index),
-	       L1EG_IEta->at(Index),
-	       L1EG_IPhi->at(Index),
-	       L1EG_Iso->at(Index),
-	       L1EG_Bx->at(Index),
-	       0,// LEG_TowerIPhi->at(Index),
-	       0,// LEG_TowerIEta->at(Index),
-	       L1EG_RawEt->at(Index),
-	       L1EG_IsoEt->at(Index),
-	       L1EG_FootprintEt->at(Index),
-	       L1EG_NTT->at(Index),
-	       L1EG_Shape->at(Index),
-	       L1EG_TowerHoE->at(Index));
+	       L1EGEmu_Et.at(Index),
+	       L1EGEmu_Eta.at(Index),
+	       L1EGEmu_Phi.at(Index),
+	       L1EGEmu_IEt.at(Index),
+	       L1EGEmu_IEta.at(Index),
+	       L1EGEmu_IPhi.at(Index),
+	       L1EGEmu_Iso.at(Index),
+	       L1EGEmu_Bx.at(Index),
+	       L1EGEmu_TowerIPhi.at(Index),
+	       L1EGEmu_TowerIEta.at(Index),
+	       L1EGEmu_RawEt.at(Index),
+	       L1EGEmu_IsoEt.at(Index),
+	       L1EGEmu_FootprintEt.at(Index),
+	       L1EGEmu_NTT.at(Index),
+	       L1EGEmu_Shape.at(Index),
+	       L1EGEmu_TowerHoE.at(Index));
     
     return theL1EG;
 }
@@ -748,12 +748,12 @@ L1Sum TreeReaderMC::GetL1Sum(unsigned int Index)
 {
 
   L1Sum theL1Sum(Index,
-		 L1Sum_Et->at(Index),
-		 L1Sum_Phi->at(Index),
-		 L1Sum_IET->at(Index),
-		 L1Sum_IPhi->at(Index),
-		 L1Sum_Type->at(Index),
-		 L1Sum_Bx->at(Index));
+		 L1SumEmu_Et.at(Index),
+		 L1SumEmu_Phi.at(Index),
+		 L1SumEmu_IEt.at(Index),
+		 L1SumEmu_IPhi.at(Index),
+		 L1SumEmu_Type.at(Index),
+		 L1SumEmu_Bx.at(Index));
 
   return theL1Sum;
 }
@@ -768,7 +768,7 @@ vector<L1Sum> TreeReaderMC::GetL1Sums(bool bPrintList)
   L1Sum theL1Sum;
 
   // For-loop: All L1 EG
-  for (Size_t i = 0; i < L1Sum_Et->size(); i++)
+  for (Size_t i = 0; i < L1SumEmu_Et.size(); i++)
     {
       theL1Sum = GetL1Sum(i);
       theL1Sums.push_back(theL1Sum);
@@ -783,7 +783,7 @@ void TreeReaderMC::PrintL1TauCollection(vector<L1Tau> collection)
 //============================================================================
 {
   
-  Table info("Index | Et | Eta | Phi | IET | IPhi | Iso | Bx | TowerIPhi | TowerIEta | RawEt | IsoEt | NTT | HasEM | IsMerged | HwQual | Type", "Text");
+  Table info("Index | Et | Eta | Phi | IET | IEta | IPhi | Iso | Bx | TowerIPhi | TowerIEta | RawEt | IsoEt | NTT | HasEM | IsMerged | HwQual | Type", "Text");
 
   // For-loop: All L1Taus
   int row=0;
@@ -794,7 +794,7 @@ void TreeReaderMC::PrintL1TauCollection(vector<L1Tau> collection)
     info.AddRowColumn(row, auxTools_.ToString( p->getEt(), 4)        );
     info.AddRowColumn(row, auxTools_.ToString( p->getEta(), 4)       );
     info.AddRowColumn(row, auxTools_.ToString( p->getPhi(), 4)       );
-    info.AddRowColumn(row, auxTools_.ToString( p->getIET() , 3)      );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIEt() , 3)      );
     info.AddRowColumn(row, auxTools_.ToString( p->getIEta(), 3)      );
     info.AddRowColumn(row, auxTools_.ToString( p->getIPhi(), 3)      );
     info.AddRowColumn(row, auxTools_.ToString( p->getIso() , 3)      );
@@ -811,7 +811,7 @@ void TreeReaderMC::PrintL1TauCollection(vector<L1Tau> collection)
     
   }
 
-  info.Print();
+  if (collection.size()>0) info.Print();
   return;
 }
 
@@ -831,7 +831,7 @@ void TreeReaderMC::PrintL1JetCollection(vector<L1Jet> collection)
     info.AddRowColumn(row, auxTools_.ToString( p->getEt(), 3)         );
     info.AddRowColumn(row, auxTools_.ToString( p->getEta(), 3)        );
     info.AddRowColumn(row, auxTools_.ToString( p->getPhi(), 3)        );
-    info.AddRowColumn(row, auxTools_.ToString( p->getIET() , 3)       );
+    info.AddRowColumn(row, auxTools_.ToString( p->getIEt() , 3)       );
     info.AddRowColumn(row, auxTools_.ToString( p->getIEta(), 3)       );
     info.AddRowColumn(row, auxTools_.ToString( p->getIPhi(), 3)       );
     info.AddRowColumn(row, auxTools_.ToString( p->getBx() , 3)        );
@@ -867,7 +867,7 @@ void TreeReaderMC::PrintL1EGCollection(vector<L1EG> collection)
   info.AddRowColumn(row, auxTools_.ToString( p->getEt()         , 3) );
   info.AddRowColumn(row, auxTools_.ToString( p->getEta()        , 3) );
   info.AddRowColumn(row, auxTools_.ToString( p->getPhi()        , 3) );
-  info.AddRowColumn(row, auxTools_.ToString( p->getIET()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getIEt()        , 3) );
   info.AddRowColumn(row, auxTools_.ToString( p->getIEta()       , 3) );
   info.AddRowColumn(row, auxTools_.ToString( p->getIPhi()       , 3) );
   info.AddRowColumn(row, auxTools_.ToString( p->getIso()        , 3) );
@@ -944,8 +944,8 @@ void TreeReaderMC::PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collec
     row++;
   }
 
-  info.Print();
+  if (collection.size()>0) info.Print();
   return;
 }
-*/
+
 #endif //TreeReaderMC_cxx 

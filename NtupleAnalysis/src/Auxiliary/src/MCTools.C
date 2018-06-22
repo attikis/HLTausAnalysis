@@ -80,14 +80,14 @@ bool MCTools::IsQuark(const int pdgId){
 }
 
 
-/* marina1
+
 // ****************************************************************************
 bool MCTools::RecursivelyLookForMotherId(Int_t Indx,
 					 Int_t MoId,
 					 const bool posn)
 // ****************************************************************************
 {
-  unsigned short nMoms = GenP_Mothers->at(Indx).size();
+  unsigned short nMoms = GenP_Mothers.at(Indx).size();
   if (nMoms == 0)return false;
   Int_t MyId;
 
@@ -97,15 +97,15 @@ bool MCTools::RecursivelyLookForMotherId(Int_t Indx,
 
   for (unsigned short i = 0; i < nMoms; i++){
     if (!posn) {
-      MyId = fabs(GenP_PdgId->at(GenP_Mothers->at(Indx).at(i)));
+      MyId = fabs(GenP_PdgId.at(GenP_Mothers.at(Indx).at(i)));
       MoId = fabs(MoId);
     }
     else {
-      MyId = GenP_PdgId->at(GenP_Mothers->at(Indx).at(i));
+      MyId = GenP_PdgId.at(GenP_Mothers.at(Indx).at(i));
     } 
     if (MyId == MoId)
       return true;
-    if (RecursivelyLookForMotherId(GenP_Mothers->at(Indx).at(i), MoId, posn) )
+    if (RecursivelyLookForMotherId(GenP_Mothers.at(Indx).at(i), MoId, posn) )
       return true;
   }
   return false;
@@ -118,25 +118,25 @@ Int_t MCTools::PosOfMotherId(Int_t Indx,
 			   const bool posn)
 // *****************************************************************
 {
-  unsigned short nMoms = GenP_Mothers->at(Indx).size();
+  unsigned short nMoms = GenP_Mothers.at(Indx).size();
   if (nMoms == 0)return 65535;
   Int_t MyId;
   Int_t Position;
   for (unsigned short i = 0; i < nMoms; i++){
-    Position = GenP_Mothers->at(Indx).at(i);
+    Position = GenP_Mothers.at(Indx).at(i);
     if (!posn) {
-      MyId = fabs(GenP_PdgId->at(Position));
+      MyId = fabs(GenP_PdgId.at(Position));
       MoId = fabs(MoId);
     }
     else {
-      MyId = GenP_PdgId->at(Position);
+      MyId = GenP_PdgId.at(Position);
     } 
-    Int_t status = GenP_Status->at(Position);
+    Int_t status = GenP_Status.at(Position);
     if (MyId == MoId) {
       if (status == 3) {
-	if(GenP_Daughters->at(Position).size()>2)
+	if(GenP_Daughters.at(Position).size()>2)
 	  {
-	    Position = GenP_Daughters->at(Position).at(2);
+	    Position = GenP_Daughters.at(Position).at(2);
 	    return Position;
 	  }
 	else
@@ -162,7 +162,7 @@ bool MCTools::LookForMotherId(Int_t Indx,
 			      const bool posn)
 // *****************************************************************
 {
-  unsigned short nMoms = GenP_Mothers->at(Indx).size();
+  unsigned short nMoms = GenP_Mothers.at(Indx).size();
   if (nMoms == 0)
     {
       std::cout << "Look  No Mothers\n"; 
@@ -171,11 +171,11 @@ bool MCTools::LookForMotherId(Int_t Indx,
   Int_t MyId;
   for (unsigned short i = 0; i < nMoms; i++) {
     if (!posn) {
-      MyId = fabs(GenP_PdgId->at(GenP_Mothers->at(Indx).at(i)));
+      MyId = fabs(GenP_PdgId.at(GenP_Mothers.at(Indx).at(i)));
       MoId = fabs(MoId);
     }
     else {
-      MyId = GenP_PdgId->at(GenP_Mothers->at(Indx).at(i));
+      MyId = GenP_PdgId.at(GenP_Mothers.at(Indx).at(i));
     } 
     if (MyId == MoId) return true;
   }
@@ -190,7 +190,7 @@ TLorentzVector MCTools::GetP4(const Int_t iGenP)
 
   // Sanity check on 4-momentum
   TLorentzVector p4;
-  p4.SetPtEtaPhiM(GenP_Pt->at(iGenP), GenP_Eta->at(iGenP), GenP_Phi->at(iGenP), GenP_Mass->at(iGenP));
+  p4.SetPtEtaPhiM(GenP_Pt.at(iGenP), GenP_Eta.at(iGenP), GenP_Phi.at(iGenP), GenP_Mass.at(iGenP));
   return p4;
 
 }
@@ -219,16 +219,16 @@ TLorentzVector MCTools::GetVisibleP4(const std::vector<unsigned short>& Daug)
   for (unsigned short i = 0; i< Daug.size(); i++){
 
     const unsigned short index = Daug.at(i);
-    const Int_t id             = abs( GenP_PdgId->at(index) );
+    const Int_t id             = abs( GenP_PdgId.at(index) );
 
     // Skip invisible daughters (neutrinos)
     if( (id == 12)  || (id == 14)  || (id == 16) ){ continue; }
 
     // Get properties
-    Double_t pt   = GenP_Pt  ->at(index);
-    Double_t eta  = GenP_Eta ->at(index);
-    Double_t phi  = GenP_Phi ->at(index);
-    Double_t mass = GenP_Mass->at(index);
+    Double_t pt   = GenP_Pt  .at(index);
+    Double_t eta  = GenP_Eta .at(index);
+    Double_t phi  = GenP_Phi .at(index);
+    Double_t mass = GenP_Mass.at(index);
 
     TLorentzVector tmp;
     tmp.SetPtEtaPhiM(pt, eta, phi, mass);
@@ -253,14 +253,14 @@ Int_t MCTools::GetLdgDaughterIndex(std::vector<unsigned short> Daug, bool bOnlyC
   for (size_t i = 0; i< Daug.size(); i++){
     
     const Int_t Indx = Daug.at(i);
-    const Int_t id   = fabs( GenP_PdgId->at(Indx) );
+    const Int_t id   = fabs( GenP_PdgId.at(Indx) );
 
     // Skip neutrinos
     if( (id == 12)  || (id == 14)  || (id == 16) ) continue;
 
     // Get pt and charge
-    Double_t pt     = GenP_Pt->at(Indx);
-    Double_t charge = GenP_Charge->at(Indx);
+    Double_t pt     = GenP_Pt.at(Indx);
+    Double_t charge = GenP_Charge.at(Indx);
     
     if(bOnlyChargedDaughters && fabs(charge) < 1 ) continue;
 
@@ -287,8 +287,8 @@ Double_t MCTools::GetHadronicTauMaxSignalCone(std::vector<unsigned short> Daug,
 
   // Get Ldg Charged Track index and direction
   const Int_t ldgIndex  = GetLdgDaughterIndex(Daug, true);
-  const Double_t ldgEta = GenP_Eta->at(ldgIndex);
-  const Double_t ldgPhi = GenP_Phi->at(ldgIndex);
+  const Double_t ldgEta = GenP_Eta.at(ldgIndex);
+  const Double_t ldgPhi = GenP_Phi.at(ldgIndex);
   Double_t deltaRMax    = -1.0;
   Int_t indexMax        = -1.0;
   Double_t dEta         = -1.0;
@@ -302,14 +302,14 @@ Double_t MCTools::GetHadronicTauMaxSignalCone(std::vector<unsigned short> Daug,
     if (index == ldgIndex) continue;
 
     // Skip neutrinos
-    Int_t Id = abs(GenP_PdgId->at(index));
+    Int_t Id = abs(GenP_PdgId.at(index));
     if( (Id == 12)  || (Id == 14)  || (Id == 16) ){ continue; }
 
     // Get Daughter properties
-    Double_t pt     = GenP_Pt ->at(index);
-    Double_t eta    = GenP_Eta->at(index);
-    Double_t phi    = GenP_Phi->at(index);
-    Double_t charge = GenP_Charge->at(index);
+    Double_t pt     = GenP_Pt .at(index);
+    Double_t eta    = GenP_Eta.at(index);
+    Double_t phi    = GenP_Phi.at(index);
+    Double_t charge = GenP_Charge.at(index);
 
     // Consider only charged daughters above minPt
     if (pt < minPt) continue;
@@ -336,7 +336,7 @@ void MCTools::GetHadronicTauChargedOrNeutralPions(Int_t tauIndex,
 // ****************************************************************************
 {
   
-  if (GenP_Daughters->at(tauIndex).size() == 0) return;
+  if (GenP_Daughters.at(tauIndex).size() == 0) return;
 
   // Get the pi+/-,pi0, K+/-, K0,K0L,KOS,eta,omegas and gammas
   std::vector<unsigned short> hTau_Dau;
@@ -347,7 +347,7 @@ void MCTools::GetHadronicTauChargedOrNeutralPions(Int_t tauIndex,
 
     // Get Daughter properties
     Int_t daughter_index     = hTau_Dau.at(i);
-    Double_t daughter_charge = GenP_Charge->at(daughter_index);
+    Double_t daughter_charge = GenP_Charge.at(daughter_index);
 
     // Keep only the pi+/-, K+/-, omegas
     if( fabs(daughter_charge) != charge ) continue;
@@ -389,19 +389,19 @@ void MCTools::GetHadronicTauFinalDaughters(Int_t Indx,
 // ****************************************************************************
 {
 
-  std::cout << "GenP_PdgId->size() = " << GenP_PdgId->size() << std::endl;
-  std::cout << "GenP_PdgId->at("<<Indx<<") = " << GenP_PdgId->at(Indx) << std::endl;
-  std::cout << "GenP_Daughters->at(0).size() = " << GenP_Daughters->at(0).size() << std::endl;
+  std::cout << "GenP_PdgId.size() = " << GenP_PdgId.size() << std::endl;
+  std::cout << "GenP_PdgId.at("<<Indx<<") = " << GenP_PdgId.at(Indx) << std::endl;
+  std::cout << "GenP_Daughters.at(0).size() = " << GenP_Daughters.at(0).size() << std::endl;
   
-  if (GenP_Daughters->at(Indx).size() == 0) return;
-  for (unsigned short i = 0; i< GenP_Daughters->at(Indx).size(); i++)
+  if (GenP_Daughters.at(Indx).size() == 0) return;
+  for (unsigned short i = 0; i< GenP_Daughters.at(Indx).size(); i++)
     {
 
-    Int_t IndxDau = GenP_Daughters->at(Indx).at(i);
-    Int_t IdDau = fabs(GenP_PdgId->at(IndxDau));
-    Int_t IdMo  = fabs(GenP_PdgId->at(Indx));
+    Int_t IndxDau = GenP_Daughters.at(Indx).at(i);
+    Int_t IdDau = fabs(GenP_PdgId.at(IndxDau));
+    Int_t IdMo  = fabs(GenP_PdgId.at(Indx));
     // Keep only the pi+/-,pi0, K+/-, 
-    // K0,K0L,KOS,eta,omegas and gammas from tau->tau+gamma transition
+    // K0,K0L,KOS,eta,omegas and gammas from tau.tau+gamma transition
     if ( (IdDau == 111 || IdDau == 211 || IdDau == 321 ||   //pi0,pi+/-,K+/-
           IdDau == 130 || IdDau == 310 || IdDau == 311 ||   //K0L,K0S,K0
 	  IdDau == 211 || IdDau == 223)                     //eta and omega
@@ -413,7 +413,7 @@ void MCTools::GetHadronicTauFinalDaughters(Int_t Indx,
 
     Int_t ifound = 0;      
       for (unsigned short j=0; j< Daug.size(); j++){
-	if (RecursivelyLookForMotherId(IndxDau, GenP_PdgId->at(Daug[j]),true)) {
+	if (RecursivelyLookForMotherId(IndxDau, GenP_PdgId.at(Daug[j]),true)) {
 	  ifound += 1;
 	}
       }
@@ -445,7 +445,7 @@ bool MCTools::IsFinalStateTau(const std::vector<unsigned short>& Daug)
   for (unsigned short i = 0; i < Daug.size(); i++){
     
     const unsigned short Indx = Daug[i];
-    Int_t id = GenP_PdgId->at(Indx);
+    Int_t id = GenP_PdgId.at(Indx);
     if ( TMath::Abs(id) == 15) return false;
   
   }
@@ -460,11 +460,11 @@ Bool_t MCTools::IsFinalStateHadronicTau(Int_t indx)
  {
 
    // Only consider taus
-   bool bIsTau = (TMath::Abs( GenP_PdgId->at(indx) ) == 15);
+   bool bIsTau = (TMath::Abs( GenP_PdgId.at(indx) ) == 15);
    if (!bIsTau) return false;
 
    // Only consider final state taus (do not decay to self)
-   bool bIsFinalStateTau  = IsFinalStateTau( GenP_Daughters->at(indx) );
+   bool bIsFinalStateTau  = IsFinalStateTau( GenP_Daughters.at(indx) );
    if (!bIsFinalStateTau) return false;
 
    // // Only consider tau-jets
@@ -526,8 +526,8 @@ Int_t MCTools::GetGenTauDecayMode(std::vector<unsigned short> Daug)
 
   // For-loop: Daughters
   for (unsigned short j = 0; j < Daug.size(); j++) {
-    Int_t partId   = fabs(GenP_PdgId->at(Daug.at(j)));
-    float charge = fabs(GenP_Charge->at(Daug.at(j)));
+    Int_t partId   = fabs(GenP_PdgId.at(Daug.at(j)));
+    float charge = fabs(GenP_Charge.at(Daug.at(j)));
     
     // Leptonic decays
     if ( fabs(partId) == 11 || fabs(partId) == 13 ) nLeptons++;
@@ -609,16 +609,16 @@ void MCTools::PrintAllDaughters(Int_t Indx)
 // ********************************************************
 {
 
-  if (GenP_Daughters->at(Indx).size() == 0) return;
+  if (GenP_Daughters.at(Indx).size() == 0) return;
 
-  for (unsigned int i=0; i< GenP_Daughters->at(Indx).size(); i++)
+  for (unsigned int i=0; i< GenP_Daughters.at(Indx).size(); i++)
     {
-      Int_t DauIndx = GenP_Daughters->at(Indx).at(i);
+      Int_t DauIndx = GenP_Daughters.at(Indx).at(i);
       std::cout << std::fixed;
       std::cout << "(" << std::setw(4) << Indx << ")" << std::setw(6) 
-		<< GenP_PdgId->at(Indx)<< " ---> " 
+		<< GenP_PdgId.at(Indx)<< " ---> " 
 		<< "(" << std::setw(4) << DauIndx << ")" << std::setw(6)
-		<< GenP_PdgId->at(DauIndx)
+		<< GenP_PdgId.at(DauIndx)
 		<< std::endl;
       // Print all daughters of the daughter itself
       PrintAllDaughters(DauIndx);
@@ -632,11 +632,11 @@ void MCTools::PrintAllDaughtersMinimalInfo(Int_t Indx)
 // ********************************************************
 {
 
-  if (GenP_Daughters->at(Indx).size() == 0) return;
+  if (GenP_Daughters.at(Indx).size() == 0) return;
 
-  for (unsigned int i=0; i< GenP_Daughters->at(Indx).size(); i++)
+  for (unsigned int i=0; i< GenP_Daughters.at(Indx).size(); i++)
     {
-      Int_t DauIndx = GenP_Daughters->at(Indx).at(i);
+      Int_t DauIndx = GenP_Daughters.at(Indx).at(i);
       PrintGenpMinimalInfo(DauIndx, false);
       PrintAllDaughtersMinimalInfo(DauIndx);
     }
@@ -648,11 +648,11 @@ void MCTools::PrintGenpDaughters(Int_t Indx, bool bPrintHeaders)
 // ********************************************************
 {
 
-  if (GenP_Daughters->at(Indx).size() == 0) return;
+  if (GenP_Daughters.at(Indx).size() == 0) return;
 
-  for (unsigned int i=0; i< GenP_Daughters->at(Indx).size(); i++)
+  for (unsigned int i=0; i< GenP_Daughters.at(Indx).size(); i++)
     {
-      Int_t DauIndx = GenP_Daughters->at(Indx).at(i);
+      Int_t DauIndx = GenP_Daughters.at(Indx).at(i);
       PrintGenp(DauIndx, bPrintHeaders);
     }
   return;
@@ -663,13 +663,13 @@ void MCTools::PrintAllMothers(Int_t Indx)
 // ******************************************************
 {
 
-  if (GenP_Mothers->at(Indx).size() == 0) return;
-  for (unsigned int i = 0; i < GenP_Mothers->at(Indx).size(); i++){
-    Int_t MoIndx = GenP_Mothers->at(Indx).at(i);
+  if (GenP_Mothers.at(Indx).size() == 0) return;
+  for (unsigned int i = 0; i < GenP_Mothers.at(Indx).size(); i++){
+    Int_t MoIndx = GenP_Mothers.at(Indx).at(i);
     std::cout << std::fixed;
     std::cout << "(" << std::setw(4) << Indx << ")" << std::setw(4) 
-	      << GenP_PdgId->at(Indx)<< " <--- " << "(" << std::setw(3) 
-	      << MoIndx << ")" << std::setw(4) << GenP_PdgId->at(MoIndx)
+	      << GenP_PdgId.at(Indx)<< " <--- " << "(" << std::setw(3) 
+	      << MoIndx << ")" << std::setw(4) << GenP_PdgId.at(MoIndx)
 	      << std::endl;
     PrintAllMothers(MoIndx);
   }
@@ -685,49 +685,49 @@ void MCTools::PrintGenp(Int_t Indx, bool bPrintHeaders)
   unsigned int daug1 = 0;
   unsigned int daug2 = 0;
   unsigned int NDaug;
-  static Int_t evOld = 0;
-
-  if ( (evOld != EvtNumber) || (Indx == 0) ) {
+  //static Int_t evOld = 0;
+  /*
+    if ( (evOld != event) || (Indx == 0) ) {
     std::cout << std::endl;
-    evOld = EvtNumber;
-
-    if (bPrintHeaders)
-      {
-	std::cout << std::setw(10)  << ">>> Run"
-		  << std::setw(10)  << "Event"
-		  << std::setw(10)  << "Indx"  
-		  << std::setw(10) << "Id" 
-		  << std::setw(10)  << "Status"
-		  << std::setw(10)  << "Mot1"
-		  << std::setw(10)  << "Mot2"
-		  << std::setw(10)  << "Dau1"
-		  << std::setw(10)  << "Dau2"
-		  << std::setw(10)  << "px"
-		  << std::setw(10) << "py"
-		  << std::setw(10) << "pz"
-		  << std::setw(10) << "E"
-		  << std::setw(10) << "Eta"
-		  << std::setw(10) << "Phi"
-		  << std::setw(10) << "M"
-		  << std::setw(10) << "Vtx-Z"
-		  << std::endl;
-      }
-  }
-  if (GenP_Mothers->at(Indx).size() > 0) moth1 = GenP_Mothers->at(Indx).at(0);
-  if (GenP_Mothers->at(Indx).size() > 1) moth2 = GenP_Mothers->at(Indx).at(1);
-  NDaug = GenP_Daughters->at(Indx).size();
+    evOld = event;
+  */
+  if (bPrintHeaders)
+    {
+      std::cout //<< std::setw(10)  << ">>> Run"
+	//<< std::setw(10)  << "Event"
+	<< std::setw(10)  << "Indx"  
+	<< std::setw(10) << "Id" 
+	<< std::setw(10)  << "Status"
+	<< std::setw(10)  << "Mot1"
+	<< std::setw(10)  << "Mot2"
+	<< std::setw(10)  << "Dau1"
+	<< std::setw(10)  << "Dau2"
+	<< std::setw(10)  << "px"
+	<< std::setw(10) << "py"
+	<< std::setw(10) << "pz"
+	<< std::setw(10) << "E"
+	<< std::setw(10) << "Eta"
+	<< std::setw(10) << "Phi"
+	<< std::setw(10) << "M"
+	<< std::setw(10) << "Vtx-Z"
+	<< std::endl;
+    }
+  //}
+  if (GenP_Mothers.at(Indx).size() > 0) moth1 = GenP_Mothers.at(Indx).at(0);
+  if (GenP_Mothers.at(Indx).size() > 1) moth2 = GenP_Mothers.at(Indx).at(1);
+  NDaug = GenP_Daughters.at(Indx).size();
   if (NDaug > 0){
-      daug1 = GenP_Daughters->at(Indx).at(0); // First Daughter index
-      if (NDaug > 1) {
-	daug2 = daug1 + NDaug -1;          // Last Daughter index 
-	if (GenP_Daughters->at(Indx).at(NDaug-1) != daug2) daug2 -=1;
-      }
+    daug1 = GenP_Daughters.at(Indx).at(0); // First Daughter index
+    if (NDaug > 1) {
+      daug2 = daug1 + NDaug -1;          // Last Daughter index 
+      if (GenP_Daughters.at(Indx).at(NDaug-1) != daug2) daug2 -=1;
+    }
   }
-  double mass = GenP_Mass->at(Indx);
-  double pt   = GenP_Pt->at(Indx);
-  double phi  = GenP_Phi->at(Indx);
-  double eta  = GenP_Eta->at(Indx);
-
+  double mass = GenP_Mass.at(Indx);
+  double pt   = GenP_Pt.at(Indx);
+  double phi  = GenP_Phi.at(Indx);
+  double eta  = GenP_Eta.at(Indx);
+  
   TLorentzVector pGen;
   pGen.SetPtEtaPhiM(pt,eta,phi,mass);
   double ene = pGen.E();
@@ -735,24 +735,24 @@ void MCTools::PrintGenp(Int_t Indx, bool bPrintHeaders)
   double py  = pGen.Py();
   double pz  = pGen.Pz();
   std::cout << std::fixed;
-  std::cout << std::setw(10) << std::setprecision(0) << RunNumber
-	    << std::setw(10) << std::setprecision(0) << EvtNumber
-	    << std::setw(10) << std::setprecision(0) << Indx
-	    << std::setw(10) << std::setprecision(0) << GenP_PdgId->at(Indx)
-	    << std::setw(10) << std::setprecision(0) << GenP_Status->at(Indx)
-	    << std::setw(10) << std::setprecision(0) << moth1
-	    << std::setw(10) << std::setprecision(0) << moth2
-	    << std::setw(10) << std::setprecision(0) << daug1
-	    << std::setw(10) << std::setprecision(0) << daug2
-	    << std::setw(10) << std::setprecision(3) << px
-	    << std::setw(10) << std::setprecision(3) << py
-	    << std::setw(10) << std::setprecision(3) << pz
-	    << std::setw(10) << std::setprecision(3) << ene
-	    << std::setw(10) << std::setprecision(3) << eta
-	    << std::setw(10) << std::setprecision(3) << phi
-	    << std::setw(10) << std::setprecision(3) << mass
-	    << std::setw(10) << std::setprecision(3) << GenP_VertexZ->at(Indx)
-	    << std::endl;
+  std::cout //<< std::setw(10) << std::setprecision(0) << run
+    //<< std::setw(10) << std::setprecision(0) << event
+    << std::setw(10) << std::setprecision(0) << Indx
+    << std::setw(10) << std::setprecision(0) << GenP_PdgId.at(Indx)
+    << std::setw(10) << std::setprecision(0) << GenP_Status.at(Indx)
+    << std::setw(10) << std::setprecision(0) << moth1
+    << std::setw(10) << std::setprecision(0) << moth2
+    << std::setw(10) << std::setprecision(0) << daug1
+    << std::setw(10) << std::setprecision(0) << daug2
+    << std::setw(10) << std::setprecision(3) << px
+    << std::setw(10) << std::setprecision(3) << py
+    << std::setw(10) << std::setprecision(3) << pz
+    << std::setw(10) << std::setprecision(3) << ene
+    << std::setw(10) << std::setprecision(3) << eta
+    << std::setw(10) << std::setprecision(3) << phi
+    << std::setw(10) << std::setprecision(3) << mass
+    << std::setw(10) << std::setprecision(3) << GenP_VertexZ.at(Indx)
+    << std::endl;
 }
 
 
@@ -777,11 +777,11 @@ void MCTools::PrintGenpMinimalInfo(Int_t Indx, bool bPrintHeaders)
 // **************************************************
 {
 
-  double pt    = GenP_Pt->at(Indx);
-  double eta   = GenP_Eta->at(Indx);
-  double phi   = GenP_Phi->at(Indx);
-  double mass  = GenP_Mass->at(Indx);
-  double PdgId = GenP_PdgId->at(Indx);
+  double pt    = GenP_Pt.at(Indx);
+  double eta   = GenP_Eta.at(Indx);
+  double phi   = GenP_Phi.at(Indx);
+  double mass  = GenP_Mass.at(Indx);
+  double PdgId = GenP_PdgId.at(Indx);
 
   TLorentzVector pGen;
   pGen.SetPtEtaPhiM(pt,eta,phi,mass);
@@ -793,8 +793,8 @@ void MCTools::PrintGenpMinimalInfo(Int_t Indx, bool bPrintHeaders)
   std::cout << std::fixed;
   if (bPrintHeaders)
     {
-      std::cout << std::setw(10) << ">>> Run"
-		<< std::setw(10) << "Event"
+      std::cout //<< std::setw(10) << ">>> Run"
+		//<< std::setw(10) << "Event"
 		<< std::setw(10) << "Indx"  
 		<< std::setw(10) << "Energy"
 		<< std::setw(10) << "Et"
@@ -804,8 +804,8 @@ void MCTools::PrintGenpMinimalInfo(Int_t Indx, bool bPrintHeaders)
 		<< std::endl;
     }
 
-  std::cout << std::setw(10) << std::setprecision(0) << RunNumber
-	    << std::setw(10) << std::setprecision(0) << EvtNumber
+  std::cout //<< std::setw(10) << std::setprecision(0) << run
+	    //<< std::setw(10) << std::setprecision(0) << event
 	    << std::setw(10) << std::setprecision(0) << Indx
 	    << std::setw(10) << std::setprecision(3) << E
 	    << std::setw(10) << std::setprecision(3) << Et
@@ -824,10 +824,10 @@ TLorentzVector MCTools::GetGenpP4(const Int_t Index)
 {
 
   // Construct the 4-momentum of the gen-particles
-  Double_t pt   = GenP_Pt  ->at(Index);
-  Double_t eta  = GenP_Eta ->at(Index);
-  Double_t phi  = GenP_Phi ->at(Index);
-  Double_t mass = GenP_Mass->at(Index);
+  Double_t pt   = GenP_Pt  .at(Index);
+  Double_t eta  = GenP_Eta .at(Index);
+  Double_t phi  = GenP_Phi .at(Index);
+  Double_t mass = GenP_Mass.at(Index);
     
   TLorentzVector p4;
   p4.SetPtEtaPhiM(pt, eta, phi, mass);
@@ -851,8 +851,8 @@ double MCTools::GetLxy(const Int_t iGenP,
   // Particles that decay promptly should have Lxy very close to zero.
   double refP_X = refPoint_X;
   double refP_Y = refPoint_Y;
-  double vtx_X  = GenP_VertexX->at(iGenP);
-  double vtx_Y  = GenP_VertexY->at(iGenP);
+  double vtx_X  = GenP_VertexX.at(iGenP);
+  double vtx_Y  = GenP_VertexY.at(iGenP);
   double Lxy    = sqrt(pow( (vtx_X - refP_X), 2) + pow( (vtx_Y - refP_Y), 2));
 
   return Lxy;
@@ -873,14 +873,14 @@ double MCTools::GetD0Mag(const Int_t iGenP,
   // Then d0 can be simply obtained by multiplying the tangent of the azimuthal
   // angle difference with the decay length Lxy:
   double Lxy      = GetLxy(iGenP);
-  double phi      = GenP_Phi->at(iGenP);
-  double phi_mom  = GenP_Phi->at(iMom);
+  double phi      = GenP_Phi.at(iGenP);
+  double phi_mom  = GenP_Phi.at(iMom);
   double deltaPhi = fabs(phi - phi_mom);
   double d0Mag    = sin(phi)*Lxy;
 
   return d0Mag;
 }
-*/ //marina1
+
 
 #endif  // MCTools_cxx
 

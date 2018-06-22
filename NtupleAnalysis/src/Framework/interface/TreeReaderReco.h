@@ -57,6 +57,7 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
     fUpgradeEmu           = new TChain("l1UpgradeEmuTree/L1UpgradeTree");
     fuGTEmu               = new TChain("l1uGTEmuTree/L1uGTTree");
     fGenerator            = new TChain("l1GeneratorTree/L1GenTree");
+    fTracks               = new TChain("l1TrackTree/eventTree"); // l1TrackTree/L1TrackTree");
     
     // Associated the ROOT files to the TChain
     std::cout << "\tGetting ROOT files for dataset " << SampleName << " and adding them to the chain." << std::endl;
@@ -75,6 +76,7 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
     if (doUpgradeEmu)          OpenFiles(SamplePath, SampleName, fUpgradeEmu       );
     if (douGTEmu)              OpenFiles(SamplePath, SampleName, fuGTEmu           );
     if (doGenerator)           OpenFiles(SamplePath, SampleName, fGenerator        );
+    if (doTracks)              OpenFiles(SamplePath, SampleName, fTracks           );
 
     // Set the Tree
     chain = fMainChain;
@@ -140,7 +142,7 @@ bool TreeReaderReco::CheckTreesExistence(const std::string SamplePath, const std
   doUpgradeEmu       = true;
   douGTEmu           = true;
   doGenerator        = true;
-  //doCheck            = true; // CHECK!
+  doTracks           = true;
   //
 
   // Get the file name of the first root file 
@@ -171,7 +173,7 @@ bool TreeReaderReco::CheckTreesExistence(const std::string SamplePath, const std
   TTree *treeUpgradeEmu       = (TTree*)file->Get("l1UpgradeEmuTree/L1UpgradeTree");
   TTree *treeuGTEmu           = (TTree*)file->Get("l1uGTEmuTree/L1uGTTree");
   TTree *treeGenerator        = (TTree*)file->Get("l1GeneratorTree/L1GenTree");
-  TTree *treeCheck            = (TTree*)file->Get("l1Check/L1CheckTree"); // CHECK!
+  TTree *treeTracks           = (TTree*)file->Get("l1TrackTree/eventTree"); // l1TrackTree/L1TrackTree");
 
   // Check if the trees exist
   if (!treeEvent) {
@@ -229,11 +231,10 @@ bool TreeReaderReco::CheckTreesExistence(const std::string SamplePath, const std
     doGenerator = false;
   }
 
-  // CHECK!
-  //  if (!treeCheck) {
-  //std::cout << "TREE EXISTENCE CHECK WORKS ! ! ! !" << std::endl;
-  //doCheck = false;
-  //}
+  if (!treeTracks) {
+    std::cout << treeTracks->GetName() << " not found!"<<std::endl;
+    doTracks = false;
+  }
 
   return true;
 }

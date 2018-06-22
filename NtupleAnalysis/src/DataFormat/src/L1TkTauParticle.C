@@ -243,26 +243,24 @@ void L1TkTauParticle::PrintTTTracks(vector<TTTrack> theTracks,
 Table table(theTrackType + " # | Pt | Eta | Phi | z0 (cm) | d0 (cm) | Q | Chi2 | DOF | Chi2Red | Stubs (PS)", "Text");
 
 // For-loop: All Tracks
-for (size_t i = 0; i < theTracks.size(); i++)
-  {
-
-TTTrack tk = theTracks.at(i);
-      
-// Fill table
-table.AddRowColumn(i, auxTools.ToString(i+1) );
-table.AddRowColumn(i, auxTools.ToString( tk.getPt() , 3  ) );
-table.AddRowColumn(i, auxTools.ToString( tk.getEta(), 3  ) );
-table.AddRowColumn(i, auxTools.ToString( tk.getPhi(), 3  ) );
-// table.AddRowColumn(i, auxTools.ToString( tk.getX0() , 3  ) );
-// table.AddRowColumn(i, auxTools.ToString( tk.getY0() , 3  ) );
-table.AddRowColumn(i, auxTools.ToString( tk.getZ0() , 3  ) );
-table.AddRowColumn(i, auxTools.ToString( tk.getD0() , 3  ) );
-table.AddRowColumn(i, auxTools.ToString( tk.getQ()  , 3  ) );
-table.AddRowColumn(i, auxTools.ToString( tk.getChi2(),3  ) );
-table.AddRowColumn(i, auxTools.ToString( tk.getDOF()     ) );
-table.AddRowColumn(i, auxTools.ToString( tk.getChi2Red(), 3 ) );
-table.AddRowColumn(i, auxTools.ToString( tk.getNumOfStubs()) + " (" + auxTools.ToString(tk.getNumOfStubsPS()) + ")");
-}
+ for (size_t i = 0; i < theTracks.size(); i++)
+   {
+     
+     TTTrack tk = theTracks.at(i);
+     
+     // Fill table
+     table.AddRowColumn(i, auxTools.ToString(i+1) );
+     table.AddRowColumn(i, auxTools.ToString( tk.getPt() , 3  ) );
+     table.AddRowColumn(i, auxTools.ToString( tk.getEta(), 3  ) );
+     table.AddRowColumn(i, auxTools.ToString( tk.getPhi(), 3  ) );
+     table.AddRowColumn(i, auxTools.ToString( tk.getZ0() , 3  ) );
+     table.AddRowColumn(i, auxTools.ToString( tk.getD0() , 3  ) );
+     //table.AddRowColumn(i, auxTools.ToString( tk.getQ()  , 3  ) );
+     table.AddRowColumn(i, auxTools.ToString( tk.getChi2(),3  ) );
+     table.AddRowColumn(i, auxTools.ToString( tk.getDOF()     ) );
+     table.AddRowColumn(i, auxTools.ToString( tk.getChi2Red(), 3 ) );
+     table.AddRowColumn(i, auxTools.ToString( tk.getNumOfStubs()) );// + " (" + auxTools.ToString(tk.getNumOfStubsPS()) + ")");
+   }
   
 if (theTracks.size() > 0) table.Print();
   

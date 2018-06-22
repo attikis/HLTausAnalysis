@@ -4,129 +4,120 @@
 // User
 #include "../interface/TrackingParticle.h"
 
-//****************************************************************************
+// ****************************************************************************
 TrackingParticle::TrackingParticle()
-//****************************************************************************
+// ****************************************************************************
 {
 
   _InitVars();
 
 }
 
-//****************************************************************************
+// ****************************************************************************
 void TrackingParticle::_InitVars(void)
-//****************************************************************************
+// ****************************************************************************
 {
 
 
   // Variable declaration
   theIndex = 0.0;
   theMomentum.SetXYZ(0,0,0);
-  thePOCA.SetXYZ(0,0,0);
   theD0propagated = 0.0;
   theZ0propagated = 0.0;
   theCharge = 0.0;
   theQ = "N/A";
   theDxy = 0.0;
-  theD0 = 0.0;
+  theD0produced = 0.0;
+  theZ0produced = 0.0;
   theD0Sign = 0.0;
   theD0Phi = 0.0;
   theNMatch = 0;
-  theTTTrackIndex = 0;
-  theTTClusters = 0;
-  theTTStubs = 0;
+  theNStubs = 0;
+  theTTTrackPt     = 0.0;
+  theTTTrackEta    = 0.0;
+  theTTTrackPhi    = 0.0;
+  theTTTrackZ0     = 0.0;
+  theTTTrackD0     = 0.0;
+  theTTTrackChi2   = 0.0;
+  theTTTrackNStubs = 0;
   theEventId = 0;
-  theTTTracks = 0;
   
   return;
 }
 
-//****************************************************************************
+// ****************************************************************************
 TrackingParticle::~TrackingParticle()
-//****************************************************************************
+// ****************************************************************************
 {
 
 }
 
 
-//****************************************************************************
+// ****************************************************************************
 TrackingParticle::TrackingParticle(unsigned short index,
 				   TVector3 momentum,
-				   ROOT::Math::XYZVector poca, // ROOT::Math::XYZVector (https://root.cern.ch/doc/master/Vector3DPage.html)
-				   double d0_propagated,
-				   double z0_propagated,
+				   float d0_propagated,
+				   float z0_propagated,
+				   float d0_produced,
+				   float z0_produced,
+				   float dxy,
 				   int charge,
-				   unsigned short pdgId,
-				   unsigned short nMatch,
-				   unsigned short ttTrackIndex,
-				   unsigned short ttClusters,
-				   unsigned short ttStubs,
-				   unsigned short ttTracks,
+				   int pdgId,
+				   int nMatch,
+				   int nStubs,
+				   float ttTrackPt,
+				   float ttTrackEta,
+				   float ttTrackPhi,
+				   float ttTrackZ0,
+				   float ttTrackD0,
+				   float ttTrackChi2,
+				   int ttTrackNstubs,
 				   int eventId)
-//****************************************************************************
+// ****************************************************************************
 {
 
   _InitVars();
   theIndex        = index;
   theMomentum     = momentum;
-  thePOCA         = poca;
   theD0propagated = d0_propagated;
   theZ0propagated = z0_propagated;
   theCharge       = charge;
   theQ            = _getQ();
   thePdgId        = pdgId;
   theNMatch       = nMatch;
-  theTTTrackIndex = ttTrackIndex;
-  theTTClusters   = ttClusters;
-  theTTStubs      = ttStubs;
-  theTTTracks     = ttTracks;
-  theDxy          = _getDxy();
-  theD0           = _getD0();
-  theD0Sign       = _getD0Sign();
-  theD0Phi        = _getD0Phi();
+  theNStubs       = nStubs;
+  theDxy          = dxy; //_getDxy();
+  theD0produced  = d0_produced; //_getD0();
+  theZ0produced  = z0_produced;
+  //theD0Sign       = _getD0Sign();
+  //theD0Phi        = _getD0Phi();
   theNMatch       = nMatch;
-  theTTTrackIndex = ttTrackIndex;
-  theTTClusters   = ttClusters;
-  theTTStubs      = ttStubs;
-  theTTTracks     = ttTracks;
+  theTTTrackPt    = ttTrackPt;
+  theTTTrackEta   = ttTrackEta;
+  theTTTrackPhi   = ttTrackPhi;
+  theTTTrackZ0    = ttTrackZ0;
+  theTTTrackD0    = ttTrackD0;
+  theTTTrackChi2  = ttTrackChi2;
+  theTTTrackNStubs= ttTrackNstubs;
   theEventId      = eventId;
 
   if (0) PrintProperties();
 }
 
-
-//****************************************************************************
-double TrackingParticle::_getD0(void)
-//****************************************************************************
-{
-  // Same as in TTTrack
-  double d0 = -thePOCA.X() * sin( theMomentum.Phi() ) + thePOCA.Y() * cos(theMomentum.Phi() );
-  return d0;
-}
-
-
-//****************************************************************************
-double TrackingParticle::_getDxy(void)
-//****************************************************************************
+/*
+// ****************************************************************************
+float TrackingParticle::_getD0Phi(void)
+// ****************************************************************************
 {
 
-  double dxy = sqrt(thePOCA.X() * thePOCA.X() + thePOCA.Y() * thePOCA.Y() );
-  return dxy;
-}
-
-//****************************************************************************
-double TrackingParticle::_getD0Phi(void)
-//****************************************************************************
-{
-
-  double d0phi = atan2(thePOCA.Y(), thePOCA.X()); // range(-pi, +pi)
+  float d0phi = atan2(thePOCA.Y(), thePOCA.X()); // range(-pi, +pi)
   return d0phi;
 }
 
 
-//****************************************************************************
-double TrackingParticle::_getD0Sign(void)
-//****************************************************************************
+// ****************************************************************************
+float TrackingParticle::_getD0Sign(void)
+// ****************************************************************************
 {
 
   // The track d0 sign has the same sign as the curvature (rho)
@@ -139,7 +130,7 @@ double TrackingParticle::_getD0Sign(void)
   // momentum at the POCA and then project along the unit vector of the viewing direction.
   // If you are looking AT the x-y plane the we are looking along the negative z-axis.
   // Therefore we need to project along (0, 0, -1)
-  // double tp_RInv = t->TP_RInv->at(iTP);
+  // doublem tp_RInv = t->TP_RInv->at(iTP);
 
   // Q. How to determine if a vector is moving clockwise or anti-clockwise to another
   // A. The question only makes sense in 3-D since the notion only makes sense
@@ -158,22 +149,22 @@ double TrackingParticle::_getD0Sign(void)
   // a = thePOCA vector
   // b = theMomentum unit vector at the POCA
   // TVector3 cross_product = thePOCA.Cross( theMomentum.Unit() );
-  ROOT::Math::DisplacementVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> cross_product = thePOCA.Cross( theMomentum.Unit() );
+  ROOT::Math::DisplacementVector3D<ROOT::Math::Cartesian3D<float>, ROOT::Math::DefaultCoordinateSystemTag> cross_product = thePOCA.Cross( theMomentum.Unit() );
 
   // For looking down on the Cartesian plane the viewing direction vector (0, 0, -1) is (0, 0, -1)
   TVector3 v_z(0, 0, -1);
-  double dot_product = cross_product.Dot(v_z);  
+  float dot_product = cross_product.Dot(v_z);  
   
   // If dot product is positive then track is clockwise. Otherwise anticlockwise
   if (dot_product >= 0.0) return +1.0;
   else return -1.0;
 
 }
+*/
 
-
-//****************************************************************************
+// ****************************************************************************
 string TrackingParticle::_getQ(void)
-//****************************************************************************
+// ****************************************************************************
 {
 
   string theQ = "N/A";
@@ -190,39 +181,44 @@ string TrackingParticle::_getQ(void)
 }
   
 
-//****************************************************************************
+// ****************************************************************************
 void TrackingParticle::PrintProperties(bool bPrintTitleRow)
-//****************************************************************************
+// ****************************************************************************
 {
   
-  Table info("Index | Pt | Eta | Phi | PdgId | Q | x0 | y0 | z0 | d0 | d0-sign | d0-phi | NMatch | TTTrackIndex | NClusters | NStubs | NTracks | Event-Id", "Text");
+  Table info("Index | Pt | Eta | Phi | PdgId | Q | z0 propagated | d0 propagated | z0 produced | d0 produced | dxy | NMatch | NStubs | TTTrackPt | TTTrackEta | TTTrackPhi | TTTrackZ0 | TTTrackD0 | TTTrackChi2 | TTTrackNStubs | Event-Id", "Text");
+
   info.AddRowColumn(0, auxTools.ToString( theIndex) );
   info.AddRowColumn(0, auxTools.ToString( theMomentum.Perp(), 3) );
   info.AddRowColumn(0, auxTools.ToString( theMomentum.Eta() , 3) );
   info.AddRowColumn(0, auxTools.ToString( theMomentum.Phi() , 3) );
   info.AddRowColumn(0, auxTools.ToString( getPdgId()) );
   info.AddRowColumn(0, getQ());
-  info.AddRowColumn(0, auxTools.ToString( getX0(), 3)    );
-  info.AddRowColumn(0, auxTools.ToString( getY0(), 3)    );
-  info.AddRowColumn(0, auxTools.ToString( getZ0(), 3)    );
-  info.AddRowColumn(0, auxTools.ToString( getD0(), 3)    );
-  info.AddRowColumn(0, auxTools.ToString( getD0Sign() )  );
-  info.AddRowColumn(0, auxTools.ToString( getD0Phi(), 3) );
-
+  info.AddRowColumn(0, auxTools.ToString( getZ0propagated(), 3)    );
+  info.AddRowColumn(0, auxTools.ToString( getD0propagated(), 3)    );
+  info.AddRowColumn(0, auxTools.ToString( getZ0produced(), 3)    );
+  info.AddRowColumn(0, auxTools.ToString( getD0produced(), 3)    );
+  info.AddRowColumn(0, auxTools.ToString( theDxy , 3)    );
+  //info.AddRowColumn(0, auxTools.ToString( getD0Sign() )  );
+  //info.AddRowColumn(0, auxTools.ToString( getD0Phi(), 3) );
   info.AddRowColumn(0, auxTools.ToString( theNMatch)       );
-  info.AddRowColumn(0, auxTools.ToString( theTTTrackIndex) );
-  info.AddRowColumn(0, auxTools.ToString( theTTClusters)   );
-  info.AddRowColumn(0, auxTools.ToString( theTTStubs)      );
-  info.AddRowColumn(0, auxTools.ToString( theTTTracks)     );
+  info.AddRowColumn(0, auxTools.ToString( theNStubs)       );
+  info.AddRowColumn(0, auxTools.ToString( theTTTrackPt)    );
+  info.AddRowColumn(0, auxTools.ToString( theTTTrackEta)   );
+  info.AddRowColumn(0, auxTools.ToString( theTTTrackPhi)   );
+  info.AddRowColumn(0, auxTools.ToString( theTTTrackZ0)    );
+  info.AddRowColumn(0, auxTools.ToString( theTTTrackD0)    );
+  info.AddRowColumn(0, auxTools.ToString( theTTTrackChi2)  );
+  info.AddRowColumn(0, auxTools.ToString( theTTTrackNStubs));
   info.AddRowColumn(0, auxTools.ToString( theEventId)      );
   info.Print(bPrintTitleRow);
 
   return;
 }
 
-//****************************************************************************
-TLorentzVector TrackingParticle::p4(double mass)
-//****************************************************************************
+// ****************************************************************************
+TLorentzVector TrackingParticle::p4(float mass)
+// ****************************************************************************
 {  
   TLorentzVector p4;
   p4.SetPtEtaPhiM(getPt(), getEta(), getPhi(), mass);

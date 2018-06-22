@@ -1252,7 +1252,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
   fChain->SetMakeClass(1);
   
   TFriendElement *friendTreeElement = (TFriendElement*)fChain->GetListOfFriends()->First();
-  fChain->GetListOfFriends()->ls();
+  
   while (friendTreeElement){
     friendTreeElement->GetTree()->SetMakeClass(1);
     friendTreeElement = (TFriendElement*)fChain->GetListOfFriends()->After(friendTreeElement);

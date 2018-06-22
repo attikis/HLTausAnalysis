@@ -7,7 +7,7 @@
 
 // User
 #include "../Framework/src/TreeAnalyserMC.C"
-//#include "../Framework/src/TreeReaderMC.C"
+#include "../Framework/src/TreeReaderMC.C"
 
 
 #include "../Auxiliary/src/AuxTools.C"
@@ -26,6 +26,7 @@
 #include "../DataFormat/src/L1Jet.C"
 #include "../DataFormat/src/L1Tau.C"
 #include "../DataFormat/src/L1Sum.C"
+#include "../DataFormat/src/L1CaloTP.C"
 
 // #include "../Plugins/src/L1TkPrimaryVertex.C"
 #include "../Plugins/src/L1PixelTrackFit.C"
@@ -53,7 +54,6 @@ class CaloTk : public TreeAnalyserMC{
 		const int maxEvents_ = -1, 
 	//TTree* tree=0) : 
 	TChain* chain=0) :
-  //TreeAnalyserMC("", SamplePath, SampleName, text_, maxEvents_, tree) 
   TreeAnalyserMC("", SamplePath, SampleName, text_, maxEvents_, chain)
     { 
       auxTools_.StopwatchStart();
@@ -65,7 +65,7 @@ class CaloTk : public TreeAnalyserMC{
   virtual void Loop();
 
   void PrintSettings(void);
-/*
+  /*
   void PrintGenParticleCollection(vector<GenParticle> collection);
 
   void PrintTrackingParticleCollection(vector<TrackingParticle> collection);
@@ -83,14 +83,16 @@ class CaloTk : public TreeAnalyserMC{
   void PrintL1TauCollection(vector<L1Tau> collection);
 
   void PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection);
-*/
+  */
+
   void ApplyDiTauZMatching(string tkCollectionType,
 			   vector<L1TkTauParticle> &L1TkTaus);
-/*
+
+  /*
   vector<GenParticle> GetHadronicGenTaus(vector<GenParticle> GenTaus,
 					 double visEt=20.0,
 					 double visEta=2.3);
-*/
+  */
   void GetShrinkingConeSizes(double calo_et,
 			     double sigCone_Constant,
 			     double isoCone_Constant,
