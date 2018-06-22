@@ -2,6 +2,10 @@
 #ifndef TreeDefinitionBase_h
 #define TreeDefinitionBase_h
 
+#include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisCaloTPDataFormat.h"
+#include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisL1CaloTowerDataFormat.h"
+#include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisL1CaloClusterDataFormat.h"
+
 // ROOT
 #include "TChain.h"
 
@@ -19,6 +23,7 @@ class TreeDefinitionBase
      TChain  *fUpgradeEmu;
      TChain  *fuGTEmu;
      TChain  *fGenerator;
+     TChain  *fTracks;
      Int_t   fCurrent;  //! Current Tree number in a Chain
 
      bool doCaloTower;
@@ -31,8 +36,13 @@ class TreeDefinitionBase
      bool doUpgradeEmu;
      bool douGTEmu;
      bool doGenerator;
-     //bool doCheck; // CHECK!
-     
+     bool doTracks;
+
+     // ---May be needed for taking both CaloTowers and CaloClusters
+     // L1Analysis::L1AnalysisCaloTPDataFormat      caloTP_;
+     // L1Analysis::L1AnalysisL1CaloTowerDataFormat* caloTower_;
+     // L1Analysis::L1AnalysisL1CaloClusterDataFormat* caloCluster_;
+
      virtual Bool_t  Notify();
      virtual void    Show(Long64_t entry = -1);
      virtual Int_t   GetEntry(Long64_t entry);

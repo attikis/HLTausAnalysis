@@ -171,7 +171,51 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<int>     hcalQIESample_Adc;
   vector<int>     hcalQIESample_Dv;
   vector<int>     hcalQIESample_Er;
+  
+  // Tracks
+  vector<float>   *L1Tks_Pt;
+  vector<float>   *L1Tks_Eta;
+  vector<float>   *L1Tks_Phi;
+  vector<float>   *L1Tks_d0;
+  vector<float>   *L1Tks_z0;
+  vector<float>   *L1Tks_ChiSquared;
+  vector<int>     *L1Tks_NStubs;
+  vector<int>     *L1Tks_IsGenuine;
+  vector<int>     *L1Tks_IsLoose;
+  vector<int>     *L1Tks_IsUnknown;
+  vector<int>     *L1Tks_IsCombinatoric;
+  vector<int>     *L1Tks_IsFake;
 
+  vector<int>     *L1Tks_TP_PdgId;
+  vector<float>   *L1Tks_TP_Pt;
+  vector<float>   *L1Tks_TP_Eta;
+  vector<float>   *L1Tks_TP_Phi;
+  vector<float>   *L1Tks_TP_z0;
+  vector<float>   *L1Tks_TP_dxy;
+
+  // Tracking Particles
+  vector<float>   *TP_Pt;
+  vector<float>   *TP_Eta;
+  vector<float>   *TP_Phi;
+  vector<float>   *TP_dxy;
+  vector<float>   *TP_d0;
+  vector<float>   *TP_z0;
+  vector<float>   *TP_d0_produced;
+  vector<float>   *TP_z0_produced;
+  vector<int>     *TP_PdgId;
+  vector<int>     *TP_NMatch;
+  vector<int>     *TP_NStubs;
+  vector<int>     *TP_EventId;
+  vector<int>     *TP_Charge;
+  
+  vector<float>   *TP_Trk_Pt;
+  vector<float>   *TP_Trk_Eta;
+  vector<float>   *TP_Trk_Phi;
+  vector<float>   *TP_Trk_z0;
+  vector<float>   *TP_Trk_d0;
+  vector<float>   *TP_Trk_ChiSquared;
+  vector<int>     *TP_Trk_NStubs;
+ 
   // =========================================== EMULATOR TREES =============================================
 
   // Calo Towers Emulator
@@ -372,6 +416,9 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_caloTower_eta;  
   TBranch        *b_caloTower_phi;  
 
+  // UpgradeTfMuon
+  // ****Fix me
+
   // Upgrade
   TBranch        *b_L1EG_N;   
   TBranch        *b_L1EG_Et;   
@@ -476,8 +523,51 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_hcalQIESample_Dv;   
   TBranch        *b_hcalQIESample_Er;   
 
+  // Tracks 
+  TBranch        *b_L1Tks_Pt;   
+  TBranch        *b_L1Tks_Eta;   
+  TBranch        *b_L1Tks_Phi;   
+  TBranch        *b_L1Tks_d0;   
+  TBranch        *b_L1Tks_z0;   
+  TBranch        *b_L1Tks_ChiSquared;   
+  TBranch        *b_L1Tks_NStubs;   
+  TBranch        *b_L1Tks_IsGenuine;   
+  TBranch        *b_L1Tks_IsLoose;   
+  TBranch        *b_L1Tks_IsUnknown;   
+  TBranch        *b_L1Tks_IsCombinatoric;   
+  TBranch        *b_L1Tks_IsFake;   
+
+  TBranch        *b_L1Tks_TP_PdgId;   
+  TBranch        *b_L1Tks_TP_Pt;   
+  TBranch        *b_L1Tks_TP_Eta;   
+  TBranch        *b_L1Tks_TP_Phi;   
+  TBranch        *b_L1Tks_TP_z0;   
+  TBranch        *b_L1Tks_TP_dxy;   
+
+  // Tracking Particles
+  TBranch        *b_TP_Pt;   
+  TBranch        *b_TP_Eta;   
+  TBranch        *b_TP_Phi;   
+  TBranch        *b_TP_dxy;   
+  TBranch        *b_TP_d0;   
+  TBranch        *b_TP_z0;   
+  TBranch        *b_TP_d0_produced;   
+  TBranch        *b_TP_z0_produced;   
+  TBranch        *b_TP_PdgId;   
+  TBranch        *b_TP_NMatch;   
+  TBranch        *b_TP_NStubs;   
+  TBranch        *b_TP_EventId;   
+  TBranch        *b_TP_Charge;   
+
+  TBranch        *b_TP_Trk_Pt;   
+  TBranch        *b_TP_Trk_Eta;   
+  TBranch        *b_TP_Trk_Phi;   
+  TBranch        *b_TP_Trk_z0;   
+  TBranch        *b_TP_Trk_d0;   
+  TBranch        *b_TP_Trk_ChiSquared;   
+  TBranch        *b_TP_Trk_NStubs;   
+
   // =========================================== EMULATOR TREES =============================================
-  
 
   // Calo Tower Emulator
   //==CaloTP (Emu)
@@ -628,9 +718,6 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_mEmu_algoDecisionPreScaled;   
   TBranch        *b_mEmu_algoDecisionFinal;   
 
-
-  	
-
   virtual void InitReco(TChain *chain);
   
 };
@@ -684,6 +771,50 @@ void TreeDefinitionReco::InitReco(TChain *chain)
   hcalDetId_N     = 0;
   hcalQIESample_N = 0;
 
+  // L1 tracks
+  L1Tks_Pt = 0;
+  L1Tks_Eta = 0;
+  L1Tks_Phi = 0;
+  L1Tks_d0 = 0;
+  L1Tks_z0 = 0;
+  L1Tks_ChiSquared = 0;
+  L1Tks_NStubs = 0;
+  L1Tks_IsGenuine = 0;
+  L1Tks_IsLoose = 0;
+  L1Tks_IsUnknown = 0;
+  L1Tks_IsCombinatoric = 0;
+  L1Tks_IsFake = 0;
+
+  L1Tks_TP_PdgId = 0;
+  L1Tks_TP_Pt = 0;
+  L1Tks_TP_Eta = 0;
+  L1Tks_TP_Phi = 0;
+  L1Tks_TP_z0 = 0;
+  L1Tks_TP_dxy = 0;
+
+  // Tracking Particles
+  TP_Pt = 0;
+  TP_Eta = 0;
+  TP_Phi = 0;
+  TP_dxy = 0;
+  TP_d0 = 0;
+  TP_z0 = 0;
+  TP_d0_produced = 0;
+  TP_z0_produced = 0;
+  TP_PdgId = 0;
+  TP_NMatch = 0;
+  TP_NStubs = 0;
+  TP_EventId = 0;
+  TP_Charge = 0;
+  
+  TP_Trk_Pt = 0;
+  TP_Trk_Eta = 0;
+  TP_Trk_Phi = 0;
+  TP_Trk_z0 = 0;
+  TP_Trk_d0 = 0;
+  TP_Trk_ChiSquared = 0;
+  TP_Trk_NStubs = 0;
+ 
   // =========================================== EMULATOR TREES =============================================
 
   // Calo Towers Emulator
@@ -896,7 +1027,57 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       // Add friend (HOTree)
       fChain -> AddFriend(fHO);
     }
-    
+
+  // Tracks and Tracking Particles
+  if(doTracks)
+    {
+      //Tracks
+      fTracks->SetBranchAddress("trk_pt", &L1Tks_Pt, &b_L1Tks_Pt);
+      
+      fTracks->SetBranchAddress("trk_eta", &L1Tks_Eta, &b_L1Tks_Eta);
+      fTracks->SetBranchAddress("trk_phi", &L1Tks_Phi, &b_L1Tks_Phi);
+      fTracks->SetBranchAddress("trk_d0", &L1Tks_d0, &b_L1Tks_d0);
+      fTracks->SetBranchAddress("trk_z0", &L1Tks_z0, &b_L1Tks_z0);
+      fTracks->SetBranchAddress("trk_chi2", &L1Tks_ChiSquared, &b_L1Tks_ChiSquared);
+      fTracks->SetBranchAddress("trk_nstub", &L1Tks_NStubs, &b_L1Tks_NStubs);
+      fTracks->SetBranchAddress("trk_genuine", &L1Tks_IsGenuine, &b_L1Tks_IsGenuine);
+      fTracks->SetBranchAddress("trk_loose", &L1Tks_IsLoose, &b_L1Tks_IsLoose);
+      fTracks->SetBranchAddress("trk_unknown", &L1Tks_IsUnknown, &b_L1Tks_IsUnknown);
+      fTracks->SetBranchAddress("trk_combinatoric", &L1Tks_IsCombinatoric, &b_L1Tks_IsCombinatoric);
+      fTracks->SetBranchAddress("trk_fake", &L1Tks_IsFake, &b_L1Tks_IsFake);
+      fTracks->SetBranchAddress("trk_matchtp_pdgid", &L1Tks_TP_PdgId, &b_L1Tks_TP_PdgId);
+      fTracks->SetBranchAddress("trk_matchtp_pt", &L1Tks_TP_Pt, &b_L1Tks_TP_Pt);
+      fTracks->SetBranchAddress("trk_matchtp_eta", &L1Tks_TP_Eta, &b_L1Tks_TP_Eta);
+      fTracks->SetBranchAddress("trk_matchtp_phi", &L1Tks_TP_Phi, &b_L1Tks_TP_Phi);
+      fTracks->SetBranchAddress("trk_matchtp_z0", &L1Tks_TP_z0, &b_L1Tks_TP_z0);
+      fTracks->SetBranchAddress("trk_matchtp_dxy", &L1Tks_TP_dxy, &b_L1Tks_TP_dxy);
+
+      fTracks->SetBranchAddress("tp_pt", &TP_Pt, &b_TP_Pt);
+      fTracks->SetBranchAddress("tp_eta", &TP_Eta, &b_TP_Eta);
+      fTracks->SetBranchAddress("tp_phi", &TP_Phi, &b_TP_Phi);
+      fTracks->SetBranchAddress("tp_dxy", &TP_dxy, &b_TP_dxy);
+      fTracks->SetBranchAddress("tp_d0", &TP_d0, &b_TP_d0);
+      fTracks->SetBranchAddress("tp_z0", &TP_z0, &b_TP_z0);
+      fTracks->SetBranchAddress("tp_d0_prod", &TP_d0_produced, &b_TP_d0_produced);
+      fTracks->SetBranchAddress("tp_z0_prod", &TP_z0_produced, &b_TP_z0_produced);
+      fTracks->SetBranchAddress("tp_pdgid", &TP_PdgId, &b_TP_PdgId);
+      fTracks->SetBranchAddress("tp_nmatch", &TP_NMatch, &b_TP_NMatch);
+      fTracks->SetBranchAddress("tp_nstub", &TP_NStubs, &b_TP_NStubs);
+      fTracks->SetBranchAddress("tp_eventid", &TP_EventId, &b_TP_EventId);
+      fTracks->SetBranchAddress("tp_charge", &TP_Charge, &b_TP_Charge);
+
+      fTracks->SetBranchAddress("matchtrk_pt", &TP_Trk_Pt, &b_TP_Trk_Pt);
+      fTracks->SetBranchAddress("matchtrk_eta", &TP_Trk_Eta, &b_TP_Trk_Eta);
+      fTracks->SetBranchAddress("matchtrk_phi", &TP_Trk_Phi, &b_TP_Trk_Phi);
+      fTracks->SetBranchAddress("matchtrk_z0", &TP_Trk_z0, &b_TP_Trk_z0);
+      fTracks->SetBranchAddress("matchtrk_d0", &TP_Trk_d0, &b_TP_Trk_d0);
+      fTracks->SetBranchAddress("matchtrk_chi2", &TP_Trk_ChiSquared, &b_TP_Trk_ChiSquared);
+      fTracks->SetBranchAddress("matchtrk_nstub", &TP_Trk_NStubs, &b_TP_Trk_NStubs);
+      
+      // Add friend ( TracksTree )
+      fChain -> AddFriend(fTracks);
+    }
+  
   // =========================================== EMULATOR TREES =============================================
   
   // Calo Towers Emulator
@@ -929,6 +1110,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fCaloTowerEmu->SetBranchAddress("ecalEBTPtime", &ecalEBTPEmu_time, &b_ecalEBTPEmu_time);
 
       //
+      // ---May be needed for taking both CaloTowers and CaloClusters
       // caloTower_ = new L1Analysis::L1AnalysisL1CaloTowerDataFormat();
       // fCaloTowerEmu->SetBranchAddress("L1CaloTower", &caloTower_ );
       //
@@ -1070,11 +1252,12 @@ void TreeDefinitionReco::InitReco(TChain *chain)
   fChain->SetMakeClass(1);
   
   TFriendElement *friendTreeElement = (TFriendElement*)fChain->GetListOfFriends()->First();
+  fChain->GetListOfFriends()->ls();
   while (friendTreeElement){
     friendTreeElement->GetTree()->SetMakeClass(1);
     friendTreeElement = (TFriendElement*)fChain->GetListOfFriends()->After(friendTreeElement);
-  }                                                                                                                                                                      
-  
+  }                                                                                                                                                                     
+
   Notify();
 }
 

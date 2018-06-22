@@ -20,12 +20,18 @@ class TreeDefinitionGenP : public virtual TreeDefinitionBase
   UInt_t              GenP_N;
   std::vector<int>    GenP_PdgId;
   std::vector<int>    GenP_Status;
-  std::vector<int>    GenP_Parent;
   std::vector<float>  GenP_Pt;
   std::vector<float>  GenP_Eta;
   std::vector<float>  GenP_Phi;
+  std::vector<float>  GenP_Mass;
   std::vector<float>  GenP_E;
   std::vector<int>    GenP_Charge;
+  std::vector<float>  GenP_VertexX;
+  std::vector<float>  GenP_VertexY;
+  std::vector<float>  GenP_VertexZ;
+  std::vector<std::vector<unsigned short> > GenP_Mothers;
+  std::vector<std::vector<unsigned short> > GenP_Daughters;
+
 
   // GenJets 
   Int_t           GenJet_N;
@@ -45,12 +51,17 @@ class TreeDefinitionGenP : public virtual TreeDefinitionBase
   TBranch *b_GenP_N;
   TBranch *b_GenP_PdgId;
   TBranch *b_GenP_Status;
-  TBranch *b_GenP_Parent;
   TBranch *b_GenP_Pt;
   TBranch *b_GenP_Eta;
   TBranch *b_GenP_Phi;
+  TBranch *b_GenP_Mass;
   TBranch *b_GenP_E;
   TBranch *b_GenP_Charge;
+  TBranch *b_GenP_VertexX;
+  TBranch *b_GenP_VertexY;
+  TBranch *b_GenP_VertexZ;
+  TBranch *b_GenP_Mothers;
+  TBranch *b_GenP_Daughters;
 
   // GenJets
   TBranch *b_GenJet_N; 
@@ -100,15 +111,21 @@ void TreeDefinitionGenP::InitGenP(TChain *chain)
       fGenerator->SetBranchAddress("nMeanPU"      , &nMeanPU     , &b_nMeanPU);
 
       // GenParticles
-      fGenerator->SetBranchAddress("nPart"        , &GenP_N      , &b_GenP_N);
-      fGenerator->SetBranchAddress("partId"       , &GenP_PdgId  , &b_GenP_PdgId);
-      fGenerator->SetBranchAddress("partStat"     , &GenP_Status , &b_GenP_Status);
-      fGenerator->SetBranchAddress("partParent"   , &GenP_Parent , &b_GenP_Parent);
-      fGenerator->SetBranchAddress("partPt"       , &GenP_Pt     , &b_GenP_Pt);
-      fGenerator->SetBranchAddress("partEta"      , &GenP_Eta    , &b_GenP_Eta);
-      fGenerator->SetBranchAddress("partPhi"      , &GenP_Phi    , &b_GenP_Phi);
-      fGenerator->SetBranchAddress("partE"        , &GenP_E      , &b_GenP_E);
-      fGenerator->SetBranchAddress("partCh"       , &GenP_Charge , &b_GenP_Charge);
+      fGenerator->SetBranchAddress("nPart"        , &GenP_N         , &b_GenP_N);
+      fGenerator->SetBranchAddress("partId"       , &GenP_PdgId     , &b_GenP_PdgId);
+      fGenerator->SetBranchAddress("partStat"     , &GenP_Status    , &b_GenP_Status);
+      fGenerator->SetBranchAddress("partPt"       , &GenP_Pt        , &b_GenP_Pt);
+      fGenerator->SetBranchAddress("partEta"      , &GenP_Eta       , &b_GenP_Eta);
+      fGenerator->SetBranchAddress("partPhi"      , &GenP_Phi       , &b_GenP_Phi);
+      fGenerator->SetBranchAddress("partMass"     , &GenP_Mass      , &b_GenP_Mass);
+      fGenerator->SetBranchAddress("partE"        , &GenP_E         , &b_GenP_E);
+      fGenerator->SetBranchAddress("partCh"       , &GenP_Charge    , &b_GenP_Charge);
+      fGenerator->SetBranchAddress("partVertexX"  , &GenP_VertexX   , &b_GenP_VertexX);
+      fGenerator->SetBranchAddress("partVertexY"  , &GenP_VertexY   , &b_GenP_VertexY);
+      fGenerator->SetBranchAddress("partVertexZ"  , &GenP_VertexZ   , &b_GenP_VertexZ);
+      fGenerator->SetBranchAddress("partMothers"  , &GenP_Mothers   , &b_GenP_Mothers);
+      fGenerator->SetBranchAddress("partDaughters", &GenP_Daughters , &b_GenP_Daughters);
+
 
       // GenJets
       fGenerator->SetBranchAddress("nJet"         , &GenJet_N    , &b_GenJet_N);
