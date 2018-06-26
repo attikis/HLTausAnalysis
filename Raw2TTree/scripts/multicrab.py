@@ -1586,7 +1586,7 @@ def CreateCfgFile(dataset, taskDirName, requestName, infilePath, opts):
     Creates a CRAB-specific configuration file which will be used in the submission
     of a job. The function uses as input a generic cfg file which is then customised
     based on the dataset type used.
-
+    
     infilePath = "crabConfig.py"
     '''
     Verbose("CreateCfgFile()")
