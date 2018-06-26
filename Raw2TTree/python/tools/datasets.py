@@ -72,8 +72,8 @@ datasetsSingleNu = []
 #datasetsSingleNu.append(Dataset('/SingleNeutrino/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
 #datasetsSingleNu.append(Dataset('/SingleNeutrino/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
 
-datasetsSingleNu.append(Dataset(''/SingleNeutrino/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das)) 
-datasetsSingleNu.append(Dataset(''/SingleNeutrino/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das)) 
+datasetsSingleNu.append(Dataset('/SingleNeutrino/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das)) 
+datasetsSingleNu.append(Dataset('/SingleNeutrino/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das)) 
 
 
 datasetsSinglePhoton = []
