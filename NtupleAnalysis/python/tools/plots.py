@@ -122,6 +122,13 @@ _physicalMcAdd = {
     "TT_TuneCUETP8M1_14TeV_NoPU" : "TT_TuneCUETP8M1_14TeV_NoPU", 
     "TT_TuneCUETP8M1_14TeV_PU140": "TT_TuneCUETP8M1_14TeV_PU140", 
     "TT_TuneCUETP8M1_14TeV_PU200": "TT_TuneCUETP8M1_14TeV_PU200",     
+
+    #Fall17D
+    "TT_TuneCUETP8M2T4_14TeV_NoPU"  : "TT_TuneCUETP8M2T4_14TeV_NoPU",
+    "TT_TuneCUETP8M2T4_14TeV_PU140"  : "TT_TuneCUETP8M2T4_14TeV_PU140",
+    "TT_TuneCUETP8M2T4_14TeV_PU200"  : "TT_TuneCUETP8M2T4_14TeV_PU200",
+
+
 }
 
 '''
@@ -233,6 +240,13 @@ _physicalToLogical.update({
     "TT_TuneCUETP8M1_14TeV_NoPU" : "TT_TuneCUETP8M1_14TeV_NoPU", 
     "TT_TuneCUETP8M1_14TeV_PU140": "TT_TuneCUETP8M1_14TeV_PU140", 
     "TT_TuneCUETP8M1_14TeV_PU200": "TT_TuneCUETP8M1_14TeV_PU200", 
+
+    #Fall17D
+    "TT_TuneCUETP8M2T4_14TeV_L1TnoPU"  : "TT_TuneCUETP8M2T4_14TeV_NoPU",
+    "TT_TuneCUETP8M2T4_14TeV_L1TPU140"  : "TT_TuneCUETP8M2T4_14TeV_PU140",
+    "TT_TuneCUETP8M2T4_14TeV_L1TPU200"  : "TT_TuneCUETP8M2T4_14TeV_PU200",
+    
+
 
 })
 
@@ -405,6 +419,12 @@ _datasetOrder.extend([
     "TT_TuneCUETP8M1_14TeV_PU140",
     "TT_TuneCUETP8M1_14TeV_PU200",
 
+    #Fall17D
+    "TT_TuneCUETP8M2T4_14TeV_NoPU",
+    "TT_TuneCUETP8M2T4_14TeV_PU140",
+    "TT_TuneCUETP8M2T4_14TeV_PU200",
+    
+
     ]) 
 
 ## Map the logical dataset names to legend labels
@@ -527,6 +547,12 @@ _legendLabels = {
     "TT_TuneCUETP8M1_14TeV_PU140": "t#bar{t} (PU=140)",
     "TT_TuneCUETP8M1_14TeV_PU200": "t#bar{t} (PU=200)",
 
+    #Fall17D
+    "TT_TuneCUETP8M2T4_14TeV_NoPU"  : "t#bar{t} (PU=0)",
+    "TT_TuneCUETP8M2T4_14TeV_PU140"  : "t#bar{t} (PU=140)",
+    "TT_TuneCUETP8M2T4_14TeV_PU200"  : "t#bar{t} (PU=200)",
+
+
     # Ratio uncertainties
     "BackgroundStatError"    : "Stat. unc.",
     "BackgroundSystError"    : "Syst. unc.",
@@ -601,6 +627,12 @@ _plotStyles = {
     "TT_TuneCUETP8M1_14TeV_NoPU" : styles.TTBarNoPU,
     "TT_TuneCUETP8M1_14TeV_PU140": styles.TTBarPU140,
     "TT_TuneCUETP8M1_14TeV_PU200": styles.TTBarPU200,
+
+    #Fall17D
+    "TT_TuneCUETP8M2T4_14TeV_PU140"  : styles.TTBarNoPU,
+    "TT_TuneCUETP8M2T4_14TeV_PU140"  : styles.TTBarPU140,
+    "TT_TuneCUETP8M2T4_14TeV_PU140"  : styles.TTBarPU200,
+
 
     "WJets_0bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+1),
     "WJets_1bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+4),

@@ -276,6 +276,24 @@ backgroundCrossSections = CrossSectionList(
             "13": 831.76, # [18]
             "14": 984.50, # [18] 
             }),
+    CrossSection("TT_TuneCUETP8M2T4_14TeV_L1TnoPU", {
+             "7": 172.0,  # [10]
+             "8": 245.8,  # [10]
+            "13": 831.76, # [18]
+            "14": 984.50, # [18] 
+            }),
+    CrossSection("TT_TuneCUETP8M2T4_14TeV_L1TPU140", {
+             "7": 172.0,  # [10]
+             "8": 245.8,  # [10]
+            "13": 831.76, # [18]
+            "14": 984.50, # [18] 
+            }),
+    CrossSection("TT_TuneCUETP8M2T4_14TeV_L1TPU200", {
+             "7": 172.0,  # [10]
+             "8": 245.8,  # [10]
+            "13": 831.76, # [18]
+            "14": 984.50, # [18] 
+            }),
     CrossSection("TTJets_HT600to800", {
             "13": 0.0, 
             }),
@@ -455,8 +473,17 @@ backgroundCrossSections = CrossSectionList(
     CrossSection("ZprimeToTauTau_M_3000", {
             "13": 1.585e-03,
             }),
-    CrossSection("GluGluHToTauTau_M125", {
+    CrossSection("GluGluHToTauTau_M125_NoPU", {
             "13": 1, # dummy value, not really needed as this sample is not merged with anything else
+            "14": 1, # dummy value, marinaT
+            }),
+    CrossSection("GluGluHToTauTau_M125_PU140", {
+            "13": 1, # dummy value, not really needed as this sample is not merged with anything else
+            "14": 1, # dummy value, marinaT
+            }),
+    CrossSection("GluGluHToTauTau_M125_PU200", {
+            "13": 1, # dummy value, not really needed as this sample is not merged with anything else
+            "14": 1, # dummy value, marinaT
             }),
     CrossSection("GluGluHToTauTau_M125_TauHLT", {
             "13": 1, # dummy value, not really needed as this sample is not merged with anything else

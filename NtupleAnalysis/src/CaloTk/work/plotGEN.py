@@ -128,7 +128,7 @@ def Plot(jsonfile, opts):
         plots.mergeRenameReorderForDataMC(datasetsMgr)
 
         # Print dataset information (after merge)
-        datasetsMgr.PrintInfo()
+        #datasetsMgr.PrintInfo() #marinaT
 
         # Plot the histogram
         MCPlot(datasetsMgr, j)

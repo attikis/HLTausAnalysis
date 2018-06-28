@@ -768,7 +768,7 @@ void CaloTk::Loop()
     
     ////////////////////////////////////////////////
     // SingleTau
-  ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
     FillSingleTau_(L1TkTaus_Calo, hCalo_Rate  , hCalo_Eff);
     FillSingleTau_(L1TkTaus_Calo, hCalo_Rate_C, hCalo_Eff_C, 0.0, 1.0);
     FillSingleTau_(L1TkTaus_Calo, hCalo_Rate_I, hCalo_Eff_I, 1.0, 1.6);
@@ -924,10 +924,14 @@ void CaloTk::Loop()
   // Write the histograms to the file
   ////////////////////////////////////////////////
   outFile->cd();
+  WriteHistos_();
   outFile->Write();
   auxTools_.StopwatchStop(5, "minutes", "Total Time");
 
 }
+
+
+
 
 
 //============================================================================
@@ -1106,6 +1110,178 @@ void CaloTk::BookHistos_(void)
   return;
 }
 
+//============================================================================
+void CaloTk::WriteHistos_(void)
+//============================================================================
+{
+  hCounters->Write();
+
+  // L1TkTaus: Matching track
+  hL1TkTau_MatchTk_DeltaR->Write();
+  hL1TkTau_MatchTk_PtRel->Write();
+  hL1TkTau_MatchTk_Pt->Write();
+  hL1TkTau_MatchTk_Eta->Write();
+  hL1TkTau_MatchTk_d0->Write();
+  hL1TkTau_MatchTk_d0Abs->Write();
+  hL1TkTau_MatchTk_NStubs->Write();
+  hL1TkTau_MatchTk_ChiSquared->Write();
+  hL1TkTau_MatchTk_RedChiSquared->Write();
+  hL1TkTau_MatchTk_IsGenuine->Write();
+  hL1TkTau_MatchTk_IsUnknown->Write();
+  hL1TkTau_MatchTk_IsCombinatoric->Write();
+  hL1TkTau_MatchTk_PtMinusCaloEt->Write();
+
+  
+  // L1TkTaus: Signal cone tracks                                                                                                                              
+  hL1TkTau_SigTks_Pt->Write();
+  hL1TkTau_SigTks_PtRel->Write();
+  hL1TkTau_SigTks_Eta->Write();
+  hL1TkTau_SigTks_POCAz->Write();
+  hL1TkTau_SigTks_DeltaPOCAz->Write();
+  hL1TkTau_SigTks_d0->Write();
+  hL1TkTau_SigTks_d0Abs->Write();
+  hL1TkTau_SigTks_d0Sig->Write();
+  hL1TkTau_SigTks_d0SigAbs->Write();
+  hL1TkTau_SigTks_DeltaR->Write();
+  hL1TkTau_SigTks_NStubs->Write();
+  hL1TkTau_SigTks_ChiSquared->Write();
+  hL1TkTau_SigTks_RedChiSquared->Write();
+  hL1TkTau_SigTks_PtMinusCaloEt->Write();
+  
+  // L1TkTaus: Isolation cone tracks                                                                                                                           
+  hL1TkTau_IsoTks_Pt->Write();
+  hL1TkTau_IsoTks_PtRel->Write();
+  hL1TkTau_IsoTks_Eta->Write();
+  hL1TkTau_IsoTks_POCAz->Write();
+  hL1TkTau_IsoTks_DeltaPOCAz->Write();
+  hL1TkTau_IsoTks_d0->Write();
+  hL1TkTau_IsoTks_d0Abs->Write();
+  hL1TkTau_IsoTks_d0Sig->Write();
+  hL1TkTau_IsoTks_d0SigAbs->Write();
+  hL1TkTau_IsoTks_DeltaR->Write();
+  hL1TkTau_IsoTks_NStubs->Write();
+  hL1TkTau_IsoTks_ChiSquared->Write();
+  hL1TkTau_IsoTks_RedChiSquared->Write();
+  hL1TkTau_IsoTks_PtMinusCaloEt->Write();
+  
+  // L1TkTaus: VtxIsolated                                                                                                                                     
+  hL1TkTau_Multiplicity->Write();
+  hL1TkTau_Rtau->Write();
+  hL1TkTau_CHF->Write();
+  hL1TkTau_NHF->Write();
+  hL1TkTau_NHFAbs->Write();
+  hL1TkTau_NSigTks->Write();
+  hL1TkTau_NIsoTks->Write();
+  hL1TkTau_InvMass->Write();
+  hL1TkTau_InvMassIncl->Write();
+  hL1TkTau_SigConeRMin->Write();
+  hL1TkTau_SigConeRMax->Write();
+  hL1TkTau_IsoConeRMin->Write();
+  hL1TkTau_IsoConeRMax->Write();
+  hL1TkTau_Charge->Write();
+  hL1TkTau_ChargeAbs->Write();
+  hL1TkTau_RelIso->Write();
+  hL1TkTau_VtxIso->Write();
+  //hL1TkTau_VtxIsoAbs->Write();
+  hL1TkTau_DeltaRGenP->Write();
+
+  
+  // L1Taus: Resolutions                                                                                                                                       
+  hL1Tau_ResolutionCaloEt->Write();
+  hL1Tau_ResolutionCaloEta->Write();
+  hL1Tau_ResolutionCaloPhi->Write();
+
+  // L1TkTaus: Resolutions                                                                                                                                     
+  hL1TkTau_ResolutionCaloEt->Write();
+  hL1TkTau_ResolutionCaloEta->Write();
+  hL1TkTau_ResolutionCaloPhi->Write();
+
+  // SingleTau: Rates                                                                                                                                          
+  hCalo_Rate->Write(); // Inclusive = C+I+F                                                                                                                       
+  hCalo_Rate_C->Write();
+  hCalo_Rate_I->Write();
+  hCalo_Rate_F->Write();
+  hTk_Rate->Write();
+  hTk_Rate_C->Write();
+  hTk_Rate_I->Write();
+  hTk_Rate_F->Write();
+  hVtxIso_Rate->Write();
+  hVtxIso_Rate_C->Write();
+  hVtxIso_Rate_I->Write();
+  hVtxIso_Rate_F->Write();
+
+  // SingleTau: Efficiencies                                                                                                                                   
+  hCalo_Eff->Write();  // Inclusive = C+I+F                                                                                                                       
+  hCalo_Eff_C->Write();
+  hCalo_Eff_I->Write();
+  hCalo_Eff_F->Write();
+  hTk_Eff->Write();
+  hTk_Eff_C->Write();
+  hTk_Eff_I->Write();
+  hTk_Eff_F->Write();
+  hVtxIso_Eff->Write();
+  hVtxIso_Eff_C->Write();
+  hVtxIso_Eff_I->Write();
+  hVtxIso_Eff_F->Write();
+
+  // DiTau: Rates                                                                                                                                              
+  hDiTau_Rate_Calo->Write(); // Inclusive = C+I+F                                                                                                                 
+  hDiTau_Rate_Calo_C->Write();
+  hDiTau_Rate_Calo_I->Write();
+  hDiTau_Rate_Calo_F->Write();
+  hDiTau_Rate_Tk->Write();
+  hDiTau_Rate_Tk_C->Write();
+  hDiTau_Rate_Tk_I->Write();
+  hDiTau_Rate_Tk_F->Write();
+  hDiTau_Rate_VtxIso->Write();
+  hDiTau_Rate_VtxIso_C->Write();
+  hDiTau_Rate_VtxIso_I->Write();
+  hDiTau_Rate_VtxIso_F->Write();
+
+  // DiTau: Efficiencies                                                                                                                                       
+  hDiTau_Eff_Calo->Write(); // Inclusive = C+I+F                                                                                                                  
+  hDiTau_Eff_Calo_C->Write();
+  hDiTau_Eff_Calo_I->Write();
+  hDiTau_Eff_Calo_F->Write();
+  hDiTau_Eff_Tk->Write();
+  hDiTau_Eff_Tk_C->Write();
+  hDiTau_Eff_Tk_I->Write();
+  hDiTau_Eff_Tk_F->Write();
+  hDiTau_Eff_VtxIso->Write();
+  hDiTau_Eff_VtxIso_C->Write();
+  hDiTau_Eff_VtxIso_I->Write();
+  hDiTau_Eff_VtxIso_F->Write();
+
+  // DiTau: (Calo-Other)                                                                                                                                       
+  hDiTau_Rate_Calo_Tk->Write();
+  hDiTau_Rate_Calo_VtxIso->Write();
+  hDiTau_Eff_Calo_Tk->Write();
+  hDiTau_Eff_Calo_VtxIso->Write();
+
+  // DiTau (Tk-Other)                                                                                                                                          
+  hDiTau_Rate_Tk_VtxIso->Write();
+  hDiTau_Eff_Tk_VtxIso->Write();
+
+  // Turn-Ons                                                                                                                                                  
+  // TEfficiency* pEff->Write();                                                                                                                                        
+  hMcHadronicTau_VisEt->Write();
+  hCalo_TurnOn50->Write();
+  hTk_TurnOn50->Write();
+  hVtxIso_TurnOn50->Write();
+  //                                                                                                                                                           
+  hCalo_TurnOn25->Write();
+  hTk_TurnOn25->Write();
+  hVtxIso_TurnOn25->Write();
+  //                                                                                                                                                           
+  hCalo_TurnOn_SingleTau50KHz->Write();
+  hTk_TurnOn_SingleTau50KHz->Write();
+  hVtxIso_TurnOn_SingleTau50KHz->Write();
+  //                                                                                                                                                           
+  hCalo_TurnOn_DiTau50KHz->Write();
+  hTk_TurnOn_DiTau50KHz->Write();
+  hVtxIso_TurnOn_DiTau50KHz->Write();
+  
+}
 
 //============================================================================
 void CaloTk::FinaliseEffHisto_(TH1D *histo, 

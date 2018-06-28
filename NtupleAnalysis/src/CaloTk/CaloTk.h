@@ -183,6 +183,7 @@ class CaloTk : public TreeAnalyserMC{
  private:
   // Function declaration
   void BookHistos_(void);
+  void WriteHistos_(void);
   void InitObjects(void);
   void InitVars_(void);
 

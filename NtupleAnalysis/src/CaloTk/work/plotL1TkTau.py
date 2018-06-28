@@ -96,8 +96,9 @@ def Plot(jsonfile, opts):
 
     with open(os.path.abspath(jsonfile)) as jfile:
         j = json.load(jfile)
+        saveDir = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/L1TkTaus/"
 
-        Verbose("Plotting %s. Will save under \"%s\"" % (j["saveName"], j["saveDir"]), True)
+        Verbose("Plotting %s. Will save under \"%s\"" % (j["saveName"], saveDir), True)
 
         # Setup the style
         style = tdrstyle.TDRStyle()
@@ -122,7 +123,7 @@ def Plot(jsonfile, opts):
         for d in datasetsMgr.getAllDatasets():
             if "ChargedHiggs" in d.getName():
                 datasetsMgr.getDataset(d.getName()).setCrossSection(1.0)
-                
+
         ## Print dataset information (before merge)        
         #datasetsMgr.PrintInfo()
         
@@ -130,7 +131,7 @@ def Plot(jsonfile, opts):
         plots.mergeRenameReorderForDataMC(datasetsMgr)
 
         # Print dataset information (after merge)
-        datasetsMgr.PrintInfo()
+        #datasetsMgr.PrintInfo()
 
         # Plot the histogram
         MCPlot(datasetsMgr, j)
@@ -160,12 +161,14 @@ def MCPlot(datasetsMgr, json):
     if "ylabelsize" in json:
         ylabelSize = json["ylabelsize"]
 
+    '''
     # Set universal histo styles
     if("drawStyle" in json):
         p.histoMgr.setHistoDrawStyleAll(json["drawStyle"])
     if("legendStyle" in json):
         p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
-
+    '''
+    
     # For-loop: All histos
     for index, h in enumerate(p.histoMgr.getHistos()):
         if index == 0:
@@ -174,11 +177,17 @@ def MCPlot(datasetsMgr, json):
             p.histoMgr.setHistoDrawStyle(h.getName(), "AP")
             p.histoMgr.setHistoLegendStyle(h.getName(), "AP")
 
+
+    for index, h in enumerate(p.histoMgr.getHistos()):
+        plots._plotStyles[p.histoMgr.getHistos()[index].getDataset().getName()].apply(p.histoMgr.getHistos()[index].getRootHisto())
+       #plots._plotStyles[dataset.getName()].apply(p)
+
     # Additional text
     histograms.addText(json["extraText"].get("x"), json["extraText"].get("y"), json["extraText"].get("text"), json["extraText"].get("size") )
     
     # Draw a customised plot
-    saveName = os.path.join(json["saveDir"], json["saveName"])
+    saveDir  = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/L1TkTaus/"
+    saveName = os.path.join(saveDir, json["saveName"])
     plots.drawPlot(p, 
                    saveName,                  
                    xlabel            = json["xlabel"], 
@@ -205,10 +214,20 @@ def MCPlot(datasetsMgr, json):
         p.removeLegend()
 
     # Save in all formats chosen by user
-    saveFormats = json["saveFormats"]
+        
+    #saveFormats = json["saveFormats"]
+    saveFormats = [".pdf"]
     for i, ext in enumerate(saveFormats):
-        Print("%s" % saveName + ext, i==0)
-    p.saveAs(saveName, formats=saveFormats)
+        saveNameURL = saveName + ext
+        #saveNameURL = saveNameURL.replace("/publicweb/a/aattikis/", "http://home.fnal.gov/~aattikis/")                                                                   
+        saveNameURL = saveNameURL.replace("/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/", "https://cmsdoc.cern.ch/~mtoumazo/hltaus/")
+        if opts.url:
+            Print(saveNameURL, 1)
+        else:
+            Print(saveName + ext, 1)
+            plot.saveAs(saveName, formats=saveFormats)
+            
+
     return
 
 
@@ -280,7 +299,10 @@ if __name__ == "__main__":
 
     parser.add_option("-e", "--excludeTasks", dest="excludeTasks", action="store", 
                       help="List of datasets in mcrab to exclude")
-    
+
+    parser.add_option("--url", dest="url", action="store_true", default=False,
+                      help="Don't print the actual save path the histogram is saved, but print the URL instead [default: %s]" % False)
+
     (opts, parseArgs) = parser.parse_args()
 
     # Require at least two arguments (script-name, path to multicrab)

@@ -67,7 +67,7 @@ def GetLumi(datasetsMgr):
 
 def GetDatasetsFromDir(opts, json):
     Verbose("Getting datasets")
-    
+    print opts.includeOnlyTasks
     if (not opts.includeOnlyTasks and not opts.excludeTasks):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
                                                         dataEra=json["dataEra"],
@@ -96,8 +96,9 @@ def Plot(jsonfile, opts):
 
     with open(os.path.abspath(jsonfile)) as jfile:
         j = json.load(jfile)
-
-        Verbose("Plotting %s. Will save under \"%s\"" % (j["saveName"], j["saveDir"]), True)
+        saveDir = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/performance/"
+        
+        Verbose("Plotting %s. Will save under \"%s\"" % (j["saveName"], saveDir), True)
 
         # Setup the style
         style = tdrstyle.TDRStyle()
@@ -126,7 +127,7 @@ def Plot(jsonfile, opts):
         plots.mergeRenameReorderForDataMC(datasetsMgr)
 
         # Print dataset information
-        datasetsMgr.PrintInfo()
+        #datasetsMgr.PrintInfo()
 
         # Plot the histogram
         ComparisonPlot(datasetsMgr, j)
@@ -213,7 +214,8 @@ def ComparisonPlot(datasetsMgr, json):
     p.histoMgr.setHistoLegendLabelMany(legendDict)
     
     # Draw a customised plot
-    saveName = os.path.join(json["saveDir"], json["saveName"])    
+    saveDir = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/performance/"
+    saveName = os.path.join(saveDir, json["saveName"])    
 
     # Create the customised plot
     plots.drawPlot(p, 
@@ -244,10 +246,17 @@ def ComparisonPlot(datasetsMgr, json):
     histograms.addText(json["extraText"].get("x"), json["extraText"].get("y"), json["extraText"].get("text"), json["extraText"].get("size") )
 
     # Save in all formats chosen by user
-    saveFormats = json["saveFormats"]
+    #saveFormats = json["saveFormats"]
+    saveFormats = [".pdf"]
     for i, ext in enumerate(saveFormats):
-        Print("%s" % saveName + ext, i==0)
-    p.saveAs(saveName, formats=saveFormats)
+        saveNameURL = saveName + ext
+        saveNameURL = saveNameURL.replace("/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/", "https://cmsdoc.cern.ch/~mtoumazo/hltaus/")
+        if opts.url:
+            Print(saveNameURL, 1)
+        else:
+            Print(saveName + ext, 1)
+            plot.saveAs(saveName, formats=saveFormats)
+
     return
 
 
@@ -316,6 +325,10 @@ if __name__ == "__main__":
     parser.add_option("-e", "--excludeTasks", dest="excludeTasks", action="store", 
                       help="List of datasets in mcrab to exclude")
     
+    parser.add_option("--url", dest="url", action="store_true", default=False,
+                      help="Don't print the actual save path the histogram is saved, but print the URL instead [default: %s]" % False)
+
+
     (opts, parseArgs) = parser.parse_args()
 
     # Require at least two arguments (script-name, path to multicrab)

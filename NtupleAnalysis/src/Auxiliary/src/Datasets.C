@@ -309,17 +309,59 @@ void Datasets::CreateMcProductions_(void)
 
 
   // PhaseIIFall17D                                                                                                                                                     
-  string path1_NoPU  = "/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW";
-  string path1_PU140 = "/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW";
-  string path1_PU200 = "/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW";
+  string path_NoPU_v1  = "/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW";
+  string path_NoPU_v2  = "/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW"; 
+  string path_PU140_v1 = "/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW";
+  string path_PU140_v2 = "/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW"; 
+  string path_PU200_v1 = "/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW";
+  string path_PU200_v2 = "/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW"; 
   cmssw    = "10_1_5";
   geometry = "Phase2";
 
-  Datasets SinglePionNoPU_PhaseIIFall17D("SinglePion_FlatPt_2to100_NoPU", "SinglePion_FlatPt_2to100_NoPU", "/SinglePion_FlatPt-2to100" + path1_NoPU , CP, cmssw, geometry, 140, 500000, 0, 0);
+  Datasets SinglePionNoPU_PhaseIIFall17D("SinglePion_FlatPt_2to100_NoPU", "SinglePion_FlatPt_2to100_NoPU", "/SinglePion_FlatPt-2to100" + path_NoPU_v1 , CP, cmssw, geometry, 140, 500000, 0, 0);
+
+  Datasets TTNoPU_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TnoPU", "TT_TuneCUETP8M2T4_14TeV_L1TnoPU", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_NoPU_v2, CP, cmssw, geometry, 0, 99328, 24, 2);
+  Datasets TTPU140_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TPU140", "TT_TuneCUETP8M2T4_14TeV_L1TPU140", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_PU140_v2, CP, cmssw, geometry, 140, 99328, 24, 2);
+  Datasets TTPU200_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TPU200", "TT_TuneCUETP8M2T4_14TeV_L1TPU200", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_PU200_v2, CP, cmssw, geometry, 200, 99328, 24, 2);
+
+  Datasets SingleNeutrinoPU140_PhaseIIFall17D("SingleNeutrino_PU140", "SingleNeutrino_PU140", "/SingleNeutrino" + path_PU140_v1, CP, cmssw, geometry, 140, 500000, 0, 0);
+  Datasets SingleNeutrinoPU200_PhaseIIFall17D("SingleNeutrino_PU200", "SingleNeutrino_PU200", "/SingleNeutrino" + path_PU200_v1, CP, cmssw, geometry, 200, 498400, 0, 0);
+
+  Datasets GluGluHToTauTauM125NoPU_PhaseIIFall17D("GluGluHToTauTau_M125_NoPU", "GluGluHToTauTau_M125_NoPU", "/GluGluHToTauTau_M125_14TeV_powheg_pythia8" + path_NoPU_v1 , CP, cmssw, geometry, 0, 100000, 25 , 2);
+  Datasets GluGluHToTauTauM125PU140_PhaseIIFall17D("GluGluHToTauTau_M125_PU140", "GluGluHToTauTau_M125_PU140", "/GluGluHToTauTau_M125_14TeV_powheg_pythia8" + path_PU140_v1 ,CP, cmssw, geometry, 0, 100000, 25 , 2);
+  Datasets GluGluHToTauTauM125PU200_PhaseIIFall17D("GluGluHToTauTau_M125_PU200", "GluGluHToTauTau_M125_PU200", "/GluGluHToTauTau_M125_14TeV_powheg_pythia8" + path_PU140_v1 ,CP, cmssw, geometry, 0, 100000, 25 , 2);
+
+  Datasets HPlus200NoPU_PhaseIIFall17D ( "HPlus200_NoPU"  , "HPlus200_NoPU" , "/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV" + path_NoPU_v2, CP, cmssw, geometry, 0,  100000, 37, 1);
+  Datasets HPlus200PU140_PhaseIIFall17D ( "HPlus200_PU140"  , "HPlus200_PU140" , "/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV" + path_PU140_v2, CP, cmssw, geometry, 140, 100000, 37, 1);
+  Datasets HPlus200PU200_PhaseIIFall17D ( "HPlus200_PU200"  , "HPlus200_PU200" , "/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV" + path_PU200_v2, CP, cmssw, geometry, 200, 100000, 37, 1);
+  Datasets HPlus500NoPU_PhaseIIFall17D ( "HPlus500_NoPU"  , "HPlus500_NoPU" , "/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV" + path_NoPU_v2, CP, cmssw, geometry, 0,  100000, 37, 1);
+  Datasets HPlus500PU140_PhaseIIFall17D ( "HPlus500_PU140"  , "HPlus500_PU140" , "/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV" + path_PU140_v2, CP, cmssw, geometry, 140, 100000, 37, 1);
+  Datasets HPlus500PU200_PhaseIIFall17D ( "HPlus500_PU200"  , "HPlus500_PU200" , "/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV" + path_PU200_v2, CP, cmssw, geometry, 200, 99000, 37, 1);
+  Datasets HPlus1000NoPU_PhaseIIFall17D ( "HPlus1000_NoPU"  , "HPlus1000_NoPU" , "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV" + path_NoPU_v2, CP, cmssw, geometry, 0,  100000, 37, 1);
+  Datasets HPlus1000PU140_PhaseIIFall17D ( "HPlus1000_PU140"  , "HPlus1000_PU140" , "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV" + path_PU140_v2, CP, cmssw, geometry, 140, 100000, 37, 1);
+  Datasets HPlus1000PU200_PhaseIIFall17D ( "HPlus1000_PU200"  , "HPlus1000_PU200" , "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV" + path_PU200_v2, CP, cmssw, geometry, 200, 100000, 37, 1);
 
 
 
   datasets_PhaseIIFall17D.push_back(SinglePionNoPU_PhaseIIFall17D);
+
+  datasets_PhaseIIFall17D.push_back(TTNoPU_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(TTPU140_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(TTPU200_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(SingleNeutrinoPU140_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(SingleNeutrinoPU200_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(GluGluHToTauTauM125NoPU_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(GluGluHToTauTauM125PU140_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(GluGluHToTauTauM125PU200_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(HPlus200NoPU_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(HPlus200PU140_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(HPlus200PU200_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(HPlus500NoPU_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(HPlus500PU140_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(HPlus500PU200_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(HPlus1000NoPU_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(HPlus1000PU140_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(HPlus1000PU200_PhaseIIFall17D);
 
   
   return;
@@ -355,7 +397,7 @@ Datasets Datasets::GetDataset(const string datasetAlias)
     bSuccess = true;
     d = datasets_PhaseIISpring17D.at(iD);
   }
-
+  
   // Check if the selected MC Prodution is valid
   for( int iD = 0 ; iD < (int) datasets_PhaseIIFall17D.size(); iD++){
 
