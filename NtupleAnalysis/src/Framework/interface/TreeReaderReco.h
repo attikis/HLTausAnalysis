@@ -57,7 +57,7 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
     fUpgradeEmu           = new TChain("l1UpgradeEmuTree/L1UpgradeTree");
     fuGTEmu               = new TChain("l1uGTEmuTree/L1uGTTree");
     fGenerator            = new TChain("l1GeneratorTree/L1GenTree");
-    fTracks               = new TChain("l1TrackTree/eventTree"); // l1TrackTree/L1TrackTree");
+    fTracks               = new TChain("l1TrackTree/L1TrackTree");
     
     // Associated the ROOT files to the TChain
     std::cout << "\tGetting ROOT files for dataset " << SampleName << " and adding them to the chain." << std::endl;
@@ -173,7 +173,7 @@ bool TreeReaderReco::CheckTreesExistence(const std::string SamplePath, const std
   TTree *treeUpgradeEmu       = (TTree*)file->Get("l1UpgradeEmuTree/L1UpgradeTree");
   TTree *treeuGTEmu           = (TTree*)file->Get("l1uGTEmuTree/L1uGTTree");
   TTree *treeGenerator        = (TTree*)file->Get("l1GeneratorTree/L1GenTree");
-  TTree *treeTracks           = (TTree*)file->Get("l1TrackTree/eventTree"); // l1TrackTree/L1TrackTree");
+  TTree *treeTracks           = (TTree*)file->Get("l1TrackTree/L1TrackTree");
 
   // Check if the trees exist
   if (!treeEvent) {

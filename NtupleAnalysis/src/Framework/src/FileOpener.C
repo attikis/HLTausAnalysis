@@ -15,7 +15,7 @@
 TChain* FileOpener::OpenFiles(const string multicrabPath, const string dataset, TChain* mychain)
 {
 
-  cout << "=== FileOpener::OpenFile()" << endl;
+  if (0) cout << "=== FileOpener::OpenFile()" << endl;
 
   // Get the dataset attributes
   string rootFileName;
@@ -35,9 +35,8 @@ TChain* FileOpener::OpenFiles(const string multicrabPath, const string dataset, 
   for (vector<string>::iterator f = dirs.begin(); f != dirs.end(); f++)
     {     
       rootFileName = *f;
-      cout << "\tAdding file " << rootFileName << " to the chain" << endl;
+      if (0) cout << "\tAdding file " << rootFileName << " to the chain" << endl;
       
-
       ifstream file(rootFileName);
       
       if (!file.good() )
@@ -62,7 +61,7 @@ string FileOpener::GetFirstFileName(const string multicrabPath, const string dat
   const string datasetPath = datasets_.GetDatasetPathFromAlias(dataset);
   const string fullPath    = multicrabPath + "/" + datasetPath + "/results/";
   vector<string> dirs      = GetListOfFiles(fullPath);
-
+  
   // Sanity check
   if (dirs.size() < 1)
     {
@@ -71,13 +70,9 @@ string FileOpener::GetFirstFileName(const string multicrabPath, const string dat
     }
   else cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << endl;
 
-  // For-loop: All ROOT files
-  //for (vector<string>::iterator f = dirs.begin(); f != dirs.end(); f++)
-  //{     
   vector<string>::iterator f = dirs.begin();
   rootFileName = *f;
   cout << "\tOpening file " << rootFileName << endl;
-      
 
   ifstream file(rootFileName);
   
@@ -86,43 +81,35 @@ string FileOpener::GetFirstFileName(const string multicrabPath, const string dat
       if(0) cout << "\tFile \"" << rootFileName << "\" also does not exist. EXIT" << endl;
       exit(1);
     }
-  // else 
-  //{
-      //fileName = TFile::Open(rootFileName.c_str());
-  //  fileName = rootFileName;
-  // }
-  cout << rootFileName<<endl;
-  //cout << fileName<<endl;
   
   return rootFileName; 
 }
 
 
-
-
-
 vector<string> FileOpener::GetListOfFiles(const string fullPath)
 {
-
+  
   // Declare variables
   const char* entry;
-  std::vector<string> dirs;
+  vector<string> dirs;
+  vector<string> dirs_new;
   
   Int_t n = 0;
   const char* ext = ".root";
   
+  
   char* dir  = gSystem->ExpandPathName(fullPath.c_str()); // cast a "std::string" to a "char*" with c_str()
   void* dirp = gSystem->OpenDirectory(dir);
-  const char* filename[100];
+  const char* filename[200];
   TString str;
-
+  
   // Get all files in the dir fullPath
   while((entry = (char*)gSystem->GetDirEntry(dirp)))
     {
       str = entry;
       if(str.EndsWith(ext)) filename[n++] = gSystem->ConcatFileName(dir, entry);
     }
-
+  
   // For-loop: All files
   for (Int_t i = 0; i < n; i++)
     {
@@ -130,10 +117,11 @@ vector<string> FileOpener::GetListOfFiles(const string fullPath)
       string fileName = string(filename[i]);
       size_t found    = fileName.find("L1Ntuple");
       if (found!=std::string::npos) dirs.push_back(fileName);
-      else {} //cout << "\tSkipping " << fileName << endl;
-
+      else {}//cout << "\tSkipping " << fileName << endl;
+      
     }
-  
+
+
   return dirs;
 }
 
