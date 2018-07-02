@@ -97,7 +97,8 @@ def Plot(jsonfile, opts):
     with open(os.path.abspath(jsonfile)) as jfile:
         j = json.load(jfile)
 
-        Verbose("Plotting %s. Will save under \"%s\"" % (j["title"], j["saveDir"]), True)
+        saveDir = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/TkCalo/"
+        Verbose("Plotting %s. Will save under \"%s\"" % (j["saveName"], saveDir), True)          
 
         # Setup the style
         style = tdrstyle.TDRStyle()
@@ -127,7 +128,7 @@ def Plot(jsonfile, opts):
         plots.mergeRenameReorderForDataMC(datasetsMgr)
 
         # Print dataset information
-        datasetsMgr.PrintInfo()
+        #datasetsMgr.PrintInfo()
 
         # Plot the histogram
         MCPlot(datasetsMgr, j)
@@ -139,6 +140,7 @@ def MCPlot(datasetsMgr, json):
         
     # Create the MC Plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
     ylabel_ = json["ylabel"]
+    
     if json["normalization"]=="normalizeToLumi":
         kwargs = {}
         p = plots.MCPlot(datasetsMgr, json["histogram"], normalizeToLumi=opts.intLumi, **kwargs)
@@ -148,7 +150,15 @@ def MCPlot(datasetsMgr, json):
         p = plots.MCPlot(datasetsMgr, json["histogram"], **kwargs)
     else:
         raise Exception("Invalid normalization \"%s\"" % (json["normalization"]) )
-    
+    '''
+
+    if json["normalizationToOne"]=="True":
+        ylabel_ = ylabel_.replace(json["ylabel"].split(" /")[0], "Arbitrary Units")
+        kwargs  = {json["normalizationToOne"]: True}
+        p = plots.MCPlot(datasetsMgr, json["histogram"], **kwargs)
+    else:
+        raise Exception("Invalid normalization \"%s\"" % (json["normalization"]) )
+    '''
     # Label size (optional. Commonly Used in counters)
     xlabelSize = None
     if "xlabelsize" in json:
@@ -163,8 +173,22 @@ def MCPlot(datasetsMgr, json):
     if("legendStyle" in json):
         p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
     
+    # For-loop: All histos
+    for index, h in enumerate(p.histoMgr.getHistos()):
+        if index == 0:
+            continue
+        else:
+            p.histoMgr.setHistoDrawStyle(h.getName(), "AP")
+            p.histoMgr.setHistoLegendStyle(h.getName(), "AP")
+            
+    # Set default dataset style to all histos 
+    for index, h in enumerate(p.histoMgr.getHistos()):
+        plots._plotStyles[p.histoMgr.getHistos()[index].getDataset().getName()].apply(p.histoMgr.getHistos()[index].getRootHisto())
+
+
     # Draw a customised plot
-    saveName = os.path.join(json["saveDir"], json["title"])
+    saveDir  = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/TkCalo/"
+    saveName = os.path.join(saveDir, json["saveName"])
     plots.drawPlot(p, 
                    saveName,                  
                    xlabel            = json["xlabel"], 
@@ -194,10 +218,16 @@ def MCPlot(datasetsMgr, json):
     histograms.addText(json["extraText"].get("x"), json["extraText"].get("y"), json["extraText"].get("text"), json["extraText"].get("size") )
 
     # Save in all formats chosen by user
-    saveFormats = json["saveFormats"]
+    saveFormats = [".pdf"]
     for i, ext in enumerate(saveFormats):
-        Print("%s" % saveName + ext, i==0)
-    p.saveAs(saveName, formats=saveFormats)
+        saveNameURL = saveName + ext
+        saveNameURL = saveNameURL.replace("/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/", "https://cmsdoc.cern.ch/~mtoumazo/hltaus/")
+        if opts.url:
+            Print(saveNameURL, 1)
+        else:
+            Print(saveName + ext, 1)
+        p.saveAs(saveName, formats=saveFormats)
+
     return
 
 
@@ -270,6 +300,9 @@ if __name__ == "__main__":
     parser.add_option("-e", "--excludeTasks", dest="excludeTasks", action="store", 
                       help="List of datasets in mcrab to exclude")
     
+    parser.add_option("--url", dest="url", action="store_true", default=False,
+                      help="Don't print the actual save path the histogram is saved, but print the URL instead [default: %s]" % False)
+
     (opts, parseArgs) = parser.parse_args()
 
     # Require at least two arguments (script-name, path to multicrab)

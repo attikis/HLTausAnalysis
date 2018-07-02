@@ -148,7 +148,7 @@ void TkCalo::Loop()
     // Tracks
     if (cfg_AddL1Tks) {
 	  if (cfg_DEBUG) cout << "\n=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
-	  TTTracks = GetTTTracks(cfg_tk_minPt, cfg_tk_minEta, cfg_tk_maxEta, cfg_tk_maxChiSqRed, cfg_tk_minStubs, cfg_tk_minStubsPS, cfg_tk_maxStubsPS, cfg_tk_nFitParams, false);
+	  TTTracks = GetTTTracks(cfg_tk_minPt, cfg_tk_minEta, cfg_tk_maxEta, cfg_tk_maxChiSqRed, cfg_tk_minStubs, cfg_tk_nFitParams, false);
 	  sort( TTTracks.begin(), TTTracks.end() ); // Sort from highest Pt to lowest (not done by default)
 	}    
 	
@@ -166,7 +166,7 @@ void TkCalo::Loop()
 	// Hadronic GenTaus (skip for MinBias samples)
     GenTausHadronic.clear();
     if (cfg_AddGenP) {
-      if (cfg_DEBUG) cout << "\n=== GenParticles (" << GenP_Pt->size() << ")" << endl;
+      if (cfg_DEBUG) cout << "\n=== GenParticles (" << GenP_Pt.size() << ")" << endl;
 	  if (!isMinBias) GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
 	}
 
@@ -324,7 +324,7 @@ void TkCalo::Loop()
         unsigned int counter_passDRmax = 0;
         unsigned int counter_passDRmin = 0;
         unsigned int counter_passInvMass = 0;    
-	    for (auto eg = L1EGs.begin(); ( !stopClustering && (eg != L1EGs.end()) ); eg++) {
+	for (auto eg = L1EGs.begin(); ( !stopClustering && (eg != L1EGs.end()) ); eg++) {
           // Skip small-Et EGs and those not matching to lead track (in terms of DeltaR)
           counter_allEG++;
           // TODO: Correct eta of EG based on vertex position of the leading track?
@@ -403,10 +403,12 @@ void TkCalo::Loop()
 
         // Build a tau candidate from tracks and EGs
         L1TkEGParticle newTauCandidate(trackTauCandidates[i], EGcluster, genTau, hasGenTau);
-        cout << "Constructed a new tau candidate with a track invariant mass of " << newTauCandidate.GetTrackInvMass() 
-             << ", an EG invariant mass of " << newTauCandidate.GetEGInvMass();
-        if (hasGenTau) cout  << " and a generator tau with visible pT " << newTauCandidate.GetGenTauPt() << endl;
-        else cout << " and does not have a matching generator tau" << endl;
+	if (cfg_DEBUG) { //marina
+	  cout << "Constructed a new tau candidate with a track invariant mass of " << newTauCandidate.GetTrackInvMass() 
+	       << ", an EG invariant mass of " << newTauCandidate.GetEGInvMass();
+	  if (hasGenTau) cout  << " and a generator tau with visible pT " << newTauCandidate.GetGenTauPt() << endl;
+	  else cout << " and does not have a matching generator tau" << endl;
+	}
         TauCandidates.push_back(newTauCandidate);
     }  
        
@@ -483,7 +485,9 @@ void TkCalo::Loop()
   // Fill counters
   ////////////////////////////////////////////////
 
-  // TODO
+  hCounters->SetBinContent(1, nAllEvts);
+  hCounters->SetBinContent(2, nEvts);
+
   
   
   ////////////////////////////////////////////////
@@ -525,6 +529,7 @@ void TkCalo::Loop()
   // Write the histograms to the file
   ////////////////////////////////////////////////
   outFile->cd();
+  WriteHistos_();
   outFile->Write();
   auxTools_.StopwatchStop(5, "minutes", "Total Time");
 
@@ -555,6 +560,8 @@ float TkCalo::deltaR(float eta1, float eta2, float phi1, float phi2)
 void TkCalo::BookHistos_(void)
 //============================================================================
 {
+  // Event-Type Histograms
+  histoTools_.BookHisto_1D(hCounters, "Counters",  "", 2, 0.0, +2.0);
 
   // Number of genuine hadronic taus (per event)
   histoTools_.BookHisto_1D(h_genTausHad_N, "genTausHadronic_N", ";Number of genuine hadronic taus in event;Events / bin", 4, -0.5, +4.5);
@@ -691,6 +698,79 @@ void TkCalo::BookHistos_(void)
   histoTools_.BookHisto_1D(hEffDiTau_F   , "Eff_DiTau_F"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
   
   return;
+}
+
+
+//============================================================================
+void TkCalo::WriteHistos_(void)
+//============================================================================
+{
+  hCounters->Write();
+
+  h_genTausHad_N->Write();
+  h_leadTrks_Multiplicity->Write();
+
+  h_leadTrks_Pt->Write();
+  h_leadTrks_Eta->Write();
+  h_leadTrks_Phi->Write();
+  h_leadTrks_Phi_Eta->Write();
+
+  h_leadTrkSelection->Write();
+
+  h_clustTrks_Pt->Write();
+  h_clustTrks_Eta->Write();
+  h_clustTrks_Phi->Write();
+  h_clustTrks_Phi_Eta->Write();
+  h_clustTrks_counter->Write();
+
+  h_trkClusters_MultiplicityPerCluster->Write();
+  h_trkClusters_Pt->Write();
+  h_trkClusters_PtResolution->Write();
+  h_trkClusters_M->Write();
+
+  h_clustEGs_Et->Write();
+  h_clustEGs_Eta->Write();
+  h_clustEGs_Phi->Write();
+  h_clustEGs_Phi_Eta->Write();
+  h_clustEGs_M->Write();
+
+  h_clustEGs_counter->Write();
+  h_EGClusters_MultiplicityPerCluster->Write();
+  h_EGClusters_Et->Write();
+  h_EGClusters_EtResolution->Write();
+  h_EGClusters_M->Write();
+
+  h_trkClusters_relIso->Write();
+
+  hTkEG_DeltaRmatch->Write();
+  hTkEG_VisEt->Write();
+  hMcHadronicTau_VisEt->Write();
+
+  hTurnOn25_all->Write();
+  hTurnOn25_relIso->Write();
+  hTurnOn50_all->Write();
+  hTurnOn50_relIso->Write();
+
+  hRateSingleTau->Write(); // Inclusive = C+I+F                                                                                                                   
+  hRateSingleTau_C->Write();
+  hRateSingleTau_I->Write();
+  hRateSingleTau_F->Write();
+
+  hRateDiTau->Write(); // Inclusive = C+I+F                                                                                                                       
+  hRateDiTau_C->Write();
+  hRateDiTau_I->Write();
+  hRateDiTau_F->Write();
+
+  hEffSingleTau->Write();  // Inclusive = C+I+F                                                                                                                   
+  hEffSingleTau_C->Write();
+  hEffSingleTau_I->Write();
+  hEffSingleTau_F->Write();
+
+  hEffDiTau->Write();  // Inclusive = C+I+F                                                                                                                       
+  hEffDiTau_C->Write();
+  hEffDiTau_I->Write();
+  hEffDiTau_F->Write();
+
 }
 
 

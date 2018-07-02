@@ -107,6 +107,46 @@ datasetsTTbar_PhaseIISpring17D.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseII
 datasetsTTbar_PhaseIISpring17D.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-PU200_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
 
 
+
+#================================================================================================ 
+# PhaseIIFall17D
+#================================================================================================ 
+dasAll  = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset+dataset%3D%2F*%2F*PhaseIISpring17D*%2F*+status%3D*"
+dasDone = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset+dataset%3D%2F*%2F*PhaseIISpring17D*%2F*"
+das     = dasAll
+
+
+datasetsSingleNu_PhaseIIFall17D = []
+datasetsSingleNu_PhaseIIFall17D.append(Dataset('/SingleNeutrino/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+datasetsSingleNu_PhaseIIFall17D.append(Dataset('/SingleNeutrino/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+
+
+datasetsTT_PhaseIIFall17D = []
+datasetsTT_PhaseIIFall17D.append(Dataset('/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+datasetsTT_PhaseIIFall17D.append(Dataset('/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+datasetsTT_PhaseIIFall17D.append(Dataset('/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+
+
+datasetsH2tautau_PhaseIIFall17D = []
+datasetsH2tautau_PhaseIIFall17D.append(Dataset('/GluGluHToTauTau_M125_14TeV_powheg_pythia8/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+datasetsH2tautau_PhaseIIFall17D.append(Dataset('/GluGluHToTauTau_M125_14TeV_powheg_pythia8/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+datasetsH2tautau_PhaseIIFall17D.append(Dataset('/GluGluHToTauTau_M125_14TeV_powheg_pythia8/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+
+datasetsChargedHiggs_PhaseIIFall17D = []
+datasetsChargedHiggs_PhaseIIFall17D.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+datasetsChargedHiggs_PhaseIIFall17D.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+datasetsChargedHiggs_PhaseIIFall17D.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+
+datasetsChargedHiggs_PhaseIIFall17D.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+datasetsChargedHiggs_PhaseIIFall17D.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+datasetsChargedHiggs_PhaseIIFall17D.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+
+datasetsChargedHiggs_PhaseIIFall17D.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+datasetsChargedHiggs_PhaseIIFall17D.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+datasetsChargedHiggs_PhaseIIFall17D.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+
+
+
 #================================================================================================ 
 # Dataset Grouping
 #================================================================================================ 
@@ -128,6 +168,11 @@ ID2017Datasets.extend(datasetsSingleTau_PhaseIISpring17D)
 ID2017Datasets.extend(datasetsTTJpsiFilter_PhaseIISpring17D)
 ID2017Datasets.extend(datasetsTT_PhaseIISpring17D)
 ID2017Datasets.extend(datasetsTTbar_PhaseIISpring17D)
+
+ID2017Datasets.extend(datasetsSingleNu_PhaseIIFall17D)
+ID2017Datasets.extend(datasetsTT_PhaseIIFall17D)
+ID2017Datasets.extend(datasetsH2tautau_PhaseIIFall17D)
+ID2017Datasets.extend(datasetsChargedHiggs_PhaseIIFall17D)  
 
 TDR2019Datasets = []
 

@@ -136,11 +136,11 @@ table.AddRowColumn(i, auxTools.ToString( tk.getPhi(), 3  ) );
 // table.AddRowColumn(i, auxTools.ToString( tk.getY0() , 3  ) );
 table.AddRowColumn(i, auxTools.ToString( tk.getZ0() , 3  ) );
 table.AddRowColumn(i, auxTools.ToString( tk.getD0() , 3  ) );
-table.AddRowColumn(i, auxTools.ToString( tk.getQ()  , 3  ) );
+//table.AddRowColumn(i, auxTools.ToString( tk.getQ()  , 3  ) );
 table.AddRowColumn(i, auxTools.ToString( tk.getChi2(),3  ) );
 table.AddRowColumn(i, auxTools.ToString( tk.getDOF()     ) );
 table.AddRowColumn(i, auxTools.ToString( tk.getChi2Red(), 3 ) );
-table.AddRowColumn(i, auxTools.ToString( tk.getNumOfStubs()) + " (" + auxTools.ToString(tk.getNumOfStubsPS()) + ")");
+table.AddRowColumn(i, auxTools.ToString( tk.getNumOfStubs()) ); //+ " (" + auxTools.ToString(tk.getNumOfStubsPS()) + ")");
 }
   
 if (theTracks.size() > 0) table.Print();

@@ -48,7 +48,7 @@ class TkCalo : public TreeAnalyserMC{
 		const string SampleName,
 		const string text_, 
 		const int maxEvents_ = -1, 
-		TTree* tree=0) :  
+		TChain* tree=0) :  
   TreeAnalyserMC("", SamplePath, SampleName, text_, maxEvents_, tree) 
     { 
       auxTools_.StopwatchStart();
@@ -79,6 +79,7 @@ class TkCalo : public TreeAnalyserMC{
  private:
   // Private function declarations
   void BookHistos_(void);
+  void WriteHistos_(void);
   void InitObjects(void);
   void InitVars_(void);
   float DeltaPhi(float phi1, float phi2);
@@ -169,6 +170,10 @@ class TkCalo : public TreeAnalyserMC{
   bool bFoundAllTaus_;
 
   // Histogram declarations
+
+  // Event-Type Histograms                                                                                                                                     
+  TH1D* hCounters;
+
   TH1D* h_genTausHad_N;
   TH1D* h_leadTrks_Multiplicity;
   

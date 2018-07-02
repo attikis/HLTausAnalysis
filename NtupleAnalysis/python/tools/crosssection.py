@@ -214,11 +214,11 @@ backgroundCrossSections = CrossSectionList(
         "13": 1.0, 
         "14": 1.0,
     }),
-    CrossSection("SingleNeutrino_PU140", {
+    CrossSection("SingleNeutrino_L1TPU140", {
         "13": 1.0, 
         "14": (100.0/1000.0)*1e12, #100 mb (40mb elastic + 60mb inelastic) # Dummy value. 
     }),
-    CrossSection("SingleNeutrino_PU200", {
+    CrossSection("SingleNeutrino_L1TPU200", {
         "13": 1.0, 
         "14": (100.0/1000.0)*1e12, #100 mb (40mb elastic + 60mb inelastic) # Dummy value. 
     }),
