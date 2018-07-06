@@ -87,11 +87,13 @@ if ( $LOCATION == "mac" ) then
     echo "=== Using default ROOT version"
     #source /Users/$USER/ROOT/v5-34-00-patches/bin/thisroot.csh
     #setenv ROOTSYS /Users/$USER/ROOT/v5-34-00-patches/
-    source /Users/$USER/root/v6-10-08/bin/thisroot.csh
+    #source /Users/$USER/root/v6-10-08/bin/thisroot.csh
+    #RootSetup.sh v6-11-03
+    source /Users/$USER/root/v6-11-03/bin/thisroot.csh
     if ($?PYTHONPATH) then
-    setenv PYTHONPATH "$ROOTSYS/lib:$PYTHONPATH"
+	setenv PYTHONPATH "$ROOTSYS/lib:$PYTHONPATH"
     else
-    setenv PYTHONPATH "$ROOTSYS/lib"
+	setenv PYTHONPATH "$ROOTSYS/lib"
     endif
 endif
 

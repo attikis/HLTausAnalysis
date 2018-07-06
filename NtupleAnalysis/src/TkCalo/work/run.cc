@@ -16,8 +16,8 @@ void run(const std::string MulticrabDir = "",
 {
 
   // Alexandros' files
-  // const std::string absolutePath = "/Users/attikis/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X";
-  const std::string absolutePath = "/afs/cern.ch/user/a/attikis/workspace/multicrab";
+  const std::string absolutePath = "/Users/attikis/hltaus/rootFiles/TTrees/P2L1T_HLTaus_92X";
+  // const std::string absolutePath = "/afs/cern.ch/user/a/attikis/workspace/multicrab";
   // const std::string absolutePath = "/Users/attikis/disk/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X/";
   
   // Santeri's files
