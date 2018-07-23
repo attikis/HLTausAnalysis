@@ -1,0 +1,35 @@
+root [0] .x runTauTrigger.cc("AllTracks_CaloTausCorr_FitParam5_TTI2023Upg14D_16Feb2015_113104", "MinBias", "", -1);
+Info in <TMacOSXSystem::ACLiC>: creating shared library /Users/attikis/my_work/cms/lxplus/hltaus/pyROOT/Macros/TauTrigger/TauTrigger_C.so
+I N F O ! FileOpener::OpenFile(...) - Adding file /Users/attikis/hltaus/rootFiles/TTrees/CMSSW_6_2_0_SLHC12_patch1/TkTauFromCaloAnalyzer_v3/AllTracks_CaloTausCorr_FitParam5_TTI2023Upg14D_16Feb2015_113104/Neutrino_Pt2to20_gun_TTI2023Upg14D-PU140bx25/res/output-Neutrino_Pt2to20_gun_TTI2023Upg14D-PU140bx25.root to the chain 
+I N F O ! TreeDefinitionReco::InitReco(...) - Setting branch addresses and branch pointers.
+I N F O ! TreeDefinitionReco::InitReco(...) - Setting L1 Tracks addresses.
+I N F O ! TreeDefinitionReco::InitReco(...) - Setting L1 Pixel Tracks addresses.
+I N F O ! TreeDefinitionReco::InitReco(...) - Setting L1 Calo Tau addresses.
+======================================================
+Variable                         | Value         | Units         
+======================================================
+MC Sample                        | MinBias       |  -            
+Tau Algorithm                    | ShrinkingCone |  -            
+Track Collection                 | TTPixelTracks |  -            
+SigTks WP                        | vLooseWP      |  -            
+Calo-Matching Tk Pt (min)        | 5.000000      | GeVc^{-1}     
+Calo-Matching Tk DeltaR (max)    | 0.120000      |  -            
+SigCone Shrink Constant          | 1.500000      | GeV           
+SigCone DeltaR (max)             | 0.150000      |  -            
+SigCone InvMass (max)            | 1.770000      | GeVc^{-2}     
+SigCone TkDeltaPOCAz (max)       | 0.200000      | cm            
+IsoTks WP                        | vLooseWP      |  -            
+IsoCone Shrink Constant          | 3.500000      | GeV           
+IsoCone DeltaR (min)             | 0.150000      |  -            
+IsoCone DeltaR (max)             | 0.400000      |  -            
+VtxIso WP                        | 0.400000      | cm            
+MC-Matching DeltaR (max)         | 0.100000      |  -            
+Unique MC-Matching               | 1             |  -            
+MC-Tau Decay Mode (all, 1p, 3p)  | all           |  -            
+MC-Tau Mom (PdgId)               | 0             |  -            
+Num of MC-Taus                   | 0             |  -            
+Di-TAu Delta POCA-z              | 0.500000      | cm            
+
+Analyzing: 284300/284300 events
+
+

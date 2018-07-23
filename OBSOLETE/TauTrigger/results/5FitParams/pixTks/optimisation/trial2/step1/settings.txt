@@ -1,0 +1,32 @@
+root [0] .x runTauTrigger.cc("AllTracks_CaloTausCorr_FitParam5_TTI2023Upg14D_16Feb2015_113104", "MinBias", "", -1);
+Info in <TMacOSXSystem::ACLiC>: creating shared library /Users/attikis/my_work/cms/lxplus/hltaus/pyROOT/Macros/TauTrigger/TauTrigger_C.so
+I N F O ! FileOpener::OpenFile(...) - Adding file /Users/attikis/hltaus/rootFiles/TTrees/CMSSW_6_2_0_SLHC12_patch1/TkTauFromCaloAnalyzer_v3/AllTracks_CaloTausCorr_FitParam5_TTI2023Upg14D_16Feb2015_113104/Neutrino_Pt2to20_gun_TTI2023Upg14D-PU140bx25/res/output-Neutrino_Pt2to20_gun_TTI2023Upg14D-PU140bx25.root to the chain 
+I N F O ! TreeDefinitionReco::InitReco(...) - Setting branch addresses and branch pointers.
+I N F O ! TreeDefinitionReco::InitReco(...) - Setting L1 Tracks addresses.
+I N F O ! TreeDefinitionReco::InitReco(...) - Setting L1 Pixel Tracks addresses.
+I N F O ! TreeDefinitionReco::InitReco(...) - Setting L1 Calo Tau addresses.
+===================================================
+Variable                      | Value         | Units         
+===================================================
+MC Sample                     | MinBias       |  -            
+Tau Algorithm                 | ShrinkingCone |  -            
+SigTks WP                     | NoWP          |  -            
+Calo-Matching Tk Pt (min)     | 8.000000      | GeVc^{-1}     
+Calo-Matching Tk DeltaR (max) | 0.120000      |  -            
+SigCone DeltaR (min)          | 0.000000      |  -            
+SigCone DeltaR (max)          | 0.100000      |  -            
+SigCone InvMass (max)         | 10000.000000  | GeVc^{-2}     
+SigCone TkDeltaPOCAz (max)    | -1.000000     | cm            
+IsoTks WP                     | NoWP          |  -            
+IsoCone DeltaR (min)          | 0.100000      |  -            
+IsoCone DeltaR (max)          | 0.300000      |  -            
+VtxIso WP                     | 0.500000      | cm            
+RelIso WP                     | 0.150000      |  -            
+MC-Matching DeltaR (max)      | 0.100000      |  -            
+Unique MC-Matching            | 1             |  -            
+Tau Decay Mode (all, 1p, 3p)  | all           |  -            
+Track Collection              | TTPixelTracks |  -            
+
+Analyzing: 284300/284300 events
+Elapsed Time: 1.7154 (minutes)                                                                                   
+root [1] .q
