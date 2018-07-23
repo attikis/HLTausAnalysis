@@ -216,11 +216,11 @@ backgroundCrossSections = CrossSectionList(
     }),
     CrossSection("SingleNeutrino_L1TPU140", {
         "13": 1.0, 
-        "14": (100.0/1000.0)*1e12, #100 mb (40mb elastic + 60mb inelastic) # Dummy value. 
+        "14": 79e+09,#(100.0/1000.0)*1e12, #100 mb (40mb elastic + 60mb inelastic) # Dummy value. 
     }),
     CrossSection("SingleNeutrino_L1TPU200", {
         "13": 1.0, 
-        "14": (100.0/1000.0)*1e12, #100 mb (40mb elastic + 60mb inelastic) # Dummy value. 
+        "14": 79e+09,#(100.0/1000.0)*1e12, #100 mb (40mb elastic + 60mb inelastic) # Dummy value. 
     }),
     CrossSection("WW", {
             "7": 43.0, # [3]
@@ -473,19 +473,19 @@ backgroundCrossSections = CrossSectionList(
     CrossSection("ZprimeToTauTau_M_3000", {
             "13": 1.585e-03,
             }),
-    CrossSection("GluGluHToTauTau_M125_NoPU", {
+    CrossSection("GluGluHToTauTau_14TeV_L1TnoPU", {
             "13": 1, # dummy value, not really needed as this sample is not merged with anything else
             "14": 1, # dummy value, marinaT
             }),
-    CrossSection("GluGluHToTauTau_M125_PU140", {
+    CrossSection("GluGluHToTauTau_14TeV_L1TPU140", {
             "13": 1, # dummy value, not really needed as this sample is not merged with anything else
             "14": 1, # dummy value, marinaT
             }),
-    CrossSection("GluGluHToTauTau_M125_PU200", {
+    CrossSection("GluGluHToTauTau_14TeV_L1TPU200", {
             "13": 1, # dummy value, not really needed as this sample is not merged with anything else
             "14": 1, # dummy value, marinaT
             }),
-    CrossSection("GluGluHToTauTau_M125_TauHLT", {
+    CrossSection("GluGluHTauTau_M125_TauHLT", {
             "13": 1, # dummy value, not really needed as this sample is not merged with anything else
             }),
     CrossSection("T_t-channel", {

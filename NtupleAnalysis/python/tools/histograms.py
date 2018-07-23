@@ -401,11 +401,10 @@ def addLuminosityText(x, y, lumi, unit="fb^{-1}"):
 # \param cmsExtraTextPosition Position of CMS extra text (None for default, pair of (x, y) for explicit)
 # \param cmsText         If not None, override the "CMS" text
 # \param cmsExtraText    If not None, override the CMS extra text (e.g. "Preliminary")
-def addStandardTexts(lumi=None, sqrts=None, addCmsText=True, cmsTextPosition=None, cmsExtraTextPosition=None, cmsText=None, cmsExtraText=None):
+def addStandardTexts(lumi=None, sqrts=None, addCmsText=True, cmsTextPosition="right", cmsExtraTextPosition=None, cmsText=None, cmsExtraText=None):
 #    if cmsTextPosition is None:
 #        cmsTextPosition = "left"
-    cmsTextPosition = "outframe"
-
+    #cmsTextPosition = "outframe"
     lumiTextSize = 40*0.6
     cmsTextFrac = 0.75
     cmsTextSize = 40*cmsTextFrac
@@ -421,7 +420,7 @@ def addStandardTexts(lumi=None, sqrts=None, addCmsText=True, cmsTextPosition=Non
         lumiText += " fb^{-1}"
 
     # Disable automatic addition of PU=140 text
-    #lumiText += pileupText + ", "
+    lumiText += pileupText + ", "
     if sqrts is not None:
         #lumiText += " (" + sqrts + ")"
         lumiText += "  " + sqrts + " "

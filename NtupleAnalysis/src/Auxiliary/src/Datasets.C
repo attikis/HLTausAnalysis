@@ -320,26 +320,29 @@ void Datasets::CreateMcProductions_(void)
 
   Datasets SinglePionNoPU_PhaseIIFall17D("SinglePion_FlatPt_2to100_NoPU", "SinglePion_FlatPt_2to100_NoPU", "/SinglePion_FlatPt-2to100" + path_NoPU_v1 , CP, cmssw, geometry, 140, 500000, 0, 0);
 
-  Datasets TTNoPU_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TnoPU", "TT_TuneCUETP8M2T4_14TeV_L1TnoPU", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_NoPU_v2, CP, cmssw, geometry, 0, 99328, 24, 2);
-  Datasets TTPU140_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TPU140", "TT_TuneCUETP8M2T4_14TeV_L1TPU140", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_PU140_v2, CP, cmssw, geometry, 140, 99328, 24, 2);
-  Datasets TTPU200_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TPU200", "TT_TuneCUETP8M2T4_14TeV_L1TPU200", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_PU200_v2, CP, cmssw, geometry, 200, 99328, 24, 2);
+  Datasets TTNoPU_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TnoPU", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TnoPU_93X", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_NoPU_v2, CP, cmssw, geometry, 0, 99328, 24, 2);
+  Datasets TTPU140_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TPU140", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU140_93X", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_PU140_v2, CP, cmssw, geometry, 140, 99328, 24, 2);
 
-  Datasets SingleNeutrinoPU140_PhaseIIFall17D("SingleNeutrino_L1TPU140", "SingleNeutrino_L1TPU140", "/SingleNeutrino" + path_PU140_v1, CP, cmssw, geometry, 140, 500000, 0, 0);
-  Datasets SingleNeutrinoPU200_PhaseIIFall17D("SingleNeutrino_L1TPU200", "SingleNeutrino_L1TPU200", "/SingleNeutrino" + path_PU200_v1, CP, cmssw, geometry, 200, 498400, 0, 0);
+  Datasets TTPU200_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TPU200", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU200_93X", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_PU200_v2, CP, cmssw, geometry, 200, 99328, 24, 2);
 
-  Datasets GluGluHToTauTauM125NoPU_PhaseIIFall17D("GluGluHToTauTau14TeV_L1TNoPU", "GluGluHToTauTau14TeV_L1TNoPU", "/GluGluHToTauTau_M125_14TeV_powheg_pythia8" + path_NoPU_v1 , CP, cmssw, geometry, 0, 100000, 25 , 2);
-  Datasets GluGluHToTauTauM125PU140_PhaseIIFall17D("GluGluHToTauTau14TeV_L1TPU140", "GluGluHToTauTau14TeV_L1TPU140", "/GluGluHToTauTau_M125_14TeV_powheg_pythia8" + path_PU140_v1 ,CP, cmssw, geometry, 0, 100000, 25 , 2);
-  Datasets GluGluHToTauTauM125PU200_PhaseIIFall17D("GluGluHToTauTau14TeV_L1TPU200", "GluGluHToTauTau14TeV_L1TPU200", "/GluGluHToTauTau_M125_14TeV_powheg_pythia8" + path_PU140_v1 ,CP, cmssw, geometry, 0, 100000, 25 , 2);
+  Datasets SingleNeutrinoPU140_PhaseIIFall17D("SingleNeutrino_L1TPU140", "SingleNeutrino_PhaseIIFall17D_L1TPU140_93X", "/SingleNeutrino" + path_PU140_v1, CP, cmssw, geometry, 140, 500000, 0, 0);
+  Datasets SingleNeutrinoPU200_PhaseIIFall17D("SingleNeutrino_L1TPU200", "SingleNeutrino_PhaseIIFall17D_L1TPU200_93X", "/SingleNeutrino" + path_PU200_v1, CP, cmssw, geometry, 200, 498400, 0, 0);
 
-  Datasets HPlus200NoPU_PhaseIIFall17D ( "HPlus200_NoPU"  , "HPlus200_NoPU" , "/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV" + path_NoPU_v2, CP, cmssw, geometry, 0,  100000, 37, 1);
-  Datasets HPlus200PU140_PhaseIIFall17D ( "HPlus200_PU140"  , "HPlus200_PU140" , "/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV" + path_PU140_v2, CP, cmssw, geometry, 140, 100000, 37, 1);
-  Datasets HPlus200PU200_PhaseIIFall17D ( "HPlus200_PU200"  , "HPlus200_PU200" , "/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV" + path_PU200_v2, CP, cmssw, geometry, 200, 100000, 37, 1);
-  Datasets HPlus500NoPU_PhaseIIFall17D ( "HPlus500_NoPU"  , "HPlus500_NoPU" , "/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV" + path_NoPU_v2, CP, cmssw, geometry, 0,  100000, 37, 1);
-  Datasets HPlus500PU140_PhaseIIFall17D ( "HPlus500_PU140"  , "HPlus500_PU140" , "/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV" + path_PU140_v2, CP, cmssw, geometry, 140, 100000, 37, 1);
-  Datasets HPlus500PU200_PhaseIIFall17D ( "HPlus500_PU200"  , "HPlus500_PU200" , "/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV" + path_PU200_v2, CP, cmssw, geometry, 200, 99000, 37, 1);
-  Datasets HPlus1000NoPU_PhaseIIFall17D ( "HPlus1000_NoPU"  , "HPlus1000_NoPU" , "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV" + path_NoPU_v2, CP, cmssw, geometry, 0,  100000, 37, 1);
-  Datasets HPlus1000PU140_PhaseIIFall17D ( "HPlus1000_PU140"  , "HPlus1000_PU140" , "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV" + path_PU140_v2, CP, cmssw, geometry, 140, 100000, 37, 1);
-  Datasets HPlus1000PU200_PhaseIIFall17D ( "HPlus1000_PU200"  , "HPlus1000_PU200" , "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV" + path_PU200_v2, CP, cmssw, geometry, 200, 100000, 37, 1);
+  Datasets GluGluHToTauTauM125NoPU_PhaseIIFall17D("GluGluHToTauTau_14TeV_L1TnoPU", "GluGluHToTauTau_M125_14TeV_powheg_pythia8_PhaseIIFall17D_L1TnoPU_93X", "/GluGluHToTauTau_M125_14TeV_powheg_pythia8" + path_NoPU_v1 , CP, cmssw, geometry, 0, 100000, 25 , 2);
+  Datasets GluGluHToTauTauM125PU140_PhaseIIFall17D("GluGluHToTauTau_14TeV_L1TPU140", "GluGluHToTauTau_M125_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU140_93X", "/GluGluHToTauTau_M125_14TeV_powheg_pythia8" + path_PU140_v1 ,CP, cmssw, geometry, 0, 100000, 25 , 2);
+  Datasets GluGluHToTauTauM125PU200_PhaseIIFall17D("GluGluHToTauTau_14TeV_L1TPU200", "GluGluHToTauTau_M125_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU200_93X", "/GluGluHToTauTau_M125_14TeV_powheg_pythia8" + path_PU140_v1 ,CP, cmssw, geometry, 0, 100000, 25 , 2);
+
+  Datasets HPlus200NoPU_PhaseIIFall17D ( "ChargedHiggs200_14TeV_L1TnoPU"  , "PYTHIA_Tauola_TB_ChargedHiggs200_14TeV_PhaseIIFall17D_L1TnoPU_93X" , "/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV" + path_NoPU_v2, CP, cmssw, geometry, 0,  100000, 37, 1);
+  Datasets HPlus200PU140_PhaseIIFall17D ( "ChargedHiggs200_14TeV_L1TPU140"  , "PYTHIA_Tauola_TB_ChargedHiggs200_14TeV_PhaseIIFall17D_L1TPU140_93X" , "/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV" + path_PU140_v2, CP, cmssw, geometry, 140, 100000, 37, 1);
+  Datasets HPlus200PU200_PhaseIIFall17D ( "ChargedHiggs200_14TeV_L1TPU200"  , "PYTHIA_Tauola_TB_ChargedHiggs200_14TeV_PhaseIIFall17D_L1TPU200_93X" , "/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV" + path_PU200_v2, CP, cmssw, geometry, 200, 100000, 37, 1);
+
+  Datasets HPlus500NoPU_PhaseIIFall17D ( "ChargedHiggs500_14TeV_L1TnoPU"  , "PYTHIA_Tauola_TB_ChargedHiggs500_14TeV_PhaseIIFall17D_L1TnoPU_93X" , "/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV" + path_NoPU_v2, CP, cmssw, geometry, 0,  100000, 37, 1);
+  Datasets HPlus500PU140_PhaseIIFall17D ( "ChargedHiggs500_14TeV_L1TPU140"  , "PYTHIA_Tauola_TB_ChargedHiggs500_14TeV_PhaseIIFall17D_L1TPU140_93X" , "/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV" + path_PU140_v2, CP, cmssw, geometry, 140, 100000, 37, 1);
+  Datasets HPlus500PU200_PhaseIIFall17D ( "ChargedHiggs500_14TeV_L1TPU200"  , "PYTHIA_Tauola_TB_ChargedHiggs500_14TeV_PhaseIIFall17D_L1TPU200_93X" , "/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV" + path_PU200_v2, CP, cmssw, geometry, 200, 99000, 37, 1);
+
+  Datasets HPlus1000NoPU_PhaseIIFall17D ( "ChargedHiggs1000_14TeV_L1TnoPU"  , "PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PhaseIIFall17D_L1TnoPU_93X" , "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV" + path_NoPU_v2, CP, cmssw, geometry, 0,  100000, 37, 1);
+  Datasets HPlus1000PU140_PhaseIIFall17D ( "ChargedHiggs1000_14TeV_L1TPU140"  , "PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PhaseIIFall17D_L1TPU140_93X" , "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV" + path_PU140_v2, CP, cmssw, geometry, 140, 100000, 37, 1);
+  Datasets HPlus1000PU200_PhaseIIFall17D ( "ChargedHiggs1000_14TeV_L1TPU200"  , "PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PhaseIIFall17D_L1TPU200_93X" , "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV" + path_PU200_v2, CP, cmssw, geometry, 200, 100000, 37, 1);
 
 
 

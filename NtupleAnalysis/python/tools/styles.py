@@ -291,6 +291,7 @@ signal1500Style = signalStyle.clone()
 signal2000Style = signalStyle.clone()
 signal3000Style = signalStyle.clone()
 
+ggtautauStyle     = Style(ROOT.kMultiply, ROOT.kSpring+3)
 dibStyle          = Style(ROOT.kMultiply, ROOT.kBlue-4)
 dyStyle           = Style(ROOT.kStar, ROOT.kTeal-9)
 ewkFillStyle      = StyleCompound([StyleFill(fillColor=ROOT.kMagenta-2)])
@@ -330,20 +331,34 @@ HToTauTauStyle    = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.
                                    StyleFill(fillColor=ROOT.kRed, fillStyle=1001)])
 MinBiasStyle      = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kGray+2, markerSizes=None, markerStyle=ROOT.kFullCircle),
                                    StyleLine(lineColor=ROOT.kGray+2, lineStyle=ROOT.kSolid, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kGray+2, fillStyle=3001)])
+                                   StyleFill(fillColor=ROOT.kGray+2, fillStyle=0)])
 Tau3prStyle       = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kViolet-3, markerSizes=None, markerStyle=ROOT.kOpenCircle),
                                    StyleLine(lineColor=ROOT.kViolet-3, lineStyle=ROOT.kDotted, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kViolet-3, fillStyle=1001)])
 
-caloStyle1        = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
+regionStyle1      = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kRed-4, markerSizes=None, markerStyle=ROOT.kFullCircle),
+                                   StyleLine(lineColor=ROOT.kRed-4, lineStyle=ROOT.kSolid, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kRed-4, fillStyle=1001)])
+regionStyle2      = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure+6, markerSizes=None, markerStyle=ROOT.kFullSquare),
+                                   StyleLine(lineColor=ROOT.kAzure+6, lineStyle=ROOT.kSolid, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kAzure+6, fillStyle=1001)])
+regionStyle3      = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kSpring+5, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                                   StyleLine(lineColor=ROOT.kSpring+5, lineStyle=ROOT.kSolid, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kSpring+5, fillStyle=1001)])
+
+caloStyle1        = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
                                    StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kBlack, fillStyle=3001)])
-caloStyle2        = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+caloStyle2        = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
                                    StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kSolid, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kRed, fillStyle=3001)])
-caloStyle3        = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+caloStyle3        = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kAzure, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
                                    StyleLine(lineColor=ROOT.kAzure, lineStyle=ROOT.kSolid, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kAzure, fillStyle=3001)])
+caloStyle4        = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kGreen+2, markerSizes=None, markerStyle=ROOT.kFullSquare),
+                                   StyleLine(lineColor=ROOT.kGreen+2, lineStyle=ROOT.kSolid, lineWidth=3), 
+                                   StyleFill(fillColor=ROOT.kGreen+2, fillStyle=3001)])
+
 caloTkStyle       = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
                                    StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kBlack, fillStyle=3001)])
@@ -365,16 +380,16 @@ SingleTauPU200     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT
                                    StyleFill(fillColor=ROOT.kBlue-2, fillStyle=3001)])
 
 TTBarNoPU         = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
-                                   StyleLine(lineColor=ROOT.kMagenta, lineStyle=ROOT.kDashed, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kMagenta, fillStyle=3001)])
+                                   StyleLine(lineColor=ROOT.kMagenta, lineStyle=ROOT.kDashed, lineWidth=3)])#, 
+                                  # StyleFill(fillColor=ROOT.kMagenta, fillStyle=3001)])
 
 TTBarPU140        = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta-7, markerSizes=None, markerStyle=ROOT.kFullCircle),
-                                   StyleLine(lineColor=ROOT.kMagenta-7, lineStyle=ROOT.kDashed, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kMagenta-7, fillStyle=3001)])
+                                   StyleLine(lineColor=ROOT.kMagenta-7, lineStyle=ROOT.kSolid, lineWidth=3)])#, 
+                                  # StyleFill(fillColor=ROOT.kMagenta-7, fillStyle=3001)])
 
 TTBarPU200        = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta-4, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
-                                   StyleLine(lineColor=ROOT.kMagenta-4, lineStyle=ROOT.kDashed, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kMagenta-4, fillStyle=3001)])
+                                   StyleLine(lineColor=ROOT.kMagenta-4, lineStyle=ROOT.kDashed, lineWidth=3)])#, 
+                                  # StyleFill(fillColor=ROOT.kMagenta-4, fillStyle=3001)])
 
 
 SingleNeutrinoPU140 = MinBiasStyle
@@ -451,6 +466,17 @@ def getQCDLineStyle():
 def getBaselineStyle():
     return baselineStyle
 
+def getRegionStyle(i):
+    if i==0:
+        return regionStyle1
+    elif i==1:
+        return regionStyle2
+    elif i==2:
+        return regionStyle3
+    else:
+        styles[index]
+
+
 def getCaloStyle(i):
     if i==0:
         return caloStyle1
@@ -458,6 +484,8 @@ def getCaloStyle(i):
         return caloStyle2
     elif i==2:
         return caloStyle3
+    elif i==3:
+        return caloStyle4
     else:
         styles[index]
 
@@ -520,6 +548,8 @@ def getCaloLegend(i):
     elif i==1:
         return "CaloTk"
     elif i==2:
-        return "CaloTk #it{Iso}"
+        return "CaloTk #it{Vtx Iso}"
+    elif i==3:
+        return "CaloTk #it{Rel Iso}"
     else:
         return "Unknown"

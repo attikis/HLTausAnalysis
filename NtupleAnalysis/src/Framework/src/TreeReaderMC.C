@@ -246,7 +246,7 @@ vector<GenParticle> TreeReaderMC::GetHadronicGenTaus(vector<GenParticle> GenTaus
   // Sanity check
   vector<GenParticle> genP_hadGenTaus;
   if (GenTaus.size() < 1 ) return genP_hadGenTaus;
-    
+  
   // For-loop: GenTaus
   for (vector<GenParticle>::iterator tau = GenTaus.begin(); tau != GenTaus.end(); tau++)
     {
@@ -255,11 +255,10 @@ vector<GenParticle> TreeReaderMC::GetHadronicGenTaus(vector<GenParticle> GenTaus
       bool bIsHadronicTau = (tau->finalDaughtersCharged().size() > 0);
 
       if (0) tau->PrintFinalDaughters();
-      
+
       // Apply acceptance cuts
       bool bPassVisEt  = ( tau->p4vis().Et() >= visEt);
       bool bPassVisEta = ( abs(tau->p4vis().Eta()) <= visEta );
-
 
       if (!(bPassVisEt)) continue;
       if (!(bPassVisEta)) continue;
@@ -273,7 +272,7 @@ vector<GenParticle> TreeReaderMC::GetHadronicGenTaus(vector<GenParticle> GenTaus
 }      
 
 
-//============================================================================
+//===========================================================================
 void TreeReaderMC::SetGenParticleFinalDaughters(GenParticle &p)
 //============================================================================
 {
@@ -285,6 +284,7 @@ void TreeReaderMC::SetGenParticleFinalDaughters(GenParticle &p)
   vector<unsigned short> finalDaughtersIndex;
 
   // For taus, get hadronic decay products (pi+/-, pi0, K+/-, K0, K0L)
+  //mcTools_.GetHadronicTauFinalDaughters(p.index(), finalDaughtersIndex);
   GetHadronicTauFinalDaughters(p, finalDaughtersIndex);
 
   // For-loop: All daughter indices
@@ -926,21 +926,21 @@ void TreeReaderMC::PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collec
   for (vector<L1TkTauParticle>::iterator p = collection.begin(); p != collection.end(); p++)
   {
     // Construct table
-    info.AddRowColumn(0, auxTools_.ToString( p->GetMatchConeMin(), 2) + " < dR < " + auxTools_.ToString( p->GetMatchConeMax(), 2) );
-    info.AddRowColumn(0, auxTools_.ToString( p->GetSigConeMin()  , 2) + " < dR < " + auxTools_.ToString( p->GetSigConeMax()  , 2) );
-    info.AddRowColumn(0, auxTools_.ToString( p->GetIsoConeMin()  , 2) + " < dR < " + auxTools_.ToString( p->GetIsoConeMax()  , 2) ); 
-    info.AddRowColumn(0, auxTools_.ToString( p->GetCaloTau().et()       ,3  ) );
-    info.AddRowColumn(0, auxTools_.ToString( p->GetCaloTau().eta()      ,3  ) );
-    info.AddRowColumn(0, auxTools_.ToString( p->GetMatchingTk().getPt() ,3  ) );
-    info.AddRowColumn(0, auxTools_.ToString( p->GetMatchingTk().getEta(),3  ) );
-    info.AddRowColumn(0, auxTools_.ToString( p->GetMatchingTkDeltaR()   ,3  ) );
-    info.AddRowColumn(0, auxTools_.ToString( p->GetMatchingGenParticle().pt() , 3) );
-    info.AddRowColumn(0, auxTools_.ToString( p->GetMatchingGenParticle().eta(), 3) );
-    info.AddRowColumn(0, auxTools_.ToString( p->GetMatchingGenParticleDeltaR(), 3) );  
-    info.AddRowColumn(0, auxTools_.ToString( p->GetSigConeTTTracks().size() ) );
-    info.AddRowColumn(0, auxTools_.ToString( p->GetIsoConeTTTracks().size() ) );
-    info.AddRowColumn(0, auxTools_.ToString( p->GetVtxIsolation(), 3) );
-    info.AddRowColumn(0, auxTools_.ToString( p->GetRelIsolation(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->GetMatchConeMin(), 2) + " < dR < " + auxTools_.ToString( p->GetMatchConeMax(), 2) );
+    info.AddRowColumn(row, auxTools_.ToString( p->GetSigConeMin()  , 2) + " < dR < " + auxTools_.ToString( p->GetSigConeMax()  , 2) );
+    info.AddRowColumn(row, auxTools_.ToString( p->GetIsoConeMin()  , 2) + " < dR < " + auxTools_.ToString( p->GetIsoConeMax()  , 2) ); 
+    info.AddRowColumn(row, auxTools_.ToString( p->GetCaloTau().et()       ,3  ) );
+    info.AddRowColumn(row, auxTools_.ToString( p->GetCaloTau().eta()      ,3  ) );
+    info.AddRowColumn(row, auxTools_.ToString( p->GetMatchingTk().getPt() ,3  ) );
+    info.AddRowColumn(row, auxTools_.ToString( p->GetMatchingTk().getEta(),3  ) );
+    info.AddRowColumn(row, auxTools_.ToString( p->GetMatchingTkDeltaR()   ,3  ) );
+    info.AddRowColumn(row, auxTools_.ToString( p->GetMatchingGenParticle().pt() , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->GetMatchingGenParticle().eta(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->GetMatchingGenParticleDeltaR(), 3) );  
+    info.AddRowColumn(row, auxTools_.ToString( p->GetSigConeTTTracks().size() ) );
+    info.AddRowColumn(row, auxTools_.ToString( p->GetIsoConeTTTracks().size() ) );
+    info.AddRowColumn(row, auxTools_.ToString( p->GetVtxIsolation(), 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->GetRelIsolation(), 3) );
     row++;
   }
 

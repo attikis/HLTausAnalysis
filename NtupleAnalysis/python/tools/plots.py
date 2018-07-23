@@ -117,18 +117,33 @@ _physicalMcAdd = {
     "SingleTau_NoPU"             : "SingleTau_NoPU",
     "SingleTau_PU140"            : "SingleTau_PU140",
     "SingleTau_PU200"            : "SingleTau_PU200",
-    "SingleNeutrino_L1TPU140"       : "SingleNeutrino_L1TPU140",
-    "SingleNeutrino_L1TPU200"       : "SingleNeutrino_L1TPU200",
+    "SingleNeutrino_PU140"       : "SingleNeutrino_PU140",
+    "SingleNeutrino_PU200"       : "SingleNeutrino_PU200",
     "TT_TuneCUETP8M1_14TeV_NoPU" : "TT_TuneCUETP8M1_14TeV_NoPU", 
     "TT_TuneCUETP8M1_14TeV_PU140": "TT_TuneCUETP8M1_14TeV_PU140", 
     "TT_TuneCUETP8M1_14TeV_PU200": "TT_TuneCUETP8M1_14TeV_PU200",     
 
     #Fall17D
-    "TT_TuneCUETP8M2T4_14TeV_NoPU"  : "TT_TuneCUETP8M2T4_14TeV_NoPU",
-    "TT_TuneCUETP8M2T4_14TeV_PU140"  : "TT_TuneCUETP8M2T4_14TeV_PU140",
-    "TT_TuneCUETP8M2T4_14TeV_PU200"  : "TT_TuneCUETP8M2T4_14TeV_PU200",
+    "TT_TuneCUETP8M2T4_14TeV_L1TnoPU"  : "TT_TuneCUETP8M2T4_14TeV_L1TnoPU",
+    "TT_TuneCUETP8M2T4_14TeV_L1TPU140" : "TT_TuneCUETP8M2T4_14TeV_L1TPU140",
+    "TT_TuneCUETP8M2T4_14TeV_L1TPU200" : "TT_TuneCUETP8M2T4_14TeV_L1TPU200",
+    
+    "SingleNeutrino_PhaseIIFall17D_L1TPU140_93X"       : "SingleNeutrino_L1TPU140",
+    "SingleNeutrino_PhaseIIFall17D_L1TPU200_93X"       : "SingleNeutrino_L1TPU200",
+    
+    "ChargedHiggs200_14TeV_L1TnoPU"    : "ChargedHiggs200_14TeV_L1TnoPU", 
+    "ChargedHiggs200_14TeV_L1TPU140"   : "ChargedHiggs200_14TeV_L1TPU140", 
+    "ChargedHiggs200_14TeV_L1TPU200"   : "ChargedHiggs200_14TeV_L1TPU200", 
+    "ChargedHiggs500_14TeV_L1TnoPU"    : "ChargedHiggs500_14TeV_L1TnoPU", 
+    "ChargedHiggs500_14TeV_L1TPU140"   : "ChargedHiggs500_14TeV_L1TPU140", 
+    "ChargedHiggs500_14TeV_L1TPU200"   : "ChargedHiggs500_14TeV_L1TPU200", 
+    "ChargedHiggs1000_14TeV_L1TnoPU"   : "ChargedHiggs1000_14TeV_L1TnoPU",
+    "ChargedHiggs1000_14TeV_L1TPU140"  : "ChargedHiggs1000_14TeV_L1TPU140",
+    "ChargedHiggs1000_14TeV_L1TPU200"  : "ChargedHiggs1000_14TeV_L1TPU200",
 
-
+    "GluGluHToTauTau_14TeV_L1TnoPU"  : "GluGluHToTauTau_14TeV_L1TnoPU", 
+    "GluGluHToTauTau_14TeV_L1TPU140" : "GluGluHToTauTau_14TeV_L1TPU140", 
+    "GluGluHToTauTau_14TeV_L1TPU200" : "GluGluHToTauTau_14TeV_L1TPU200", 
 }
 
 '''
@@ -235,17 +250,34 @@ _physicalToLogical.update({
     "SingleTau_NoPU"             : "SingleTau_NoPU",
     "SingleTau_PU140"            : "SingleTau_PU140",
     "SingleTau_PU200"            : "SingleTau_PU200",
-    "SingleNeutrino_L1TPU140"       : "SingleNeutrino_L1TPU140",
-    "SingleNeutrino_L1TPU200"       : "SingleNeutrino_L1TPU200",
+    "SingleNeutrino_PU140"       : "SingleNeutrino_PU140",
+    "SingleNeutrino_PU200"       : "SingleNeutrino_PU200",
     "TT_TuneCUETP8M1_14TeV_NoPU" : "TT_TuneCUETP8M1_14TeV_NoPU", 
     "TT_TuneCUETP8M1_14TeV_PU140": "TT_TuneCUETP8M1_14TeV_PU140", 
     "TT_TuneCUETP8M1_14TeV_PU200": "TT_TuneCUETP8M1_14TeV_PU200", 
 
     #Fall17D
-    "TT_TuneCUETP8M2T4_14TeV_L1TnoPU"  : "TT_TuneCUETP8M2T4_14TeV_NoPU",
-    "TT_TuneCUETP8M2T4_14TeV_L1TPU140"  : "TT_TuneCUETP8M2T4_14TeV_PU140",
-    "TT_TuneCUETP8M2T4_14TeV_L1TPU200"  : "TT_TuneCUETP8M2T4_14TeV_PU200",
+    "TT_TuneCUETP8M2T4_14TeV_L1TnoPU"  : "TT_TuneCUETP8M2T4_14TeV_L1TnoPU",
+    "TT_TuneCUETP8M2T4_14TeV_L1TPU140"  : "TT_TuneCUETP8M2T4_14TeV_L1TPU140",
+    "TT_TuneCUETP8M2T4_14TeV_L1TPU200"  : "TT_TuneCUETP8M2T4_14TeV_L1TPU200",
     
+    "SingleNeutrino_L1TPU140"       : "SingleNeutrino_L1TPU140",
+    "SingleNeutrino_L1TPU200"       : "SingleNeutrino_L1TPU200",
+
+    "ChargedHiggs200_14TeV_L1TnoPU"    : "ChargedHiggs200_14TeV_L1TnoPU",
+    "ChargedHiggs200_14TeV_L1TPU140"   : "ChargedHiggs200_14TeV_L1TPU140",
+    "ChargedHiggs200_14TeV_L1TPU200"   : "ChargedHiggs200_14TeV_L1TPU200",
+    "ChargedHiggs500_14TeV_L1TnoPU"    : "ChargedHiggs500_14TeV_L1TnoPU",
+    "ChargedHiggs500_14TeV_L1TPU140"   : "ChargedHiggs500_14TeV_L1TPU140",
+    "ChargedHiggs500_14TeV_L1TPU200"   : "ChargedHiggs500_14TeV_L1TPU200",
+    "ChargedHiggs1000_14TeV_L1TnoPU"   : "ChargedHiggs1000_14TeV_L1TnoPU",
+    "ChargedHiggs1000_14TeV_L1TPU140"  : "ChargedHiggs1000_14TeV_L1TPU140",
+    "ChargedHiggs1000_14TeV_L1TPU200"  : "ChargedHiggs1000_14TeV_L1TPU200",
+
+    "GluGluHToTauTau_14TeV_L1TnoPU"  : "GluGluHToTauTau_14TeV_L1TnoPU",
+    "GluGluHToTauTau_14TeV_L1TPU140" : "GluGluHToTauTau_14TeV_L1TPU140",
+    "GluGluHToTauTau_14TeV_L1TPU200" : "GluGluHToTauTau_14TeV_L1TPU200",
+
 
 
 })
@@ -413,17 +445,33 @@ _datasetOrder.extend([
     "SingleTau_NoPU",
     "SingleTau_PU140"
     "SingleTau_PU200",
-    "SingleNeutrino_L1TPU140",
-    "SingleNeutrino_L1TPU200",
+    "SingleNeutrino_PU140",
+    "SingleNeutrino_PU200",
     "TT_TuneCUETP8M1_14TeV_NoPU" ,
     "TT_TuneCUETP8M1_14TeV_PU140",
     "TT_TuneCUETP8M1_14TeV_PU200",
 
     #Fall17D
-    "TT_TuneCUETP8M2T4_14TeV_NoPU",
-    "TT_TuneCUETP8M2T4_14TeV_PU140",
-    "TT_TuneCUETP8M2T4_14TeV_PU200",
+    "SingleNeutrino_L1TPU140",
+    "SingleNeutrino_L1TPU200",
     
+    "TT_TuneCUETP8M2T4_14TeV_L1TnoPU",
+    "TT_TuneCUETP8M2T4_14TeV_L1TPU140",
+    "TT_TuneCUETP8M2T4_14TeV_L1TPU200",
+
+    "ChargedHiggs200_14TeV_L1TnoPU",
+    "ChargedHiggs200_14TeV_L1TPU140",
+    "ChargedHiggs200_14TeV_L1TPU200",
+    "ChargedHiggs500_14TeV_L1TnoPU",
+    "ChargedHiggs500_14TeV_L1TPU140",
+    "ChargedHiggs500_14TeV_L1TPU200",
+    "ChargedHiggs1000_14TeV_L1TnoPU",
+    "ChargedHiggs1000_14TeV_L1TPU140",
+    "ChargedHiggs1000_14TeV_L1TPU200",
+
+    "GluGluHToTauTau_14TeV_L1TnoPU",
+    "GluGluHToTauTau_14TeV_L1TPU140",
+    "GluGluHToTauTau_14TeV_L1TPU200",
 
     ]) 
 
@@ -538,20 +586,36 @@ _legendLabels = {
     "Tbar_s-channel"    : "Single #bar{t} (s channel)",
 
     # ID2017
-    "SingleTau_NoPU"      : "Single #tau (PU=0)",
+    "SingleTau_NoPU"      : "Single #tau",
     "SingleTau_PU140"     : "Single #tau (PU=140)",
     "SingleTau_PU200"     : "Single #tau (PU=200)",
-    "SingleNeutrino_L1TPU140": "MB (PU=140)",
-    "SingleNeutrino_L1TPU200": "MB (PU=200)",
-    "TT_TuneCUETP8M1_14TeV_NoPU" : "t#bar{t} (PU=0)",
+    "SingleNeutrino_PU140": "MB (PU=140)",
+    "SingleNeutrino_PU200": "MB (PU=200)",
+    "TT_TuneCUETP8M1_14TeV_NoPU" : "t#bar{t}",
     "TT_TuneCUETP8M1_14TeV_PU140": "t#bar{t} (PU=140)",
     "TT_TuneCUETP8M1_14TeV_PU200": "t#bar{t} (PU=200)",
 
     #Fall17D
-    "TT_TuneCUETP8M2T4_14TeV_NoPU"  : "t#bar{t} (PU=0)",
-    "TT_TuneCUETP8M2T4_14TeV_PU140"  : "t#bar{t} (PU=140)",
-    "TT_TuneCUETP8M2T4_14TeV_PU200"  : "t#bar{t} (PU=200)",
+    "SingleNeutrino_L1TPU140": "MB",
+    "SingleNeutrino_L1TPU200": "MB",
 
+    "TT_TuneCUETP8M2T4_14TeV_L1TnoPU"  : "t#bar{t}",
+    "TT_TuneCUETP8M2T4_14TeV_L1TPU140"  : "t#bar{t}",
+    "TT_TuneCUETP8M2T4_14TeV_L1TPU200"  : "t#bar{t}",
+
+    "ChargedHiggs200_14TeV_L1TnoPU"    : "H^{+} m_{H^{+}}=200 GeV",
+    "ChargedHiggs200_14TeV_L1TPU140"  : "H^{+} m_{H^{+}}=200 GeV",
+    "ChargedHiggs200_14TeV_L1TPU200"  : "H^{+} m_{H^{+}}=200 GeV",
+    "ChargedHiggs500_14TeV_L1TnoPU"   : "H^{+} m_{H^{+}}=500 GeV",
+    "ChargedHiggs500_14TeV_L1TPU140"  : "H^{+} m_{H^{+}}=500 GeV",
+    "ChargedHiggs500_14TeV_L1TPU200"  : "H^{+} m_{H^{+}}=500 GeV",
+    "ChargedHiggs1000_14TeV_L1TnoPU"  : "H^{+} m_{H^{+}}=1000 GeV",
+    "ChargedHiggs1000_14TeV_L1TPU140" : "H^{+} m_{H^{+}}=1000 GeV",
+    "ChargedHiggs1000_14TeV_L1TPU200" : "H^{+} m_{H^{+}}=1000 GeV",
+
+    "GluGluHToTauTau_14TeV_L1TnoPU"    : "H^{0}#rightarrow#tau#tau",
+    "GluGluHToTauTau_14TeV_L1TPU140"   : "H^{0}#rightarrow#tau#tau", 
+    "GluGluHToTauTau_14TeV_L1TPU200"   : "H^{0}#rightarrow#tau#tau",
 
     # Ratio uncertainties
     "BackgroundStatError"    : "Stat. unc.",
@@ -622,17 +686,11 @@ _plotStyles = {
     "SingleTau_NoPU"             : styles.SingleTauNoPU,
     "SingleTau_PU140"            : styles.SingleTauPU140,
     "SingleTau_PU200"            : styles.SingleTauPU200,
-    "SingleNeutrino_L1TPU140"       : styles.SingleNeutrinoPU140,
-    "SingleNeutrino_L1TPU200"       : styles.SingleNeutrinoPU200,
+    "SingleNeutrino_PU140"       : styles.SingleNeutrinoPU140,
+    "SingleNeutrino_PU200"       : styles.SingleNeutrinoPU200,
     "TT_TuneCUETP8M1_14TeV_NoPU" : styles.TTBarNoPU,
     "TT_TuneCUETP8M1_14TeV_PU140": styles.TTBarPU140,
     "TT_TuneCUETP8M1_14TeV_PU200": styles.TTBarPU200,
-
-    #Fall17D
-    "TT_TuneCUETP8M2T4_14TeV_PU140"  : styles.TTBarNoPU,
-    "TT_TuneCUETP8M2T4_14TeV_PU140"  : styles.TTBarPU140,
-    "TT_TuneCUETP8M2T4_14TeV_PU140"  : styles.TTBarPU200,
-
 
     "WJets_0bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+1),
     "WJets_1bquark": styles.Style(ROOT.kFullTriangleDown, ROOT.kRed+4),
@@ -654,6 +712,29 @@ _plotStyles = {
     "BackgroundSystError"    : styles.errorRatioSystStyle,
     "BackgroundStatSystError": styles.errorRatioSystStyle,
     "RatioLine"              : styles.ratioLineStyle,
+
+    #Fall17D
+    "SingleNeutrino_L1TPU140"       : styles.SingleNeutrinoPU140,
+    "SingleNeutrino_L1TPU200"       : styles.SingleNeutrinoPU200,
+
+    "TT_TuneCUETP8M2T4_14TeV_L1TnoPU" : styles.TTBarNoPU,
+    "TT_TuneCUETP8M2T4_14TeV_L1TPU140": styles.TTBarPU140,
+    "TT_TuneCUETP8M2T4_14TeV_L1TPU200": styles.TTBarPU200,
+
+    "ChargedHiggs200_14TeV_L1TnoPU"   : styles.signal200Style,
+    "ChargedHiggs200_14TeV_L1TPU140"  : styles.signal200Style,
+    "ChargedHiggs200_14TeV_L1TPU200"  : styles.signal200Style,
+    "ChargedHiggs500_14TeV_L1TnoPU"   : styles.signal500Style,
+    "ChargedHiggs500_14TeV_L1TPU140"  : styles.signal500Style,
+    "ChargedHiggs500_14TeV_L1TPU200"  : styles.signal500Style,
+    "ChargedHiggs1000_14TeV_L1TnoPU"  : styles.signal1000Style,
+    "ChargedHiggs1000_14TeV_L1TPU140" : styles.signal1000Style,
+    "ChargedHiggs1000_14TeV_L1TPU200" : styles.signal1000Style,
+
+    "GluGluHToTauTau_14TeV_L1TnoPU"    : styles.ggtautauStyle,
+    "GluGluHToTauTau_14TeV_L1TPU140"   : styles.ggtautauStyle,
+    "GluGluHToTauTau_14TeV_L1TPU200"   : styles.ggtautauStyle,
+
     }
 
 # Other
@@ -2781,7 +2862,7 @@ class PlotDrawer:
     # \param cmsExtraTextPosition CMS extra text position (None for default value, see histograms.addStandardTexts() for more)
     def __init__(self,
                  xlabel=None,
-                 ylabel="Occurrances / %.0f",
+                 ylabel=None,#"Occurrances / %.0f",
                  zlabel=None,
                  xlabelsize = None,
                  ylabelsize = None,
@@ -2821,7 +2902,7 @@ class PlotDrawer:
                  cmsText=None,
                  cmsExtraText=None,
                  addCmsText=True,
-                 cmsTextPosition=None,
+                 cmsTextPosition= "right",#None,
                  cmsExtraTextPosition=None,
                  ):
         self.xlabelDefault = xlabel
@@ -3403,8 +3484,7 @@ class PlotDrawer:
                            cmsExtraTextPosition = self._getValue("cmsExtraTextPosition", p, kwargs),
                            cmsText = self._getValue("cmsText", p, kwargs),
                            cmsExtraText = self._getValue("cmsExtraText", p, kwargs))
-
-
+        
         customize2 = self._getValue("customizeBeforeSave", p, kwargs)
         if customize2 is not None:
             customize2(p)

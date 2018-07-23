@@ -7,9 +7,8 @@
 #include "../src/TreeReaderMC.C"
 #include "../src/ObjectMCAssociator.C"
 
-class L1Tracks;
-
-// class TrackingParticles;
+//class L1Tracks;
+//class TrackingParticles;
 
 class TreeAnalyserMC : public TreeAnalyserBase, public TreeReaderMC, 
                        public virtual MCTools,  public virtual ObjectMCAssociator
@@ -29,12 +28,13 @@ class TreeAnalyserMC : public TreeAnalyserBase, public TreeReaderMC,
                   //TreeReaderMC(SamplePath, SampleName, tree) { InitSelector(); };
 		  TreeReaderMC(SamplePath, SampleName, chain) { InitSelector(); };
 
-   friend class L1Tracks;
-   // friend class TrackingParticles;
+		  // friend class L1Tracks;
+		  //friend class TrackingParticles;
+
 
  private:
    void InitSelector();
-   L1Tracks* s;
+   //L1Tracks* s;
    //TrackingParticles* tp;
 
 };
