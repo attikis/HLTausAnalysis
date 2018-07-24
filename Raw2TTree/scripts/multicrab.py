@@ -1526,26 +1526,39 @@ def GetRequestName(dataset):
     tune_re        = re.compile("Tune\w+_")
     tev_re         = re.compile("\d*TeV")
     pileup_re      = re.compile("\w*PU\d*")
+    campaign_re    = re.compile("\Phase\w+_*")
+    release_re     = re.compile("\d*X")
 
     # Scan through the string 'dataset' & look for any location where the compiled RE 'mcdataset_re' matches
     match = mcdataset_re.search(dataset.URL)
     if match:
-        requestName = match.group().split("_")[0]        
+        requestName = match.group()
 
+        '''
     # Append the MC-tune
     tune_match = tune_re.search(dataset.URL)
     if tune_match:
         requestName += "_" + tune_match.group()
-
+    
     # Append the COM Energy
     tev_match = tev_re.search(dataset.URL)
     if tev_match:
         requestName += tev_match.group()
+    '''
+    # Append the Campaign
+    campaign_match = campaign_re.search(dataset.URL)
+    if campaign_match:
+        requestName += "_" + campaign_match.group()
 
     # Append the Pileup
     pileup_match = pileup_re.search(dataset.URL)
     if pileup_match:
         requestName += "_" + pileup_match.group()
+
+    # Append the realease
+    release_match = release_re.search(dataset.URL)
+    if release_match:
+        requestName += "_" + release_match.group()
 
     # Append the Run Range (for Data samples only)
     if dataset.isData():
@@ -1685,6 +1698,7 @@ def CreateCfgFile(dataset, taskDirName, requestName, infilePath, opts):
 	# Write line to the output file
         fOUT.write(line)
 
+    
     # Close input and output files 
     fOUT.close()
     fIN.close()
@@ -1879,6 +1893,7 @@ def CreateJob(opts, args):
         
         Verbose("Task %s, creating CRAB configuration file" % (dataset) )
         requestName = GetRequestName(dataset)
+    
         fullDir     = taskDirName + "/" + requestName
 
         if os.path.exists(fullDir) and os.path.isdir(fullDir):
@@ -1914,7 +1929,7 @@ if __name__ == "__main__":
     # Default Values
     VERBOSE = False
     PSET    = "raw2TTree_CaloTk_cfg.py"
-    SITE    = "T2_CH_CERN" #"T2_FI_HIP"
+    SITE    =  "T3_US_FNALLPC" #"T2_CH_CERN" #"T2_FI_HIP"
     DIRNAME = ""
 
     parser = OptionParser(usage="Usage: %prog [options]")

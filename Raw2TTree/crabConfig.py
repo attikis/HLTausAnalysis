@@ -43,8 +43,8 @@ config.JobType.outputFiles = ['L1Ntuple.root']
 #config.JobType.disableAutomaticOutputCollection
 #config.JobType.eventsPerLumi
 #config.JobType.allowUndistributedCMSSW
-config.JobType.maxMemoryMB = 4000
-#config.JobType.maxJobRuntimeMin
+config.JobType.maxMemoryMB = 2500 #4000
+#config.JobType.maxJobRuntimeMin = 1500
 #config.JobType.numCores
 #config.JobType.priority
 #config.JobType.scriptExe
@@ -63,8 +63,8 @@ config.Data.splitting = 'FileBased'
 #config.Data.totalUnits  = 10
 config.Data.unitsPerJob = 5
 config.Data.publication = False
-#config.Data.outLFNDirBase = '/store/user/%s/CRAB3_TransferData' % (getUsernameFromSiteDB())
-config.Data.outLFNDirBase = '/store/user/%s/' % (getUsernameFromSiteDB())
+config.Data.outLFNDirBase = '/store/user/%s/CRAB3_TransferData' % (getUsernameFromSiteDB())
+
 # testing:
 # config.Data.totalUnits    = 100000
 # config.Data.unitsPerJob   = 10000 
@@ -82,7 +82,7 @@ config.Data.outLFNDirBase = '/store/user/%s/' % (getUsernameFromSiteDB())
 # config.Data.publishDBS
 # config.Data.outputDatasetTag
 # config.Data.publishWithGroupName
-# config.Data.ignoreLocality
+###config.Data.ignoreLocality = True
 # config.Data.userInputFiles
 
 
@@ -91,9 +91,10 @@ config.Data.outLFNDirBase = '/store/user/%s/' % (getUsernameFromSiteDB())
 #================================================================================================
 config.section_("Site")
 config.Site.storageSite = 'T2_FI_HIP' #'T2_CH_CERN' 
+#config.Site.ignoreGlobalBlacklist = True
 # options:
 # config.Site.blacklist = ['T2_US_Florida']
-# config.Site.whitelist = ['T2_CH_CERN', 'T2_FI_HIP']
+###config.Site.whitelist = ['T2_US_*']#['T2_CH_CERN', 'T2_FI_HIP']
 
 
 #================================================================================================

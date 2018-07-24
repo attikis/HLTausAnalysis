@@ -116,13 +116,11 @@ datasetsTTbar = []
 #datasetsTTbar.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-PU200_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
 
 datasetsH2tautau = []
-
 datasetsH2tautau.append(Dataset('/GluGluHToTauTau_M125_14TeV_powheg_pythia8/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
 datasetsH2tautau.append(Dataset('/GluGluHToTauTau_M125_14TeV_powheg_pythia8/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
 datasetsH2tautau.append(Dataset('/GluGluHToTauTau_M125_14TeV_powheg_pythia8/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
 
 datasetsChargedHiggs = []
-
 datasetsChargedHiggs.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
 datasetsChargedHiggs.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
 datasetsChargedHiggs.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
