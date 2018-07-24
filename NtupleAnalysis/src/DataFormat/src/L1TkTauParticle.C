@@ -147,7 +147,7 @@ TTTrack L1TkTauParticle::GetSigConeLdgTk(void)
     {
       
       TTTrack tk = theTracks.at(i);
-      ldgTk = tk;
+      // ldgTk = tk; //marina : this shouldn't be here
 
       // Find new leading track
       if (tk.getPt() > ldgTk.getPt() ) ldgTk = tk;

@@ -40,7 +40,7 @@ void CaloTk::InitVars_()
 
   // Matching tracks
   matchTk_Collection  =  "TTTracks"; // TP: "TTTracks" (not "TTPixelTracks")
-  matchTk_nFitParams  =   5;         // TP:   5
+  matchTk_nFitParams  =   4;         // TP:   5
   matchTk_minPt       =   5.00;      // TP:   5.0
   matchTk_minEta      =   0.0;       // TP:   0.0
   matchTk_maxEta      = 999.9;       // TP: 999.9  
@@ -83,6 +83,7 @@ void CaloTk::InitVars_()
   // Isolation cone
   isoCone_Constant = +3.50;         // TP: 3.50 GeV
   isoCone_VtxIsoWP = +0.50;         // TP: 1.0 cm
+  isoCone_RelIsoWP = +0.10;
   isoCone_dRMin    = sigCone_dRMax; // TP: 0.4
   isoCone_dRMax    = +0.30;         // TP: 0.4
   diTau_deltaPOCAz = +1.00;         // TP: 1.0 cm
@@ -90,6 +91,10 @@ void CaloTk::InitVars_()
   // MC matching
   mcMatching_dRMax  = +0.10;        // TP: 0.05
   mcMatching_unique = true;
+
+  // Eta Regions
+  _eta_C             =   0.8;
+  _eta_F             =   1.6;
 
   PrintSettings();
 
@@ -333,37 +338,44 @@ void CaloTk::PrintSettings(void)
   settings.AddRowColumn(31, "cm");
   settings.AddRowColumn(31, "");
 
-  settings.AddRowColumn(32, "Di-Tau |Delta z0|");
-  settings.AddRowColumn(32, "<");
-  settings.AddRowColumn(32, auxTools_.ToString(diTau_deltaPOCAz) );
-  settings.AddRowColumn(32, "1.0" );
+  settings.AddRowColumn(32, "Isolation Cone: RelIso" );
+  settings.AddRowColumn(32, "<=" );
+  settings.AddRowColumn(32, auxTools_.ToString(isoCone_RelIsoWP) );
+  settings.AddRowColumn(32, "--");
   settings.AddRowColumn(32, "cm");
+  settings.AddRowColumn(32, "");
 
-  settings.AddRowColumn(33, "MC-Matching DeltaR");
-  settings.AddRowColumn(33, "<=");
-  settings.AddRowColumn(33, auxTools_.ToString(mcMatching_dRMax) );
-  settings.AddRowColumn(33, "0.05" );
-  settings.AddRowColumn(33, "" );
+  settings.AddRowColumn(33, "Di-Tau |Delta z0|");
+  settings.AddRowColumn(33, "<");
+  settings.AddRowColumn(33, auxTools_.ToString(diTau_deltaPOCAz) );
+  settings.AddRowColumn(33, "1.0" );
+  settings.AddRowColumn(33, "cm");
 
-  settings.AddRowColumn(34, "MC-Matching IsUnique");
-  settings.AddRowColumn(34, "==");
-  settings.AddRowColumn(34, auxTools_.ToString(mcMatching_unique) );
-  settings.AddRowColumn(34, "1" );
+  settings.AddRowColumn(34, "MC-Matching DeltaR");
+  settings.AddRowColumn(34, "<=");
+  settings.AddRowColumn(34, auxTools_.ToString(mcMatching_dRMax) );
+  settings.AddRowColumn(34, "0.05" );
   settings.AddRowColumn(34, "" );
-  
-  settings.AddRowColumn(35, "MC-Taus: Mom PdgId");
-  settings.AddRowColumn(35, "==");
-  settings.AddRowColumn(35, auxTools_.ToString(realTauMom));
-  settings.AddRowColumn(35, "N/A" );
-  settings.AddRowColumn(35, "" );
 
-  settings.AddRowColumn(36, "MC-Taus: Number Expected");
-  settings.AddRowColumn(36, ">=");
-  settings.AddRowColumn(36, auxTools_.ToString(nMaxNumOfHTausPossible));
+  settings.AddRowColumn(35, "MC-Matching IsUnique");
+  settings.AddRowColumn(35, "==");
+  settings.AddRowColumn(35, auxTools_.ToString(mcMatching_unique) );
+  settings.AddRowColumn(35, "1" );
+  settings.AddRowColumn(35, "" );
+  
+  settings.AddRowColumn(36, "MC-Taus: Mom PdgId");
+  settings.AddRowColumn(36, "==");
+  settings.AddRowColumn(36, auxTools_.ToString(realTauMom));
   settings.AddRowColumn(36, "N/A" );
   settings.AddRowColumn(36, "" );
 
+  settings.AddRowColumn(37, "MC-Taus: Number Expected");
+  settings.AddRowColumn(37, ">=");
+  settings.AddRowColumn(37, auxTools_.ToString(nMaxNumOfHTausPossible));
+  settings.AddRowColumn(37, "N/A" );
   settings.AddRowColumn(37, "" );
+
+  settings.AddRowColumn(38, "" );
   settings.Print();
   
   return;
@@ -417,27 +429,6 @@ void CaloTk::Loop()
 
     nb = fChain->GetEntry(jentry);
     nbytes += nb;
-
-    /*
-    cout << "******************************"<<endl;
-    cout<<"L1TauEmu_TowerIPhi_SIZE=  "<<L1TauEmu_TowerIPhi.size()<<endl; 
-    cout << "***********Values*************"<<endl;
-
-
-    for (unsigned int i=0; i<L1TauEmu_TowerIPhi.size() ;i++){
-      cout<<L1TauEmu_TowerIPhi.at(i)<<endl;
-    }
-
-    // Fix me
-    cout << "******************************"<<endl;
-    cout<<"CaloCluster_iEta_SIZE=  "<<caloClusterEmu_ieta.size()<<endl; 
-    cout << "***********Values*************"<<endl;
-
-
-    for (unsigned int i=0; i<5 ;i++){
-      cout<<caloClusterEmu_ieta.at(i)<<endl;
-    }
-    */
         
     //======================================================================================================
     
@@ -454,16 +445,9 @@ void CaloTk::Loop()
 	if (0) GenParticles = GetGenParticles(false); // time-consuming
 	GenTaus             = GetGenParticles(15, true);
 	GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
-	GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 2.4);
+	GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 1.5);//2.4);
       }
 
-    /*
-    for (unsigned int itau=0;itau<GenTaus.size();itau++){
-      cout<<"*********************** W is the mother?   ->  "<<RecursivelyLookForMotherId(GenTaus.at(itau).index(), 24, false)<<endl;
-      GenParticles = GetGenParticles(true); // time-consuming
-    }
-    */
-    
     if (DEBUG)
     {
 	cout << "\tPrinting all GenParticle Collections" << endl;
@@ -472,7 +456,9 @@ void CaloTk::Loop()
 	PrintGenParticleCollection(GenTausHadronic);    
 	PrintGenParticleCollection(GenTausTrigger);
       }
+
     
+
     // Track Collections
     if(DEBUG) cout << "\tGetting the Tracks and Track Particles Collections" << endl;
     vector<TrackingParticle> TPs = GetTrackingParticles(false);
@@ -495,7 +481,6 @@ void CaloTk::Loop()
 	PrintTTTrackCollection(sigTTTracks);
 	PrintTTTrackCollection(isoTTTracks);
       }
-    
 
     // Tau Collections
     vector<L1Tau> L1Taus = GetL1Taus(false);
@@ -503,7 +488,7 @@ void CaloTk::Loop()
     vector<L1TkTauParticle> L1TkTaus_Calo;
     vector<L1TkTauParticle> L1TkTaus_Tk;
     vector<L1TkTauParticle> L1TkTaus_VtxIso;    
-
+    vector<L1TkTauParticle> L1TkTaus_RelIso;
     // -------------------------------------- ALEX-START -------------------------------------- 
     // Jet Collections
     vector<L1Jet> L1Jets = GetL1Jets(false);
@@ -515,7 +500,60 @@ void CaloTk::Loop()
     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
     if (bFoundAllTaus_) nEvtsWithMaxHTaus++;
 
-    
+    // ======================================================================================
+    // For-loop: GenTausHadronic
+    // ======================================================================================
+    for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++)
+      {
+	
+	// Get the charged pions from the tau decaying hadronically
+	vector<unsigned short> chargedPionsIndices;
+	vector<GenParticle>    chargedPions;
+
+	//if (tau->HasMatchingGenParticle()) 
+	GetHadronicTauChargedPions(tau->index(), chargedPionsIndices);
+
+	// Ask for 3-prong or 5-prong decay
+	if (chargedPionsIndices.size() >= 3)
+	  {
+	    double pions_dRMax = -1000.0;
+	    double ldgPionPt  = -1000.0;
+	    int ldgPionIndx   = -1;
+	    GenParticle ldgPion;
+
+	    // For-loop: All charged pions
+	    for (unsigned int i=0; i< chargedPionsIndices.size(); i++)
+	      {
+		GenParticle pion = GetGenParticle(chargedPionsIndices.at(i));
+		chargedPions.push_back(pion);
+		
+		if (0) PrintGenp(pion.index(), true);
+		
+		if (pion.pt() > ldgPionPt)
+		  {
+		    ldgPionIndx = chargedPionsIndices.at(i);
+		    ldgPionPt   = pion.pt();
+		    ldgPion     = pion;
+		  }
+		
+	      }// For-loop: All charged pions
+	    
+	    for (vector<GenParticle>::iterator chPion = chargedPions.begin(); chPion != chargedPions.end(); chPion++)
+	      {
+		if (chPion->index() == ldgPionIndx) continue;
+		double pions_dR = auxTools_.DeltaR(ldgPion.eta(), ldgPion.phi(), chPion->eta(), chPion->phi() );
+
+		if ( pions_dR > pions_dRMax) pions_dRMax = pions_dR;
+	      }
+	    
+	    // Fill histo
+	    h_GenP_VisET_dRMaxLdgPion -> Fill(pions_dRMax, tau->p4vis().Et());
+
+	  }// Ask for 3-prong or 5-prong decay
+
+      }
+
+
     // ======================================================================================
     // For-loop: L1Taus
     // ======================================================================================
@@ -539,9 +577,10 @@ void CaloTk::Loop()
 	GetSigConeTracks(L1TkTauCandidate, sigTTTracks);
 	GetIsoConeTracks(L1TkTauCandidate, isoTTTracks);
 	GetIsolationValues(L1TkTauCandidate);
-	GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic);
+	//GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic); //marina
+	GetMatchingGenParticle(L1TkTauCandidate, GenTausTrigger);
 	if (DEBUG) L1TkTauCandidate.PrintProperties(false, false, true, true);
-	
+
 	// Save L1TkTau Candidate
 	L1TkTauCandidates.push_back(L1TkTauCandidate);
       }
@@ -555,12 +594,15 @@ void CaloTk::Loop()
 	// Calo
 	L1TkTaus_Calo.push_back(*L1TkTau);
 
-	// +Tk and +VtxIso
+	// +Tk
 	if (L1TkTau->HasMatchingTk() )
 	  {
 	    // std::cout << "\n=== L1TkTau->GetMatchingTkDeltaR() = " << L1TkTau->GetMatchingTkDeltaR() << std::endl;
 	    L1TkTaus_Tk.push_back(*L1TkTau);
+	    // +VtxIso
 	    if (L1TkTau->GetVtxIsolation() > isoCone_VtxIsoWP) L1TkTaus_VtxIso.push_back(*L1TkTau);
+	    // +RelIso
+	    if (L1TkTau->GetRelIsolation() < isoCone_RelIsoWP) L1TkTaus_RelIso.push_back(*L1TkTau);
 	  }
       }// L1TkTauCandidates
 
@@ -571,8 +613,9 @@ void CaloTk::Loop()
 	PrintL1TkTauParticleCollection(L1TkTaus_Calo);
 	PrintL1TkTauParticleCollection(L1TkTaus_Tk);
 	PrintL1TkTauParticleCollection(L1TkTaus_VtxIso);
+	PrintL1TkTauParticleCollection(L1TkTaus_RelIso);
       }
-
+    
     /*
     ////////////////////////////////////////////////
     // Event-Type Histograms
@@ -589,25 +632,23 @@ void CaloTk::Loop()
     ////////////////////////////////////////////////
     for (vector<L1TkTauParticle>::iterator tau = L1TkTaus_Calo.begin(); tau != L1TkTaus_Calo.end(); tau++)
       {
-
 	// L1TkTau Resolution
 	GenParticle p = tau->GetMatchingGenParticle();	
-	hL1Tau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().eta() - p.p4vis().Pt() )/p.p4vis().Pt()  );
+	hL1Tau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().et() - p.p4vis().Pt() )/p.p4vis().Pt()  );
 	hL1Tau_ResolutionCaloEta->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
-	hL1Tau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().eta() - p.p4vis().Phi())/p.p4vis().Phi() );
-
+	hL1Tau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().phi() - p.p4vis().Phi())/p.p4vis().Phi() );
       }
     
     ////////////////////////////////////////////////
     /// L1Tktau Properties 
     ////////////////////////////////////////////////
-    vector<L1TkTauParticle> myL1TkTaus = L1TkTaus_Tk; // L1TkTaus_Calo, L1TkTaus_Tk, L1TkTaus_VtxIso
+    vector<L1TkTauParticle> myL1TkTaus = L1TkTaus_Tk; // L1TkTaus_Calo, L1TkTaus_Tk, L1TkTaus_VtxIso, L1TkTaus_RelIso
     hL1TkTau_Multiplicity ->Fill( myL1TkTaus.size() );
     for (vector<L1TkTauParticle>::iterator tau = myL1TkTaus.begin(); tau != myL1TkTaus.end(); tau++)
       {
 	
 	if (DEBUG) tau->PrintProperties(true, true, true, true);
-	
+
 	// Variables
 	TLorentzVector sigTks_p4 = tau->GetSigConeTTTracksP4();
 	TLorentzVector isoTks_p4 = tau->GetIsoConeTTTracksP4();
@@ -617,24 +658,48 @@ void CaloTk::Loop()
 	
 	// L1TkTau Resolution
 	GenParticle p = tau->GetMatchingGenParticle(); //fixme: more plots from MC info
-
+      
 	// Resolution
-	hL1TkTau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().eta() - p.p4vis().Pt() )/p.p4vis().Pt()  );
+	hL1TkTau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().et() - p.p4vis().Pt() )/p.p4vis().Pt()  );
 	hL1TkTau_ResolutionCaloEta->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
-	hL1TkTau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().eta() - p.p4vis().Phi())/p.p4vis().Phi() );
-
-
-	// Apply isolation?
-	if (0) if (tau->GetVtxIsolation() > isoCone_VtxIsoWP) continue;
-
+	hL1TkTau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().phi() - p.p4vis().Phi())/p.p4vis().Phi() );
 	
+	double caloTau_eta =tau->GetCaloTau().eta();
+	if ( IsWithinEtaRegion("Central"          , caloTau_eta) )
+	  {
+	    hL1TkTau_ResolutionCaloEt_C ->Fill( (tau->GetCaloTau().et() - p.p4vis().Pt() )/p.p4vis().Pt()  );
+	    hL1TkTau_ResolutionCaloEta_C->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
+	    hL1TkTau_ResolutionCaloPhi_C->Fill( (tau->GetCaloTau().phi() - p.p4vis().Phi())/p.p4vis().Phi() ); 
+	  }
+	else if ( IsWithinEtaRegion("Intermediate", caloTau_eta) )
+	  {
+	    hL1TkTau_ResolutionCaloEt_I ->Fill( (tau->GetCaloTau().et() - p.p4vis().Pt() )/p.p4vis().Pt()  );
+	    hL1TkTau_ResolutionCaloEta_I->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
+	    hL1TkTau_ResolutionCaloPhi_I->Fill( (tau->GetCaloTau().phi() - p.p4vis().Phi())/p.p4vis().Phi() ); 
+	  }
+	// currently no L1Taus in forward eta region
+	else if ( IsWithinEtaRegion("Forward"     , caloTau_eta) )
+	  {
+	    hL1TkTau_ResolutionCaloEt_F ->Fill( (tau->GetCaloTau().et() - p.p4vis().Pt() )/p.p4vis().Pt()  );
+	    hL1TkTau_ResolutionCaloEta_F->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
+	    hL1TkTau_ResolutionCaloPhi_F->Fill( (tau->GetCaloTau().phi() - p.p4vis().Phi())/p.p4vis().Phi() ); 
+	  }
+	else{                                                                                                                                                           
+	  cout << "E R R O R ! Tracking::Loop(...) - Unexpected Eta value of \"" << caloTau_eta << "\". EXIT" << endl;
+	  exit(1);                                                                                                                                                      
+	}                    
+	
+	// Apply isolation? 
+	if (0) if (tau->GetVtxIsolation() <= isoCone_VtxIsoWP) continue; // Vertex Isolation
+	if (0) if (tau->GetRelIsolation() >= isoCone_RelIsoWP) continue; // Relative Isolation
+
 	// Matching Track Variables
 	TTTrack matchTk   = tau->GetMatchingTk();
-	double matchTk_dR = auxTools_.DeltaR(matchTk.getEta(), matchTk.getPhi(), tau->GetCaloTau().eta(), tau->GetCaloTau().phi() );
+	double matchTk_dR = auxTools_.DeltaR(matchTk.getEta(), matchTk.getPhi(), tau->GetCaloTau().eta(), tau->GetCaloTau().phi() ); // marina: can't we get the tau->GetMatchingTkDeltaR
 	TLorentzVector caloTau_p4;
       	caloTau_p4.SetPtEtaPhiE(tau->GetCaloTau().et(), tau->GetCaloTau().eta(), tau->GetCaloTau().phi(), tau->GetCaloTau().et() );
 	hL1TkTau_MatchTk_DeltaR        ->Fill( matchTk_dR );
-	hL1TkTau_MatchTk_PtRel         ->Fill( matchTk.p3().Perp(caloTau_p4.Vect()) );
+	hL1TkTau_MatchTk_PtRel         ->Fill( matchTk.p3().Perp(caloTau_p4.Vect()) ); // marina: ??
 	hL1TkTau_MatchTk_Pt            ->Fill( matchTk.getPt() );
 	hL1TkTau_MatchTk_Eta           ->Fill( matchTk.getEta() );
 	hL1TkTau_MatchTk_POCAz         ->Fill( matchTk.getZ0() );
@@ -650,7 +715,7 @@ void CaloTk::Loop()
 
 	// Signal/Isolation Cone Variables
 	hL1TkTau_Rtau        ->Fill( tau->GetSigConeLdgTk().getPt() / tau->GetCaloTau().et() );
-	hL1TkTau_CHF         ->Fill( tau->GetCaloTau().et()/sigTks_p4.Et() );
+	hL1TkTau_CHF         ->Fill( sigTks_p4.Et()/tau->GetCaloTau().et() );
 	hL1TkTau_NHF         ->Fill( (tau->GetCaloTau().et() - sigTks_p4.Et())/tau->GetCaloTau().et() );
 	hL1TkTau_NHFAbs      ->Fill( abs( (tau->GetCaloTau().et() - sigTks_p4.Et())/tau->GetCaloTau().et() ) );
 	hL1TkTau_NSigTks     ->Fill( tau->GetSigConeTTTracks().size() );
@@ -710,7 +775,6 @@ void CaloTk::Loop()
 	hL1TkTau_Charge->Fill( sigTks_sumCharge);
 	hL1TkTau_ChargeAbs->Fill( abs(sigTks_sumCharge) );
 
-
 	// IsoCone TTTracks
 	vector<TTTrack> isoTks = tau->GetIsoConeTTTracks();	
 	for (vector<TTTrack>::iterator isoTk = isoTks.begin(); isoTk != isoTks.end(); isoTk++)
@@ -746,25 +810,32 @@ void CaloTk::Loop()
 
       } // L1TkTaus_VtxIso
     
-    
+
     ////////////////////////////////////////////////
     // Fill Turn-On histograms
     ////////////////////////////////////////////////
-    for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++) hMcHadronicTau_VisEt->Fill( tau->p4vis().Et() );
+    //for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++) hMcHadronicTau_VisEt->Fill( tau->p4vis().Et() ); //marina
+    for (vector<GenParticle>::iterator tau = GenTausTrigger.begin(); tau != GenTausTrigger.end(); tau++) hMcHadronicTau_VisEt->Fill( tau->p4vis().Et() );
+
     FillTurnOn_Numerator_(L1TkTaus_Calo   , 25.0, hCalo_TurnOn25  );
     FillTurnOn_Numerator_(L1TkTaus_Tk     , 25.0, hTk_TurnOn25    );
     FillTurnOn_Numerator_(L1TkTaus_VtxIso , 25.0, hVtxIso_TurnOn25);
+    FillTurnOn_Numerator_(L1TkTaus_RelIso , 25.0, hRelIso_TurnOn25);
+
     FillTurnOn_Numerator_(L1TkTaus_Calo   , 50.0, hCalo_TurnOn50  );
     FillTurnOn_Numerator_(L1TkTaus_Tk     , 50.0, hTk_TurnOn50    );
-
-
     FillTurnOn_Numerator_(L1TkTaus_VtxIso , 50.0, hVtxIso_TurnOn50);
+    FillTurnOn_Numerator_(L1TkTaus_RelIso , 50.0, hRelIso_TurnOn50);
+
     FillTurnOn_Numerator_(L1TkTaus_Calo   , 66.0, hCalo_TurnOn_SingleTau50KHz  );
     FillTurnOn_Numerator_(L1TkTaus_Tk     , 65.0, hTk_TurnOn_SingleTau50KHz    );
-    FillTurnOn_Numerator_(L1TkTaus_VtxIso , 50.0, hVtxIso_TurnOn_SingleTau50KHz);
+    FillTurnOn_Numerator_(L1TkTaus_VtxIso , 50.0, hVtxIso_TurnOn_SingleTau50KHz);    
+    FillTurnOn_Numerator_(L1TkTaus_RelIso , 50.0, hRelIso_TurnOn_SingleTau50KHz); // marina: ET threshold???
+
     FillTurnOn_Numerator_(L1TkTaus_Calo   , 42.0, hCalo_TurnOn_DiTau50KHz  );
     FillTurnOn_Numerator_(L1TkTaus_Tk     , 40.0, hTk_TurnOn_DiTau50KHz    );
     FillTurnOn_Numerator_(L1TkTaus_VtxIso , 25.0, hVtxIso_TurnOn_DiTau50KHz);
+    FillTurnOn_Numerator_(L1TkTaus_RelIso , 25.0, hRelIso_TurnOn_DiTau50KHz); // marina: ET threshold???
     
     ////////////////////////////////////////////////
     // SingleTau
@@ -784,19 +855,26 @@ void CaloTk::Loop()
     FillSingleTau_(L1TkTaus_VtxIso, hVtxIso_Rate_I, hVtxIso_Eff_I, 1.0, 1.6);
     FillSingleTau_(L1TkTaus_VtxIso, hVtxIso_Rate_F, hVtxIso_Eff_F, 1.6, 3.0); // 2.5 is max
 
+    FillSingleTau_(L1TkTaus_RelIso, hRelIso_Rate  , hRelIso_Eff);
+    FillSingleTau_(L1TkTaus_RelIso, hRelIso_Rate_C, hRelIso_Eff_C, 0.0, 1.0);
+    FillSingleTau_(L1TkTaus_RelIso, hRelIso_Rate_I, hRelIso_Eff_I, 1.0, 1.6);
+    FillSingleTau_(L1TkTaus_RelIso, hRelIso_Rate_F, hRelIso_Eff_F, 1.6, 3.0); // 2.5 is max
+    
     ////////////////////////////////////////////////
     // DiTau
     ////////////////////////////////////////////////
-    FillDiTau_(L1TkTaus_Calo, L1TkTaus_Tk    , hDiTau_Rate_Calo_Tk    , hDiTau_Eff_Calo_Tk    );
-    FillDiTau_(L1TkTaus_Calo, L1TkTaus_VtxIso, hDiTau_Rate_Calo_VtxIso, hDiTau_Eff_Calo_VtxIso);
-    FillDiTau_(L1TkTaus_Tk  , L1TkTaus_VtxIso, hDiTau_Rate_Tk_VtxIso  , hDiTau_Eff_Tk_VtxIso  );
-    
+    FillDiTau_(L1TkTaus_Calo   , L1TkTaus_Tk    , hDiTau_Rate_Calo_Tk        , hDiTau_Eff_Calo_Tk        );
+    FillDiTau_(L1TkTaus_Calo   , L1TkTaus_VtxIso, hDiTau_Rate_Calo_VtxIso    , hDiTau_Eff_Calo_VtxIso    );
+    FillDiTau_(L1TkTaus_Calo   , L1TkTaus_RelIso, hDiTau_Rate_Calo_RelIso    , hDiTau_Eff_Calo_RelIso    );
+    FillDiTau_(L1TkTaus_Tk     , L1TkTaus_VtxIso, hDiTau_Rate_Tk_VtxIso      , hDiTau_Eff_Tk_VtxIso      );
+    FillDiTau_(L1TkTaus_Tk     , L1TkTaus_RelIso, hDiTau_Rate_Tk_RelIso      , hDiTau_Eff_Tk_RelIso      );
 
     ////////////////////////////////////////////////
     // WARNING: Erases L1TkTaus from vector!
     ////////////////////////////////////////////////
     ApplyDiTauZMatching(matchTk_Collection, L1TkTaus_Tk);
     ApplyDiTauZMatching(matchTk_Collection, L1TkTaus_VtxIso); 
+    ApplyDiTauZMatching(matchTk_Collection, L1TkTaus_RelIso);
 
     FillDiTau_(L1TkTaus_Calo, hDiTau_Rate_Calo  , hDiTau_Eff_Calo);
     FillDiTau_(L1TkTaus_Calo, hDiTau_Rate_Calo_C, hDiTau_Eff_Calo_C, 0.0, 1.0);
@@ -812,7 +890,12 @@ void CaloTk::Loop()
     FillDiTau_(L1TkTaus_VtxIso, hDiTau_Rate_VtxIso_C, hDiTau_Eff_VtxIso_C, 0.0, 1.0);
     FillDiTau_(L1TkTaus_VtxIso, hDiTau_Rate_VtxIso_I, hDiTau_Eff_VtxIso_I, 1.0, 1.6);
     FillDiTau_(L1TkTaus_VtxIso, hDiTau_Rate_VtxIso_F, hDiTau_Eff_VtxIso_F, 1.6, 3.0);
-    
+
+    FillDiTau_(L1TkTaus_RelIso, hDiTau_Rate_RelIso  , hDiTau_Eff_RelIso);
+    FillDiTau_(L1TkTaus_RelIso, hDiTau_Rate_RelIso_C, hDiTau_Eff_RelIso_C, 0.0, 1.0);
+    FillDiTau_(L1TkTaus_RelIso, hDiTau_Rate_RelIso_I, hDiTau_Eff_RelIso_I, 1.0, 1.6);
+    FillDiTau_(L1TkTaus_RelIso, hDiTau_Rate_RelIso_F, hDiTau_Eff_RelIso_F, 1.6, 3.0);
+
     // Progress bar
     if (!DEBUG) auxTools_.ProgressBar(jentry, nEntries, 100, 100);
     
@@ -821,7 +904,6 @@ void CaloTk::Loop()
   // Fill counters
   hCounters->SetBinContent(1, nAllEvts);
   hCounters->SetBinContent(2, nEvts);
-
 
   ////////////////////////////////////////////////
   // Convert/Finalise Histos
@@ -841,7 +923,12 @@ void CaloTk::Loop()
   histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_C, nEntries);
   histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_I, nEntries);
   histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_F, nEntries);
-  
+
+  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate  , nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_C, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_I, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_F, nEntries);
+
   FinaliseEffHisto_( hCalo_Eff  , nEvtsWithMaxHTaus);
   FinaliseEffHisto_( hCalo_Eff_C, nEvtsWithMaxHTaus);
   FinaliseEffHisto_( hCalo_Eff_I, nEvtsWithMaxHTaus);
@@ -856,6 +943,11 @@ void CaloTk::Loop()
   FinaliseEffHisto_( hVtxIso_Eff_C, nEvtsWithMaxHTaus);
   FinaliseEffHisto_( hVtxIso_Eff_I, nEvtsWithMaxHTaus);
   FinaliseEffHisto_( hVtxIso_Eff_F, nEvtsWithMaxHTaus);
+
+  FinaliseEffHisto_( hRelIso_Eff  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hRelIso_Eff_C, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hRelIso_Eff_I, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hRelIso_Eff_F, nEvtsWithMaxHTaus);
 
   // DiTau
   histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Calo  , nEntries);
@@ -873,6 +965,11 @@ void CaloTk::Loop()
   histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso_I, nEntries);
   histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso_F, nEntries);
   
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso  , nEntries);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso_C, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso_I, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso_F, nEntries);
+  
   FinaliseEffHisto_( hDiTau_Eff_Calo  , nEvtsWithMaxHTaus);
   FinaliseEffHisto_( hDiTau_Eff_Calo_C, nEvtsWithMaxHTaus);
   FinaliseEffHisto_( hDiTau_Eff_Calo_I, nEvtsWithMaxHTaus);
@@ -888,15 +985,27 @@ void CaloTk::Loop()
   FinaliseEffHisto_( hDiTau_Eff_VtxIso_I, nEvtsWithMaxHTaus);
   FinaliseEffHisto_( hDiTau_Eff_VtxIso_F, nEvtsWithMaxHTaus);
 
+  FinaliseEffHisto_( hDiTau_Eff_RelIso  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hDiTau_Eff_RelIso_C, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hDiTau_Eff_RelIso_I, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hDiTau_Eff_RelIso_F, nEvtsWithMaxHTaus);
+
+
   // DiTau (Calo-Other)
   histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Calo_Tk    , nEntries);
   histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Calo_VtxIso, nEntries);
+  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Calo_RelIso, nEntries);
+
   FinaliseEffHisto_( hDiTau_Eff_Calo_Tk    , nEvtsWithMaxHTaus);;
   FinaliseEffHisto_( hDiTau_Eff_Calo_VtxIso, nEvtsWithMaxHTaus);;
+  FinaliseEffHisto_( hDiTau_Eff_Calo_RelIso, nEvtsWithMaxHTaus);;
 
   // DiTau (Tk-Other)
   histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_VtxIso, nEntries);
+  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_RelIso, nEntries);
+
   FinaliseEffHisto_( hDiTau_Eff_Tk_VtxIso, nEvtsWithMaxHTaus);;
+  FinaliseEffHisto_( hDiTau_Eff_Tk_RelIso, nEvtsWithMaxHTaus);;
 
   // Turn-Ons: fixme. iro. alex
   // TEfficiency *pEff = 0;
@@ -906,27 +1015,30 @@ void CaloTk::Loop()
   histoTools_.DivideHistos_1D(hCalo_TurnOn50   , hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hTk_TurnOn50     , hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hVtxIso_TurnOn50 , hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hRelIso_TurnOn50 , hMcHadronicTau_VisEt);
 
   histoTools_.DivideHistos_1D(hCalo_TurnOn25   , hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hTk_TurnOn25     , hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hVtxIso_TurnOn25 , hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hRelIso_TurnOn25 , hMcHadronicTau_VisEt);
 
   histoTools_.DivideHistos_1D(hCalo_TurnOn_SingleTau50KHz  , hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hTk_TurnOn_SingleTau50KHz    , hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hVtxIso_TurnOn_SingleTau50KHz, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hRelIso_TurnOn_SingleTau50KHz, hMcHadronicTau_VisEt);
 
   histoTools_.DivideHistos_1D(hCalo_TurnOn_DiTau50KHz  , hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hTk_TurnOn_DiTau50KHz    , hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hVtxIso_TurnOn_DiTau50KHz, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hRelIso_TurnOn_DiTau50KHz, hMcHadronicTau_VisEt);
 
 
   ////////////////////////////////////////////////
   // Write the histograms to the file
   ////////////////////////////////////////////////
-  outFile->cd();
   WriteHistos_();
-  outFile->Write();
   auxTools_.StopwatchStop(5, "minutes", "Total Time");
+
 
 }
 
@@ -939,6 +1051,9 @@ void CaloTk::BookHistos_(void)
 //============================================================================
 {
   
+  // GenParticles Histograms
+  histoTools_.BookHisto_2D(h_GenP_VisET_dRMaxLdgPion, "GenP_VisET_dRMaxLdgPion", ";#DeltaR_{max}(#pi_{ldg}^{#pm},#pi^{#pm});E_{T}^{vis}",  50,  0.0, +0.25, 100, 0.0, +200.0);
+
   // Event-Type Histograms
   histoTools_.BookHisto_1D(hCounters, "Counters",  "", 2, 0.0, +2.0);
   histoTools_.BookHisto_1D(hL1TkPV_VtxZ            , "L1TkPV_VtxZ"            ,  "", 600, -30.0,  +30.0);
@@ -1025,87 +1140,126 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEta, "L1TkTau_ResolutionCaloEta", ";#eta;Events / %.2f", 100,  -5.0,  +5.0);
   histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloPhi, "L1TkTau_ResolutionCaloPhi", ";#phi (rads);Events / %.2f rads", 100,  -10.0,  +10.0);
 
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEt_C, "L1TkTau_ResolutionCaloEt_C" , ";E_{T} (GeV);Events / %.0f GeV", 100,  -5.0,  +5.0);
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEta_C, "L1TkTau_ResolutionCaloEta_C", ";#eta;Events / %.2f", 100,  -5.0,  +5.0);
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloPhi_C, "L1TkTau_ResolutionCaloPhi_C", ";#phi (rads);Events / %.2f rads", 100,  -10.0,  +10.0);
+
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEt_I , "L1TkTau_ResolutionCaloEt_I" , ";E_{T} (GeV);Events / %.0f GeV", 100,  -5.0,  +5.0);
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEta_I, "L1TkTau_ResolutionCaloEta_I", ";#eta;Events / %.2f", 100,  -5.0,  +5.0);
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloPhi_I, "L1TkTau_ResolutionCaloPhi_I", ";#phi (rads);Events / %.2f rads", 100,  -10.0,  +10.0);
+
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEt_F , "L1TkTau_ResolutionCaloEt_F" , ";E_{T} (GeV);Events / %.0f GeV", 100,  -5.0,  +5.0);
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloEta_F, "L1TkTau_ResolutionCaloEta_F", ";#eta;Events / %.2f", 100,  -5.0,  +5.0);
+  histoTools_.BookHisto_1D(hL1TkTau_ResolutionCaloPhi_F, "L1TkTau_ResolutionCaloPhi_F", ";#phi (rads);Events / %.2f rads", 100,  -10.0,  +10.0);
+
+
+
   // SingleTau
-  histoTools_.BookHisto_1D(hCalo_Rate    , "Calo_Rate"    , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hCalo_Rate_C  , "Calo_Rate_C"  , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hCalo_Rate_I  , "Calo_Rate_I"  , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hCalo_Rate_F  , "Calo_Rate_F"  , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTk_Rate      , "Tk_Rate"      , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTk_Rate_C    , "Tk_Rate_C"    , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTk_Rate_I    , "Tk_Rate_I"    , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTk_Rate_F    , "Tk_Rate_F"    , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hVtxIso_Rate  , "VtxIso_Rate"  , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hVtxIso_Rate_C, "VtxIso_Rate_C", "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hVtxIso_Rate_I, "VtxIso_Rate_I", "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hVtxIso_Rate_F, "VtxIso_Rate_F", "", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hCalo_Rate    , "Calo_Rate"    , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hCalo_Rate_C  , "Calo_Rate_C"  , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hCalo_Rate_I  , "Calo_Rate_I"  , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hCalo_Rate_F  , "Calo_Rate_F"  , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hTk_Rate      , "Tk_Rate"      , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hTk_Rate_C    , "Tk_Rate_C"    , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hTk_Rate_I    , "Tk_Rate_I"    , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hTk_Rate_F    , "Tk_Rate_F"    , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hVtxIso_Rate  , "VtxIso_Rate"  , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hVtxIso_Rate_C, "VtxIso_Rate_C", "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hVtxIso_Rate_I, "VtxIso_Rate_I", "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hVtxIso_Rate_F, "VtxIso_Rate_F", "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hRelIso_Rate  , "RelIso_Rate"  , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hRelIso_Rate_C, "RelIso_Rate_C", "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hRelIso_Rate_I, "RelIso_Rate_I", "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hRelIso_Rate_F, "RelIso_Rate_F", "", 300, 0.0,  +300.0);
+
   
-  histoTools_.BookHisto_1D(hCalo_Eff     , "Calo_Eff"     , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hCalo_Eff_C   , "Calo_Eff_C"   , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hCalo_Eff_I   , "Calo_Eff_I"   , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hCalo_Eff_F   , "Calo_Eff_F"   , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTk_Eff       , "Tk_Eff"       , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTk_Eff_C     , "Tk_Eff_C"     , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTk_Eff_I     , "Tk_Eff_I"     , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTk_Eff_F     , "Tk_Eff_F"     , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hVtxIso_Eff   , "VtxIso_Eff"   , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hVtxIso_Eff_C , "VtxIso_Eff_C" , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hVtxIso_Eff_I , "VtxIso_Eff_I" , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hVtxIso_Eff_F , "VtxIso_Eff_F" , "", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hCalo_Eff     , "Calo_Eff"     , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hCalo_Eff_C   , "Calo_Eff_C"   , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hCalo_Eff_I   , "Calo_Eff_I"   , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hCalo_Eff_F   , "Calo_Eff_F"   , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hTk_Eff       , "Tk_Eff"       , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hTk_Eff_C     , "Tk_Eff_C"     , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hTk_Eff_I     , "Tk_Eff_I"     , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hTk_Eff_F     , "Tk_Eff_F"     , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hVtxIso_Eff   , "VtxIso_Eff"   , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hVtxIso_Eff_C , "VtxIso_Eff_C" , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hVtxIso_Eff_I , "VtxIso_Eff_I" , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hVtxIso_Eff_F , "VtxIso_Eff_F" , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hRelIso_Eff   , "RelIso_Eff"   , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hRelIso_Eff_C , "RelIso_Eff_C" , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hRelIso_Eff_I , "RelIso_Eff_I" , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hRelIso_Eff_F , "RelIso_Eff_F" , "", 300, 0.0,  +300.0);
   
   // DiTau
-  histoTools_.BookHisto_1D(hDiTau_Rate_Calo    , "DiTau_Rate_Calo"    , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Rate_Calo_C  , "DiTau_Rate_Calo_C"  , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Rate_Calo_I  , "DiTau_Rate_Calo_I"  , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Rate_Calo_F  , "DiTau_Rate_Calo_F"  , "", 200, 0.0,  +200.0);  
-  histoTools_.BookHisto_1D(hDiTau_Rate_Tk      , "DiTau_Rate_Tk"      , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Rate_Tk_C    , "DiTau_Rate_Tk_C"    , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Rate_Tk_I    , "DiTau_Rate_Tk_I"    , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Rate_Tk_F    , "DiTau_Rate_Tk_F"    , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Rate_VtxIso  , "DiTau_Rate_VtxIso"  , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Rate_VtxIso_C, "DiTau_Rate_VtxIso_C", "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Rate_VtxIso_I, "DiTau_Rate_VtxIso_I", "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Rate_VtxIso_F, "DiTau_Rate_VtxIso_F", "", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hDiTau_Rate_Calo    , "DiTau_Rate_Calo"    , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Rate_Calo_C  , "DiTau_Rate_Calo_C"  , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Rate_Calo_I  , "DiTau_Rate_Calo_I"  , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Rate_Calo_F  , "DiTau_Rate_Calo_F"  , "", 300, 0.0,  +300.0);  
+  histoTools_.BookHisto_1D(hDiTau_Rate_Tk      , "DiTau_Rate_Tk"      , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Rate_Tk_C    , "DiTau_Rate_Tk_C"    , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Rate_Tk_I    , "DiTau_Rate_Tk_I"    , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Rate_Tk_F    , "DiTau_Rate_Tk_F"    , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Rate_VtxIso  , "DiTau_Rate_VtxIso"  , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Rate_VtxIso_C, "DiTau_Rate_VtxIso_C", "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Rate_VtxIso_I, "DiTau_Rate_VtxIso_I", "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Rate_VtxIso_F, "DiTau_Rate_VtxIso_F", "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Rate_RelIso  , "DiTau_Rate_RelIso"  , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Rate_RelIso_C, "DiTau_Rate_RelIso_C", "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Rate_RelIso_I, "DiTau_Rate_RelIso_I", "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Rate_RelIso_F, "DiTau_Rate_RelIso_F", "", 300, 0.0,  +300.0);
     
-  histoTools_.BookHisto_1D(hDiTau_Eff_Calo     , "DiTau_Eff_Calo"    , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Eff_Calo_C   , "DiTau_Eff_Calo_C"  , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Eff_Calo_I   , "DiTau_Eff_Calo_I"  , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Eff_Calo_F   , "DiTau_Eff_Calo_F"  , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Eff_Tk       , "DiTau_Eff_Tk"      , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Eff_Tk_C     , "DiTau_Eff_Tk_C"    , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Eff_Tk_I     , "DiTau_Eff_Tk_I"    , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Eff_Tk_F     , "DiTau_Eff_Tk_F"    , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Eff_VtxIso   , "DiTau_Eff_VtxIso"  , "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Eff_VtxIso_C , "DiTau_Eff_VtxIso_C", "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Eff_VtxIso_I , "DiTau_Eff_VtxIso_I", "", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hDiTau_Eff_VtxIso_F , "DiTau_Eff_VtxIso_F", "", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_Calo     , "DiTau_Eff_Calo"    , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_Calo_C   , "DiTau_Eff_Calo_C"  , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_Calo_I   , "DiTau_Eff_Calo_I"  , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_Calo_F   , "DiTau_Eff_Calo_F"  , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_Tk       , "DiTau_Eff_Tk"      , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_Tk_C     , "DiTau_Eff_Tk_C"    , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_Tk_I     , "DiTau_Eff_Tk_I"    , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_Tk_F     , "DiTau_Eff_Tk_F"    , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_VtxIso   , "DiTau_Eff_VtxIso"  , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_VtxIso_C , "DiTau_Eff_VtxIso_C", "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_VtxIso_I , "DiTau_Eff_VtxIso_I", "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_VtxIso_F , "DiTau_Eff_VtxIso_F", "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_RelIso   , "DiTau_Eff_RelIso"  , "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_RelIso_C , "DiTau_Eff_RelIso_C", "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_RelIso_I , "DiTau_Eff_RelIso_I", "", 300, 0.0,  +300.0);
+  histoTools_.BookHisto_1D(hDiTau_Eff_RelIso_F , "DiTau_Eff_RelIso_F", "", 300, 0.0,  +300.0);
   
   // Turn-Ons
   histoTools_.BookHisto_1D(hMcHadronicTau_VisEt, "McHadronicTau_VisEt", "", 40, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hCalo_TurnOn50      , "Calo_TurnOn50"      , "", 40, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hTk_TurnOn50        , "Tk_TurnOn50"        , "", 40, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hVtxIso_TurnOn50    , "VtxIso_TurnOn50"    , "", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hRelIso_TurnOn50    , "RelIso_TurnOn50"    , "", 40, 0.0,  +200.0);
 
   histoTools_.BookHisto_1D(hCalo_TurnOn25  , "Calo_TurnOn25"   , "", 40, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hTk_TurnOn25    , "Tk_TurnOn25"     , "", 40, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hVtxIso_TurnOn25, "VtxIso_TurnOn25" , "", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hRelIso_TurnOn25, "RelIso_TurnOn25" , "", 40, 0.0,  +200.0);
   
   histoTools_.BookHisto_1D(hCalo_TurnOn_SingleTau50KHz  , "Calo_TurnOn_SingleTau50KHz"  , "", 40, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hTk_TurnOn_SingleTau50KHz    , "Tk_TurnOn_SingleTau50KHz"    , "", 40, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hVtxIso_TurnOn_SingleTau50KHz, "VtxIso_TurnOn_SingleTau50KHz", "", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hRelIso_TurnOn_SingleTau50KHz, "RelIso_TurnOn_SingleTau50KHz", "", 40, 0.0,  +200.0);
 
   histoTools_.BookHisto_1D(hCalo_TurnOn_DiTau50KHz  , "Calo_TurnOn_DiTau50KHz"  , "", 40, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hTk_TurnOn_DiTau50KHz    , "Tk_TurnOn_DiTau50KHz"    , "", 40, 0.0,  +200.0);
   histoTools_.BookHisto_1D(hVtxIso_TurnOn_DiTau50KHz, "VtxIso_TurnOn_DiTau50KHz", "", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hRelIso_TurnOn_DiTau50KHz, "RelIso_TurnOn_DiTau50KHz", "", 40, 0.0,  +200.0);
 
   // DiTau (Calo-Other)
-  histoTools_.BookHisto_2D(hDiTau_Rate_Calo_Tk    , "DiTau_Rate_Calo_Tk"    , "" ,200, 0.0,  +200.0, 200, 0.0,  +200.0);
-  histoTools_.BookHisto_2D(hDiTau_Rate_Calo_VtxIso, "DiTau_Rate_Calo_VtxIso", "" ,200, 0.0,  +200.0, 200, 0.0,  +200.0);
-  histoTools_.BookHisto_2D(hDiTau_Eff_Calo_Tk     , "DiTau_Eff_Calo_Tk"     , "" ,200, 0.0,  +200.0, 200, 0.0,  +200.0);
-  histoTools_.BookHisto_2D(hDiTau_Eff_Calo_VtxIso , "DiTau_Eff_Calo_VtxIso" , "" ,200, 0.0,  +200.0, 200, 0.0,  +200.0);
+  histoTools_.BookHisto_2D(hDiTau_Rate_Calo_Tk    , "DiTau_Rate_Calo_Tk"    , "" ,300, 0.0,  +300.0, 300, 0.0,  +300.0);
+  histoTools_.BookHisto_2D(hDiTau_Rate_Calo_VtxIso, "DiTau_Rate_Calo_VtxIso", "" ,300, 0.0,  +300.0, 300, 0.0,  +300.0);
+  histoTools_.BookHisto_2D(hDiTau_Rate_Calo_RelIso, "DiTau_Rate_Calo_RelIso", "" ,300, 0.0,  +300.0, 300, 0.0,  +300.0);
+  histoTools_.BookHisto_2D(hDiTau_Eff_Calo_Tk     , "DiTau_Eff_Calo_Tk"     , "" ,300, 0.0,  +300.0, 300, 0.0,  +300.0);
+  histoTools_.BookHisto_2D(hDiTau_Eff_Calo_VtxIso , "DiTau_Eff_Calo_VtxIso" , "" ,300, 0.0,  +300.0, 300, 0.0,  +300.0);
+  histoTools_.BookHisto_2D(hDiTau_Eff_Calo_RelIso , "DiTau_Eff_Calo_RelIso" , "" ,300, 0.0,  +300.0, 300, 0.0,  +300.0);
 
   // DiTau (Tk-Other)
-  histoTools_.BookHisto_2D(hDiTau_Rate_Tk_VtxIso, "DiTau_Rate_Tk_VtxIso", "", 200, 0.0, +200.0, 200, 0.0,  +200.0);
-  histoTools_.BookHisto_2D(hDiTau_Eff_Tk_VtxIso , "DiTau_Eff_Tk_VtxIso" , "", 200, 0.0, +200.0, 200, 0.0,  +200.0);
+  histoTools_.BookHisto_2D(hDiTau_Rate_Tk_VtxIso, "DiTau_Rate_Tk_VtxIso", "", 300, 0.0, +300.0, 300, 0.0,  +300.0);
+  histoTools_.BookHisto_2D(hDiTau_Rate_Tk_RelIso, "DiTau_Rate_Tk_RelIso", "", 300, 0.0, +300.0, 300, 0.0,  +300.0);
+  histoTools_.BookHisto_2D(hDiTau_Eff_Tk_VtxIso , "DiTau_Eff_Tk_VtxIso" , "", 300, 0.0, +300.0, 300, 0.0,  +300.0);
+  histoTools_.BookHisto_2D(hDiTau_Eff_Tk_RelIso , "DiTau_Eff_Tk_RelIso" , "", 300, 0.0, +300.0, 300, 0.0,  +300.0);
 
   return;
 }
@@ -1114,7 +1268,14 @@ void CaloTk::BookHistos_(void)
 void CaloTk::WriteHistos_(void)
 //============================================================================
 {
+  // Location -> outFile 
+  outFile->cd();
+
+  // Fill the counters
   hCounters->Write();
+
+  // GenParticles Histograms
+  h_GenP_VisET_dRMaxLdgPion->Write();
 
   // L1TkTaus: Matching track
   hL1TkTau_MatchTk_DeltaR->Write();
@@ -1195,6 +1356,15 @@ void CaloTk::WriteHistos_(void)
   hL1TkTau_ResolutionCaloEt->Write();
   hL1TkTau_ResolutionCaloEta->Write();
   hL1TkTau_ResolutionCaloPhi->Write();
+  hL1TkTau_ResolutionCaloEt_C->Write();
+  hL1TkTau_ResolutionCaloEta_C->Write();
+  hL1TkTau_ResolutionCaloPhi_C->Write();
+  hL1TkTau_ResolutionCaloEt_I->Write();
+  hL1TkTau_ResolutionCaloEta_I->Write();
+  hL1TkTau_ResolutionCaloPhi_I->Write();
+  hL1TkTau_ResolutionCaloEt_F->Write();
+  hL1TkTau_ResolutionCaloEta_F->Write();
+  hL1TkTau_ResolutionCaloPhi_F->Write();
 
   // SingleTau: Rates                                                                                                                                          
   hCalo_Rate->Write(); // Inclusive = C+I+F                                                                                                                       
@@ -1209,6 +1379,10 @@ void CaloTk::WriteHistos_(void)
   hVtxIso_Rate_C->Write();
   hVtxIso_Rate_I->Write();
   hVtxIso_Rate_F->Write();
+  hRelIso_Rate->Write();
+  hRelIso_Rate_C->Write();
+  hRelIso_Rate_I->Write();
+  hRelIso_Rate_F->Write();
 
   // SingleTau: Efficiencies                                                                                                                                   
   hCalo_Eff->Write();  // Inclusive = C+I+F                                                                                                                       
@@ -1223,6 +1397,10 @@ void CaloTk::WriteHistos_(void)
   hVtxIso_Eff_C->Write();
   hVtxIso_Eff_I->Write();
   hVtxIso_Eff_F->Write();
+  hRelIso_Eff->Write();
+  hRelIso_Eff_C->Write();
+  hRelIso_Eff_I->Write();
+  hRelIso_Eff_F->Write();
 
   // DiTau: Rates                                                                                                                                              
   hDiTau_Rate_Calo->Write(); // Inclusive = C+I+F                                                                                                                 
@@ -1237,6 +1415,10 @@ void CaloTk::WriteHistos_(void)
   hDiTau_Rate_VtxIso_C->Write();
   hDiTau_Rate_VtxIso_I->Write();
   hDiTau_Rate_VtxIso_F->Write();
+  hDiTau_Rate_RelIso->Write();
+  hDiTau_Rate_RelIso_C->Write();
+  hDiTau_Rate_RelIso_I->Write();
+  hDiTau_Rate_RelIso_F->Write();
 
   // DiTau: Efficiencies                                                                                                                                       
   hDiTau_Eff_Calo->Write(); // Inclusive = C+I+F                                                                                                                  
@@ -1251,16 +1433,24 @@ void CaloTk::WriteHistos_(void)
   hDiTau_Eff_VtxIso_C->Write();
   hDiTau_Eff_VtxIso_I->Write();
   hDiTau_Eff_VtxIso_F->Write();
+  hDiTau_Eff_RelIso->Write();
+  hDiTau_Eff_RelIso_C->Write();
+  hDiTau_Eff_RelIso_I->Write();
+  hDiTau_Eff_RelIso_F->Write();
 
   // DiTau: (Calo-Other)                                                                                                                                       
   hDiTau_Rate_Calo_Tk->Write();
   hDiTau_Rate_Calo_VtxIso->Write();
+  hDiTau_Rate_Calo_RelIso->Write();
   hDiTau_Eff_Calo_Tk->Write();
   hDiTau_Eff_Calo_VtxIso->Write();
+  hDiTau_Eff_Calo_RelIso->Write();
 
   // DiTau (Tk-Other)                                                                                                                                          
   hDiTau_Rate_Tk_VtxIso->Write();
+  hDiTau_Rate_Tk_RelIso->Write();
   hDiTau_Eff_Tk_VtxIso->Write();
+  hDiTau_Eff_Tk_RelIso->Write();
 
   // Turn-Ons                                                                                                                                                  
   // TEfficiency* pEff->Write();                                                                                                                                        
@@ -1268,20 +1458,48 @@ void CaloTk::WriteHistos_(void)
   hCalo_TurnOn50->Write();
   hTk_TurnOn50->Write();
   hVtxIso_TurnOn50->Write();
+  hRelIso_TurnOn50->Write();
   //                                                                                                                                                           
   hCalo_TurnOn25->Write();
   hTk_TurnOn25->Write();
   hVtxIso_TurnOn25->Write();
+  hRelIso_TurnOn25->Write();
   //                                                                                                                                                           
   hCalo_TurnOn_SingleTau50KHz->Write();
   hTk_TurnOn_SingleTau50KHz->Write();
   hVtxIso_TurnOn_SingleTau50KHz->Write();
+  hRelIso_TurnOn_SingleTau50KHz->Write();
+
   //                                                                                                                                                           
   hCalo_TurnOn_DiTau50KHz->Write();
   hTk_TurnOn_DiTau50KHz->Write();
   hVtxIso_TurnOn_DiTau50KHz->Write();
+  hRelIso_TurnOn_DiTau50KHz->Write();
   
+  // Write the outfile
+  outFile->Write();
+
 }
+
+
+//****************************************************************************
+bool CaloTk::IsWithinEtaRegion(string etaRegion,
+                                 double eta)
+//****************************************************************************
+{
+
+  bool bWithinEtaRegion = false;
+  if ( etaRegion.compare("Central") == 0 )           bWithinEtaRegion = (fabs(eta) <= _eta_C);
+  else if ( etaRegion.compare("Intermediate") == 0 ) bWithinEtaRegion = (fabs(eta) <= _eta_F && fabs(eta) > _eta_C);
+  else if ( etaRegion.compare("Forward") == 0 )      bWithinEtaRegion = (fabs(eta) > _eta_F);
+  else{
+    cout << "E R R O R ! Tracking::IsWithinEtaRegion(...) - Invalid eta region type \"" << etaRegion << "\". EXIT" << endl;
+    exit(1);
+  }
+
+  return bWithinEtaRegion;
+}
+
 
 //============================================================================
 void CaloTk::FinaliseEffHisto_(TH1D *histo, 
@@ -1395,7 +1613,7 @@ void CaloTk::FillSingleTau_(vector<L1TkTauParticle> L1TkTaus,
   
   // Fill rate
   double ldgEt = L1TkTaus.at(0).GetCaloTau().et();
-
+  
   // Inclusive or Eta slice in Central/Intermedieate/Forward Tracker region?
   if ( abs(L1TkTaus.at(0).GetCaloTau().eta()) < minEta) return;
   if ( abs(L1TkTaus.at(0).GetCaloTau().eta()) > maxEta) return;
@@ -1407,10 +1625,10 @@ void CaloTk::FillSingleTau_(vector<L1TkTauParticle> L1TkTaus,
   // Get MC-matched trigger objects
   vector<L1TkTauParticle> L1TkTaus_mcMatched = GetMcMatchedL1TkTaus(L1TkTaus);
   if (L1TkTaus_mcMatched.size() < 1) return;
-  
+
   // Check that all taus were found
   if(!bFoundAllTaus_) return;
-
+  
   // Fill efficiency
   double ldgEt_mcMatched = L1TkTaus_mcMatched.at(0).GetCaloTau().et();
   FillEfficiency_(hEfficiency, ldgEt_mcMatched);
@@ -1735,7 +1953,7 @@ void CaloTk::GetIsolationValues(L1TkTauParticle &L1TkTau)
   // Store default values
   L1TkTau.SetVtxIsolation(999.9);
   L1TkTau.SetRelIsolation(0.0);
-
+  
   // Return if CaloTau is not Tk-Confirmed
   if (!L1TkTau.HasMatchingTk()) return; 
 
@@ -1749,7 +1967,7 @@ void CaloTk::GetIsolationValues(L1TkTauParticle &L1TkTau)
   double deltaZ0             = 999.9;
   double relIso              = 0.0;
   
-  // For-loop: All Tracks
+  // For-loop: All Tracks in isolation cone 
   for (size_t i = 0; i < isoConeTks.size(); i++)
     {
       TTTrack isoConeTk = isoConeTks.at(i);
@@ -1787,7 +2005,6 @@ void CaloTk::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
   // final decay products (pions, Kaons) with the matching track. If a match is found
   // the assign the tau (not the pion) to the L1TkTau as the matching genParticle.
   //
-
   // Sanity check
   if (hadGenTaus.size() < 1 ) return;
 
@@ -1795,14 +2012,14 @@ void CaloTk::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
   TTTrack matchTk  = L1TkTau.GetMatchingTk();
   double match_dR  = 9999.9;
   GenParticle match_GenParticle;
-
+  
   // For-loop: All hadronic GenTaus
   for (vector<GenParticle>::iterator tau = hadGenTaus.begin(); tau != hadGenTaus.end(); tau++)
     {
       // If no hadronic decay products found (pi+/-, pi0, K+/-, K0, K0L), skip this tau
-      //marina
+      //marina (needed?)
       //if (tau->finalDaughtersCharged().size() < 1) continue;
-      
+
       double deltaR = auxTools_.DeltaR( L1TkTau.GetCaloTau().eta(), L1TkTau.GetCaloTau().phi(), tau->eta(), tau->phi() );
       if (deltaR > mcMatching_dRMax) continue;
       if (deltaR < match_dR)
@@ -1814,6 +2031,7 @@ void CaloTk::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
     }  // For-loop: All hadronic GenTaus
 
   // Save the matching
+  //cout << "index of match genp ="<<match_GenParticle.index()<<endl;
   L1TkTau.SetMatchingGenParticle(match_GenParticle);
   L1TkTau.SetMatchingGenParticleDeltaR(match_dR);
 

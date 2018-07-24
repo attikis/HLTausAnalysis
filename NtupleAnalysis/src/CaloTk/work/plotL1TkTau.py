@@ -96,7 +96,7 @@ def Plot(jsonfile, opts):
 
     with open(os.path.abspath(jsonfile)) as jfile:
         j = json.load(jfile)
-        saveDir = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/L1TkTaus/"
+        saveDir = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/CaloTk/L1TkTaus/"
 
         Verbose("Plotting %s. Will save under \"%s\"" % (j["saveName"], saveDir), True)
 
@@ -150,9 +150,12 @@ def MCPlot(datasetsMgr, json):
         ylabel_ = ylabel_.replace(json["ylabel"].split(" /")[0], "Arbitrary Units")
         kwargs  = {json["normalization"]: True}
         p = plots.MCPlot(datasetsMgr, json["histograms"][0], **kwargs)
+        # Customize binwidth on y axis title
+        binWidth = p.histoMgr.getHistos()[0].getRootHisto().GetXaxis().GetBinWidth(0)
+        ylabel_ = ylabel_.replace(json["ylabel"].split(" /")[-1], GetBinwidthDecimals(binWidth)) 
     else:
         raise Exception("Invalid normalization \"%s\"" % (json["normalization"]) )
-    
+
     # Label size (optional. Commonly Used in counters)
     xlabelSize = None
     if "xlabelsize" in json:
@@ -161,23 +164,17 @@ def MCPlot(datasetsMgr, json):
     if "ylabelsize" in json:
         ylabelSize = json["ylabelsize"]
 
-    '''
-    # Set universal histo styles
-    if("drawStyle" in json):
-        p.histoMgr.setHistoDrawStyleAll(json["drawStyle"])
-    if("legendStyle" in json):
-        p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
-    '''
-    
     # For-loop: All histos
     for index, h in enumerate(p.histoMgr.getHistos()):
         if index == 0:
-            continue
+            p.histoMgr.setHistoDrawStyle(h.getName(), "HIST")
+            p.histoMgr.setHistoLegendStyle(h.getName(), "L")
+            #    continue
         else:
             p.histoMgr.setHistoDrawStyle(h.getName(), "AP")
             p.histoMgr.setHistoLegendStyle(h.getName(), "AP")
 
-
+    # Set default dataset style to all histos
     for index, h in enumerate(p.histoMgr.getHistos()):
         plots._plotStyles[p.histoMgr.getHistos()[index].getDataset().getName()].apply(p.histoMgr.getHistos()[index].getRootHisto())
        #plots._plotStyles[dataset.getName()].apply(p)
@@ -186,8 +183,9 @@ def MCPlot(datasetsMgr, json):
     histograms.addText(json["extraText"].get("x"), json["extraText"].get("y"), json["extraText"].get("text"), json["extraText"].get("size") )
     
     # Draw a customised plot
-    saveDir  = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/L1TkTaus/"
+    saveDir  = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/CaloTk/L1TkTaus/"
     saveName = os.path.join(saveDir, json["saveName"])
+
     plots.drawPlot(p, 
                    saveName,                  
                    xlabel            = json["xlabel"], 
@@ -199,36 +197,56 @@ def MCPlot(datasetsMgr, json):
                    addLuminosityText = json["addLuminosityText"]=="True",
                    addCmsText        = json["addCmsText"]=="True",
                    cmsExtraText      = json["cmsExtraText"],
+                   cmsTextPosition   = "outframe", 
                    opts              = json["opts"],
+                   #opts2             = json["ratioOpts"],
                    log               = json["logY"]=="True", 
                    errorBarsX        = json["errorBarsX"]=="True", 
-                   moveLegend        = json["moveLegend"],
+                   moveLegend        = {"dx": -0.11, "dy": -0.01, "dh": -0.13},#json["moveLegend"],
                    # cutLine           = json["cutValue"], #cannot have this and "cutBox" defined
                    cutBox            = {"cutValue": json["cutValue"], "fillColor": json["cutFillColour"], "box": json["cutBox"]=="True", "line": json["cutLine"]=="True", "greaterThan": json["cutGreaterThan"]=="True"},
+                   #ratio             = json["ratio"]=="True",
+                   #ratioInvert       = json["ratioInvert"]=="True",
+                   #ratioYlabel       = json["ratioYlabel"],
                    xlabelsize        = xlabelSize,
                    ylabelsize        = ylabelSize,
                    )
-    
+
     # Remove legend?
     if json["removeLegend"] == "True":
         p.removeLegend()
 
     # Save in all formats chosen by user
-        
-    #saveFormats = json["saveFormats"]
     saveFormats = [".pdf"]
     for i, ext in enumerate(saveFormats):
         saveNameURL = saveName + ext
-        #saveNameURL = saveNameURL.replace("/publicweb/a/aattikis/", "http://home.fnal.gov/~aattikis/")                                                                   
         saveNameURL = saveNameURL.replace("/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/", "https://cmsdoc.cern.ch/~mtoumazo/hltaus/")
         if opts.url:
             Print(saveNameURL, 1)
         else:
             Print(saveName + ext, 1)
-            plot.saveAs(saveName, formats=saveFormats)
+        p.saveAs(saveName, formats=saveFormats)
             
-
     return
+
+
+def GetBinwidthDecimals(binWidth):                                                                                                                                        
+    dec =  " %0.0f"
+    if binWidth < 1:
+        dec = " %0.1f"
+    if binWidth < 0.1:
+        dec = " %0.2f"
+    if binWidth < 0.01:
+        dec =  " %0.3f"
+    if binWidth < 0.001:
+        dec =  " %0.4f"
+    if binWidth < 0.0001:
+        dec =  " %0.5f"
+    if binWidth < 0.00001:
+        dec =  " %0.6f"
+    if binWidth < 0.000001:
+        dec =  " %0.7f"
+    return dec
 
 
 def main(opts):

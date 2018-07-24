@@ -49,11 +49,11 @@ class CaloTk : public TreeAnalyserMC{
   // Constructors/Destructors
   ~CaloTk(){};
  CaloTk(const string SamplePath,
-		const string SampleName,
-		const string text_, 
-		const int maxEvents_ = -1, 
-	//TTree* tree=0) : 
+	const string SampleName,
+	const string text_, 
+	const int maxEvents_ = -1, 
 	TChain* chain=0) :
+
   TreeAnalyserMC("", SamplePath, SampleName, text_, maxEvents_, chain)
     { 
       auxTools_.StopwatchStart();
@@ -65,34 +65,10 @@ class CaloTk : public TreeAnalyserMC{
   virtual void Loop();
 
   void PrintSettings(void);
-  /*
-  void PrintGenParticleCollection(vector<GenParticle> collection);
-
-  void PrintTrackingParticleCollection(vector<TrackingParticle> collection);
-
-  void PrintTTTrackCollection(vector<TTTrack> collection);
-
-  void PrintTTPixelTrackCollection(vector<TTPixelTrack> collection);
-
-  void PrintL1SumCollection(vector<L1Sum> collection);
-
-  void PrintL1EGCollection(vector<L1EG> collection);
-
-  void PrintL1JetCollection(vector<L1Jet> collection);
-
-  void PrintL1TauCollection(vector<L1Tau> collection);
-
-  void PrintL1TkTauParticleCollection(vector<L1TkTauParticle> collection);
-  */
 
   void ApplyDiTauZMatching(string tkCollectionType,
 			   vector<L1TkTauParticle> &L1TkTaus);
 
-  /*
-  vector<GenParticle> GetHadronicGenTaus(vector<GenParticle> GenTaus,
-					 double visEt=20.0,
-					 double visEta=2.3);
-  */
   void GetShrinkingConeSizes(double calo_et,
 			     double sigCone_Constant,
 			     double isoCone_Constant,
@@ -157,6 +133,9 @@ class CaloTk : public TreeAnalyserMC{
   double mcMatching_dRMax;
   double pv_deltaZMax;
   double pv_z;
+  
+  double _eta_C;
+  double _eta_F;
 
   //
   double sigCone_Constant;
@@ -168,6 +147,7 @@ class CaloTk : public TreeAnalyserMC{
   //
   double isoCone_Constant;
   double isoCone_VtxIsoWP;
+  double isoCone_RelIsoWP;
   double isoCone_dRMax;
   double isoCone_dRMin;
   //
@@ -229,6 +209,10 @@ class CaloTk : public TreeAnalyserMC{
 		  TH2D *hEfficiency);
 
   vector<L1TkTauParticle> GetMcMatchedL1TkTaus(vector<L1TkTauParticle> L1TkTaus);
+
+  bool IsWithinEtaRegion(string etaRegion,
+			 double eta);
+
   
   // Variable declaration
   // L1TkPrimaryVertex *pvProducer;
@@ -245,6 +229,9 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkPV_VtxZ;
   TH1D* hPrimaryVertex_DeltaZ;
   TH1D* hPrimaryVertex_AbsDeltaZ;  
+
+  // GenParticles Histograms
+  TH2D* h_GenP_VisET_dRMaxLdgPion;
   
   // L1TkTaus: Matching track
   TH1D* hL1TkTau_MatchTk_DeltaR;
@@ -336,6 +323,15 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkTau_ResolutionCaloEt;
   TH1D* hL1TkTau_ResolutionCaloEta;
   TH1D* hL1TkTau_ResolutionCaloPhi;
+  TH1D* hL1TkTau_ResolutionCaloEt_C;
+  TH1D* hL1TkTau_ResolutionCaloEta_C;
+  TH1D* hL1TkTau_ResolutionCaloPhi_C;
+  TH1D* hL1TkTau_ResolutionCaloEt_I;
+  TH1D* hL1TkTau_ResolutionCaloEta_I;
+  TH1D* hL1TkTau_ResolutionCaloPhi_I;
+  TH1D* hL1TkTau_ResolutionCaloEt_F;
+  TH1D* hL1TkTau_ResolutionCaloEta_F;
+  TH1D* hL1TkTau_ResolutionCaloPhi_F;
   
   // SingleTau: Rates
   TH1D* hCalo_Rate; // Inclusive = C+I+F
@@ -350,6 +346,10 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hVtxIso_Rate_C;
   TH1D* hVtxIso_Rate_I;
   TH1D* hVtxIso_Rate_F;
+  TH1D* hRelIso_Rate;
+  TH1D* hRelIso_Rate_C;
+  TH1D* hRelIso_Rate_I;
+  TH1D* hRelIso_Rate_F;
   // SingleTau: Efficiencies
   TH1D* hCalo_Eff;  // Inclusive = C+I+F
   TH1D* hCalo_Eff_C;
@@ -363,6 +363,10 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hVtxIso_Eff_C;
   TH1D* hVtxIso_Eff_I;
   TH1D* hVtxIso_Eff_F;      
+  TH1D* hRelIso_Eff;
+  TH1D* hRelIso_Eff_C;
+  TH1D* hRelIso_Eff_I;
+  TH1D* hRelIso_Eff_F;      
 
   // DiTau: Rates
   TH1D* hDiTau_Rate_Calo; // Inclusive = C+I+F
@@ -377,6 +381,11 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hDiTau_Rate_VtxIso_C;
   TH1D* hDiTau_Rate_VtxIso_I;
   TH1D* hDiTau_Rate_VtxIso_F;
+  TH1D* hDiTau_Rate_RelIso;
+  TH1D* hDiTau_Rate_RelIso_C;
+  TH1D* hDiTau_Rate_RelIso_I;
+  TH1D* hDiTau_Rate_RelIso_F;
+
   // DiTau: Efficiencies
   TH1D* hDiTau_Eff_Calo; // Inclusive = C+I+F
   TH1D* hDiTau_Eff_Calo_C;
@@ -390,16 +399,24 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hDiTau_Eff_VtxIso_C;
   TH1D* hDiTau_Eff_VtxIso_I;
   TH1D* hDiTau_Eff_VtxIso_F;
+  TH1D* hDiTau_Eff_RelIso;
+  TH1D* hDiTau_Eff_RelIso_C;
+  TH1D* hDiTau_Eff_RelIso_I;
+  TH1D* hDiTau_Eff_RelIso_F;
 
   // DiTau: (Calo-Other)
   TH2D* hDiTau_Rate_Calo_Tk;
   TH2D* hDiTau_Rate_Calo_VtxIso;
+  TH2D* hDiTau_Rate_Calo_RelIso;
   TH2D* hDiTau_Eff_Calo_Tk;
   TH2D* hDiTau_Eff_Calo_VtxIso;
+  TH2D* hDiTau_Eff_Calo_RelIso;
 
   // DiTau (Tk-Other)
   TH2D* hDiTau_Rate_Tk_VtxIso;
+  TH2D* hDiTau_Rate_Tk_RelIso;
   TH2D* hDiTau_Eff_Tk_VtxIso;
+  TH2D* hDiTau_Eff_Tk_RelIso;
 
   // Turn-Ons
   // TEfficiency* pEff;
@@ -407,18 +424,22 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hCalo_TurnOn50;
   TH1D* hTk_TurnOn50;
   TH1D* hVtxIso_TurnOn50;
+  TH1D* hRelIso_TurnOn50;
   //
   TH1D* hCalo_TurnOn25;
   TH1D* hTk_TurnOn25;
   TH1D* hVtxIso_TurnOn25;
+  TH1D* hRelIso_TurnOn25;
   //
   TH1D* hCalo_TurnOn_SingleTau50KHz;
   TH1D* hTk_TurnOn_SingleTau50KHz;
   TH1D* hVtxIso_TurnOn_SingleTau50KHz;
+  TH1D* hRelIso_TurnOn_SingleTau50KHz;
   //
   TH1D* hCalo_TurnOn_DiTau50KHz;
   TH1D* hTk_TurnOn_DiTau50KHz;
   TH1D* hVtxIso_TurnOn_DiTau50KHz;
+  TH1D* hRelIso_TurnOn_DiTau50KHz;
 
 };
 

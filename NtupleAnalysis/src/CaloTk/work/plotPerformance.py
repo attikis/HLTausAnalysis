@@ -67,7 +67,7 @@ def GetLumi(datasetsMgr):
 
 def GetDatasetsFromDir(opts, json):
     Verbose("Getting datasets")
-    print opts.includeOnlyTasks
+
     if (not opts.includeOnlyTasks and not opts.excludeTasks):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
                                                         dataEra=json["dataEra"],
@@ -96,7 +96,7 @@ def Plot(jsonfile, opts):
 
     with open(os.path.abspath(jsonfile)) as jfile:
         j = json.load(jfile)
-        saveDir = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/performance/"
+        saveDir = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/CaloTk/performance/"
         
         Verbose("Plotting %s. Will save under \"%s\"" % (j["saveName"], saveDir), True)
 
@@ -112,6 +112,7 @@ def Plot(jsonfile, opts):
         datasetsMgr = GetDatasetsFromDir(opts, j)
         # datasetsMgr.loadLuminosities()
         # datasetsMgr.updateNAllEventsToPUWeighted()
+        #datasetsMgr.PrintInfo()
 
         # Print information
         if opts.verbose:
@@ -173,6 +174,7 @@ def ComparisonPlot(datasetsMgr, json):
     # Create the MC Plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
     legendDict = {}
     kwargs     = {}
+    #normToOne_ = json["normalization"]=="normalizeToOne"
     normToOne_ = json["normalizationToOne"]=="True"
     ylabel_    = json["ylabel"]
     cutBox_    = {}
@@ -190,8 +192,11 @@ def ComparisonPlot(datasetsMgr, json):
         ylabel_ = ylabel_.replace(json["ylabel"].split(" /")[0], "Arbitrary Units")
 
     # Get the reference histo and the list of histos to compare
-    histoReference = getHisto(datasetsMgr, json['datasets'][0], json['histograms'][0])
-    histoCompares  = getHistos(datasetsMgr, json['datasets'][0], json['histograms'])
+    datasets0 = datasetsMgr.getAllDatasets()[0].getName()
+
+    histoReference = getHisto(datasetsMgr, datasets0, json['histograms'][0])
+    histoCompares  = getHistos(datasetsMgr, datasets0, json['histograms'])
+
     p = plots.ComparisonManyPlot(histoReference, histoCompares, saveFormats=[])
     
     # Set universal histo styles
@@ -199,22 +204,23 @@ def ComparisonPlot(datasetsMgr, json):
     p.histoMgr.setHistoLegendStyleAll(json["legendStyle"])
 
     # Set individual styles
-    for i in range(0, len(histoCompares)+1):
-        hName = "h%s-%s" % (i, json["datasets"][0])
-        legendDict[hName] = styles.getCaloLegend(i)
-        p.histoMgr.forHisto(hName, styles.getCaloStyle(i) )
+    for index, h in enumerate(p.histoMgr.getHistos()):
+        hName = h.getName()
+        legendDict[hName] = styles.getCaloLegend(index)
+        p.histoMgr.forHisto(hName, styles.getCaloStyle(index))
+        #styles.getCaloStyle(index).apply(h.getRootHisto())
         if 0:
             p.histoMgr.setHistoDrawStyle(hName, "L")
             p.histoMgr.setHistoLegendStyle(hName, "LP")
-        if json["drawStyle"]=="HIST":
-            p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetFillStyle(0))
+        if json["drawStyle"]=="HIST":                                                                                    
+            p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetFillStyle(0))                                            
             #p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerSize(0.0))
 
     # Set legend labels
     p.histoMgr.setHistoLegendLabelMany(legendDict)
-    
+
     # Draw a customised plot
-    saveDir = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/performance/"
+    saveDir = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/CaloTk/performance/"
     saveName = os.path.join(saveDir, json["saveName"])    
 
     # Create the customised plot
@@ -226,7 +232,8 @@ def ComparisonPlot(datasetsMgr, json):
                    stackMCHistograms = json["stackMCHistograms"]=="True", 
                    addCmsText        = json["addCmsText"]=="True",
                    cmsExtraText      = json["cmsExtraText"],
-                   opts              = json["opts"],
+                   cmsTextPosition   = "outframe",
+                   opts              = json["opts"],#{"xmin": 0, "xmax": 300, "ymin" :0, "ymax":1.1},#json["opts"],
                    opts2             = json["ratioOpts"],
                    log               = json["logY"]=="True", 
                    moveLegend        = json["moveLegend"],
@@ -241,21 +248,22 @@ def ComparisonPlot(datasetsMgr, json):
     if json["removeLegend"] == "True":
         p.removeLegend()
  
-
     # Additional text
     histograms.addText(json["extraText"].get("x"), json["extraText"].get("y"), json["extraText"].get("text"), json["extraText"].get("size") )
+    histograms.addText(0.18, 0.89, plots._legendLabels[datasets0], 17)
+
 
     # Save in all formats chosen by user
-    #saveFormats = json["saveFormats"]
     saveFormats = [".pdf"]
     for i, ext in enumerate(saveFormats):
+        saveName = saveName + "_" + datasets0.split("_")[0]
         saveNameURL = saveName + ext
         saveNameURL = saveNameURL.replace("/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/", "https://cmsdoc.cern.ch/~mtoumazo/hltaus/")
         if opts.url:
             Print(saveNameURL, 1)
         else:
             Print(saveName + ext, 1)
-            plot.saveAs(saveName, formats=saveFormats)
+        p.saveAs(saveName, formats=saveFormats)
 
     return
 

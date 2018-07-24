@@ -165,67 +165,211 @@ def main(opts):
         style.setGridX(opts.gridX)
         style.setGridY(opts.gridY)
 
+        # Define signal and background datasets names
+        datasetSignal = "ChargedHiggs200_14TeV_L1TPU140"#"TT_TuneCUETP8M2T4_14TeV_L1TPU140"#"GluGluHToTauTau_14TeV_L1TPU140"
+        datasetBkg    = "SingleNeutrino_L1TPU140"
+
         # Plot Histograms
-        folder     = "" #opts.folder
-        histoList  = datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDirectoryContent(folder)
-        histoPaths = [os.path.join(folder, h) for h in histoList]
-        histoType  = type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram())
-        for i, h in enumerate(histoPaths, 1):
-            histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))
-            if "TH2" not in histoType:
-                continue
-            PlotHistograms(datasetsMgr, h)
+        effHistoLists  = [["Calo_Eff", "Tk_Eff", "VtxIso_Eff", "RelIso_Eff"], ["DiTau_Eff_Calo", "DiTau_Eff_Tk", "DiTau_Eff_VtxIso", "DiTau_Eff_RelIso"]]
+        rateHistoLists = [["Calo_Rate", "Tk_Rate", "VtxIso_Rate", "RelIso_Rate"], ["DiTau_Rate_Calo", "DiTau_Rate_Tk", "DiTau_Rate_VtxIso", "DiTau_Rate_RelIso"]]
+
+
+        for i in range(0, len(effHistoLists)):
+            PlotRateVsEff(datasetsMgr, effHistoLists[i], rateHistoLists[i], datasetSignal, datasetBkg)
+            
+    return
+
+
+def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, datasetSignal, datasetBkg):
+    tgraphs=[]
+    legendDict = {}
+
+    # Get Histogram name and its kwargs
+    if "ditau" in effHistoList[0].lower():
+        saveName = "DiTau_RateVsEff_"+ datasetSignal.split("_")[0]
+    else:
+        saveName = "SingleTau_RateVsEff_"+ datasetSignal.split("_")[0]
+    kwargs_  = GetHistoKwargs(saveName, opts)
+
+    for i in range (0, len(effHistoList)):
+        if (i==0) :
+            g0 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], datasetSignal, datasetBkg)
+            g0.SetName("Calo")
+        elif (i==1):
+            g1 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], datasetSignal, datasetBkg)
+            g1.SetName("Tk")
+        elif (i==2):
+            g2 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], datasetSignal, datasetBkg)
+            g2.SetName("VtxIso")
+        elif (i==3):
+            g3 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], datasetSignal, datasetBkg)
+            g3.SetName("RelIso")
+
+    # Create & draw the plot
+    p = plots.ComparisonManyPlot(g0, [g1,g2, g3], saveFormats=[])
+    
+    # Set individual styles
+    for index, h in enumerate(p.histoMgr.getHistos()):
+        hName = h.getName()
+        legendDict[hName] = styles.getCaloLegend(index)
+        p.histoMgr.forHisto(hName, styles.getCaloStyle(index))
+
+        p.histoMgr.setHistoDrawStyle(h.getName(), "PX")                                                                                                     
+        p.histoMgr.setHistoLegendStyle(h.getName(), "LP")
+
+    # Set legend labels
+    p.histoMgr.setHistoLegendLabelMany(legendDict)
+
+    # Get the x and y axis title
+    #binWidthX = p.histoMgr.getHistos()[0].getRootHisto().GetXaxis().GetBinWidth(0)
+    #binWidthY = p.histoMgr.getHistos()[0].getRootHisto().GetYaxis().GetBinWidth(0)
+    #xlabel = kwargs_["xlabel"] + " / %s" % (GetBinwidthDecimals(binWidthX) % (binWidthX))
+    #kwargs_["xlabel"] = xlabel
+    #ylabel = kwargs_["ylabel"] + " / %s" % (GetBinwidthDecimals(binWidthY) % (binWidthY))
+    #kwargs_["ylabel"] = ylabel
+
+
+
+    # Draw and save the plot
+    plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
+
+    # Additional text                                                                                                                                                    
+    histograms.addText(0.65, 0.38, plots._legendLabels[datasetSignal], 17)
+    if "ditau" in saveName.lower():
+        histograms.addText(0.77, 0.89,"DoubleTau", 20)
+    else:
+        histograms.addText(0.77, 0.89,"SingleTau", 20)
+    # Save the plots in custom list of saveFormats
+    SavePlot(p, saveName, os.path.join(opts.saveDir, opts.optMode, opts.folder), [".pdf",".png"] )          
+
 
     return
 
+def convert2RateVsEffTGraph(datasetsMgr, effHistoName, rateHistoName, datasetSignal, datasetBkg):
+
+    hEff  = datasetsMgr.getDataset(datasetSignal).getDatasetRootHisto(effHistoName).getHistogram()
+    hRate = datasetsMgr.getDataset(datasetBkg).getDatasetRootHisto(rateHistoName).getHistogram()
+    
+    # Sanity Checks
+    if (hEff.GetXaxis().GetBinWidth(0) != hRate.GetXaxis().GetBinWidth(0)):
+        Print("Efficiency histogram '%s' and rate histogram '%s' have different binning." % (effHistoName,rateHistoName), True)
+        sys.exit()
+    if (hEff.GetNbinsX() != hRate.GetNbinsX()):
+        Print("Efficiency histogram '%s' and rate histogram %s have different number of bins." % (effHistoName,rateHistoName), True)
+        sys.exit()
+    
+    # Lists for values                                                                                                                                         
+    x     = []
+    y     = []
+    xerrl = []
+    xerrh = []
+    yerrl = []
+    yerrh = []
+    
+    nBinsX = hEff.GetNbinsX()
+
+    for i in range (0, nBinsX):
+        # Get values
+        xVal  = hEff.GetBinContent(i)
+        xLow  = hEff.GetBinError(i)
+        xHigh = xLow
+        yVal  = hRate.GetBinContent(i)
+        yLow  = hRate.GetBinError(i)
+        yHigh = yLow            
+        
+        # Store values
+        x.append(xVal)
+        xerrl.append(xLow)
+        xerrh.append(xHigh)
+            
+        # Force error bars to not be above (belo) 1.0 (0.0)
+        if 0:
+            if abs(yVal + yHigh) > 1.0:
+                yHigh = 1.0-yVal
+            if yVal - yLow < 0.0:
+                yLow = yVal
+
+        
+        # WARNING! Ugly trick so that zero points are not visible on canvas
+        if 1:
+            if yVal == 0.0:
+                yVal  = -0.1
+                yLow  = +0.0001
+                yHigh = +0.0001
+        
+        # Save final values
+        y.append(yVal)
+        yerrl.append(yLow)
+        yerrh.append(yHigh)
+        
+    # Create the TGraph with asymmetric errors
+    tgraph = ROOT.TGraphAsymmErrors(nBinsX,
+                                    array.array("d",x),
+                                    array.array("d",y),
+                                    array.array("d",xerrl),
+                                    array.array("d",xerrh),
+                                    array.array("d",yerrl),
+                                    array.array("d",yerrh))
+    
+
+    # Construct info table (debugging)
+    table  = []
+    align  = "{0:>6} {1:^10} {2:>10} {3:>10} {4:>10} {5:^3} {6:<10}"
+    header = align.format("#", "xLow", "Efficiency", "xUp", "Rate", "+/-", "Error") #Purity = 1-EWK/Data
+    hLine  = "="*70
+    table.append("")
+    table.append(hLine)
+    table.append("{0:^70}".format(effHistoName))
+    table.append(header)
+    table.append(hLine)
+    
+    # For-loop: All values x-y and their errors
+    for i, xV in enumerate(x, 0):
+        row = align.format(i+1, "%.4f" % xerrl[i], "%.4f" %  x[i], "%.4f" %  xerrh[i], "%.5f" %  y[i], "+/-", "%.5f" %  yerrh[i])
+        table.append(row)
+    table.append(hLine)
+
+    if 0:#printValues:
+        for i, line in enumerate(table, 1):
+            Print(line, False) #i==1)        
+   
+    return tgraph
+
 def GetHistoKwargs(h, opts):
-    _moveLegend = {"dx": -0.1, "dy": 0.0, "dh": -0.15}
-    logY    = False
+    _moveLegend = {"dx": -0.1, "dy": -0.55, "dh": -0.15}
+    logY    = True
     yMin    = 0.0
     if logY:
-        yMin = 0.001
+        yMin = 1
         yMaxF = 10
     else:
-        yMaxF = 1.0
+        yMaxF = 1.2
         
     _kwargs = {
-        "stackMCHistograms": opts.nostack,
+        "xlabel"           : "Efficiency",
+        "ylabel"           : "Rate (kHz)",
+        "addMCUncertainty" : False, 
         "addLuminosityText": False,
         "addCmsText"       : True,
         "cmsExtraText"     : "Phase-2 Simulation",
-        "opts"             : {"ymin": yMin, "ymaxfactor": yMaxF},
+        "cmsTextPosition"  : "outframe",
+        "opts"             : {"xmin": 0.0, "xmax": 0.7, "ymin": yMin, "ymax":1000, "ymaxfactor": yMaxF},
         "opts2"            : {"ymin": 0.59, "ymax": 1.41},
         "log"              : logY,
         "moveLegend"       : _moveLegend,
         "xtitlesize"       : 0.1,#xlabelSize,
         "ytitlesize"       : 0.1,#ylabelSize,
+        "cutBoxY"           : {"cutValue": 50, "fillColor": 16, "box": False, "line": True, "cutGreaterThan"   : False}
         }
 
     kwargs = copy.deepcopy(_kwargs)
     
-    if opts.normToOne:
-        kwargs["zlabel"]= "Arbitrary Units"
-    else:
-        kwargs["zlabel"]= "Entries"
-    '''
-    if "_eta" in h.lower():
-        #_yLabel = "Arbitrary Units / %.0f "
-        units            = ""
-        kwargs["xlabel"] = "#eta" 
-        kwargs["ylabel"] = _yLabel + units
-        kwargs["cutBox"] = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-        kwargs["opts"]   = {"xmin": -2.5, "xmax": 2.5, "ymin": yMin, "ymaxfactor": yMaxF}
+    if "ditau" in h.lower():
+        kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.6, "ymin": yMin, "ymax":2000, "ymaxfactor": yMaxF}
 
-    if "phi" in h.lower():
-        #_yLabel = "Arbitrary Units / %.0f "
-        units            = "rad"
-        kwargs["xlabel"] = "#phi (%s)" % units
-        kwargs["ylabel"] = _yLabel + units
-        kwargs["cutBox"] = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-        kwargs["opts"]   = {"xmin": -3.15, "xmax": 3.15, "ymin": yMin, "ymaxfactor": yMaxF}
-        '''
 
     return kwargs
+
     
 def GetBinwidthDecimals(binWidth):
     dec =  " %0.0f"
@@ -246,14 +390,6 @@ def GetBinwidthDecimals(binWidth):
     return dec
 
 
-
-def getHisto(datasetsMgr, datasetName, name):
-
-    h1 = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(name)
-    h1.setName("h0" + "-" + datasetName)
-    return h1
-
-
 def getHistos(datasetsMgr, histoName):
 
     h1 = datasetsMgr.getDataset("Data").getDatasetRootHisto(histoName)
@@ -263,78 +399,33 @@ def getHistos(datasetsMgr, histoName):
     h2.setName("EWK")
     return [h1, h2]
 
+
 def PlotHistograms(datasetsMgr, histoName):
     Verbose("Plotting Data-MC Histograms")
 
     # Get Histogram name and its kwargs
-    saveName = histoName.rsplit("/")[-1] + "_" + datasetsMgr.getAllDatasets()[0].getName().split("_")[0]
+    saveName = histoName.rsplit("/")[-1]
     kwargs_  = GetHistoKwargs(saveName, opts)
-    kwargs ={}
-
-    ROOT.gStyle.SetNdivisions(8, "Z")
-    ROOT.gStyle.SetNdivisions(8, "Y")
-
-    # Get the reference histo and the list of histos to compare                                                                                                
-    datasets0 = datasetsMgr.getAllDatasets()[0].getName()
-    histoList = [getHisto(datasetsMgr, datasets0, histoName)]
-
-    ##########################################################
-    # Plot a Tgraph 
-    ymax = 200
-    x=[]
-    y=[]
     
-    for i in range(1, ymax):
-        y.append( i )
-        x.append( 3.5/float(i))
-
-    gr = ROOT.TGraph(len(x), array.array('d', x), array.array('d', y))
-    ##########################################################
-
-
-    if opts.normToOne:
-        for h in histoList:
-            h.normalizeToOne()
     
-    p = plots.PlotBase(histoList, saveFormats=[])
+    # Create the plotting object
+    p = plots.MCPlot(datasetsMgr, histoName, saveFormats=[], normalizeToOne=True)
+    # p = plots.ComparisonManyPlot(FakeB_inverted, compareHistos, saveFormats=[])
 
-    # Set universal histo styles
-    p.histoMgr.setHistoDrawStyleAll("COLZ")
-    p.histoMgr.setHistoLegendStyleAll("L")
+    # For-loop: All histos                                                                                                                                               
+    for index, h in enumerate(p.histoMgr.getHistos()):
+        if index == 0:
+            continue
+        else:
+            #p.histoMgr.setHistoDrawStyle(h.getName(), "L")
+            p.histoMgr.setHistoLegendStyle(h.getName(), "L")
 
-    # Customize histo
-    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetTitle(kwargs_["zlabel"]))
-    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetTitleOffset(1.5))
-
-    # Get the x and y axis title
-    binWidthX = p.histoMgr.getHistos()[0].getRootHisto().GetXaxis().GetBinWidth(0)
-    binWidthY = p.histoMgr.getHistos()[0].getRootHisto().GetYaxis().GetBinWidth(0)
-    xlabel = p.histoMgr.getHistos()[0].getRootHisto().GetXaxis().GetTitle() + " / %s" % (GetBinwidthDecimals(binWidthX) % (binWidthX))
-    kwargs_["xlabel"] = xlabel
-    ylabel = p.histoMgr.getHistos()[0].getRootHisto().GetYaxis().GetTitle() + " / %s" % (GetBinwidthDecimals(binWidthY) % (binWidthY))
-    kwargs_["ylabel"] = ylabel
-
-    #p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMinimum(zmin))
-    #p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMaximum(zmax))
-
-    # Set default dataset style to all histos
+    # Set default dataset style to all histos                                                                                                                            
     for index, h in enumerate(p.histoMgr.getHistos()):
         plots._plotStyles[p.histoMgr.getHistos()[index].getDataset().getName()].apply(p.histoMgr.getHistos()[index].getRootHisto())
 
     # Draw and save the plot
     plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
-    # Draw Line(tgraph)
-    gr.SetLineWidth(3)
-    gr.Draw("L same")
-    
-    # Remove legend
-    p.removeLegend()
-
-    # Set log-z?                                                                                                                                               
-    p.getPad().SetLogz(False)
-
-     # Additional text                                                                                                                                          
-    histograms.addText(0.18, 0.89, plots._legendLabels[datasets0], 17)
 
     # Save the plots in custom list of saveFormats
     SavePlot(p, saveName, os.path.join(opts.saveDir, opts.optMode, opts.folder), [".pdf"])#, ".png"] )
@@ -387,9 +478,8 @@ if __name__ == "__main__":
     ANALYSISNAME = None #"FakeBMeasurement"
     SEARCHMODE   = None #"80to1000"
     DATAERA      = None #"ID2017"
-    NORMALIZETOONE = True
-    GRIDX        = False
-    GRIDY        = False
+    GRIDX        = True
+    GRIDY        = True
     OPTMODE      = None
     BATCHMODE    = True
     PRECISION    = 3
@@ -398,7 +488,7 @@ if __name__ == "__main__":
     LATEX        = False
     URL          = True
     NOERROR      = True
-    SAVEDIR      = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/CaloTk/TH2D/" #os.getcwd()
+    SAVEDIR      = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/CaloTk/RateVsEff/" #os.getcwd()
     VERBOSE      = False
     FOLDER       = ""
     RATIO        = False
@@ -457,10 +547,6 @@ if __name__ == "__main__":
 
     parser.add_option("--nostack", dest="nostack", action="store_true", default = NOSTACK,
                       help="Do not stack MC histograms [default: %s]" % (NOSTACK) )
-
-    parser.add_option("--normToOne", dest="normToOne", action="store_true", default = NORMALIZETOONE,
-                      help="Normalize histogram to unity [default: %s]" % (NORMALIZETOONE) )
-
 
     (opts, parseArgs) = parser.parse_args()
 

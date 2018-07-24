@@ -340,7 +340,7 @@ void MCTools::GetHadronicTauChargedOrNeutralPions(Int_t tauIndex,
 
   // Get the pi+/-,pi0, K+/-, K0,K0L,KOS,eta,omegas and gammas
   std::vector<unsigned short> hTau_Dau;
-  GetHadronicTauFinalDaughters(tauIndex, hTau_Dau);
+  GetHadronicTauFinalDaugh(tauIndex, hTau_Dau);
   
   // For-loop: Daughters
   for (unsigned short i = 0; i< hTau_Dau.size(); i++){
@@ -384,15 +384,16 @@ void MCTools::GetHadronicTauNeutralPions(Int_t tauIndex,
 
 
 // ****************************************************************************
-void MCTools::GetHadronicTauFinalDaughters(Int_t Indx,
+void MCTools::GetHadronicTauFinalDaugh(Int_t Indx,
 					   std::vector<unsigned short>& Daug)
 // ****************************************************************************
 {
+  if (0){
+    std::cout << "GenP_PdgId.size() = " << GenP_PdgId.size() << std::endl;
+    std::cout << "GenP_PdgId.at("<<Indx<<") = " << GenP_PdgId.at(Indx) << std::endl;
+    std::cout << "GenP_Daughters.at(0).size() = " << GenP_Daughters.at(0).size() << std::endl;
+  }
 
-  std::cout << "GenP_PdgId.size() = " << GenP_PdgId.size() << std::endl;
-  std::cout << "GenP_PdgId.at("<<Indx<<") = " << GenP_PdgId.at(Indx) << std::endl;
-  std::cout << "GenP_Daughters.at(0).size() = " << GenP_Daughters.at(0).size() << std::endl;
-  
   if (GenP_Daughters.at(Indx).size() == 0) return;
   for (unsigned short i = 0; i< GenP_Daughters.at(Indx).size(); i++)
     {
@@ -420,8 +421,9 @@ void MCTools::GetHadronicTauFinalDaughters(Int_t Indx,
       if (ifound == 0) Daug.push_back(IndxDau);
     }
 
-    GetHadronicTauFinalDaughters(IndxDau,Daug);
+    GetHadronicTauFinalDaugh(IndxDau,Daug);
   }
+
   return;
 }
 
@@ -490,7 +492,7 @@ Bool_t MCTools::IsTriggerHadronicTau(const int iGenP,
 
   // Get hTau properties
   std::vector<unsigned short> hTau_Products;
-  GetHadronicTauFinalDaughters(iGenP, hTau_Products);
+  GetHadronicTauFinalDaugh(iGenP, hTau_Products);
   
   // Acceptance cuts using visible 4-momenta
   TLorentzVector hTau_visP4 = GetVisibleP4(hTau_Products);

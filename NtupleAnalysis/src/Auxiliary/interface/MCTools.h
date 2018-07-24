@@ -50,8 +50,7 @@ class MCTools : public virtual TreeDefinitionGenP
   
   // GenParticle GetGenParticle(unsigned int Index);
 
-  void GetHadronicTauFinalDaughters(Int_t Indx, 
-				    std::vector<unsigned short>& Daug);
+  void GetHadronicTauFinalDaugh(Int_t Indx, std::vector<unsigned short>& Daug);
 
   Int_t GetGenTauDecayMode(std::vector<unsigned short> Daug);
   

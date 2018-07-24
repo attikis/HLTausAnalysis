@@ -5,7 +5,7 @@
     "saveName"         : "DiTau_Eff_Calo",
     "saveFormats"      : [".png", ".pdf", ".C"],
     "saveDir"          : "plots",
-    "datasets"         : ["TT_TuneCUETP8M1_14TeV_NoPU"],
+    "datasets"         : ["TT_TuneCUETP8M2T4_14TeV_L1TPU140"],
     "normalizationToOne": "False",
     "rebinX"           : 1,
     "xlabel"           : "Calo E_{T} (GeV)",

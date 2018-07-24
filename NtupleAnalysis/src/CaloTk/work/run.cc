@@ -22,9 +22,10 @@ void run(const std::string MulticrabDir = "",
 
   // Marina's files 
   //const std::string absolutePath = "/afs/cern.ch/user/m/mtoumazo/workspace/multicrab";
+  const std::string absolutePath = "/eos/user/m/mtoumazo";
   
   // Mikko's files
-  const std::string absolutePath = "/eos/user/m/mlotti/";
+  //const std::string absolutePath = "/eos/user/m/mlotti";
   
   // Santeri's files
   // const std::string absolutePath = "/afs/cern.ch/work/s/slaurila/public/HLTaus/CMSSW_9_1_0_pre2/src/HLTausAnalysis/NtupleAnalysis/src/Tracking/work";

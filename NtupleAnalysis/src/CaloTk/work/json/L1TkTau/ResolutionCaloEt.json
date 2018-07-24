@@ -8,7 +8,7 @@
     "datasets"         : ["TT"],
     "normalization"    : "normalizeToOne",
     "rebinX"           : 1,
-    "xlabel"           : "(E_{T}^{gen}-E_{T}^{calo})/E_{T}^{gen}",
+    "xlabel"           : "(E_{T}^{calo}-p_{T}^{gen})/p_{T}^{gen}",
     "ylabel"           : "Events / %.1f",
     "drawStyle"        : "HIST",
     "legendStyle"      : "LF",
