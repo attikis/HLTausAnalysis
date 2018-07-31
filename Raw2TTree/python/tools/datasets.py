@@ -47,8 +47,8 @@ das = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglo
 #================================================================================================ 
 # PhaseIISpring17D
 #================================================================================================ 
-dasAll  = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset+dataset%3D%2F*%2F*PhaseIISpring17D*%2F*+status%3D*"
-dasDone = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset+dataset%3D%2F*%2F*PhaseIISpring17D*%2F*"
+dasAll  = "https://cmsweb.cern.ch/das/request?view=list&limit=100&instance=prod%2Fglobal&input=dataset%3D%2F*%2FPhaseIIFall17D*%2FGEN-SIM-DIGI-RAW"
+dasTauGun = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=%2FRelValSingleTauFlatPt2To100_pythia8%2FCMSSW_9_3_7*D17*%2FGEN-SIM-DIGI-RAW"
 das     = dasAll
 
 ## FOR PHASAE 2 L1 2017FALL SALMPLES: https://cmsweb.cern.ch/das/request?view=list&limit=100&instance=prod%2Fglobal&input=dataset%3D%2F*%2FPhaseIIFall17D*%2FGEN-SIM-DIGI-RAW
@@ -92,6 +92,8 @@ datasetsSinglePion = []
 #datasetsSinglePion.append(Dataset('/SinglePion_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
 
 datasetsSingleTau = []
+datasetsSingleTau.append(Dataset('/RelValSingleTauFlatPt2To100_pythia8/CMSSW_9_3_7-PU25ns_93X_upgrade2023_realistic_v5_2023D17PU200-v1/GEN-SIM-DIGI-RAW',dataVersion= "93Xmc", dasQuery=dasTauGun))
+datasetsSingleTau.append(Dataset('/RelValSingleTauFlatPt2To100_pythia8/CMSSW_9_3_7-93X_upgrade2023_realistic_v5_2023D17noPU-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=dasTauGun))
 #datasetsSingleTau.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
 #datasetsSingleTau.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
 #datasetsSingleTau.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
@@ -146,11 +148,11 @@ L1TauDatasets = []
 #L1TauDatasets.extend(datasetsTTbar)
 
 MyDatasets = []
-MyDatasets.extend(datasetsSingleNu)
-MyDatasets.extend(datasetsTT)
-MyDatasets.extend(datasetsH2tautau)
-MyDatasets.extend(datasetsChargedHiggs)
-
+#MyDatasets.extend(datasetsSingleNu)
+#MyDatasets.extend(datasetsTT)
+#MyDatasets.extend(datasetsH2tautau)
+#MyDatasets.extend(datasetsChargedHiggs)
+MyDatasets.extend(datasetsSingleTau)
 
 AllDatasets = []
 AllDatasets.extend(datasetsBs)
