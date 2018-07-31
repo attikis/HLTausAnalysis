@@ -36,7 +36,7 @@ class TreeReaderReco : public virtual TREEDEFINITIONRECO, public FileOpener
 
 TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string SampleName, TChain *chain)
 {
-  std::cout << "=== TreeReaderReco::TreeReaderReco()" << std::endl;
+  if (0) std::cout << "=== TreeReaderReco::TreeReaderReco()" << std::endl;
 
   // Check which trees exist to include them
   if (!CheckTreesExistence(SamplePath, SampleName)) exit(0);
@@ -60,7 +60,7 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
     fTracks               = new TChain("l1TrackTree/eventTree");//L1TrackTree");
     
     // Associated the ROOT files to the TChain
-    std::cout << "\tGetting ROOT files for dataset " << SampleName << " and adding them to the chain." << std::endl;
+    if (0) std::cout << "\tGetting ROOT files for dataset " << SampleName << " and adding them to the chain." << std::endl;
     
     // Add files to the Main Chain (Event)
     OpenFiles(SamplePath, SampleName, fMainChain);
@@ -81,8 +81,8 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
     // Set the Tree
     chain = fMainChain;
      
-    std::cout << "=== TreeReaderReco::TreeReaderReco()" << std::endl;
-    std::cout << "\tSet tree with name \"" << chain->GetName() << "\" as the principal tree." << std::endl;
+    if (0) std::cout << "=== TreeReaderReco::TreeReaderReco()" << std::endl;
+    if (0) std::cout << "\tSet tree with name \"" << chain->GetName() << "\" as the principal tree." << std::endl;
 
   }
 

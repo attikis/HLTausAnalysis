@@ -29,8 +29,11 @@ import HLTausAnalysis.NtupleAnalysis.tools.styles as styles
 import HLTausAnalysis.NtupleAnalysis.tools.plots as plots
 import HLTausAnalysis.NtupleAnalysis.tools.histograms as histograms
 import HLTausAnalysis.NtupleAnalysis.tools.aux as aux
+import HLTausAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 
 import ROOT
+ROOT.gROOT.SetBatch(True)
+from ROOT import *
 
 #================================================================================================
 # Main
@@ -44,13 +47,11 @@ def Print(msg, printHeader=False):
         print "\t", msg
     return
 
-
 def Verbose(msg, printHeader=True, verbose=False):
     if not opts.verbose:
         return
     Print(msg, printHeader)
     return
-
 
 def GetLumi(datasetsMgr):
     Verbose("Determininig Integrated Luminosity")
@@ -63,7 +64,6 @@ def GetLumi(datasetsMgr):
             lumi += d.getLuminosity()
     Verbose("Luminosity = %s (pb)" % (lumi), True )
     return lumi
-
 
 def GetDatasetsFromDir(opts, json):
     Verbose("Getting datasets")
@@ -92,21 +92,10 @@ def GetDatasetsFromDir(opts, json):
     
     
 def Plot(jsonfile, opts):
-    Verbose("Plotting")
 
     with open(os.path.abspath(jsonfile)) as jfile:
         j = json.load(jfile)
-        saveDir = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/CaloTk/L1TkTaus/"
-
-        Verbose("Plotting %s. Will save under \"%s\"" % (j["saveName"], saveDir), True)
-
-        # Setup the style
-        style = tdrstyle.TDRStyle()
-        style.setGridX(j["gridX"]=="True")
-        style.setGridY(j["gridY"]=="True")
-    
-        # Set ROOT batch mode boolean
-        ROOT.gROOT.SetBatch(opts.batchMode)
+        Verbose("Plotting %s. Will save under \"%s\"" % (j["saveName"], opts.saveDir), True)
 
         # Setup & configure the dataset manager
         datasetsMgr = GetDatasetsFromDir(opts, j)
@@ -125,34 +114,38 @@ def Plot(jsonfile, opts):
                 datasetsMgr.getDataset(d.getName()).setCrossSection(1.0)
 
         ## Print dataset information (before merge)        
-        #datasetsMgr.PrintInfo()
+        if 0:
+            datasetsMgr.PrintInfo()
         
         # Merge histograms (see NtupleAnalysis/python/tools/plots.py)    
         plots.mergeRenameReorderForDataMC(datasetsMgr)
 
         # Print dataset information (after merge)
-        #datasetsMgr.PrintInfo()
+        if 0:
+            datasetsMgr.PrintInfo()
 
         # Plot the histogram
-        MCPlot(datasetsMgr, j)
+        doPlots(datasetsMgr, j)
         return
 
 
-def MCPlot(datasetsMgr, json):
-    Verbose("Creating MC plot")
-        
+def doPlots(datasetsMgr, json):
+
     # Create the MC Plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
     ylabel_ = json["ylabel"]
     if json["normalization"]=="normalizeToLumi":
         kwargs = {}
-        p = plots.MCPlot(datasetsMgr, json["histograms"][0], normalizeToLumi=opts.intLumi, **kwargs)
+        p = plots.MCPlot(datasetsMgr, json["histograms"][0], normalizeToLumi=opts.intLumi, saveFormats=[]) #**kwargs)
+
     elif json["normalization"]=="normalizeToOne":
         ylabel_ = ylabel_.replace(json["ylabel"].split(" /")[0], "Arbitrary Units")
         kwargs  = {json["normalization"]: True}
-        p = plots.MCPlot(datasetsMgr, json["histograms"][0], **kwargs)
+        p = plots.MCPlot(datasetsMgr, json["histograms"][0], saveFormats=[], normalizeToOne=True)
+
         # Customize binwidth on y axis title
         binWidth = p.histoMgr.getHistos()[0].getRootHisto().GetXaxis().GetBinWidth(0)
         ylabel_ = ylabel_.replace(json["ylabel"].split(" /")[-1], GetBinwidthDecimals(binWidth)) 
+
     else:
         raise Exception("Invalid normalization \"%s\"" % (json["normalization"]) )
 
@@ -183,15 +176,14 @@ def MCPlot(datasetsMgr, json):
     histograms.addText(json["extraText"].get("x"), json["extraText"].get("y"), json["extraText"].get("text"), json["extraText"].get("size") )
     
     # Draw a customised plot
-    saveDir  = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/CaloTk/L1TkTaus/"
-    saveName = os.path.join(saveDir, json["saveName"])
+    saveName = json["saveName"]
 
+    # Draw the plot
     plots.drawPlot(p, 
                    saveName,                  
                    xlabel            = json["xlabel"], 
                    ylabel            = ylabel_,
                    rebinX            = json["rebinX"],
-                   #rebinY            = json["rebinY"], 
                    stackMCHistograms = json["stackMCHistograms"]=="True", 
                    addMCUncertainty  = json["addMCUncertainty"]=="True" and json["normalization"]!="normalizeToOne",
                    addLuminosityText = json["addLuminosityText"]=="True",
@@ -202,8 +194,7 @@ def MCPlot(datasetsMgr, json):
                    #opts2             = json["ratioOpts"],
                    log               = json["logY"]=="True", 
                    errorBarsX        = json["errorBarsX"]=="True", 
-                   moveLegend        = {"dx": -0.11, "dy": -0.01, "dh": -0.13},#json["moveLegend"],
-                   # cutLine           = json["cutValue"], #cannot have this and "cutBox" defined
+                   moveLegend        = {"dx": -0.11, "dy": -0.01, "dh": -0.13},
                    cutBox            = {"cutValue": json["cutValue"], "fillColor": json["cutFillColour"], "box": json["cutBox"]=="True", "line": json["cutLine"]=="True", "greaterThan": json["cutGreaterThan"]=="True"},
                    #ratio             = json["ratio"]=="True",
                    #ratioInvert       = json["ratioInvert"]=="True",
@@ -217,16 +208,7 @@ def MCPlot(datasetsMgr, json):
         p.removeLegend()
 
     # Save in all formats chosen by user
-    saveFormats = [".pdf"]
-    for i, ext in enumerate(saveFormats):
-        saveNameURL = saveName + ext
-        saveNameURL = saveNameURL.replace("/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/", "https://cmsdoc.cern.ch/~mtoumazo/hltaus/")
-        if opts.url:
-            Print(saveNameURL, 1)
-        else:
-            Print(saveName + ext, 1)
-        p.saveAs(saveName, formats=saveFormats)
-            
+    aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, opts.url)
     return
 
 
@@ -250,7 +232,15 @@ def GetBinwidthDecimals(binWidth):
 
 
 def main(opts):
-    Verbose("main function")
+    
+    # The available ROOT options for the Error-Ignore-Level are (const Int_t):  
+    ROOT.gErrorIgnoreLevel=0 # kUnset=-1, kPrint=0, kInfo=1000, kWarning=2000, kError=3000, kBreak=4000
+
+    # Apply TDR style
+    style = tdrstyle.TDRStyle()
+    style.setGridX(opts.gridX)
+    style.setGridY(opts.gridY)
+    style.setOptStat(False)
 
     jsonFiles = []
     # For-loop: All system script arguments
@@ -283,7 +273,9 @@ def main(opts):
     # For-loop: All json files
     for j in jsonFiles:
         Print("Processing JSON file \"%s\"" % (j), True)
-        Plot(j, opts)    
+        Plot(j, opts) 
+
+    Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
     return
 
 
@@ -294,9 +286,13 @@ if __name__ == "__main__":
 
     # Default Settings 
     global opts
-    BATCHMODE = True
-    VERBOSE   = False
-    INTLUMI   = 1.0
+    BATCHMODE   = True
+    VERBOSE     = False
+    INTLUMI     = 1.0
+    SAVEDIR     = None
+    SAVEFORMATS = [".C", ".png", ".pdf"]
+    GRIDX       = False
+    GRIDY       = False    
 
     parser = OptionParser(usage="Usage: %prog [options]" , add_help_option=False,conflict_handler="resolve")
 
@@ -318,8 +314,21 @@ if __name__ == "__main__":
     parser.add_option("-e", "--excludeTasks", dest="excludeTasks", action="store", 
                       help="List of datasets in mcrab to exclude")
 
+    parser.add_option("--saveDir", dest="saveDir", type="string", default=SAVEDIR,
+                      help="Directory where all pltos will be saved [default: %s]" % SAVEDIR)
+
+    parser.add_option("--gridX", dest="gridX", action="store_true", default=GRIDX,
+                      help="Enable x-axis grid? [default: %s]" % (GRIDX) )
+    
+    parser.add_option("--gridY", dest="gridY", action="store_true", default=GRIDY,
+                      help="Enable y-axis grid? [default: %s]" % (GRIDY) )
+
     parser.add_option("--url", dest="url", action="store_true", default=False,
                       help="Don't print the actual save path the histogram is saved, but print the URL instead [default: %s]" % False)
+
+    parser.add_option("--formats", dest="formats", default = None,
+                      help="Formats in which all plots will be saved in. Provide as list of comma-separated (NO SPACE!) formats. [default: None]")
+
 
     (opts, parseArgs) = parser.parse_args()
 
@@ -328,6 +337,16 @@ if __name__ == "__main__":
         Print("Not enough arguments passed to script execution. Printing docstring & EXIT.")
         print __doc__
         sys.exit(0)
+
+    # Determine path for saving plots
+    if opts.saveDir == None:
+        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="", postfix="Test")
+
+    # Overwrite default save formats?
+    if opts.formats != None:
+        opts.saveFormats = opts.formats.split(",")
+    else:
+        opts.saveFormats = SAVEFORMATS
 
     # Call the main function
     main(opts)

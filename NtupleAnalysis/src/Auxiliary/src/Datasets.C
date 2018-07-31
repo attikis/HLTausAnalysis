@@ -45,7 +45,6 @@ void Datasets::PrintSamples(const string mcProduction,
 
   // First create the tables for the known MC Productions
   if (datasets_TTI2023Updg14D.size() < 1 ) CreateMcProductions_();
-  if (datasets_TTI2023Updg14D.size() < 1 ) CreateMcProductions_();
 
   // Check that the mcProduction variable is valid
   IsValidMcProduction_(mcProduction, myDatasets);
@@ -64,8 +63,8 @@ void Datasets::IsValidMcProduction_(const string mcProduction,
 {
 
   // Declare currently supported MC-Productions
-  mcProductions.push_back("2023TTIUpg14");
-  mcProductions.push_back("PhaseIISpring17D");
+  // mcProductions.push_back("2023TTIUpg14");     // obsolete
+  // mcProductions.push_back("PhaseIISpring17D"); // obsolete 
   mcProductions.push_back("PhaseIIFall17D");
 
   // Check if the selected MC Prodution is valid
@@ -79,7 +78,7 @@ void Datasets::IsValidMcProduction_(const string mcProduction,
   }
 
   // If this is reached then the MC-Production is invalid  
-  cout << "\nE R R O R ! Datasets::PrintSamples(...) - Unknown MC Production \"" << mcProduction << "\"." << endl;
+  cout << "=== Datasets::PrintSamples() - Unknown MC Production \"" << mcProduction << "\"." << endl;
   cout << "EXIT" << endl;
   exit(1);
       
@@ -102,7 +101,7 @@ void Datasets::IsValidDatasetName(const string datasetName)
   }
   
   // If this is reached then the dataset sample is invalid
-  cout << "\nE R R O R ! Datasets::IsValidDataset(...) - Unknown dataset name \"" << datasetName << "\". See below all available dataset names." << endl;
+  cout << "=== Datasets::IsValidDataset() - Unknown dataset name \"" << datasetName << "\". See below all available dataset names." << endl;
   for( int iD = 0 ; iD < (int) datasets_TTI2023Updg14D.size(); iD++){
     cout << "\"" << datasets_TTI2023Updg14D.at(iD).datasetPath_ << "\"" << endl;
   }
@@ -120,8 +119,8 @@ void Datasets::IsValidDatasetAlias(const string datasetName)
 
 
   // First create the tables for the known MC Productions
-  if (datasets_TTI2023Updg14D.size() < 1 )   CreateMcProductions_();
-  if (datasets_PhaseIISpring17D.size() < 1 ) CreateMcProductions_();
+  // if (datasets_TTI2023Updg14D.size() < 1 )   CreateMcProductions_(); // obsolete
+  // if (datasets_PhaseIISpring17D.size() < 1 ) CreateMcProductions_(); // obsolete
   if (datasets_PhaseIIFall17D.size() < 1 ) CreateMcProductions_();
 
 
@@ -144,15 +143,18 @@ void Datasets::IsValidDatasetAlias(const string datasetName)
     }
 
 
-
-
   // If this is reached then the dataset sample is invalid
-  cout << "\nE R R O R ! Datasets::IsValidDatasetAlias(...) - Unknown dataset alias \"" << datasetName << "\". See below all available dataset aliases. EXIT" << endl;
-  PrintDatasetsVector_(datasets_TTI2023Updg14D, "Text", true);
+  cout << "=== Datasets::IsValidDatasetAlias() - Unknown dataset alias \"" << datasetName << "\". See below all available dataset aliases. EXIT" << endl;
+
+  // TTI2023Updg14D 
+  if (0) PrintDatasetsVector_(datasets_TTI2023Updg14D, "Text", true);
   cout << "" << endl;
-  PrintDatasetsVector_(datasets_PhaseIISpring17D, "Text", true);
-  cout << "EXIT" << endl;
-  PrintDatasetsVector_(datasets_PhaseIIFall17D, "Text", true);
+
+  // PhaseIISpring17D
+  if (0) PrintDatasetsVector_(datasets_PhaseIISpring17D, "Text", true);
+
+  // PhaseIIFall17D
+  if (1) PrintDatasetsVector_(datasets_PhaseIIFall17D, "Text", true);
   cout << "EXIT" << endl;
   exit(1);
   
@@ -348,10 +350,7 @@ void Datasets::CreateMcProductions_(void)
   Datasets HPlus1000PU140_PhaseIIFall17D ( "ChargedHiggs1000_14TeV_L1TPU140"  , "PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PhaseIIFall17D_L1TPU140_93X" , "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV" + path_PU140_v2, CP, cmssw, geometry, 140, 100000, 37, 1);
   Datasets HPlus1000PU200_PhaseIIFall17D ( "ChargedHiggs1000_14TeV_L1TPU200"  , "PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PhaseIIFall17D_L1TPU200_93X" , "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV" + path_PU200_v2, CP, cmssw, geometry, 200, 100000, 37, 1);
 
-
-
-  datasets_PhaseIIFall17D.push_back(SinglePionNoPU_PhaseIIFall17D);
-
+  // datasets_PhaseIIFall17D.push_back(SinglePionNoPU_PhaseIIFall17D);
   datasets_PhaseIIFall17D.push_back(TTNoPU_PhaseIIFall17D);
   datasets_PhaseIIFall17D.push_back(TTPU140_PhaseIIFall17D);
   datasets_PhaseIIFall17D.push_back(TTPU200_PhaseIIFall17D);
@@ -386,8 +385,8 @@ Datasets Datasets::GetDataset(const string datasetAlias)
   bool bSuccess = false;
 
   // First create the tables for the known MC Productions
-  if (datasets_TTI2023Updg14D.size() < 1 ) CreateMcProductions_();
-  if (datasets_PhaseIISpring17D.size() < 1 ) CreateMcProductions_();
+  // if (datasets_TTI2023Updg14D.size() < 1 ) CreateMcProductions_();   // obsolete
+  // if (datasets_PhaseIISpring17D.size() < 1 ) CreateMcProductions_(); // obsolete
   if (datasets_PhaseIIFall17D.size() < 1 ) CreateMcProductions_();
 
 
@@ -418,7 +417,7 @@ Datasets Datasets::GetDataset(const string datasetAlias)
 
     
   if(!bSuccess){
-    cout << "\nE R R O R ! Datasets::GetDataset(...) - Unexpected error! Could not find dataset alias \"" << datasetAlias << "\"." << endl;
+    cout << "=== Datasets::GetDataset() - Unexpected error! Could not find dataset alias \"" << datasetAlias << "\"." << endl;
     exit(1);
   }
 
@@ -434,8 +433,8 @@ const string Datasets::GetDatasetPathFromAlias(const string datasetAlias)
   string datasetPath = "none";
 
   // First create the tables for the known MC Productions
-  if (datasets_TTI2023Updg14D.size() < 1 )   CreateMcProductions_();
-  if (datasets_PhaseIISpring17D.size() < 1 ) CreateMcProductions_();
+  // if (datasets_TTI2023Updg14D.size() < 1 )   CreateMcProductions_(); // obsolete
+  // if (datasets_PhaseIISpring17D.size() < 1 ) CreateMcProductions_(); // obsolete
   if (datasets_PhaseIIFall17D.size() < 1 ) CreateMcProductions_();
 
   // Ensure that the supplied sample name is valids
@@ -466,7 +465,7 @@ const string Datasets::GetDatasetPathFromAlias(const string datasetAlias)
   }
   
   // If this is reached then the dataset sample is invalid
-  cout << "\nE R R O R ! Datasets::GetDatasetPathFromAlias(...) - Unexpected error! Could not find dataset path for dataset alias \"" << datasetAlias << "\"." << endl;
+  cout << "=== Datasets::GetDatasetPathFromAlias() - Unexpected error! Could not find dataset path for dataset alias \"" << datasetAlias << "\"." << endl;
   cout << "EXIT" << endl;
   exit(1);
 

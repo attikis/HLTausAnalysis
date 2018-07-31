@@ -1,5 +1,9 @@
 #! /usr/bin/env python
 
+
+#================================================================================================
+# Imports
+#================================================================================================
 import sys
 import os
 import hashlib
@@ -9,7 +13,154 @@ import stat
 import ROOT
 import OrderedDict
 import HLTausAnalysis.NtupleAnalysis.tools.git as git
+import getpass
+import socket  
 
+#================================================================================================
+# Function definition
+#================================================================================================
+def Verbose(msg, printHeader=True):
+    '''
+    Calls Print() only if verbose options is set to true
+    '''
+    #if not opts.verbose:
+    if 1:
+        return
+    Print(msg, printHeader)
+    return
+
+def Print(msg, printHeader=True):
+    '''
+    Simple print function. If verbose option is enabled prints, otherwise does nothing
+    '''
+    fName = __file__.split("/")[-1]
+    if printHeader:
+        print "=== ", fName
+    print "\t", msg
+    return
+
+def PrintFlushed(msg, printHeader=True):
+    '''
+    Useful when printing progress in a loop
+    '''
+    msg = "\r\t" + msg
+    ERASE_LINE = '\x1b[2K'
+    if printHeader:
+        print "=== aux.py"
+    sys.stdout.write(ERASE_LINE)
+    sys.stdout.write(msg)
+    sys.stdout.flush()
+    return
+
+def IsTH1(h, raiseExcept=False):
+    if not isinstance(h, ROOT.TH1):
+        msg = "Expected object of type ROOT.TH1, got \"%s\" instead" % (type(h))
+        if raiseExcept:
+            raise Exception(ShellStyles.ErrorStyle() + msg + ShellStyles.NormalStyle())
+        return False
+    else:
+        return True
+
+def SavePlot(plot, saveDir, saveName, saveFormats, url):
+    Verbose("Saving the plot in %s formats: %s" % (len(saveFormats), ", ".join(saveFormats) ) )
+
+     # Check that path exists
+    if not os.path.exists(saveDir):
+        Verbose("Directory \"%s\" does not exist. Creating it!" % (saveDir), True)
+        os.makedirs(saveDir)
+    else:
+        Verbose("Directory \"%s\" already exists. No need to create it." % (saveDir), True)
+
+    # Create the name under which plot will be saved
+    savePath = os.path.join(saveDir, saveName.replace("/", "_"))
+
+    # For-loop: All save formats
+    for i, ext in enumerate(saveFormats):
+        saveNameURL = savePath + ext
+        saveNameURL = convertToURL(saveNameURL, url)
+        Verbose(saveNameURL, i==0)
+        plot.saveAs(savePath, formats=saveFormats)
+    return
+
+def GetDecimalFormat(value):
+    if value == 0.0:
+        decFormat = "%.0f" % value
+    elif abs(value) >= 1.0:
+        decFormat = "%.0f" % value
+    elif abs(value) >= 0.1:
+        decFormat = "%.1f" % value
+    elif abs(value) >= 0.01:
+        decFormat = "%.2f" % value
+    elif abs(value) >= 0.001:
+        decFormat = "%.3f" % value
+    else:
+        decFormat = "%.4f" % value
+    return decFormat
+
+def GetTH1BinWidthString(myTH1, iBin):
+    IsTH1(myTH1, raiseExcept=True)
+
+    width = myTH1.GetBinWidth(iBin)
+    return GetDecimalFormat(width)
+
+def GetTH1BinRangeString(myTH1, iBin):
+    IsTH1(myTH1, raiseExcept=True)
+
+    lowEdge   = myTH1.GetXaxis().GetBinLowEdge(iBin)
+    upEdge    = myTH1.GetXaxis().GetBinUpEdge(iBin)
+    rangeStr  = GetDecimalFormat(lowEdge)
+    rangeStr += " -> "
+    rangeStr += GetDecimalFormat(upEdge)
+    return rangeStr
+
+def PrintTH1Info(myTH1):
+    '''
+    Generic histogram prints detailed tabled
+    with the properties of a ROOT.TH1 instance object
+    '''
+    if not IsTH1(myTH1):
+        Print("Cannot print TH1 Info. Not a ROOT.TH1 object type (type=%s)" % (type(myTH1)), True)
+        return
+
+    # Constuct the table
+    table  = []
+    align  = "{:>5} {:>10} {:^20} {:>15} {:^3} {:<10} {:>15} {:^3} {:<10}"
+    header = align.format("Bin", "Bin Width", "Bin Range", "Bin Content", "+/-", "Error", "Cum. Integral", "+/-", "Error")
+    hLine  = "="*100
+
+    # Create table
+    table.append("{:^100}".format(myTH1.GetName()))
+    table.append(hLine)
+    table.append(header)
+    table.append(hLine)
+
+    # For-loop: All bins
+    h = myTH1
+    for j in range(0, myTH1.GetNbinsX()+1):
+        binWidth      = GetTH1BinWidthString(myTH1, j)
+        #binRange      = "%.1f -> %.1f" % (h.GetXaxis().GetBinLowEdge(j), h.GetXaxis().GetBinUpEdge(j) )
+        binRange      = GetTH1BinRangeString(myTH1, j)
+        binContent    = "%.2f" % h.GetBinContent(j)
+        binError      = "%.2f" % h.GetBinError(j)
+        integralError = ROOT.Double(0.0)
+        integral      = h.IntegralAndError(0, j, integralError, "")
+        table.append(align.format(j, binWidth, binRange, binContent, "+/-", binError,"%.2f" % integral, "+/-", "%.2f" % integralError))
+    table.append(hLine)
+    table.append("")
+
+    for l in table:
+        Print(l, False)
+    return
+
+def rchop(myString, endString):
+    '''
+    if myString ends with "/" return it without the "/"
+    else return as is
+    '''
+    if myString.endswith(endString):
+        return myString[:-len(endString)]
+    return myString
+            
 def cmsswVersion():
     if "CMSSW_VERSION" in os.environ:
         return os.environ["CMSSW_VERSION"]
@@ -65,6 +216,65 @@ def swap(list,n1,n2):
     tmp = list[n1]
     list[n1] = list[n2]
     list[n2] = tmp
+
+def getSaveDirPath(pseudocrabDir, prefix="", postfix="", pseudocrabDir2=None):
+    '''
+    return the save dir path for all plotting scripts in this format:
+    saveDir = <baseDir>/<prefix>/<pseudocrabDir>/<postFix>
+
+    For LPC (FNAL):
+    <baseDir> = "/publicweb/%s/%s/" % (getpass.getuser()[0], getpass.getuser())
+    For LXPLUS (CERN):
+    <baseDir> = "/afs/cern.ch/user/%s/%s/public/html" % (getpass.getuser()[0], getpass.getuser())
+    '''
+    # Remove trailing "/" if any
+    pseudocrabDir = rchop(pseudocrabDir, "/")
+
+    # If path contains other subDirs keep the last dir name
+    if len(pseudocrabDir.split("/")) > 1:
+        saveDir_1 = pseudocrabDir.split("/")[-1]
+    else:
+        saveDir_1 = pseudocrabDir
+
+    # Determine <baseDir> according to hostname (CERN, FNAL)
+    if "cern.ch" in socket.gethostname().lower():
+        baseDir = "/afs/cern.ch/user/%s/%s/public/html" % (getpass.getuser()[0], getpass.getuser())
+    elif "fnal.gov" in socket.gethostname().lower():
+        baseDir = "/publicweb/%s/%s/" % (getpass.getuser()[0], getpass.getuser())
+    else:
+        baseDir = ""
+
+    # Put everything together to get the final path
+    if pseudocrabDir2 == None:
+        saveDir = os.path.join(baseDir, prefix, saveDir_1, postfix)
+    else:
+        # Is there a secondmulticrab in the save path? (Use-case: Data-Driven plots)
+        pseudocrabDir2 = rchop(pseudocrabDir2, "/")
+        if len(pseudocrabDir2.split("/")) > 1:
+            saveDir_2 = pseudocrabDir2.split("/")[-1]
+        else:
+            saveDir_2 = pseudocrabDir2
+        saveDir = os.path.join(baseDir, prefix, saveDir_1, saveDir_1, postfix)
+    return saveDir
+
+def convertToURL(path, url=False):
+    if not url:
+        return path
+
+    # Determine path according to hostname (CERN, FNAL)
+    if "cern.ch" in socket.gethostname().lower():
+        url  = "https://cmsdoc.cern.ch/~%s/" % (getpass.getuser())
+        base = "/afs/cern.ch/user/%s/%s/public/html" % (getpass.getuser()[0], getpass.getuser())
+    elif "fnal.gov" in socket.gethostname().lower():
+        url  = "http://home.fnal.gov/~%s/" % (getpass.getuser())
+        base = "/publicweb/%s/%s/" % (getpass.getuser()[0], getpass.getuser())
+    else:
+        raise Exception("Cannot determine URL path for host %s" % socket.gethostname())
+
+    # Get the URL path
+    pathURL = path.replace(base, url)
+    return pathURL
+
 
 def addConfigInfo(of, dataset, addLuminosity=True, dataVersion=None, additionalText={}):
     d = of.mkdir("configInfo")

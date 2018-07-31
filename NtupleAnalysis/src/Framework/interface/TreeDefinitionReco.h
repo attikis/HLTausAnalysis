@@ -732,7 +732,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
   // Init() will be called many times when running on PROOF
   // (once per file to be processed).
 
-  cout << "=== TreeDefinitionReco::InitReco()" << endl;
+  if (0) cout << "=== TreeDefinitionReco::InitReco()" << endl;
   
   // Event
   run      = 0;
@@ -840,7 +840,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
   mEmu_finalORVeto    = false; 
   mEmu_preScColumn    = 0;
 
-  cout << "\tSetting branch addresses and branch pointers." << endl;
+  if (0) cout << "\tSetting branch addresses and branch pointers." << endl;
   if (!chain) return;
   fChain = chain ;
   fCurrent = -1;
