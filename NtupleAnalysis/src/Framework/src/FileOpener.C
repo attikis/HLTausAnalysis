@@ -24,12 +24,14 @@ TChain* FileOpener::OpenFiles(const string multicrabPath, const string dataset, 
   vector<string> dirs      = GetListOfFiles(fullPath);
 
   // Sanity check
-  if (dirs.size() < 1)
-    {
-      cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << "! EXIT" << endl;
-      exit(1);      
-    }
-  else cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << endl;
+  if (0) {
+    if (dirs.size() < 1)
+      {
+	cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << "! EXIT" << endl;
+	exit(1);      
+      }
+    else cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << endl;
+  }
 
   // For-loop: All ROOT files
   for (vector<string>::iterator f = dirs.begin(); f != dirs.end(); f++)
@@ -72,7 +74,6 @@ string FileOpener::GetFirstFileName(const string multicrabPath, const string dat
 
   vector<string>::iterator f = dirs.begin();
   rootFileName = *f;
-  cout << "\tOpening file " << rootFileName << endl;
 
   ifstream file(rootFileName);
   

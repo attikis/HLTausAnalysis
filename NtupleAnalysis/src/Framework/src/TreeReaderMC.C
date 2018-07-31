@@ -60,6 +60,7 @@ void TreeReaderMC::GetHadronicTauFinalDaughters(GenParticle p,
   // pdgIds.push_back(20213); // alpha1(1260)+ 
     
 
+  // First Check that there is no lepton decay  
   // For-loop: All daughters
   for (unsigned int i = 0; i < p.daughtersIndex().size(); i++) 
     {
@@ -68,6 +69,16 @@ void TreeReaderMC::GetHadronicTauFinalDaughters(GenParticle p,
       GenParticle d      = GetGenParticle(index);
       int genD_pdgId     = abs(d.pdgId());
 
+      if ((genD_pdgId == 11) || (genD_pdgId == 12) || (genD_pdgId == 13) || (genD_pdgId == 14)) return;
+    }
+
+  // For-loop: All daughters
+  for (unsigned int i = 0; i < p.daughtersIndex().size(); i++)
+    {
+
+      unsigned int index = p.daughtersIndex().at(i);
+      GenParticle d      = GetGenParticle(index);
+      int genD_pdgId     = abs(d.pdgId());
 
       // Check if particle is of interest
       if ( std::find(pdgIds.begin(), pdgIds.end(), genD_pdgId) == pdgIds.end() )
@@ -255,7 +266,20 @@ vector<GenParticle> TreeReaderMC::GetHadronicGenTaus(vector<GenParticle> GenTaus
       bool bIsHadronicTau = (tau->finalDaughtersCharged().size() > 0);
 
       if (0) tau->PrintFinalDaughters();
-
+      /*
+      // marina :start
+      if (tau->finalDaughtersCharged().size() < 2){ 
+	// For-loop: All daughters                                                                                             
+	for (unsigned int i = 0; i < tau->daughtersIndex().size(); i++)
+	  {
+	    unsigned int index = tau->daughtersIndex().at(i);
+	    GenParticle d      = GetGenParticle(index);
+	    int genD_pdgId     = abs(d.pdgId());
+	    cout << genD_pdgId <<endl;
+	  }
+      }
+      // marina :end 
+      */
       // Apply acceptance cuts
       bool bPassVisEt  = ( tau->p4vis().Et() >= visEt);
       bool bPassVisEta = ( abs(tau->p4vis().Eta()) <= visEta );
