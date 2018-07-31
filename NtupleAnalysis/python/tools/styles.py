@@ -489,6 +489,14 @@ def getCaloStyle(i):
     else:
         styles[index]
 
+def getCaloStyleAlt(i):
+    if i==0:
+        return caloStyle1
+    elif i==1:
+        return caloStyle2
+    else:
+        styles[index]
+
 def getCaloTkStyle():
     return caloTkStyle
 
@@ -551,5 +559,13 @@ def getCaloLegend(i):
         return "CaloTk #it{Vtx Iso}"
     elif i==3:
         return "CaloTk #it{Rel Iso}"
+    else:
+        return "Unknown"
+
+def getCaloLegendAlt(i):
+    if i==0:
+        return "Tracks + e/#gamma"
+    elif i==1:
+        return "Tracks + e/#gamma #it{Rel Iso}"
     else:
         return "Unknown"

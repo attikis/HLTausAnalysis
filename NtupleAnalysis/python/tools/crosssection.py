@@ -202,11 +202,11 @@ backgroundCrossSections = CrossSectionList(
     CrossSection("SingleNeutrino", {
             "13": 1.0, # Unknown. Dummy value.
     }),
-    CrossSection("SingleTau_NoPU", {
+    CrossSection("SingleTau_L1TnoPU", {
         "13": 1.0, 
         "14": 1.0,
     }),
-    CrossSection("SingleTau_PU140", {
+    CrossSection("SingleTau_L1TPU140", {
         "13": 1.0, 
         "14": 1.0,
     }),

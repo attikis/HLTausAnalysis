@@ -128,8 +128,11 @@ _physicalMcAdd = {
     "TT_TuneCUETP8M2T4_14TeV_L1TPU140" : "TT_TuneCUETP8M2T4_14TeV_L1TPU140",
     "TT_TuneCUETP8M2T4_14TeV_L1TPU200" : "TT_TuneCUETP8M2T4_14TeV_L1TPU200",
     
-    "SingleNeutrino_PhaseIIFall17D_L1TPU140_93X"       : "SingleNeutrino_L1TPU140",
-    "SingleNeutrino_PhaseIIFall17D_L1TPU200_93X"       : "SingleNeutrino_L1TPU200",
+    "SingleTau_L1TnoPU"             : "SingleTau_L1TnoPU",
+    "SingleTau_L1TPU200"            : "SingleTau_L1TPU200",
+        
+    "SingleNeutrino_L1TPU140"       : "SingleNeutrino_L1TPU140",
+    "SingleNeutrino_L1TPU200"       : "SingleNeutrino_L1TPU200",
     
     "ChargedHiggs200_14TeV_L1TnoPU"    : "ChargedHiggs200_14TeV_L1TnoPU", 
     "ChargedHiggs200_14TeV_L1TPU140"   : "ChargedHiggs200_14TeV_L1TPU140", 
@@ -261,6 +264,9 @@ _physicalToLogical.update({
     "TT_TuneCUETP8M2T4_14TeV_L1TPU140"  : "TT_TuneCUETP8M2T4_14TeV_L1TPU140",
     "TT_TuneCUETP8M2T4_14TeV_L1TPU200"  : "TT_TuneCUETP8M2T4_14TeV_L1TPU200",
     
+    "SingleTau_L1TnoPU"             : "SingleTau_L1TnoPU",
+    "SingleTau_L1TPU200"            : "SingleTau_L1TPU200",
+
     "SingleNeutrino_L1TPU140"       : "SingleNeutrino_L1TPU140",
     "SingleNeutrino_L1TPU200"       : "SingleNeutrino_L1TPU200",
 
@@ -455,6 +461,9 @@ _datasetOrder.extend([
     "SingleNeutrino_L1TPU140",
     "SingleNeutrino_L1TPU200",
     
+    "SingleTau_L1TnoPU",
+    "SingleTau_L1TPU200",
+
     "TT_TuneCUETP8M2T4_14TeV_L1TnoPU",
     "TT_TuneCUETP8M2T4_14TeV_L1TPU140",
     "TT_TuneCUETP8M2T4_14TeV_L1TPU200",
@@ -599,6 +608,9 @@ _legendLabels = {
     "SingleNeutrino_L1TPU140": "MB",
     "SingleNeutrino_L1TPU200": "MB",
 
+    "SingleTau_L1TnoPU"  : "Single #tau",
+    "SingleTau_L1TPU200" : "Single #tau",
+
     "TT_TuneCUETP8M2T4_14TeV_L1TnoPU"  : "t#bar{t}",
     "TT_TuneCUETP8M2T4_14TeV_L1TPU140"  : "t#bar{t}",
     "TT_TuneCUETP8M2T4_14TeV_L1TPU200"  : "t#bar{t}",
@@ -716,6 +728,9 @@ _plotStyles = {
     #Fall17D
     "SingleNeutrino_L1TPU140"       : styles.SingleNeutrinoPU140,
     "SingleNeutrino_L1TPU200"       : styles.SingleNeutrinoPU200,
+
+    "SingleTau_L1TnoPU"  : styles.SingleTauNoPU,
+    "SingleTau_L1TPU200" : styles.SingleTauPU200,
 
     "TT_TuneCUETP8M2T4_14TeV_L1TnoPU" : styles.TTBarNoPU,
     "TT_TuneCUETP8M2T4_14TeV_L1TPU140": styles.TTBarPU140,
