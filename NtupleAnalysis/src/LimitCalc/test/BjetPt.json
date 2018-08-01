@@ -1,0 +1,15 @@
+{
+    "title"           : "AngularPlane",
+    "histogram"       : "ForDataDrivenCtrlPlots/BtagDiscriminator_AfterAllSelections",
+    "outputdir"       : "TestingPlots",
+    "samples"         : ["TT","QCD","HplusTB_M200","HplusTB_M500"],
+    "rebinx"          : 1,
+    "rebiny"          : 1,
+    "xlabel"          : "x",
+    "ylabel"          : "y",
+    "divideByBinWidth": "False",
+    "logy"            : "False",
+    "logx"            : "False",
+    "drawStyle"       : "",
+    "opts"            : {"ymin": 0, "ymax": 180}
+}
