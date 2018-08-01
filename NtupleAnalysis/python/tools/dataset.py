@@ -4683,7 +4683,7 @@ class DatasetManagerCreator:
                 value = _args[name]
                 if value is not None:
                     parameters.append("%s='%s'" % (name, value))
-        Print("Creating DatasetManager with %s" % (", ".join(parameters)), True )
+        Verbose("Creating DatasetManager with %s" % (", ".join(parameters)), True )
 
         # Create manager and datasets
         dataEra = _args.get("dataEra", None)
