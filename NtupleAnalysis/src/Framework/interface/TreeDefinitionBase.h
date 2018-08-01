@@ -5,7 +5,7 @@
 #include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisCaloTPDataFormat.h"
 #include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisL1CaloTowerDataFormat.h"
 #include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisL1CaloClusterDataFormat.h"
-#include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisCustomGeneratorDataFormat.h"
+// #include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisCustomGeneratorDataFormat.h"
 #include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisEventDataFormat.h"
 #include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisL1UpgradeTfMuonDataFormat.h"
 #include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisBMTFInputsDataFormat.h"

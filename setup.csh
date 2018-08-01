@@ -8,10 +8,10 @@
 # Note:
 # tested so far LOCATION="" and LOCATION="jade"
 #================================================================================================
-if ( $?HLTAUSANALYSIS_BASE ) then
-    echo "Standalone environment already loaded"
-    exit
-endif
+# if ( $?HLTAUSANALYSIS_BASE ) then
+#     echo "Standalone environment already loaded"
+#     exit
+# endif
 
 set LOCATION=""
 if ( $?CMSSW_BASE ) then
@@ -32,51 +32,56 @@ if ( $LOCATION == "" ) then
     endif
 endif
 
-
 # Set the HLTausAnalysis base directory
 setenv HLTAUSANALYSIS_BASE $PWD
-
 
 set LD_LIBRARY_PATH_APPEND=""
 if ( $LOCATION == "lxplus" || $LOCATION == "lxbatch" ) then
     echo "=== Sourcing $LOCATION environments (Hand-picked from CMSSW_7_6_5). To update these follow the instutions below:"
     echo "1) create a developer area (cmsrel):"
     echo "cmsrel CMSWW_X_Y_Z"
-    echo "2) source the CMSSW environment (cmsenv):"
-    echo "cd  CMSWW_X_Y_Z/src/"
+    echo "\n2) source the CMSSW environment (cmsenv):"
+    echo "cd CMSWW_X_Y_Z/src/"
     echo "cmcsev"
-    echo "3) Look the new paths with 'scram tool list' and 'scram tool info'"
+    echo "\n3) Look the new paths with 'scram tool list' and 'scram tool info'"
     echo "[See setup.csh for more details]"
        
+    # SCRAM architecture
+    set SCRAM_ARCH=slc6_amd64_gcc630
+    setenv SCRAM_ARCH ${SCRAM_ARCH}
+
     # scram tool info gcc-cxxcompiler (Look for GCC_CXXCOMPILER_BASE)
-    set GCC_BASE=/cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/gcc/4.9.3
-    #echo "=== GCC_BASE=${GCC_BASE}"
+    set GCC=/cvmfs/cms.cern.ch/${SCRAM_ARCH}/external/
+    set GCC_BASE=/cvmfs/cms.cern.ch/${SCRAM_ARCH}/external/gcc/6.3.0
+    set GCC_PATH=${GCC_BASE}/bin
+    set GCC_LD_PATH=${GCC_BASE}/lib64:${GCC_BASE}/lib
 
     # scram tool info root_interface (Look for ROOT_INTERFACE_BASE)
-    setenv ROOTSYS /cvmfs/cms.cern.ch/slc6_amd64_gcc493/lcg/root/6.02.12-kpegke4
-    #echo "=== ROOTSYS=$ROOTSYS"
+    set ROOTSYS_BASE=/cvmfs/cms.cern.ch/${SCRAM_ARCH}/lcg/root/6.10.09-omkpbe4
+    setenv ROOTSYS ${ROOTSYS_BASE}
+    set ROOTSYS_PATH=${ROOTSYS_BASE}/bin
 
     # scram tool info xrootd (Look for XROOTD_BASE)
-    set XROOTD_BASE=/cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xrootd/4.0.4-kpegke2
-    #echo "=== XROOTD_BASE=${XROOTD_BASE}"
+    set XROOTD_BASE=/cvmfs/cms.cern.ch/${SCRAM_ARCH}/external/xrootd/4.6.1-omkpbe4
+    set XROOTD_PATH=${XROOTD_BASE}/bin
 
     # scram tool info xz (Look for XZ_BASE)
-    set XZ_BASE=/cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/xz/5.2.1
-    #echo "=== XZ_BASE=${XZ_BASE}"
+    set XZ_BASE=/cvmfs/cms.cern.ch/${SCRAM_ARCH}/external/xz/5.2.2-oenich
+    set XZ_PATH=${XZ_BASE}/bin
 
     # scram tool info python
-    set PYTHON_BASE=/cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/python/2.7.6-kpegke
-    #echo "=== PYTHON_BASE=${PYTHON_BASE}"
+    set PYTHON_BASE=/cvmfs/cms.cern.ch/${SCRAM_ARCH}/external/python/2.7.11-omkpbe2
+    set PYTHON_PATH=${PYTHON_BASE}/bin
 
     # Set the run-time shared library loader (ld.so) an extra set of directories to look for when searching for shared libraries.
-    set LD_LIBRARY_PATH_APPEND=$ROOTSYS/lib:$GCC_BASE/lib64:$GCC_BASE/lib:$XROOTD_BASE/lib:$XZ_BASE/lib:$PYTHON_BASE/lib:/cvmfs/cms.cern.ch/slc6_amd64_gcc491/external/libjpg/8b-cms/lib:/cvmfs/cms.cern.ch/slc6_amd64_gcc491/external/libpng/1.6.16/lib
-    
+    set LD_LIBRARY_PATH_APPEND=${ROOTSYS_PATH}:${GCC_LD_PATH}:${XROOTD_PATH}:${XZ_PATH}:${PYTHON_PATH}:${GCC}/libjpg/8b/lib:${GCC}/libpng/1.6.16/lib:/cvmfs/cms.cern.ch/${SCRAM_ARCH}/cms/cmssw/CMSSW_10_1_5/external/${SCRAM_ARCH}/lib/
+
     # Tell the shell which directories to search for executable files
-    setenv PATH $ROOTSYS/bin:$GCC_BASE/bin:$XROOTD_BASE/bin:$PATH
+    setenv PATH ${PYTHON_PATH}:${ROOTSYS_PATH}:${GCC_PATH}:${XROOTD_PATH}:$PATH
 
     # $?VAR expands to 1 (true) if $VAR is set (to anything, even the empty string), 0 (false) if it isn't.
     if ($?PYTHONPATH) then
-	setenv PYTHONPATH "$ROOTSYS/lib:$PYTHONPATH"
+	setenv PYTHONPATH "$ROOTSYS/lib:${PYTHON_PATH}"
     else
         setenv PYTHONPATH "$ROOTSYS/lib"
     endif
@@ -94,9 +99,7 @@ if ( $LOCATION == "mac" ) then
     endif
 endif
 
-
-echo
-echo "=== Appending to LD_LIBRARY_PATH"
+echo "\n=== Appending to LD_LIBRARY_PATH"
 set LD_LIBRARY_PATH_APPEND="$HLTAUSANALYSIS_BASE/NtupleAnalysis/lib:${LD_LIBRARY_PATH_APPEND}"
 if ( ! $?LD_LIBRARY_PATH ) then
     setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH_APPEND}"
@@ -104,25 +107,26 @@ else
     setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH_APPEND}:${LD_LIBRARY_PATH}"
 endif
 
-echo "=== Creating symbolic links and hidden directories for $LOCATION"
+# echo "\n=== Creating symbolic links and hidden directories for $LOCATION"
 set PATHPREFIX=.python
-
 if ( $LOCATION == "CMSSW" ) then    
     if ( ! $?CMSSW_BASE || ! -e $CMSSW_BASE/python/HLTausAnalysis/NtupleAnalysis ) then
+	echo "ln -s $HLTAUSANALYSIS_BASE/NtupleAnalysis/python $CMSSW_BASE/python/HLTausAnalysis/NtupleAnalysis"
         ln -s $HLTAUSANALYSIS_BASE/NtupleAnalysis/python $CMSSW_BASE/python/HLTausAnalysis/NtupleAnalysis
     endif
-
 else
     if ( ! -e $PATHPREFIX/HLTausAnalysis ) then
-	echo "=== Creating $PATHPREFIX directory under `pwd`. Creating __init__.py"
+	echo "\n=== Creating $PATHPREFIX directory under `pwd`. Creating __init__.py"
+        # echo "mkdir -p $PATHPREFIX/HLTausAnalysis"
         mkdir -p $PATHPREFIX/HLTausAnalysis
+
+        # echo "touch $PATHPREFIX/HLTausAnalysis/__init__.py"
         touch $PATHPREFIX/HLTausAnalysis/__init__.py
     endif
 
-    echo "=== Loop over directories under NtupleAnalysis/ and HeavyChHLTausToTauNu/"
+    echo "=== Loop over directories under NtupleAnalysis"
     foreach DIR ( NtupleAnalysis )
-	# echo "DIR=$DIR"
-
+	# echo "\tDIR=$DIR"
 	set LINK_NAME=$PATHPREFIX/HLTausAnalysis/$DIR
 	set TARGET=$HLTAUSANALYSIS_BASE/$DIR/python
 	set PYINIT=$LINK_NAME/__init__.py
@@ -130,25 +134,24 @@ else
 	# If $PATHPREFIX/HLTausAnalysis/$DIR does not exist
         if ( ! -e $PATHPREFIX/HLTausAnalysis/$DIR ) then
 
-            echo "Linking $TARGET with $LINK_NAME"
+            echo "\tLinking $TARGET with $LINK_NAME"
 	    ln -s $TARGET $LINK_NAME
 
-	    echo "Creating $PYINIT"
+	    echo "\tCreating $PYINIT"
             touch $PYINIT
 	    
             foreach d ( $PATHPREFIX/HLTausAnalysis/$DIR/* )
                 if ( -d $d ) then
-		    echo "Creating $d/__init__.py"
+		    echo "\tCreating $d/__init__.py"
                     touch $d/__init__.py
                 endif
             end
         endif
     end
 
-
     echo "=== Loop over directories under NtupleAnalysis/src"
     foreach DIR ( `ls NtupleAnalysis/src` )
-	# echo "DIR=$DIR"
+	#echo "\tDIR=$DIR"
 
 	# NOTE: Remove last "/" from directory name. The "/" at the end causes the linking to FAIL for some shells
 	set DIR=`echo $DIR | sed 's/\(.*\)\//\1 /'`
@@ -157,9 +160,9 @@ else
 	set PYINIT=$LINK_NAME/__init__.py
 
 	# If $LINK_NAME does not exist and $TARGET exists
-        if ( ! -e $LINK_NAME && -e $HLTAUSANALYSIS_BASE/NtupleAnalysis/src/$DIR/python ) then
+        if ( ! -e $LINK_NAME && -e $TARGET ) then
 
-            echo "Linking $TARGET with $LINK_NAME"
+            echo "\tLinking $TARGET with $LINK_NAME"
             ln -s $TARGET $LINK_NAME
 
             # echo "Creating $PYINIT"
@@ -183,47 +186,55 @@ else
 
 endif
 
-
 #echo "=== Setting PATH variable"
 setenv PATH "${HLTAUSANALYSIS_BASE}/NtupleAnalysis/scripts:${PATH}"
 
 # Get the python version
 set PYTHON_VERSION=`python -c 'import sys ;version=sys.version_info[:3]; print("{0}.{1}.{2}".format(*version))'`
 
-echo
-echo "=== The environment variables set are:"
-echo "LOCATION is $LOCATION"
-echo "PYTHONPATH is $PYTHONPATH"
-echo "HLTAUSANALYSIS_BASE is $HLTAUSANALYSIS_BASE"
-echo "PATHPREFIX is $PATHPREFIX"
-echo "ROOTSYS is $ROOTSYS"
-echo "LD_LIBRARY_PATH is $LD_LIBRARY_PATH"
-echo "PYTHONPATH is $PYTHONPATH"
-echo "PATH is $PATH"
-echo "PYTHON_VERSION is $PYTHON_VERSION"
-echo
+if ( 0 ) then
+    echo
+    echo "=== The environment variables set are:"
+    echo "LOCATION is $LOCATION"
+    echo "\nPYTHONPATH is $PYTHONPATH"
+    echo "\nHLTAUSANALYSIS_BASE is $HLTAUSANALYSIS_BASE"
+    echo "\nPATHPREFIX is $PATHPREFIX"
+    echo "\nROOTSYS is $ROOTSYS"
+    echo "\nLD_LIBRARY_PATH is $LD_LIBRARY_PATH"
+    echo "\nPYTHONPATH is $PYTHONPATH"
+    echo "\nPATH is $PATH"
+    echo "\nPYTHON_VERSION is $PYTHON_VERSION"
+    echo
+ else 
+    echo "\n=== The environment variables set are:"
+    echo "LD_LIBRARY_PATH is $LD_LIBRARY_PATH"
+    echo "PYTHONPATH is $PYTHONPATH"
+    echo "ROOTSYS is $ROOTSYS"
+endif 
 
 if ( $PYTHON_VERSION =~ *"2.6"* ) then
-    echo "=== WARNING! Requires python 2.7 and later. The python version used is:"
+    echo "\n=== WARNING! Requires python 2.7 and later. The python version used is:"
     python -V
     echo
 
     # Python versions on LXPLUS [https://cern.service-now.com/service-portal/article.do?n=KB0000730]
     if ( $LOCATION == "lxplus" || $LOCATION == "lxbatch" ) then
-	echo "=== Printing list of available python versions:"
-	scl -l | grep python
-	echo
-
-	echo "=== To enable python27 for SHELL=$SHELL copy/paste the following:"
-	if ( $SHELL == "/bin/tcsh") then
-	    echo "scl enable python27 csh"
-	    # scl enable python27 csh
+	if (0) then
+	    echo "=== Printing list of available python versions:"
+	    scl -l | grep python
 	    echo
-	else if ( $SHELL == "/bin/bash") then
-	echo "scl enable python27 bash"
-	#scl enable python27 bash
-	echo
-	endif 
+
+	    echo "=== To enable python27 for SHELL=$SHELL copy/paste the following:"
+	    if ( $SHELL == "/bin/tcsh") then
+		echo "scl enable python27 csh"
+		#scl enable python27 csh
+		echo
+	    else if ( $SHELL == "/bin/bash") then
+		echo "scl enable python27 bash"
+		# scl enable python27 bash
+		echo
+	    endif 
+	endif
     else
 	echo "Unsupported SHELL == $SHELL. EXIT shell script"
 	exit 1
@@ -233,5 +244,3 @@ else
     python -V
     echo 
 endif
-
-
