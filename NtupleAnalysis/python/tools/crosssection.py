@@ -206,7 +206,7 @@ backgroundCrossSections = CrossSectionList(
         "13": 1.0, 
         "14": 1.0,
     }),
-    CrossSection("SingleTau_L1TPU140", {
+    CrossSection("SingleTau_L1TPU200", {
         "13": 1.0, 
         "14": 1.0,
     }),

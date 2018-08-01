@@ -318,7 +318,7 @@ void Datasets::CreateMcProductions_(void)
   cmssw    = "10_1_5";
   geometry = "Phase2";
 
-  Datasets SinglePionNoPU_PhaseIIFall17D("SinglePion_FlatPt_2to100_NoPU", "SinglePion_FlatPt_2to100_NoPU", "/SinglePion_FlatPt-2to100" + path_NoPU_v1 , CP, cmssw, geometry, 140, 500000, 0, 0);
+  //Datasets SinglePionNoPU_PhaseIIFall17D("SinglePion_FlatPt_2to100_NoPU", "SinglePion_FlatPt_2to100_NoPU", "/SinglePion_FlatPt-2to100" + path_NoPU_v1 , CP, cmssw, geometry, 140, 500000, 0, 0);
 
   Datasets TTNoPU_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TnoPU", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TnoPU_93X", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_NoPU_v2, CP, cmssw, geometry, 0, 99328, 24, 2);
   Datasets TTPU140_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TPU140", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU140_93X", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_PU140_v2, CP, cmssw, geometry, 140, 99328, 24, 2);
@@ -350,7 +350,7 @@ void Datasets::CreateMcProductions_(void)
 
 
 
-  datasets_PhaseIIFall17D.push_back(SinglePionNoPU_PhaseIIFall17D);
+  //datasets_PhaseIIFall17D.push_back(SinglePionNoPU_PhaseIIFall17D);
 
   datasets_PhaseIIFall17D.push_back(TTNoPU_PhaseIIFall17D);
   datasets_PhaseIIFall17D.push_back(TTPU140_PhaseIIFall17D);
