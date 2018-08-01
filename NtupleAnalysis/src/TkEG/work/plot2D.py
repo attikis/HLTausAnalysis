@@ -210,6 +210,9 @@ def GetHistoKwargs(h, opts):
     if "et_eta" in h.lower():
         kwargs["opts"]   = {"xmin": 0, "xmax": 300.0, "ymin": -1.5, "ymax": 1.5, "ymaxfactor": yMaxF}
 
+    if "vispt_drmax" in h.lower():
+        kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": 0.0, "ymax": 0.3, "ymaxfactor": yMaxF}
+
     '''
     if "_eta" in h.lower():
         #_yLabel = "Arbitrary Units / %.0f "
@@ -402,7 +405,7 @@ if __name__ == "__main__":
     LATEX        = False
     URL          = True
     NOERROR      = True
-    SAVEDIR      = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/TkCalo/TH2D/" #os.getcwd()
+    SAVEDIR      = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/TkEG/TH2D/" #os.getcwd()
     VERBOSE      = False
     FOLDER       = ""
     RATIO        = False

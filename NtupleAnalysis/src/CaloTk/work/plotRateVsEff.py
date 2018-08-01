@@ -166,7 +166,7 @@ def main(opts):
         style.setGridY(opts.gridY)
 
         # Define signal and background datasets names
-        datasetSignal = "ChargedHiggs200_14TeV_L1TPU140"#"TT_TuneCUETP8M2T4_14TeV_L1TPU140"#"GluGluHToTauTau_14TeV_L1TPU140"
+        datasetSignal = "GluGluHToTauTau_14TeV_L1TPU140" #"TT_TuneCUETP8M2T4_14TeV_L1TPU140"#"GluGluHToTauTau_14TeV_L1TPU140" #"ChargedHiggs200_14TeV_L1TPU140"
         datasetBkg    = "SingleNeutrino_L1TPU140"
 
         # Plot Histograms
@@ -205,6 +205,8 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, datasetSignal, datas
             g3 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], datasetSignal, datasetBkg)
             g3.SetName("RelIso")
 
+    
+
     # Create & draw the plot
     p = plots.ComparisonManyPlot(g0, [g1,g2, g3], saveFormats=[])
     
@@ -214,7 +216,7 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, datasetSignal, datas
         legendDict[hName] = styles.getCaloLegend(index)
         p.histoMgr.forHisto(hName, styles.getCaloStyle(index))
 
-        p.histoMgr.setHistoDrawStyle(h.getName(), "PX")                                                                                                     
+        p.histoMgr.setHistoDrawStyle(h.getName(), "LX")                                                                                                     
         p.histoMgr.setHistoLegendStyle(h.getName(), "LP")
 
     # Set legend labels
@@ -229,9 +231,23 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, datasetSignal, datas
     #kwargs_["ylabel"] = ylabel
 
 
-
     # Draw and save the plot
     plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
+    # Draw
+    for i, g in enumerate([g0, g1, g2, g3]):
+        shapes, min, max = DrawErrorBand(g) 
+        for shape in shapes:
+            shape.SetFillColor( p.histoMgr.getHistos()[i].getRootHisto().GetFillColor())
+            shape.SetFillStyle(3003)
+            #shape.SetFillColorAlpha(p.histoMgr.getHistos()[i].getRootHisto().GetFillColor(), 0.15)
+            shape.Draw("f same")
+        #min.Draw("l same")
+        #min.SetLineColor( p.histoMgr.getHistos()[i].getRootHisto().GetLineColor())
+        #max.Draw("l same")
+        #max.SetLineColor( p.histoMgr.getHistos()[i].getRootHisto().GetLineColor())
+        # g0.Draw("l same")
+        ROOT.gPad.RedrawAxis()
+
 
     # Additional text                                                                                                                                                    
     histograms.addText(0.65, 0.38, plots._legendLabels[datasetSignal], 17)
@@ -239,6 +255,7 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, datasetSignal, datas
         histograms.addText(0.77, 0.89,"DoubleTau", 20)
     else:
         histograms.addText(0.77, 0.89,"SingleTau", 20)
+
     # Save the plots in custom list of saveFormats
     SavePlot(p, saveName, os.path.join(opts.saveDir, opts.optMode, opts.folder), [".pdf",".png"] )          
 
@@ -267,6 +284,7 @@ def convert2RateVsEffTGraph(datasetsMgr, effHistoName, rateHistoName, datasetSig
     yerrh = []
     
     nBinsX = hEff.GetNbinsX()
+    nBins  = nBinsX
 
     for i in range (0, nBinsX):
         # Get values
@@ -276,34 +294,39 @@ def convert2RateVsEffTGraph(datasetsMgr, effHistoName, rateHistoName, datasetSig
         yVal  = hRate.GetBinContent(i)
         yLow  = hRate.GetBinError(i)
         yHigh = yLow            
-        
-        # Store values
-        x.append(xVal)
-        xerrl.append(xLow)
-        xerrh.append(xHigh)
-            
+
         # Force error bars to not be above (belo) 1.0 (0.0)
         if 0:
             if abs(yVal + yHigh) > 1.0:
                 yHigh = 1.0-yVal
             if yVal - yLow < 0.0:
                 yLow = yVal
-
         
         # WARNING! Ugly trick so that zero points are not visible on canvas
         if 1:
-            if yVal == 0.0:
-                yVal  = -0.1
-                yLow  = +0.0001
-                yHigh = +0.0001
-        
-        # Save final values
+            if xVal == 0.0:
+                #xVal  = -0.1
+                #xLow  = +0.0001
+                #xHigh = +0.0001
+                nBins=nBins-1
+                continue
+            #if yVal ==0.0:
+            #    yVal  = -0.1
+            #    yLow  = +0.0001
+            #    yHigh = +0.0001
+            #    nBins = nBins -1
+            #    continue
+            
+        # Store values
+        x.append(xVal)
+        xerrl.append(xLow)
+        xerrh.append(xHigh)
         y.append(yVal)
         yerrl.append(yLow)
         yerrh.append(yHigh)
         
     # Create the TGraph with asymmetric errors
-    tgraph = ROOT.TGraphAsymmErrors(nBinsX,
+    tgraph = ROOT.TGraphAsymmErrors(nBins,
                                     array.array("d",x),
                                     array.array("d",y),
                                     array.array("d",xerrl),
@@ -311,7 +334,7 @@ def convert2RateVsEffTGraph(datasetsMgr, effHistoName, rateHistoName, datasetSig
                                     array.array("d",yerrl),
                                     array.array("d",yerrh))
     
-
+    tgraph.GetXaxis().SetLimits(0.0, 1.0)
     # Construct info table (debugging)
     table  = []
     align  = "{0:>6} {1:^10} {2:>10} {3:>10} {4:>10} {5:^3} {6:<10}"
@@ -335,6 +358,64 @@ def convert2RateVsEffTGraph(datasetsMgr, effHistoName, rateHistoName, datasetSig
    
     return tgraph
 
+
+def DrawErrorBand(graph):
+    isErrorBand = graph.GetErrorXhigh(0) != -1 and graph.GetErrorXlow(0) != -1
+    npoints     = graph.GetN()
+ 
+    if not isErrorBand:
+        graph.Draw("l same")
+        return
+ 
+    # Declare individual TGraph objects used in drawing error band
+    central, min, max = ROOT.TGraph(), ROOT.TGraph(), ROOT.TGraph()
+    shapes = []
+    for i in range((npoints-1)*4):
+        shapes.append(ROOT.TGraph())
+ 
+    # Set ownership of TGraph objects
+    ROOT.SetOwnership(central, False)
+    ROOT.SetOwnership(    min, False)
+    ROOT.SetOwnership(    max, False)
+    for shape in shapes:
+        ROOT.SetOwnership(shape, False)
+ 
+    # Get data points from TGraphAsymmErrors
+    x, y, xmin, xmax = [], [], [], []
+    for i in range(npoints):
+        tmpX, tmpY = ROOT.Double(0), ROOT.Double(0)
+        graph.GetPoint(i, tmpX, tmpY)
+        x.append(tmpX)
+        y.append(tmpY)
+        xmin.append(tmpX - graph.GetErrorXlow(i))
+        xmax.append(tmpX + graph.GetErrorXhigh(i))
+
+    # Fill central, min and max graphs
+    for i in range(npoints):
+        # central.SetPoint(i, x[i], y[i])
+        min.SetPoint(i, xmin[i], y[i])
+        max.SetPoint(i, xmax[i], y[i])
+ 
+    # Fill shapes which will be shaded to create the error band
+    for i in range(npoints-1):
+        for version in range(4):
+            shapes[i+(npoints-1)*version].SetPoint((version+0)%4, xmax[i],   y[i])
+            shapes[i+(npoints-1)*version].SetPoint((version+1)%4, xmax[i+1], y[i+1])
+            shapes[i+(npoints-1)*version].SetPoint((version+2)%4, xmin[i+1], y[i+1])
+            shapes[i+(npoints-1)*version].SetPoint((version+3)%4, xmin[i],   y[i])
+ 
+    # Set attributes to those of input graph
+    # central.SetLineColor(graph.GetLineColor())
+    # central.SetLineStyle(graph.GetLineStyle())
+    # central.SetLineWidth(graph.GetLineWidth())
+    min.SetLineStyle(graph.GetLineStyle())
+    max.SetLineStyle(graph.GetLineStyle())
+#    for shape in shapes:
+ #       shape.SetFillStyle(3001)#3003)#graph.GetFillStyle())
+        
+    return shapes, min, max 
+
+
 def GetHistoKwargs(h, opts):
     _moveLegend = {"dx": -0.1, "dy": -0.55, "dh": -0.15}
     logY    = True
@@ -353,7 +434,7 @@ def GetHistoKwargs(h, opts):
         "addCmsText"       : True,
         "cmsExtraText"     : "Phase-2 Simulation",
         "cmsTextPosition"  : "outframe",
-        "opts"             : {"xmin": 0.0, "xmax": 0.7, "ymin": yMin, "ymax":1000, "ymaxfactor": yMaxF},
+        "opts"             : {"xmin": 0.0, "xmax": 1.0, "ymin": yMin, "ymax":1000, "ymaxfactor": yMaxF},
         "opts2"            : {"ymin": 0.59, "ymax": 1.41},
         "log"              : logY,
         "moveLegend"       : _moveLegend,
@@ -365,7 +446,7 @@ def GetHistoKwargs(h, opts):
     kwargs = copy.deepcopy(_kwargs)
     
     if "ditau" in h.lower():
-        kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.6, "ymin": yMin, "ymax":2000, "ymaxfactor": yMaxF}
+        kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.6, "ymin": yMin, "ymax":1000, "ymaxfactor": yMaxF}
 
 
     return kwargs

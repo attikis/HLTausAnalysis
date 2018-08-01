@@ -179,153 +179,6 @@ def main(opts):
 
     return
 
-def GetQumulativePlot(dataset, histoName, **kwargs):
-
-    cutDirection= ">" #kwargs.get("cutDirection")
-
-    Verbose("Calculating the cut-efficiency (%s) for histo with name %s" % (cutDirection, histoName) )
-
-    # Declare variables & options                                                                      
-    first  = True
-    isData = False
-
-    # Get the ROOT histogram                                                                           
-    rootHisto = dataset.getDatasetRootHisto(histoName)
-
-    # Normalise the histogram                                                                          
-    NormalizeRootHisto(dataset, rootHisto, dataset.isMC(), normalizeTo)
-
-    ## Get a clone of the wrapped histogram normalized as requested.                                   
-    h = rootHisto.getHistogram()
-
-    titleX   = h.GetXaxis().GetTitle()
-    binWidth = h.GetXaxis().GetBinWidth(0)
-    titleY   = "EventsNo (%s) / %s" % (cutDirection, GetBinwidthDecimals(binWidth) % (binWidth) )
-
-    # If empty return                                                                                  
-    if h.GetEntries() == 0:
-        return
-
-    # Create the eventsNo histogram                                                                    
-    eventsNo   = h.Clone("eventsNo")
-
-    # Reset and Edit the eventsNo histogram                                                            
-    eventsNo.Reset()
-    eventsNo.GetXaxis().SetTitle(titleX)
-
-    # Calculate the instances passing a given cut (all bins)                                           
-    nBinsX = h.GetNbinsX()+1
-    for iBin in range(1, nBinsX):
-
-        nTotal = h.Integral(0, nBinsX)
-
-        if cutDirection == ">":
-            nPass  = h.Integral(iBin, nBinsX)
-        elif cutDirection == "<":
-            nPass  = nTotal - h.Integral(iBin+1, nBinsX)
-        else:
-            raise Exception("Invalid cut direction  \"%s\". Please choose either \">\" or \"<\"" % (cutDirection))
-
-        # Sanity check                                                                                 
-        if nPass < 0:
-            nPass = 0
-
-        # Fill the eventNo histogram                                                                   
-        eventsNo.SetBinContent(iBin, nPass)
-        eventsNo.SetBinError(iBin, math.sqrt(nPass)/10)
-
-    return eventsNo
-    
-
-def GetOptimizationPlot(signal_dataset, background_dataset, histoName, **kwargs):
-
-    #print "--plotAux.py: ploting Optimization for histogram", histoName                               
-
-    # Get the options                                                                                  
-    drawStyle    = kwargs.get("drawStyle")
-    legStyle     = kwargs.get("legStyle")
-    legName      = plots._legendLabels[signal_dataset.getName()]
-    cutDirection = kwargs.get("cutDirection")
-
-    # Get the Qumulative Plots for Signal and Background                                               
-    Signal_Qumul     = GetQumulativePlot(signal_dataset, histoName, **kwargs)
-    Background_Qumul = GetQumulativePlot(background_dataset, histoName, **kwargs)
-    
-    ######
-        # Create lists to append the x-y values of the Qumulative Histogram                               
-    x_signal     = []                                                                                 
-    y_signal     = []                                                                                 
-    x_background = []                                                                                 
-    y_background = []                                                                                 
-                                                                                                      
-    # Clone the Qumulative plots for Signal and Bkg                                                   
-    h_signal     = Signal_Qumul.Clone()                                                               
-    h_background = Background_Qumul.Clone()                                                           
-                                                                                                      
-    #Get the binNo of the Qumulative plots for Signal and Bkg                                         
-    n_signal = h_signal.GetNbinsX()                                                                   
-    n_background = h_background.GetNbinsX()                                                           
-                                                                                                      
-    # Get the bin-width of the plots                                                                  
-    binWidth = h_signal.GetBinWidth(0)                                                                
-                                                                                                      
-    # Sanity Check                                                                                    
-    if (n_signal != n_background):                                                                    
-        print "Warning: Number of Bins of signal and background are different!"                      
-
-
-        # Get the x-y values of the Qumulative Histogram                                                  
-    for i in range(1, n_signal+1):                                                                    
-                                                                                                      
-        # Signal (x,y) Values                                                                         
-        x_signal.append(h_signal.GetBinLowEdge(i)+0.5*h_signal.GetBinWidth(i))                        
-        y_signal.append(h_signal.GetBinContent(i))                                                    
-                                                                                                      
-        # Background (x,y) values and errors                                                          
-        x_background.append(h_background.GetBinLowEdge(i)+0.5*h_background.GetBinWidth(i))            
-        y_background.append(h_background.GetBinContent(i))                                            
-                                                                                                      
-    # Create the (x-y) list to append the significance value for each x value                         
-    x = []                                                                                            
-    y = []                                                                                            
-                                                                                                      
-    # Create variables for Maximum Significance                                                       
-    maxSignX = 0                                                                                      
-    maxSignY = 0                                                                                      
-                                                                                                      
-    # Calculate the Significance of the Signal                                                        
-    for i in range(0, n_signal):                                                                      
-        if ((float(y_background[i]) <= 0 ) or (float(y_signal[i]) <= 0)):                             
-            significance = 0                                                                          
-        elif (kwargs.get("significanceDef") == "S1"):                                                 
-            significance = float(y_signal[i])/math.sqrt(float(y_background[i]))                       
-        elif (kwargs.get("significanceDef") == "S2"):                                                 
-            significance = float(y_signal[i]) / float(y_background[i])                                
-
-        # Create the Significance Plot                                                                    
-    tGraph = ROOT.TGraph(n_signal, array.array("d", x), array.array("d", y))                          
-                                                                                                      
-    # Customize y-axis title                                                                          
-    if (kwargs.get("significanceDef") == "S1"):                                                       
-        ytitle = "S/ #sqrt{B} "                                                                       
-    elif (kwargs.get("significanceDef") == "S2"):                                                     
-        ytitle = "S/B"                                
-
-    # Customize the Significance Plot                                                                 
-    styleDict[signal_dataset.getName()].apply(tGraph)                                                 
-    tGraph.SetName(signal_dataset.getName())                                                          
-    #tGraph.GetYaxis().SetTitle("\mathcal{S} =(S/sqrt(S+B))")                                         
-    #tGraph.GetYaxis().SetTitle( ytitle +" (%s) / %s" % (cutDirection, GetBinwidthDecimals(binWidth) % (binWidth) ))                      
-    tGraph.GetYaxis().SetTitle( ytitle +" (%s) / %s" % (cutDirection, GetBinwidthDecimals(binWidth) % (binWidth) ))                                        
-    #tGraph.GetYaxis().SetTitle( ytitle +" (%s) / %s" % (cutDirection,binWidth))                      
-    tGraph.GetXaxis().SetTitle(h_signal.GetXaxis().GetTitle())                                        
-    optGraph = histograms.HistoGraph(tGraph, legName, legStyle, drawStyle)      
-
-
-    return optGraph, maxSignX         
-
-
-
 def GetHistoKwargs(h, opts):
     _moveLegend = {"dx": -0.1, "dy": 0.0, "dh": -0.15}
     logY    = False
@@ -381,11 +234,31 @@ def GetHistoKwargs(h, opts):
         #_yLabel = "Arbitrary Units / %.0f "
         kwargs["opts"]   = {"xmin": 0, "xmax": 10, "ymin": yMin, "ymaxfactor": yMaxF}
 
+    if "chargeddaugh_totalmass" in h.lower():
+        kwargs["log"]  = True
+        kwargs["opts"] = {"xmin": 0.0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": yMaxF}
+
+    if "neutraldaugh_totalmass" in h.lower():
+        kwargs["log"]  = True
+        kwargs["opts"] = {"xmin": 0.0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": yMaxF}
+
+    if "chargeddaugh_pt" in h.lower():
+        #kwargs["log"]  = True
+        kwargs["opts"] = {"xmin": 0.0, "xmax": 120.0, "ymin": yMin, "ymax": 0.065, "ymaxfactor": yMaxF}
+
+    if "neutraldaugh_et" in h.lower():
+        #kwargs["log"]  = True
+        kwargs["opts"] = {"xmin": 0.0, "xmax": 120.0, "ymin": yMin, "ymax": 0.065, "ymaxfactor": yMaxF}
+        
+    if "chi2" in h.lower():
+        kwargs["rebinX"] = 2
+
     if "gentaushadronic_n" in h.lower():
         kwargs["xlabel"] = "No of genuine hadronic taus in event"
 
     if "trkClusters_M" == h:
-        kwargs["opts"]   = {"xmin": 0, "xmax": 4.0, "ymin": yMin, "ymaxfactor": yMaxF}
+        kwargs["log"]  = True
+        kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": yMaxF}
         
     if "trkClusters_Pt" == h:
         kwargs["opts"]   = {"xmin": 0, "xmax": 150.0, "ymin": yMin, "ymaxfactor": yMaxF}
@@ -395,7 +268,6 @@ def GetHistoKwargs(h, opts):
          
     if "reliso" in h.lower():
          kwargs["opts"]   = {"xmin": 0.0, "xmax": 2.0, "ymin": yMin, "ymaxfactor": yMaxF}
-
 
     if "EGClusters_M" == h:
         kwargs["opts"]   = {"xmin": 0, "xmax": 4.0, "ymin": yMin, "ymaxfactor": yMaxF}

@@ -176,17 +176,24 @@ class TkEG : public TreeAnalyserMC{
   // Event-Type Histograms                                                                                                                                     
   TH1D* hCounters;
 
+  TH1D* h_genTausAll_N;
+  TH1D* h_genTausAll_Pt;
+  TH1D* h_genTausAll_Eta;
+  TH1D* h_genTausAll_Phi;
+  TH1D* h_genTausHad_Daughters_N;
+  TH1D* h_genTausHad_chargedDaugh_N;
+  TH1D* h_genTausHad_neutralDaugh_N;
   TH1D* h_genTausHad_N;
   TH1D* h_genTau_chargedDaugh_Pt;
   TH1D* h_genTau_chargedDaugh_totalMass;
+  TH1D* h_genTau_neutralDaugh_totalMass;
   TH1D* h_genTau_neutralDaugh_Et;
+  TH2D* h_genTau_chargedDaugh_visPt_dRmax;
 
-  TH1D* h_trk_NStubs_lead;
-  TH1D* h_trk_NStubs_all;                                                                                                                                              
-  TH1D* h_trk_Chi2_lead;
-  TH1D* h_trk_Chi2_lead_4stubs;
-  TH1D* h_trk_Chi2_lead_5stubs;
+  TH1D* h_trk_Chi2_all_4stubs;
+  TH1D* h_trk_Chi2_all_5stubs;
   TH1D* h_trk_Chi2_all;
+  TH1D* h_trk_NStubs_all;                                                                                                                                              
 
   TH1D* h_leadTrks_Multiplicity;
   
