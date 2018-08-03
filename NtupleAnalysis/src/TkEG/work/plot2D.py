@@ -213,6 +213,19 @@ def GetHistoKwargs(h, opts):
     if "vispt_drmax" in h.lower():
         kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": 0.0, "ymax": 0.3, "ymaxfactor": yMaxF}
 
+    if "ptlead_drmax" in h.lower():
+        kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": 0.0, "ymax": 0.3, "ymaxfactor": yMaxF}
+        
+    if "eta1vseta2" in h.lower():
+        kwargs["opts"]   = {"xmin": -2.5, "xmax": 2.5, "ymin": -2.5, "ymax": 2.5, "ymaxfactor": yMaxF}
+
+    if "phi1vsphi2" in h.lower():
+        kwargs["opts"]   = {"xmin": -3.15, "xmax": 3.15, "ymin": -3.15, "ymax": 3.15, "ymaxfactor": yMaxF}
+        
+    if "chargedptvsneutralet" in h.lower():
+        kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": 0.0, "ymax": 100.0, "ymaxfactor": yMaxF}
+
+
     '''
     if "_eta" in h.lower():
         #_yLabel = "Arbitrary Units / %.0f "

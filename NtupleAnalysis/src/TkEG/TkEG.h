@@ -84,6 +84,7 @@ class TkEG : public TreeAnalyserMC{
   void InitVars_(void);
   float DeltaPhi(float phi1, float phi2);
   float deltaR(float eta1, float eta2, float phi1, float phi2);
+  float CorrectedEta(float eta, float zTrack);
   vector<L1TkEGParticle> GetMcMatchedL1TkEGs(vector<L1TkEGParticle> L1TkEGs);
   double GetMatchingGenParticle(TTTrack track, GenParticle *genParticlePtr);
   void FillTurnOn_Numerator_(vector<L1TkEGParticle> L1TkEGs, const double minEt, TH1D *hTurnOn);
@@ -180,6 +181,9 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_genTausAll_Pt;
   TH1D* h_genTausAll_Eta;
   TH1D* h_genTausAll_Phi;
+  TH2D* h_genTausAll_Eta1VsEta2;
+  TH2D* h_genTausAll_Phi1VsPhi2;
+
   TH1D* h_genTausHad_Daughters_N;
   TH1D* h_genTausHad_chargedDaugh_N;
   TH1D* h_genTausHad_neutralDaugh_N;
@@ -188,11 +192,15 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_genTau_chargedDaugh_totalMass;
   TH1D* h_genTau_neutralDaugh_totalMass;
   TH1D* h_genTau_neutralDaugh_Et;
+  TH2D* h_genTauHad_chargedPtVsneutralET;
   TH2D* h_genTau_chargedDaugh_visPt_dRmax;
+  TH2D* h_genTau_chargedDaugh_PtLead_dRmax;
+  TH2D* h_genTau_neutralDaugh_PtLead_dRmax;
 
   TH1D* h_trk_Chi2_all_4stubs;
   TH1D* h_trk_Chi2_all_5stubs;
   TH1D* h_trk_Chi2_all;
+  TH1D* h_trk_Chi2Red_all;
   TH1D* h_trk_NStubs_all;                                                                                                                                              
 
   TH1D* h_leadTrks_Multiplicity;
@@ -211,6 +219,8 @@ class TkEG : public TreeAnalyserMC{
   TH2D* h_clustTrks_counter;
 
   TH1D* h_trkClusters_MultiplicityPerCluster;
+  TH1D* h_MCmatch_chargedDaugh_N;
+  TH1D* h_MCmatch_neutralDaugh_N;
   TH1D* h_trkClusters_Pt;
   TH1D* h_trkClusters_PtResolution;
   TH1D* h_trkClusters_M;
@@ -223,6 +233,8 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_EGs_IPhi;
 
   TH1D* h_leadTrk_EG_dR;
+  TH1D* h_leadTrk_EG_dR_beforecorrection;
+  TH1D* h_leadTrk_EG_dRmin;
 
   TH1D* h_clustEGs_allEGs;
   TH1D* h_clustEGs_passEt;
@@ -251,7 +263,9 @@ class TkEG : public TreeAnalyserMC{
   TH1D* hMcHadronicTau_VisEt;
 
   TH1D* h_MCmatch_counters;
-  
+  TH1D* h_MCmatch_dR;
+  TH1D* h_leadTrk_MCmatch;
+
   TH1D* hTurnOn25_all;
   TH1D* hTurnOn25_relIso;
   TH1D* hTurnOn50_all;

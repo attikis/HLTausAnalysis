@@ -231,8 +231,18 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": -3.15, "xmax": 3.15, "ymin": yMin, "ymaxfactor": yMaxF}
         '''
     if "multiplicity" in h.lower():
-        #_yLabel = "Arbitrary Units / %.0f "
-        kwargs["opts"]   = {"xmin": 0, "xmax": 10, "ymin": yMin, "ymaxfactor": yMaxF}
+        kwargs["opts"]   = {"xmin": -0.5, "xmax": 20, "ymin": yMin, "ymaxfactor": yMaxF}
+
+    if "multiplicitypercluster" in h.lower():
+        kwargs["opts"]   = {"xmin": -0.5, "xmax": 10.5, "ymin": yMin, "ymax" : 1.2, "ymaxfactor": yMaxF}
+
+    if "mcmatch_chargeddaugh_n" in h.lower():
+        kwargs["xlabel"] = "Number of daughters^{+} of matched gen-#tau"
+        kwargs["opts"]   = {"xmin": -0.5, "xmax": 10.5, "ymin": yMin, "ymax" : 1.2,"ymaxfactor": yMaxF}
+
+    if "mcmatch_neutraldaugh_n" in h.lower():
+        kwargs["xlabel"] = "Number of daughters^{0} of matched gen-#tau"
+        kwargs["opts"]   = {"xmin": -0.5, "xmax": 10.5, "ymin": yMin,"ymax" : 1.2,"ymaxfactor": yMaxF}
 
     if "chargeddaugh_totalmass" in h.lower():
         kwargs["log"]  = True
@@ -290,7 +300,7 @@ def GetHistoKwargs(h, opts):
         kwargs["cutBox"] = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 50.0, "ymin": yMin, "ymaxfactor": yMaxF}
         #kwargs["log"]    = True
- 
+
     if "EGs_Et" == h:
         kwargs["log"]  = True
         kwargs["opts"] = {"xmin": 0.0, "xmax": 100.0, "ymin": 0.001, "ymaxfactor": yMaxF}

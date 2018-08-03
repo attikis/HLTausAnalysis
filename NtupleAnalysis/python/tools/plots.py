@@ -608,7 +608,7 @@ _legendLabels = {
     "SingleNeutrino_L1TPU140": "MB",
     "SingleNeutrino_L1TPU200": "MB",
 
-    "SingleTau_L1TnoPU"  : "#tau-gun",
+    "SingleTau_L1TnoPU"  : "#tau-gun (PU=0)",
     "SingleTau_L1TPU200" : "#tau-gun",
 
     "TT_TuneCUETP8M2T4_14TeV_L1TnoPU"  : "t#bar{t}",
