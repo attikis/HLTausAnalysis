@@ -605,29 +605,29 @@ _legendLabels = {
     "TT_TuneCUETP8M1_14TeV_PU200": "t#bar{t} (PU=200)",
 
     #Fall17D
-    "SingleNeutrino_L1TPU140": "MB",
-    "SingleNeutrino_L1TPU200": "MB",
+    "SingleNeutrino_L1TPU140": "MB (PU=140)",
+    "SingleNeutrino_L1TPU200": "MB (PU=200)",
 
     "SingleTau_L1TnoPU"  : "#tau-gun (PU=0)",
-    "SingleTau_L1TPU200" : "#tau-gun",
+    "SingleTau_L1TPU200" : "#tau-gun (PU=200)",
 
-    "TT_TuneCUETP8M2T4_14TeV_L1TnoPU"  : "t#bar{t}",
-    "TT_TuneCUETP8M2T4_14TeV_L1TPU140"  : "t#bar{t}",
-    "TT_TuneCUETP8M2T4_14TeV_L1TPU200"  : "t#bar{t}",
+    "TT_TuneCUETP8M2T4_14TeV_L1TnoPU"  : "t#bar{t} (PU=0)",
+    "TT_TuneCUETP8M2T4_14TeV_L1TPU140" : "t#bar{t} (PU=140)",
+    "TT_TuneCUETP8M2T4_14TeV_L1TPU200" : "t#bar{t} (PU=200)",
 
-    "ChargedHiggs200_14TeV_L1TnoPU"    : "H^{+} m_{H^{+}}=200 GeV",
-    "ChargedHiggs200_14TeV_L1TPU140"  : "H^{+} m_{H^{+}}=200 GeV",
-    "ChargedHiggs200_14TeV_L1TPU200"  : "H^{+} m_{H^{+}}=200 GeV",
-    "ChargedHiggs500_14TeV_L1TnoPU"   : "H^{+} m_{H^{+}}=500 GeV",
-    "ChargedHiggs500_14TeV_L1TPU140"  : "H^{+} m_{H^{+}}=500 GeV",
-    "ChargedHiggs500_14TeV_L1TPU200"  : "H^{+} m_{H^{+}}=500 GeV",
-    "ChargedHiggs1000_14TeV_L1TnoPU"  : "H^{+} m_{H^{+}}=1000 GeV",
-    "ChargedHiggs1000_14TeV_L1TPU140" : "H^{+} m_{H^{+}}=1000 GeV",
-    "ChargedHiggs1000_14TeV_L1TPU200" : "H^{+} m_{H^{+}}=1000 GeV",
+    "ChargedHiggs200_14TeV_L1TnoPU"   : "H^{+} m_{H^{+}}=200 GeV (PU=0)",
+    "ChargedHiggs200_14TeV_L1TPU140"  : "H^{+} m_{H^{+}}=200 GeV (PU=140)",
+    "ChargedHiggs200_14TeV_L1TPU200"  : "H^{+} m_{H^{+}}=200 GeV (PU=200)",
+    "ChargedHiggs500_14TeV_L1TnoPU"   : "H^{+} m_{H^{+}}=500 GeV (PU=0)",
+    "ChargedHiggs500_14TeV_L1TPU140"  : "H^{+} m_{H^{+}}=500 GeV (PU=140)",
+    "ChargedHiggs500_14TeV_L1TPU200"  : "H^{+} m_{H^{+}}=500 GeV (PU=200)",
+    "ChargedHiggs1000_14TeV_L1TnoPU"  : "H^{+} m_{H^{+}}=1000 GeV (PU=0)",
+    "ChargedHiggs1000_14TeV_L1TPU140" : "H^{+} m_{H^{+}}=1000 GeV (PU=140)",
+    "ChargedHiggs1000_14TeV_L1TPU200" : "H^{+} m_{H^{+}}=1000 GeV (PU=200)",
 
-    "GluGluHToTauTau_14TeV_L1TnoPU"    : "H^{0}#rightarrow#tau#tau",
-    "GluGluHToTauTau_14TeV_L1TPU140"   : "H^{0}#rightarrow#tau#tau", 
-    "GluGluHToTauTau_14TeV_L1TPU200"   : "H^{0}#rightarrow#tau#tau",
+    "GluGluHToTauTau_14TeV_L1TnoPU"    : "H^{0}#rightarrow#tau#tau (PU=0)",
+    "GluGluHToTauTau_14TeV_L1TPU140"   : "H^{0}#rightarrow#tau#tau (PU=140)",
+    "GluGluHToTauTau_14TeV_L1TPU200"   : "H^{0}#rightarrow#tau#tau (PU=200)",
 
     # Ratio uncertainties
     "BackgroundStatError"    : "Stat. unc.",

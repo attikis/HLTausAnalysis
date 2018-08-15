@@ -420,7 +420,11 @@ def addStandardTexts(lumi=None, sqrts=None, addCmsText=True, cmsTextPosition="ri
         lumiText += " fb^{-1}"
 
     # Disable automatic addition of PU=140 text
-    lumiText += pileupText + ", "
+    if 0:
+        lumiText += pileupText + ", "
+    else:
+        lumiText = ""
+
     if sqrts is not None:
         #lumiText += " (" + sqrts + ")"
         lumiText += "  " + sqrts + " "

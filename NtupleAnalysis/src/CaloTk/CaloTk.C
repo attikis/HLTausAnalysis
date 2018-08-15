@@ -634,7 +634,7 @@ void CaloTk::Loop()
       {
 	// L1TkTau Resolution
 	GenParticle p = tau->GetMatchingGenParticle();	
-	hL1Tau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().et() - p.p4vis().Pt() )/p.p4vis().Pt()  );
+	hL1Tau_ResolutionCaloEt ->Fill( (tau->GetCaloTau().et() - p.p4vis().Et() )/p.p4vis().Et()  );
 	hL1Tau_ResolutionCaloEta->Fill( (tau->GetCaloTau().eta() - p.p4vis().Eta())/p.p4vis().Eta() );
 	hL1Tau_ResolutionCaloPhi->Fill( (tau->GetCaloTau().phi() - p.p4vis().Phi())/p.p4vis().Phi() );
       }

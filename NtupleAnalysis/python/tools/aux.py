@@ -15,6 +15,7 @@ import OrderedDict
 import HLTausAnalysis.NtupleAnalysis.tools.git as git
 import getpass
 import socket  
+import HLTausAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 
 #================================================================================================
 # Function definition
@@ -61,7 +62,7 @@ def IsTH1(h, raiseExcept=False):
     else:
         return True
 
-def SavePlot(plot, saveDir, saveName, saveFormats, url):
+def SavePlot(plot, saveDir, saveName, saveFormats, url, verbose=False):
     Verbose("Saving the plot in %s formats: %s" % (len(saveFormats), ", ".join(saveFormats) ) )
 
      # Check that path exists
@@ -78,8 +79,11 @@ def SavePlot(plot, saveDir, saveName, saveFormats, url):
     for i, ext in enumerate(saveFormats):
         saveNameURL = savePath + ext
         saveNameURL = convertToURL(saveNameURL, url)
-        Verbose(saveNameURL, i==0)
+        if verbose:
+            Print(saveNameURL, i==0)
         plot.saveAs(savePath, formats=saveFormats)
+
+    # Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + convertToURL(saveDir, url) + ShellStyles.NormalStyle()), True)
     return
 
 def GetDecimalFormat(value):
