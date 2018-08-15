@@ -6,10 +6,11 @@ Basic plotting script for making plots for CaloTk analyzer.
 
 USAGE:
 ./plotL1TkTau.py -m <multicrab_directory> [opts]
+./plotL1TkTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU" -n
 
 
 LAST USED:
-./plotL1TkTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU" 
+./plotL1TkTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU|TT_TuneCUETP8M2T4_14TeV_L1TPU140" -n
 
 '''
 #================================================================================================
@@ -102,34 +103,41 @@ def GetDatasetsFromDir(opts):
     
     
 def PlotHisto(datasetsMgr, h):
+    dsetsMgr = datasetsMgr.deepCopy()
+    
+    if "_eff" in h.lower():
+        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False) 
+        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False) 
+    elif "_deltargenp" in h.lower():
+        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False) 
+        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False) 
+    elif "_resolution" in h.lower():
+        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False) 
+        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False) 
+    elif "_rate" in h.lower():
+        opts.normalizeToOne = False
+        for d in dsetsMgr.getAllDatasetNames():
+            if "SingleNeutrino" in d:
+                continue
+            else:
+                dsetsMgr.remove(d, close=False)
+    else:
+        pass
 
     # Create the MC Plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
-    p = plots.MCPlot(datasetsMgr, h, saveFormats=[], normalizeToOne=opts.normalizeToOne)
-    # p = plots.ComparisonManyPlot(FakeB_inverted, compareHistos, saveFormats=[])       
-
-    '''
-    # For-loop: All histos
-    for index, h in enumerate(p.histoMgr.getHistos()):
-        if index == 0:
-            p.histoMgr.setHistoDrawStyle(h.getName(), "HIST")
-            p.histoMgr.setHistoLegendStyle(h.getName(), "L")
-            #    continue
-        else:
-            p.histoMgr.setHistoDrawStyle(h.getName(), "AP")
-            p.histoMgr.setHistoLegendStyle(h.getName(), "AP")
-
-    # Set default dataset style to all histos
-    for index, h in enumerate(p.histoMgr.getHistos()):
-        plots._plotStyles[p.histoMgr.getHistos()[index].getDataset().getName()].apply(p.histoMgr.getHistos()[index].getRootHisto())
-       #plots._plotStyles[dataset.getName()].apply(p)
-    '''
-
-    # Additional text
-    #histograms.addText(0.18, 0.92, "Phase-2 Simulation")
+    kwargs = {}
+    if opts.normalizeToOne:
+        p = plots.MCPlot(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
+    else:
+        p = plots.MCPlot(dsetsMgr, h, normalizeToLumi=opts.intLumi, saveFormats=[], **kwargs)
     
+    # Customise legend
+    p.histoMgr.setHistoLegendStyleAll("L")
+    p.setLegend(histograms.createLegend(0.68, 0.85-0.05*len(dsetsMgr.getAllDatasetNames()), 0.92, 0.92))
+    #p.histoMgr.setHistoLegendStyle("histo_" + dataset, "LP")
+
     # Draw a customised plot
-    kwargs_  = GetHistoKwargs(h, opts)
-    plots.drawPlot(p, h, **kwargs_)
+    plots.drawPlot(p, h, **GetHistoKwargs(h, opts) )
 
     # Remove legend?
     if 0:
@@ -141,39 +149,408 @@ def PlotHisto(datasetsMgr, h):
 
 
 def GetHistoKwargs(h, opts):
-    _moveLegend = {"dx": -0.1, "dy": 0.0, "dh": -0.15}
-    logY    = False
+    
+    hName   = h.lower()
+    _xLabel = ""
     _yLabel = "Arbitrary Units / %.2f "
-    yMin    = 0.0
-    if logY:
-        yMaxF = 10
+    _rebinX = 1
+    _rebinY = None
+    _units  = ""
+    _format = "%0.0f " + _units
+    _cutBox = {"cutValue": 10.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+    _leg   = {"dx": -0.5, "dy": -0.3, "dh": -0.4}
+    _ratio = True
+    _log   = False
+    _yMin  = 0.0
+    _yMaxF = 1.2
+    _xMin  = None
+    _xMax  = None
+    _yNorm = "Arbitrary Units"
+
+    if "_eff" in hName:
+        _units  = "GeV"
+        _format = "%0.0f " + _units
+        _xLabel = "E_{T} (%s)" % (_units)
+        _cutBox = {"cutValue": 20.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = "Efficiency / %.0f " + _units
+    elif "counters" in hName:
+        _units  = ""
+        _format = "%0.0f " + _units
+        _xLabel = "counters"
+        _rebinX = 1
+        #_xMax   = +10.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+    elif "_turnon" in hName:
+        _units  = "GeV"
+        _format = "%0.0f " + _units
+        _xLabel = "#tau_{h} E_{T} (%s)" % (_units)
+        _cutBox = {"cutValue": 20.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = "Efficiency / %.0f " + _units
+        _xMax   = 200.0
+    elif "_rate" in hName:
+        _units  = "GeV"
+        _format = "%0.0f " + _units
+        _xLabel = "E_{T} (%s)" % (_units)
+        _cutBox = {"cutValue": 20.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = "Rate (kHz) / %.0f " + _units
+        _log    = True
+        _yMin   = 1e+0
+        _xMax   = 250.0
+    elif "_rtau" in hName:
+        _units  = ""
+        _format = "%0.2f " + _units
+        _xLabel = "R_{#tau}"# (%s)" % (_units)
+        _cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = _yNorm + " / " + _format
+        # _log    = True
+        # _yMin   = 1e+0
+        _xMin   = +0.0
+        _xMax   = +1.2
+    elif "_chf" in hName:
+        _units  = ""
+        _format = "%0.1f " + _units
+        _xLabel = "charged hadron fraction"
+        _cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = _yNorm + " / " + _format
+        _xMax   = 2.0
+    elif "_nhf" in hName:
+        _units  = ""
+        _format = "%0.1f " + _units
+        _xLabel = "neutral hadron fraction"
+        _cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = _yNorm + " / " + _format
+        _xMin   = -1.0
+        _xMax   = +1.5
+        if "abs" in hName:
+            _xLabel = "|neutral hadron fraction|" 
+            _xMin   = 0.0
+    elif "_charge" in hName:
+        _units  = "e"
+        _format = "%0.1f " + _units
+        _xLabel = "charge (%s)" % (_units)
+        _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = _yNorm + " / " + _format
+        _xMin   = -2.0
+        _xMax   = +2.0
+    elif "_deltargenp" in hName:
+        _units  = ""
+        _format = "%0.2f " + _units
+        _xLabel = "#DeltaR" #(%s)" % (_units)
+        _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = _yNorm + " / " + _format
+        _xMin   = +0.0
+        _xMax   = +1.0
+    elif "_invmass" in hName:
+        _units  = "GeV/c^{2}"
+        _format = "%0.1f " + _units
+        _xLabel = "m (%s)" % (_units)
+        _cutBox = {"cutValue": 1.776, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _rebinX = 2
+        _yLabel = _yNorm + " / " + _format
+        _log    = True
+        #_xMin   = +0.0
+        #_xMax   = +1.0
+    elif "_sigconermin" in hName:
+        _units  = ""
+        _format = "%0.2f " + _units
+        _xLabel = "R_{min}^{sig}"
+        _cutBox = {"cutValue": 1.776, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+        _xMin   = +0.0
+        _xMax   = +0.3
+        _log    = False
+    elif "_sigconermax" in hName:
+        _units  = ""
+        _format = "%0.2f " + _units
+        _xLabel = "R_{max}^{sig}"
+        _cutBox = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+        _xMin   = +0.0
+        _xMax   = +0.3
+    elif "_isoconermin" in hName:
+        _units  = ""
+        _format = "%0.2f " + _units
+        _xLabel = "R_{min}^{iso}"
+        _cutBox = {"cutValue": 1.776, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+        _xMin   = +0.0
+        _xMax   = +0.3
+        _log    = False
+    elif "_isoconermax" in hName:
+        _units  = ""
+        _format = "%0.2f " + _units
+        _xLabel = "R_{max}^{iso}"
+        _cutBox = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+        _xMin   = +0.0
+        _xMax   = +1.0
+    elif "_chisquared" in hName:
+        _units  = ""
+        _format = "%0.1f " + _units
+        _xLabel = "#chi^{2}"
+        _cutBox = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = _yNorm + " / " + _format
+        _log    = True
+    elif "_redchisquared" in hName:
+        _units  = ""
+        _format = "%0.1f " + _units
+        # _xLabel = "#frac{#chi^{2}}{d.o.f}"
+        _xLabel = "#chi^{2} / #nu"
+        _cutBox = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _rebinX = 5
+        _yLabel = _yNorm + " / " + _format
+        _log    = True
+        _xMax   = 80.0
+    elif "_deltapocaz" in hName:
+        _units  = "cm"
+        _format = "%0.2f " + _units
+        _xLabel = "#Deltaz_{0} (%s)" % (_units)
+        _cutBox = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _rebinX = 4
+        _yLabel = _yNorm + " / " + _format
+        _log    = True
+    elif "_deltar" in hName:
+        _units  = ""
+        _format = "%0.2f " + _units
+        _xLabel = "#DeltaR"# (%s)" % (_units)
+        _cutBox = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _rebinX = 1
+        _xMin   = +0.0
+        _xMax   = +0.4
+        _yLabel = _yNorm + " / " + _format
+        _log    = True
+    elif "_eta" in hName:
+        _units  = ""
+        _format = "%0.2f " + _units
+        _xLabel = "#eta"
+        _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _rebinX = 5
+        _xMin   = -2.4
+        _xMax   = +2.4
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+        ROOT.gStyle.SetNdivisions(6, "X")
+    elif "_nstubs" in hName:
+        _units  = ""
+        _format = "%0.0f " + _units
+        _xLabel = "stubs multiplicity"
+        _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _rebinX = 2
+        _xMax   = +11.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+    elif "_pocaz" in hName:
+        _units  = "cm"
+        _format = "%0.1f " + _units
+        _xLabel = "z_{0} (%s)" % (_units)
+        _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _rebinX = 5
+        _xMin   = -25.0
+        _xMax   = +25.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+        ROOT.gStyle.SetNdivisions(6, "X")
+    elif "_d0" in hName:
+        _units  = "cm"
+        _format = "%0.1f " + _units
+        _xLabel = "d_{0} (%s)" % (_units)
+        _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _rebinX = 5
+        _xMin   = +0.0
+        _xMax   = +35.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+        if "_d0sig" in hName:
+            _units  = "cm"
+            _format = "%0.1f " + _units
+            _xLabel = "d_{0}/#sigma_{d_{0}} (%s)" % (_units)
+            _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+            _rebinX = 5
+            _xMin   = +0.0
+            _xMax   = +10.0
+            _yLabel = _yNorm + " / " + _format
+            _log    = False
+            ROOT.gStyle.SetNdivisions(6, "X")
+    elif "_pt" in hName:
+        _units  = "GeV/c"
+        _format = "%0.0f " + _units
+        _xLabel = "p_{T} (%s)" % (_units)
+        _cutBox = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _rebinX = 1
+        _xMax   = +200.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = True
+        if "_ptrel" in hName: # matchTk.p3().Perp(caloTau_p4.Vect()) =  transverse component (R in cylindrical coordinate system)
+            _units  = "GeV/c"
+            _format = "%0.2f " + _units
+            _xLabel = "p_{T}^{rel} (%s)" % (_units)
+            _cutBox = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+            _rebinX = 5
+            _xMax   = +10.0
+            _yLabel = _yNorm + " / " + _format
+            _log    = True
+        if "_ptminuscaloet" in hName:
+            _units  = "GeV"
+            _format = "%0.0f " + _units
+            _xLabel = "p_{T}^{tk} - E_{T}^{calo} (%s)" % (_units)
+            _cutBox = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+            _rebinX = 1
+            _xMax   = +10.0
+            _yLabel = _yNorm + " / " + _format
+            _log    = True
+    elif "_iscombinatoric" in hName:
+        _units  = ""
+        _format = "%0.0f " + _units
+        _xLabel = "is combinatoric"
+        _rebinX = 1
+        _xMax   = +2.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+    elif "_isgenuine" in hName:
+        _units  = ""
+        _format = "%0.0f " + _units
+        _xLabel = "is genuine"
+        _rebinX = 1
+        _xMax   = +2.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+    elif "_isunknown" in hName:
+        _units  = ""
+        _format = "%0.0f " + _units
+        _xLabel = "is unknown"
+        _rebinX = 1
+        _xMax   = +2.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+    elif "_multiplicity" in hName:
+        _units  = ""
+        _format = "%0.0f " + _units
+        _xLabel = "tau candidate multiplicity"
+        _rebinX = 1
+        _xMax   = +12.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+    elif "_nisotks" in hName:
+        _units  = ""
+        _format = "%0.0f " + _units
+        _xLabel = "track multiplicity (isolation)"
+        _rebinX = 1
+        _xMax   = +15.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+    elif "_nsigtks" in hName:
+        _units  = ""
+        _format = "%0.0f " + _units
+        _xLabel = "track multiplicity (signal)"
+        _rebinX = 1
+        _xMax   = +15.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+    elif "_reliso" in hName:
+        _units  = ""
+        _format = "%0.2f " + _units
+        _xLabel = "relative isolation"
+        #_xLabel = "#sum#limits_{i}^{iso tks} p_{T,i}/p_{T}^{m}"
+        #_xLabel = "#Sigma_{i}^{iso tks} p_{T,i}/p_{T}^{m}"#"relative isolatin"
+        _rebinX = 1
+        _xMax   = +5.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = True
+    elif "_vtxiso" in hName:
+        _units  = "cm"
+        _format = "%0.2f " + _units
+        #_xLabel = "vertex isolation"
+        _xLabel = "min(z_{0}^{m} - z_{0}^{iso}) (%s)" % (_units)
+        _rebinX = 1
+        _xMax   = +10.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = True
+    elif "_viset" in hName:
+        _units  = "GeV"
+        _format = "%0.0f " + _units
+        _xLabel = "#tau_{h} E_{T} (%s)" % (_units)
+        _rebinX = 1
+        _xMax   = +200.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = True
+    elif "_resolutioncaloet" in hName:
+        _units  = ""
+        _format = "%0.2f " + _units
+        #_xLabel = "(E_{T}^{calo} - p_{T}^{vis}) / p_{T}^{vis}"
+        _xLabel = "#deltaE_{T} / p_{T}^{vis}"
+        _rebinX = 1
+        _xMin   = +0.0
+        _xMax   = +5.0 #+10.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = True
+        if "_resolutioncaloeta" in hName:
+            #_xLabel = "(#eta^{calo} - #eta^{vis}) / #eta^{vis}"
+            _xLabel = "#delta#eta / #eta^{vis}"
+            _xMin   = -5.0
+            _xMax   = +5.0
+            _yLabel = _yNorm + " / " + _format
+            _log    = True
+    elif "_resolutioncalophi" in hName:
+        _units  = ""
+        _format = "%0.2f " + _units
+        _xLabel = "#phi^{calo} - #phi^{vis} / #phi^{vis}"
+        _rebinX = 1
+        _xMin   = -5.0
+        _xMax   = +5.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = True
     else:
-        yMaxF = 1.2
+        ROOT.gStyle.SetNdivisions(8, "X")
+
+    if _log:
+        if _yMin == 0.0:
+            _yMin = 1e-4
+        _yMaxF = 10
+
+    _opts = {"ymin": _yMin, "ymaxfactor": _yMaxF}
+    if _xMax != None:
+        _opts["xmax"] = _xMax
+    if _xMin != None:
+        _opts["xmin"] = _xMin
 
     _kwargs = {
-        #"xlabel"           : "x",
+        "xlabel"           : _xLabel,
         "ylabel"           : _yLabel,
-        "rebinX"           : 1,
-        "rebinY"           : None,
+        "rebinX"           : _rebinX,
+        "rebinY"           : _rebinY,
         "ratioYlabel"      : "Ratio",
-        "ratio"            : False, #opts.ratio,
-        "stackMCHistograms": False, #opts.nostack,
+        #"ratio"            : _ratio,
+        "stackMCHistograms": False,
         "ratioInvert"      : False,
-        "addMCUncertainty" : False,
+        "addMCUncertainty" : True,
         "addLuminosityText": False,
         "addCmsText"       : True,
         "cmsExtraText"     : "Phase-2 Simulation",
         "cmsTextPosition"  : "outframe",
-        "opts"             : {"ymin": yMin, "ymaxfactor": yMaxF},
-        "opts2"            : {"ymin": 0.59, "ymax": 1.41},
-        "log"              : logY,
-        "moveLegend"       : _moveLegend,
-        "xtitlesize"       : 0.1,
-        "ytitlesize"       : 0.1,
+        "opts"             : _opts,
+        "log"              : _log,
+        "cutBox"           : _cutBox,
+        "createLegend"     : None #_leg,
         }
-
-    kwargs = copy.deepcopy(_kwargs)
-    return kwargs
+    return _kwargs
 
 def GetBinwidthDecimals(binWidth):                                                                                                                                        
     dec =  " %0.0f"
@@ -261,11 +638,12 @@ def main(opts):
         histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))
         if "TH1" not in histoType:
             continue
+        
+        
         PlotHisto(datasetsMgr, h)
 
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
     return
-
 
 #================================================================================================
 # Main
@@ -341,7 +719,6 @@ if __name__ == "__main__":
         sys.exit(0)
     
     # Determine path for saving plots
-    print "opts.mcrab = ", opts.mcrab
     if opts.saveDir == None:
         opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="", postfix="L1TkTau")
     else:
