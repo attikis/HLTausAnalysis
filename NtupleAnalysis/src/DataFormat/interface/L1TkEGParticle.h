@@ -26,6 +26,8 @@ class L1TkEGParticle{
   void PrintTTTracks();
   void AddTrack(TTTrack trk) { theTracks.push_back(trk); }
   TTTrack GetLeadingTrack() const { return theTracks[0]; } 
+  vector<TTTrack> GetTracks() const {return theTracks; }
+  vector<L1EG> GetEGs() const{ return theEGs;}
   bool HasMatchingGenParticle(void) const{return theMatching;}
   
   double GetTrackBasedPt();  

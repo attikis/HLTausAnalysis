@@ -86,7 +86,7 @@ uncertaintyMode = Uncertainty()
 energyText = "14 TeV"
 
 ## Default PU text
-pileupText = "PU=140"
+pileupText = "PU=200"
 
 ## Class to provide default positions of the various texts.
 #

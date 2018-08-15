@@ -1,7 +1,7 @@
 {
     "analysis"         : "HLTausAnalysis",
     "dataEra"          : "ID2017",
-    "histograms"       : ["Calo_TurnOn25", "Tk_TurnOn25", "VtxIso_TurnOn25"],
+    "histograms"       : ["TurnOn25_all", "TurnOn25_relIso"],
     "saveName"         : "TurnOn25",
     "saveFormats"      : [".png", ".pdf", ".C"],
     "saveDir"          : "plots",
@@ -28,7 +28,7 @@
     "gridY"            : "True",
     "cmsExtraText"     : "Phase-2 Simulation",
     "removeLegend"     : "False",
-    "moveLegend"       : {"dx": -0.05, "dy": 0.0, "dh": -0.15},
+    "moveLegend"       : {"dx": -0.15, "dy": 0.0, "dh": -0.15},
     "extraText"        : {"text": "", "x": 0.18, "y": 0.92, "size": 17},
     "cutValue"         : 25.0,
     "cutFillColour"    : 16,

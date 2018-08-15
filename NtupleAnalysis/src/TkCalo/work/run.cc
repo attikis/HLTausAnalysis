@@ -25,9 +25,9 @@ void run(const std::string MulticrabDir = "",
   
   // Marina's files
   //const std::string absolutePath = "/afs/cern.ch/user/m/mtoumazo/workspace/multicrab";
-
+  const std::string absolutePath = "/eos/user/m/mtoumazo/";
   // Mikko's files
-  const std::string absolutePath = "/eos/user/m/mlotti/";
+  //const std::string absolutePath = "/eos/user/m/mlotti/";
 
   TkCalo macro(absolutePath + "/" + MulticrabDir, SampleName, text, maxEvents);
   macro.Loop();
