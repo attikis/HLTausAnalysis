@@ -651,17 +651,17 @@ def main(opts):
 if __name__ == "__main__":
 
     # Default Settings 
-    BATCHMODE   = True
-    VERBOSE     = False
-    INTLUMI     = 1.0
-    SAVEDIR     = None
-    SAVEFORMATS = [".png"] #[".C", ".png", ".pdf"]
-    GRIDX       = False
-    GRIDY       = False    
     ANALYSIS    = "HLTausAnalysis"
+    BATCHMODE   = True
     DATAERA     = "ID2017" #"TDR2019"
     FOLDER      = ""
+    GRIDX       = False
+    GRIDY       = False    
+    INTLUMI     = 1.0
     NORMTOONE   = False
+    SAVEDIR     = None
+    SAVEFORMATS = [".png"] #[".C", ".png", ".pdf"]
+    VERBOSE     = False
 
     parser = OptionParser(usage="Usage: %prog [options]" , add_help_option=False,conflict_handler="resolve")
 

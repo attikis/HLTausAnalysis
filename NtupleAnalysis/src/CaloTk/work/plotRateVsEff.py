@@ -5,11 +5,11 @@ Script that plots Data/MC for all histograms under a given folder (passsed as op
 Good for sanity checks for key points in the cut-flow
 
 Usage:
-./plot_Folder.py -m <pseudo_mcrab_directory> [opts]
+./plotRateVsEff.py -m <pseudo_mcrab_directory> [opts]
 
 Examples:
-./plot_Folder.py -m <mcrab> --folder ""
-./plot_Folder.py -m FakeBMeasurement_GE2Medium_GE1Loose0p80_StdSelections_BDTm0p80_AllSelections_BDT0p90_RandomSort_171120_100657 --url --folder ForFakeBMeasurementEWKFakeB --nostack
+./plotRateVsEff.py -m <mcrab> --folder ""
+./plotRateVsEff.py -m FakeBMeasurement_GE2Medium_GE1Loose0p80_StdSelections_BDTm0p80_AllSelections_BDT0p90_RandomSort_171120_100657 --url --folder ForFakeBMeasurementEWKFakeB --nostack
 
 Last Used:
 
@@ -37,8 +37,21 @@ import HLTausAnalysis.NtupleAnalysis.tools.tdrstyle as tdrstyle
 import HLTausAnalysis.NtupleAnalysis.tools.styles as styles
 import HLTausAnalysis.NtupleAnalysis.tools.plots as plots
 import HLTausAnalysis.NtupleAnalysis.tools.crosssection as xsect
+import HLTausAnalysis.NtupleAnalysis.tools.aux as aux
 import HLTausAnalysis.NtupleAnalysis.tools.multicrabConsistencyCheck as consistencyCheck
 import HLTausAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
+
+#================================================================================================
+# Variable definition
+#================================================================================================
+ss = ShellStyles.SuccessStyle()
+ns = ShellStyles.NormalStyle()
+ts = ShellStyles.NoteStyle()
+hs = ShellStyles.HighlightAltStyle()
+ls = ShellStyles.HighlightStyle()
+es = ShellStyles.ErrorStyle()
+cs = ShellStyles.CaptionStyle()
+
 
 #================================================================================================ 
 # Function Definition
@@ -58,25 +71,6 @@ def Verbose(msg, printHeader=True, verbose=False):
     Print(msg, printHeader)
     return
 
-def GetLumi(datasetsMgr):
-    Verbose("Determininig Integrated Luminosity")
-    
-    lumi = 0.0
-    for d in datasetsMgr.getAllDatasets():
-        if d.isMC():
-            continue
-        else:
-            lumi += d.getLuminosity()
-    Verbose("Luminosity = %s (pb)" % (lumi), True)
-    return lumi
-
-def GetListOfEwkDatasets():
-    Verbose("Getting list of EWK datasets")
-    if 0: # TopSelection
-        return  ["TT", "WJetsToQQ_HT_600ToInf", "SingleTop", "DYJetsToQQHT", "TTZToQQ",  "TTWJetsToQQ", "Diboson", "TTTT"]
-    else: # TopSelectionBDT
-        return  ["TT", "noTop", "SingleTop", "ttX"]
-
 
 def GetDatasetsFromDir(opts):
     Verbose("Getting datasets")
@@ -85,20 +79,20 @@ def GetDatasetsFromDir(opts):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
                                                         dataEra=opts.dataEra,
                                                         searchMode=opts.searchMode, 
-                                                        analysisName=opts.analysisName,
+                                                        analysisName=opts.analysis,
                                                         optimizationMode=opts.optMode)
     elif (opts.includeOnlyTasks):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
                                                         dataEra=opts.dataEra,
                                                         searchMode=opts.searchMode,
-                                                        analysisName=opts.analysisName,
+                                                        analysisName=opts.analysis,
                                                         includeOnlyTasks=opts.includeOnlyTasks,
                                                         optimizationMode=opts.optMode)
     elif (opts.excludeTasks):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
                                                         dataEra=opts.dataEra,
                                                         searchMode=opts.searchMode,
-                                                        analysisName=opts.analysisName,
+                                                        analysisName=opts.analysis,
                                                         excludeTasks=opts.excludeTasks,
                                                         optimizationMode=opts.optMode)
     else:
@@ -106,8 +100,12 @@ def GetDatasetsFromDir(opts):
     return datasets
     
 def main(opts):
-
-    #optModes = ["", "OptChiSqrCutValue50", "OptChiSqrCutValue100"]
+    
+    # Apply TDR style
+    style = tdrstyle.TDRStyle()
+    style.setOptStat(False)
+    style.setGridX(opts.gridX)
+    style.setGridY(opts.gridY)
     optModes = [""]
 
     if opts.optMode != None:
@@ -119,64 +117,40 @@ def main(opts):
 
         # Setup & configure the dataset manager 
         datasetsMgr = GetDatasetsFromDir(opts)
-        datasetsMgr.updateNAllEventsToPUWeighted() #marina
+        datasetsMgr.updateNAllEventsToPUWeighted()
         if 0:
             datasetsMgr.loadLuminosities() # from lumi.json
 
-        # Set/Overwrite cross-sections
-        datasetsToRemove = []
-        for d in datasetsMgr.getAllDatasets():
-            datasetsMgr.getDataset(d.getName()).setCrossSection(1.0)
-
-        if opts.verbose:
-            datasetsMgr.PrintCrossSections()
-            datasetsMgr.PrintLuminosities()
-
         # Custom Filtering of datasets 
+        datasetsToRemove = []
         for i, d in enumerate(datasetsToRemove, 0):
             msg = "Removing dataset %s" % d
             Print(ShellStyles.WarningLabel() + msg + ShellStyles.NormalStyle(), i==0)
-            datasetsMgr.remove(filter(lambda name: d in name, datasetsMgr.getAllDatasetNames()))
-        #if opts.verbose:
-            #datasetsMgr.PrintInfo()
-
+            datasetsMgr.remove(filter(lambda name: d in name, datasetsMgr.getAllDatasetNames()))        
         # Merge histograms (see NtupleAnalysis/python/tools/plots.py) 
         plots.mergeRenameReorderForDataMC(datasetsMgr) 
-        
-        # Get Luminosity
-        if 0:
-            intLumi = datasetsMgr.getDataset("Data").getLuminosity()
 
-        # Re-order datasets (different for inverted than default=baseline)
-        newOrder = []
-        # For-loop: All MC datasets
-        for d in datasetsMgr.getMCDatasets():
-            newOrder.append(d.getName())
-            
-        # Apply new dataset order!
-        datasetsMgr.selectAndReorder(newOrder)
-        
         # Print dataset information
-        #datasetsMgr.PrintInfo()
-        
-        # Apply TDR style
-        style = tdrstyle.TDRStyle()
-        #style.setOptStat(True)
-        style.setGridX(opts.gridX)
-        style.setGridY(opts.gridY)
-
+        datasetsMgr.PrintInfo()
+        if opts.verbose:
+            datasetsMgr.PrintCrossSections()
+ 
         # Define signal and background datasets names
-        datasetSignal = "GluGluHToTauTau_14TeV_L1TPU140" #"TT_TuneCUETP8M2T4_14TeV_L1TPU140"#"GluGluHToTauTau_14TeV_L1TPU140" #"ChargedHiggs200_14TeV_L1TPU140"
+        #datasetSignal = "GluGluHToTauTau_14TeV_L1TPU140" #"TT_TuneCUETP8M2T4_14TeV_L1TPU140"#"GluGluHToTauTau_14TeV_L1TPU140" #"ChargedHiggs200_14TeV_L1TPU140"
+        datasetSignal = "TT_TuneCUETP8M2T4_14TeV_L1TPU140"
         datasetBkg    = "SingleNeutrino_L1TPU140"
 
         # Plot Histograms
         effHistoLists  = [["Calo_Eff", "Tk_Eff", "VtxIso_Eff", "RelIso_Eff"], ["DiTau_Eff_Calo", "DiTau_Eff_Tk", "DiTau_Eff_VtxIso", "DiTau_Eff_RelIso"]]
         rateHistoLists = [["Calo_Rate", "Tk_Rate", "VtxIso_Rate", "RelIso_Rate"], ["DiTau_Rate_Calo", "DiTau_Rate_Tk", "DiTau_Rate_VtxIso", "DiTau_Rate_RelIso"]]
 
-
+        # For-loop: All histos
         for i in range(0, len(effHistoLists)):
-            PlotRateVsEff(datasetsMgr, effHistoLists[i], rateHistoLists[i], datasetSignal, datasetBkg)
-            
+            eff  = effHistoLists[i]
+            rate = rateHistoLists[i]
+            PlotRateVsEff(datasetsMgr, eff, rate, datasetSignal, datasetBkg)            
+
+    Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
     return
 
 
@@ -205,7 +179,6 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, datasetSignal, datas
             g3 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], datasetSignal, datasetBkg)
             g3.SetName("RelIso")
 
-    
 
     # Create & draw the plot
     p = plots.ComparisonManyPlot(g0, [g1,g2, g3], saveFormats=[])
@@ -222,15 +195,6 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, datasetSignal, datas
     # Set legend labels
     p.histoMgr.setHistoLegendLabelMany(legendDict)
 
-    # Get the x and y axis title
-    #binWidthX = p.histoMgr.getHistos()[0].getRootHisto().GetXaxis().GetBinWidth(0)
-    #binWidthY = p.histoMgr.getHistos()[0].getRootHisto().GetYaxis().GetBinWidth(0)
-    #xlabel = kwargs_["xlabel"] + " / %s" % (GetBinwidthDecimals(binWidthX) % (binWidthX))
-    #kwargs_["xlabel"] = xlabel
-    #ylabel = kwargs_["ylabel"] + " / %s" % (GetBinwidthDecimals(binWidthY) % (binWidthY))
-    #kwargs_["ylabel"] = ylabel
-
-
     # Draw and save the plot
     plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
     # Draw
@@ -239,27 +203,19 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, datasetSignal, datas
         for shape in shapes:
             shape.SetFillColor( p.histoMgr.getHistos()[i].getRootHisto().GetFillColor())
             shape.SetFillStyle(3003)
-            #shape.SetFillColorAlpha(p.histoMgr.getHistos()[i].getRootHisto().GetFillColor(), 0.15)
             shape.Draw("f same")
-        #min.Draw("l same")
-        #min.SetLineColor( p.histoMgr.getHistos()[i].getRootHisto().GetLineColor())
-        #max.Draw("l same")
-        #max.SetLineColor( p.histoMgr.getHistos()[i].getRootHisto().GetLineColor())
-        # g0.Draw("l same")
         ROOT.gPad.RedrawAxis()
 
 
-    # Additional text                                                                                                                                                    
+    # Additional text
     histograms.addText(0.65, 0.38, plots._legendLabels[datasetSignal], 17)
-    if "ditau" in saveName.lower():
-        histograms.addText(0.77, 0.89,"DoubleTau", 20)
-    else:
-        histograms.addText(0.77, 0.89,"SingleTau", 20)
+    # if "ditau" in saveName.lower():
+    #     histograms.addText(0.77, 0.89,"DoubleTau", 20)
+    # else:
+    #     histograms.addText(0.77, 0.89,"SingleTau", 20)
 
     # Save the plots in custom list of saveFormats
-    SavePlot(p, saveName, os.path.join(opts.saveDir, opts.optMode, opts.folder), [".pdf",".png"] )          
-
-
+    aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, True)
     return
 
 def convert2RateVsEffTGraph(datasetsMgr, effHistoName, rateHistoName, datasetSignal, datasetBkg):
@@ -305,18 +261,9 @@ def convert2RateVsEffTGraph(datasetsMgr, effHistoName, rateHistoName, datasetSig
         # WARNING! Ugly trick so that zero points are not visible on canvas
         if 1:
             if xVal == 0.0:
-                #xVal  = -0.1
-                #xLow  = +0.0001
-                #xHigh = +0.0001
                 nBins=nBins-1
                 continue
-            #if yVal ==0.0:
-            #    yVal  = -0.1
-            #    yLow  = +0.0001
-            #    yHigh = +0.0001
-            #    nBins = nBins -1
-            #    continue
-            
+
         # Store values
         x.append(xVal)
         xerrl.append(xLow)
@@ -355,9 +302,7 @@ def convert2RateVsEffTGraph(datasetsMgr, effHistoName, rateHistoName, datasetSig
     if 0:#printValues:
         for i, line in enumerate(table, 1):
             Print(line, False) #i==1)        
-   
     return tgraph
-
 
 def DrawErrorBand(graph):
     isErrorBand = graph.GetErrorXhigh(0) != -1 and graph.GetErrorXlow(0) != -1
@@ -405,16 +350,9 @@ def DrawErrorBand(graph):
             shapes[i+(npoints-1)*version].SetPoint((version+3)%4, xmin[i],   y[i])
  
     # Set attributes to those of input graph
-    # central.SetLineColor(graph.GetLineColor())
-    # central.SetLineStyle(graph.GetLineStyle())
-    # central.SetLineWidth(graph.GetLineWidth())
     min.SetLineStyle(graph.GetLineStyle())
     max.SetLineStyle(graph.GetLineStyle())
-#    for shape in shapes:
- #       shape.SetFillStyle(3001)#3003)#graph.GetFillStyle())
-        
     return shapes, min, max 
-
 
 def GetHistoKwargs(h, opts):
     _moveLegend = {"dx": -0.1, "dy": -0.55, "dh": -0.15}
@@ -448,16 +386,9 @@ def GetHistoKwargs(h, opts):
     if "ditau" in h.lower():
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.6, "ymin": yMin, "ymax":1000, "ymaxfactor": yMaxF}
 
-
     return kwargs
 
-    
-def GetBinwidthDecimals(binWidth):
-    dec =  " %0.0f"
-    if binWidth < 1:
-        dec = " %0.1f"
-    if binWidth < 0.1:
-        dec = " %0.2f"
+
     if binWidth < 0.01:
         dec =  " %0.3f"
     if binWidth < 0.001:
@@ -470,7 +401,6 @@ def GetBinwidthDecimals(binWidth):
         dec =  " %0.7f"
     return dec
 
-
 def getHistos(datasetsMgr, histoName):
 
     h1 = datasetsMgr.getDataset("Data").getDatasetRootHisto(histoName)
@@ -479,61 +409,6 @@ def getHistos(datasetsMgr, histoName):
     h2 = datasetsMgr.getDataset("EWK").getDatasetRootHisto(histoName)
     h2.setName("EWK")
     return [h1, h2]
-
-
-def PlotHistograms(datasetsMgr, histoName):
-    Verbose("Plotting Data-MC Histograms")
-
-    # Get Histogram name and its kwargs
-    saveName = histoName.rsplit("/")[-1]
-    kwargs_  = GetHistoKwargs(saveName, opts)
-    
-    
-    # Create the plotting object
-    p = plots.MCPlot(datasetsMgr, histoName, saveFormats=[], normalizeToOne=True)
-    # p = plots.ComparisonManyPlot(FakeB_inverted, compareHistos, saveFormats=[])
-
-    # For-loop: All histos                                                                                                                                               
-    for index, h in enumerate(p.histoMgr.getHistos()):
-        if index == 0:
-            continue
-        else:
-            #p.histoMgr.setHistoDrawStyle(h.getName(), "L")
-            p.histoMgr.setHistoLegendStyle(h.getName(), "L")
-
-    # Set default dataset style to all histos                                                                                                                            
-    for index, h in enumerate(p.histoMgr.getHistos()):
-        plots._plotStyles[p.histoMgr.getHistos()[index].getDataset().getName()].apply(p.histoMgr.getHistos()[index].getRootHisto())
-
-    # Draw and save the plot
-    plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
-
-    # Save the plots in custom list of saveFormats
-    SavePlot(p, saveName, os.path.join(opts.saveDir, opts.optMode, opts.folder), [".pdf"])#, ".png"] )
-    return
-
-
-def SavePlot(plot, plotName, saveDir, saveFormats = [".png", ".pdf"]):
-    Verbose("Saving the plot in %s formats: %s" % (len(saveFormats), ", ".join(saveFormats) ) )
-
-    # Check that path exists
-    if not os.path.exists(saveDir):
-        os.makedirs(saveDir)
-
-    # Create the name under which plot will be saved
-    saveName = os.path.join(saveDir, plotName.replace("/", "_").replace(" ", "").replace("(", "").replace(")", "") )
-    # For-loop: All save formats
-    for i, ext in enumerate(saveFormats):
-        saveNameURL = saveName + ext
-        #saveNameURL = saveNameURL.replace("/publicweb/a/aattikis/", "http://home.fnal.gov/~aattikis/")
-        saveNameURL = saveNameURL.replace("/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/", "https://cmsdoc.cern.ch/~mtoumazo/hltaus/")
-        if opts.url:
-            Print(saveNameURL, 1)
-        else:
-            Print(saveName + ext, 1)
-        plot.saveAs(saveName, formats=saveFormats)
-    return
-
 
 #================================================================================================ 
 # Main
@@ -556,24 +431,20 @@ if __name__ == "__main__":
     '''
     
     # Default Settings
-    ANALYSISNAME = None #"FakeBMeasurement"
-    SEARCHMODE   = None #"80to1000"
-    DATAERA      = None #"ID2017"
+    ANALYSIS    = "HLTausAnalysis"
+    BATCHMODE    = True
+    DATAERA     = "ID2017" #"TDR2019"
+    FOLDER       = ""
     GRIDX        = True
     GRIDY        = True
     OPTMODE      = None
-    BATCHMODE    = True
     PRECISION    = 3
-    INTLUMI      = -1.0
-    SUBCOUNTERS  = False
-    LATEX        = False
-    URL          = True
-    NOERROR      = True
-    SAVEDIR      = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/CaloTk/RateVsEff/" #os.getcwd()
-    VERBOSE      = False
-    FOLDER       = ""
     RATIO        = False
-    NOSTACK      = False
+    SAVEDIR      = None
+    SAVEFORMATS = [".png"] #[".C", ".png", ".pdf"]
+    SEARCHMODE   = None
+    URL          = True
+    VERBOSE      = False
 
     # Define the available script options
     parser = OptionParser(usage="Usage: %prog [options]")
@@ -587,11 +458,8 @@ if __name__ == "__main__":
     parser.add_option("-b", "--batchMode", dest="batchMode", action="store_false", default=BATCHMODE, 
                       help="Enables batch mode (canvas creation does NOT generate a window) [default: %s]" % BATCHMODE)
 
-    parser.add_option("--analysisName", dest="analysisName", type="string", default=ANALYSISNAME,
-                      help="Override default analysisName [default: %s]" % ANALYSISNAME)
-
-    parser.add_option("--intLumi", dest="intLumi", type=float, default=INTLUMI,
-                      help="Override the integrated lumi [default: %s]" % INTLUMI)
+    parser.add_option("--analysis", dest="analysis", type="string", default=ANALYSIS,
+                      help="Override default analysis name [default: %s]" % ANALYSIS)
 
     parser.add_option("--searchMode", dest="searchMode", type="string", default=SEARCHMODE,
                       help="Override default searchMode [default: %s]" % SEARCHMODE)
@@ -605,11 +473,14 @@ if __name__ == "__main__":
     parser.add_option("--gridY", dest="gridY", action="store_true", default=GRIDY, 
                       help="Enable the y-axis grid lines [default: %s]" % GRIDY)
 
-    parser.add_option("--saveDir", dest="saveDir", type="string", default=SAVEDIR, 
+    parser.add_option("--saveDir", dest="saveDir", type="string", default=SAVEDIR,
                       help="Directory where all pltos will be saved [default: %s]" % SAVEDIR)
 
     parser.add_option("--url", dest="url", action="store_true", default=URL, 
                       help="Don't print the actual save path the histogram is saved, but print the URL instead [default: %s]" % URL)
+
+    parser.add_option("--formats", dest="formats", default = None,
+                      help="Formats in which all plots will be saved in. Provide as list of comma-separated (NO SPACE!) formats. [default: None]")
     
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=VERBOSE, 
                       help="Enables verbose mode (for debugging purposes) [default: %s]" % VERBOSE)
@@ -626,9 +497,6 @@ if __name__ == "__main__":
     parser.add_option("--ratio", dest="ratio", action="store_true", default = RATIO,
                       help="Draw ratio canvas for Data/MC curves? [default: %s]" % (RATIO) )
 
-    parser.add_option("--nostack", dest="nostack", action="store_true", default = NOSTACK,
-                      help="Do not stack MC histograms [default: %s]" % (NOSTACK) )
-
     (opts, parseArgs) = parser.parse_args()
 
     # Require at least two arguments (script-name, path to multicrab)
@@ -641,6 +509,18 @@ if __name__ == "__main__":
         parser.print_help()
         #print __doc__
         sys.exit(1)
+
+    # Determine path for saving plots
+    if opts.saveDir == None:
+        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="", postfix="ROC")
+    else:
+        print "opts.saveDir = ", opts.saveDir
+
+    # Overwrite default save formats?
+    if opts.formats != None:
+        opts.saveFormats = opts.formats.split(",")
+    else:
+        opts.saveFormats = SAVEFORMATS
 
     # Sanity check
     allowedFolders = [""]
@@ -655,4 +535,4 @@ if __name__ == "__main__":
     main(opts)
 
     if not opts.batchMode:
-        raw_input("=== plot_Folder.py: Press any key to quit ROOT ...")
+        raw_input("=== plotRateVsEff.py: Press any key to quit ROOT ...")
