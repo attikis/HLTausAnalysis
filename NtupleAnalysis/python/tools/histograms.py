@@ -338,14 +338,24 @@ def addEnergyText(x=None, y=None, s=None):
         text = s
     addText(x, y, "#sqrt{s} = " + text, textDefaults.getSize("energy"), bold=False)
 
-def addPileupText(x=None, y=None, s=None):
-    _printTextDeprecationWarning("histograms.addPileupText()")
-    (x, y) = textDefaults.getValues("pileup", x, y)
-    text = pileupText
+def addPileupText(s=None, x=None, y=None):
+    text = "PU=0"
+    textSize   = 40*0.6
+    textOffset = 0.2
+    l = ROOT.gPad.GetLeftMargin()
+    t = ROOT.gPad.GetTopMargin()
+    r = ROOT.gPad.GetRightMargin()
+    b = ROOT.gPad.GetBottomMargin()
+
     if s != None:
         text = s
-    addText(x, y, "PU="+text, textDefaults.getSize("pileup"), bold=False)
-    
+    if x == None:
+        x = 1-4*r
+    if y == None:
+        y = 1-t+textOffset*t
+    addText(x, y, text, size=textSize, bold=False, align="right")
+    return
+
 ## Format luminosity number to fb
 #
 # \param lumi  Luminosity in pb^-1

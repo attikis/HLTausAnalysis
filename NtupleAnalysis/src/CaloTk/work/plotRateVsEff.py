@@ -1,17 +1,20 @@
 #!/usr/bin/env python
 '''
-Description:
-Script that plots Data/MC for all histograms under a given folder (passsed as option to the script)
-Good for sanity checks for key points in the cut-flow
+DESCRIPTION:
+Script that plots the ROC curvs (Rate Vs Efficiency) 
+for all datases in a given multicrab.
 
-Usage:
+
+USAGE:
 ./plotRateVsEff.py -m <pseudo_mcrab_directory> [opts]
 
-Examples:
-./plotRateVsEff.py -m <mcrab> --folder ""
-./plotRateVsEff.py -m FakeBMeasurement_GE2Medium_GE1Loose0p80_StdSelections_BDTm0p80_AllSelections_BDT0p90_RandomSort_171120_100657 --url --folder ForFakeBMeasurementEWKFakeB --nostack
 
-Last Used:
+EXAMPLES:
+./plotRateVsEff.py -m multicrab_CaloTkSkim_v92X_20180801T1203
+
+
+LAST USED:
+./plotRateVsEff.py -m multicrab_CaloTkSkim_v92X_20180801T1203
 
 '''
 
@@ -99,6 +102,7 @@ def GetDatasetsFromDir(opts):
         raise Exception("This should never be reached")
     return datasets
     
+
 def main(opts):
     
     # Apply TDR style
@@ -106,8 +110,8 @@ def main(opts):
     style.setOptStat(False)
     style.setGridX(opts.gridX)
     style.setGridY(opts.gridY)
-    optModes = [""]
 
+    optModes = [""]
     if opts.optMode != None:
         optModes = [opts.optMode]
         
@@ -121,12 +125,14 @@ def main(opts):
         if 0:
             datasetsMgr.loadLuminosities() # from lumi.json
 
-        # Custom Filtering of datasets 
+        # Custom filtering of datasets 
         datasetsToRemove = []
+        # For-loop: All dsets to be removed
         for i, d in enumerate(datasetsToRemove, 0):
             msg = "Removing dataset %s" % d
             Print(ShellStyles.WarningLabel() + msg + ShellStyles.NormalStyle(), i==0)
             datasetsMgr.remove(filter(lambda name: d in name, datasetsMgr.getAllDatasetNames()))        
+
         # Merge histograms (see NtupleAnalysis/python/tools/plots.py) 
         plots.mergeRenameReorderForDataMC(datasetsMgr) 
 
@@ -136,47 +142,68 @@ def main(opts):
             datasetsMgr.PrintCrossSections()
  
         # Define signal and background datasets names
-        #datasetSignal = "GluGluHToTauTau_14TeV_L1TPU140" #"TT_TuneCUETP8M2T4_14TeV_L1TPU140"#"GluGluHToTauTau_14TeV_L1TPU140" #"ChargedHiggs200_14TeV_L1TPU140"
-        datasetSignal = "TT_TuneCUETP8M2T4_14TeV_L1TPU140"
-        datasetBkg    = "SingleNeutrino_L1TPU140"
+        dsets_signal  = []
+        dsets_minBias = []
+        for d in datasetsMgr.getAllDatasetNames():
+            if "SingleNeutrino" in d:
+                dsets_minBias.append(d)
+            else:
+                dsets_signal.append(d)
 
-        # Plot Histograms
+        #datasetSignal = "GluGluHToTauTau_14TeV_L1TPU140" #"TT_TuneCUETP8M2T4_14TeV_L1TPU140"#"GluGluHToTauTau_14TeV_L1TPU140" #"ChargedHiggs200_14TeV_L1TPU140"
+
+        # ROC curve ingredients (histograms)
         effHistoLists  = [["Calo_Eff", "Tk_Eff", "VtxIso_Eff", "RelIso_Eff"], ["DiTau_Eff_Calo", "DiTau_Eff_Tk", "DiTau_Eff_VtxIso", "DiTau_Eff_RelIso"]]
         rateHistoLists = [["Calo_Rate", "Tk_Rate", "VtxIso_Rate", "RelIso_Rate"], ["DiTau_Rate_Calo", "DiTau_Rate_Tk", "DiTau_Rate_VtxIso", "DiTau_Rate_RelIso"]]
 
-        # For-loop: All histos
-        for i in range(0, len(effHistoLists)):
-            eff  = effHistoLists[i]
-            rate = rateHistoLists[i]
-            PlotRateVsEff(datasetsMgr, eff, rate, datasetSignal, datasetBkg)            
+        # For-loop: All background histos (min bias)
+        for i, b in enumerate(dsets_minBias, 1):
+            bPU = b.split("PU")[1]
+            
+            # For-loop: All signal histos
+            for j, s in enumerate(dsets_signal, 1):
+                sPU = s.split("PU")[1]
+                if bPU != sPU:
+                    continue
+                else:
+                    PU = sPU
+
+                # For-loop: All triggers (Calo, Calo+Tk, Calo+VtxIso)
+                for i in range(0, len(effHistoLists)):
+                    eff  = effHistoLists[i]
+                    rate = rateHistoLists[i]
+                    Verbose("Bkg = %s, Signal = %s" % (b, s), False)
+                    PlotRateVsEff(datasetsMgr, eff, rate, s, b, PU)
 
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
     return
 
 
-def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, datasetSignal, datasetBkg):
-    tgraphs=[]
+def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
+
+    # Definitions
+    tgraphs = []
     legendDict = {}
 
     # Get Histogram name and its kwargs
     if "ditau" in effHistoList[0].lower():
-        saveName = "DiTau_RateVsEff_"+ datasetSignal.split("_")[0]
+        saveName = "DiTau_RateVsEff_%s_PU%s" % (signal.split("_")[0], PU)
     else:
-        saveName = "SingleTau_RateVsEff_"+ datasetSignal.split("_")[0]
+        saveName = "SingleTau_RateVsEff_%s_PU%s" % (signal.split("_")[0], PU)
     kwargs_  = GetHistoKwargs(saveName, opts)
 
     for i in range (0, len(effHistoList)):
         if (i==0) :
-            g0 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], datasetSignal, datasetBkg)
+            g0 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
             g0.SetName("Calo")
         elif (i==1):
-            g1 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], datasetSignal, datasetBkg)
+            g1 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
             g1.SetName("Tk")
         elif (i==2):
-            g2 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], datasetSignal, datasetBkg)
+            g2 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
             g2.SetName("VtxIso")
         elif (i==3):
-            g3 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], datasetSignal, datasetBkg)
+            g3 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
             g3.SetName("RelIso")
 
 
@@ -188,7 +215,6 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, datasetSignal, datas
         hName = h.getName()
         legendDict[hName] = styles.getCaloLegend(index)
         p.histoMgr.forHisto(hName, styles.getCaloStyle(index))
-
         p.histoMgr.setHistoDrawStyle(h.getName(), "LX")                                                                                                     
         p.histoMgr.setHistoLegendStyle(h.getName(), "LP")
 
@@ -202,26 +228,21 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, datasetSignal, datas
         shapes, min, max = DrawErrorBand(g) 
         for shape in shapes:
             shape.SetFillColor( p.histoMgr.getHistos()[i].getRootHisto().GetFillColor())
-            shape.SetFillStyle(3003)
+            shape.SetFillStyle(3002)
             shape.Draw("f same")
         ROOT.gPad.RedrawAxis()
 
-
-    # Additional text
-    histograms.addText(0.65, 0.38, plots._legendLabels[datasetSignal], 17)
-    # if "ditau" in saveName.lower():
-    #     histograms.addText(0.77, 0.89,"DoubleTau", 20)
-    # else:
-    #     histograms.addText(0.77, 0.89,"SingleTau", 20)
+    histograms.addPileupText("PU=%s" % (PU) )
+    #histograms.addText(0.65, 0.38, "<PU> = %s" % (PU), 17)
 
     # Save the plots in custom list of saveFormats
     aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, True)
     return
 
-def convert2RateVsEffTGraph(datasetsMgr, effHistoName, rateHistoName, datasetSignal, datasetBkg):
+def convert2RateVsEffTGraph(datasetsMgr, effHistoName, rateHistoName, signal, bkg):
 
-    hEff  = datasetsMgr.getDataset(datasetSignal).getDatasetRootHisto(effHistoName).getHistogram()
-    hRate = datasetsMgr.getDataset(datasetBkg).getDatasetRootHisto(rateHistoName).getHistogram()
+    hEff  = datasetsMgr.getDataset(signal).getDatasetRootHisto(effHistoName).getHistogram()
+    hRate = datasetsMgr.getDataset(bkg).getDatasetRootHisto(rateHistoName).getHistogram()
     
     # Sanity Checks
     if (hEff.GetXaxis().GetBinWidth(0) != hRate.GetXaxis().GetBinWidth(0)):
