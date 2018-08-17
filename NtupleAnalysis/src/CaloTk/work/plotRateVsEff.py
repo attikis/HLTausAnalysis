@@ -233,7 +233,7 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
         ROOT.gPad.RedrawAxis()
 
     histograms.addPileupText("PU=%s" % (PU) )
-    #histograms.addText(0.65, 0.38, "<PU> = %s" % (PU), 17)
+    histograms.addText(0.60, 0.38, plots._legendLabels[signal], 17)
 
     # Save the plots in custom list of saveFormats
     aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, True)
@@ -376,7 +376,7 @@ def DrawErrorBand(graph):
     return shapes, min, max 
 
 def GetHistoKwargs(h, opts):
-    _moveLegend = {"dx": -0.1, "dy": -0.55, "dh": -0.15}
+    _moveLegend = {"dx": -0.15, "dy": -0.55, "dh": -0.15}
     logY    = True
     yMin    = 0.0
     if logY:
@@ -393,7 +393,7 @@ def GetHistoKwargs(h, opts):
         "addCmsText"       : True,
         "cmsExtraText"     : "Phase-2 Simulation",
         "cmsTextPosition"  : "outframe",
-        "opts"             : {"xmin": 0.0, "xmax": 1.0, "ymin": yMin, "ymax":1000, "ymaxfactor": yMaxF},
+        "opts"             : {"xmin": 0.0, "xmax": 0.6, "ymin": yMin, "ymax":1000, "ymaxfactor": yMaxF},
         "opts2"            : {"ymin": 0.59, "ymax": 1.41},
         "log"              : logY,
         "moveLegend"       : _moveLegend,

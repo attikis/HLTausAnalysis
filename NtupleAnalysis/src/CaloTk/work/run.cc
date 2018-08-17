@@ -4,8 +4,22 @@
 //
 // Example:
 // root -l
+// root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "SingleNeutrino_L1TPU140", "", -1)
 // root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "SingleNeutrino_L1TPU200", "", -1)
-//
+// root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "SingleTau_L1TnoPU", "", -1)
+// root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "SingleTau_L1TPU200", "", -1)
+// root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "GluGluHToTauTau_14TeV_L1TnoPU", "", -1)
+// root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "GluGluHToTauTau_14TeV_L1TPU140", "", -1)
+// root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "GluGluHToTauTau_14TeV_L1TPU200", "", -1)
+// root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "ChargedHiggs200_14TeV_L1TnoPU", "", -1)
+// root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "ChargedHiggs200_14TeV_L1TPU140", "", -1)
+// root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "ChargedHiggs200_14TeV_L1TPU200", "", -1)
+// root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "ChargedHiggs500_14TeV_L1TnoPU", "", -1)
+// root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "ChargedHiggs1000_14TeV_L1TPU140", "", -1)
+// root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "ChargedHiggs1000_14TeV_L1TPU200", "", -1)
+// root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "ChargedHiggs1000_14TeV_L1TnoPU", "", -1)
+// root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "ChargedHiggs1000_14TeV_L1TPU140", "", -1)
+// root[0] .x run.cc("multicrab_HLTaus_v1015_20180710T1650", "ChargedHiggs1000_14TeV_L1TPU200", "", -1)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "../CaloTk.C+" // how to compile macro in ROOT6 (compatible with ROOT5 as well)
 
