@@ -63,7 +63,7 @@ string FileOpener::GetFirstFileName(const string multicrabPath, const string dat
   const string datasetPath = datasets_.GetDatasetPathFromAlias(dataset);
   const string fullPath    = multicrabPath + "/" + datasetPath + "/results/";
   vector<string> dirs      = GetListOfFiles(fullPath);
-  
+
   // Sanity check
   if (dirs.size() < 1)
     {
