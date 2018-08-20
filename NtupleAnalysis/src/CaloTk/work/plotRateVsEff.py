@@ -153,29 +153,148 @@ def main(opts):
         #datasetSignal = "GluGluHToTauTau_14TeV_L1TPU140" #"TT_TuneCUETP8M2T4_14TeV_L1TPU140"#"GluGluHToTauTau_14TeV_L1TPU140" #"ChargedHiggs200_14TeV_L1TPU140"
 
         # ROC curve ingredients (histograms)
-        effHistoLists  = [["Calo_Eff", "Tk_Eff", "VtxIso_Eff", "RelIso_Eff"], ["DiTau_Eff_Calo", "DiTau_Eff_Tk", "DiTau_Eff_VtxIso", "DiTau_Eff_RelIso"]]
-        rateHistoLists = [["Calo_Rate", "Tk_Rate", "VtxIso_Rate", "RelIso_Rate"], ["DiTau_Rate_Calo", "DiTau_Rate_Tk", "DiTau_Rate_VtxIso", "DiTau_Rate_RelIso"]]
+        effLists  = [["Calo_Eff", "Tk_Eff", "VtxIso_Eff", "RelIso_Eff"], ["DiTau_Eff_Calo", "DiTau_Eff_Tk", "DiTau_Eff_VtxIso", "DiTau_Eff_RelIso"]]
+        rateLists = [["Calo_Rate", "Tk_Rate", "VtxIso_Rate", "RelIso_Rate"], ["DiTau_Rate_Calo", "DiTau_Rate_Tk", "DiTau_Rate_VtxIso", "DiTau_Rate_RelIso"]]
 
         # For-loop: All background histos (min bias)
         for i, b in enumerate(dsets_minBias, 1):
             bPU = b.split("PU")[1]
-            
+
+            # Create rate plots (SingleTau, DiTau)
+            PlotRate(datasetsMgr, rateLists[0], b, bPU)
+            PlotRate(datasetsMgr, rateLists[1], b, bPU)
+
             # For-loop: All signal histos
             for j, s in enumerate(dsets_signal, 1):
                 sPU = s.split("PU")[1]
+
+                # Create rate plots (SingleTau, DiTau)
+                PlotEfficiency(datasetsMgr, effLists[0], s, sPU)
+                PlotEfficiency(datasetsMgr, effLists[1], s, sPU)
+
                 if bPU != sPU:
                     continue
                 else:
                     PU = sPU
 
                 # For-loop: All triggers (Calo, Calo+Tk, Calo+VtxIso)
-                for i in range(0, len(effHistoLists)):
-                    eff  = effHistoLists[i]
-                    rate = rateHistoLists[i]
+                for i in range(0, len(effLists)):
+                    eff  = effLists[i]
+                    rate = rateLists[i]
                     Verbose("Bkg = %s, Signal = %s" % (b, s), False)
                     PlotRateVsEff(datasetsMgr, eff, rate, s, b, PU)
 
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
+    return
+
+
+def PlotRate(datasetsMgr, histoList, bkg, PU):
+
+    # Get Histogram name and its kwargs
+    taus     = "SingleTau"
+    saveName = "Rate_%s_PU%s" % (taus, PU)
+    kwargs   = GetHistoKwargs(saveName, opts)
+    hList    = []
+    legDict  = {}
+
+    # For-loop: All tau algorithms
+    for i, hName in enumerate(histoList, 0):
+        algo = hName.split("_")[0]
+        if algo == "DiTau":
+            taus = "DiTau"
+            algo = hName.split("_")[-1]
+            
+        Print("Rate for \"%s\" algorithm (%s)" % (algo, taus), i==0)
+        h = datasetsMgr.getDataset(bkg).getDatasetRootHisto(hName).getHistogram()
+        h.SetName(hName)
+        legDict[hName] = algo
+        hList.append(h)
+
+    # Create the rate histograms
+    p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[])
+
+    # Set legend labels
+    for h in p.histoMgr.getHistos():
+        hName = h.getName()
+        algo  = h.getName().split("_")[0]
+        if algo == "DiTau":
+            algo = hName.split("_")[-1]
+        p.histoMgr.forHisto(hName, styles.getTauAlgoStyle(algo))
+        p.histoMgr.setHistoDrawStyle(hName, "HIST")
+        p.histoMgr.setHistoLegendStyle(hName, "L")
+    
+    # Set legend labels
+    p.histoMgr.setHistoLegendLabelMany(legDict)
+
+
+    # Draw and save the plot
+    saveName = "Rate_%s_PU%s" % (taus, PU)
+    plots.drawPlot(p, saveName, **kwargs)
+
+    # Add additional canvas text
+    histograms.addPileupText("PU=%s" % (PU) )
+    histograms.addText(0.75, 0.88, taus, 17)
+    #histograms.addText(0.60, 0.78, plots._legendLabels[bkg], 17)
+
+    # Save the plots in custom list of saveFormats
+    aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, True)
+    return
+
+def PlotEfficiency(datasetsMgr, histoList, signal, PU):
+
+    # Get Histogram name and its kwargs
+    taus     = "SingleTau"
+    saveName = "Efficiency_%s_PU%s_%s" % (taus, PU, signal)
+    kwargs   = GetHistoKwargs(saveName, opts)
+    hList    = []
+    legDict  = {}
+
+    # For-loop: All tau algorithms
+    for i, hName in enumerate(histoList, 0):
+        algo = hName.split("_")[0]
+        if algo == "DiTau":
+
+            if "TT_" in signal or "GluGlu" in signal:
+                pass
+            else:
+                return
+
+            taus = "DiTau"
+            algo = hName.split("_")[-1]
+            
+        Print("Efficiency for \"%s\" algorithm (%s, %s)" % (algo, taus, signal), i==0)
+        h = datasetsMgr.getDataset(signal).getDatasetRootHisto(hName).getHistogram()
+        h.SetName(hName)
+        legDict[hName] = algo
+        hList.append(h)
+
+    # Create the rate histograms
+    p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[])
+
+    # Set legend labels
+    for h in p.histoMgr.getHistos():
+        hName = h.getName()
+        algo  = h.getName().split("_")[0]
+        if algo == "DiTau":
+            algo = hName.split("_")[-1]
+        p.histoMgr.forHisto(hName, styles.getTauAlgoStyle(algo))
+        p.histoMgr.setHistoDrawStyle(hName, "HIST")
+        p.histoMgr.setHistoLegendStyle(hName, "L")
+    
+    # Set legend labels
+    p.histoMgr.setHistoLegendLabelMany(legDict)
+
+    # Draw and save the plot
+    saveName = "Efficiency_%s_PU%s_%s" % (taus, PU, signal)
+    plots.drawPlot(p, saveName, **kwargs)
+
+    # Add additional canvas text
+    histograms.addPileupText("PU=%s" % (PU) )
+    # histograms.addText(0.75, 0.88, taus, 17)
+    histograms.addText(0.60, 0.88, plots._legendLabels[signal], 17)
+
+    # Save the plots in custom list of saveFormats
+    aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, True)
     return
 
 
@@ -187,9 +306,13 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
 
     # Get Histogram name and its kwargs
     if "ditau" in effHistoList[0].lower():
-        saveName = "DiTau_RateVsEff_%s_PU%s" % (signal.split("_")[0], PU)
+        if "TT_" in signal or "GluGlu" in signal:
+            pass
+        else:
+            return
+        saveName = "RateVsEff_DiTau_%s_PU%s" % (signal.split("_")[0], PU)
     else:
-        saveName = "SingleTau_RateVsEff_%s_PU%s" % (signal.split("_")[0], PU)
+        saveName = "RateVsEff_SingleTau_%s_PU%s" % (signal.split("_")[0], PU)
     kwargs_  = GetHistoKwargs(saveName, opts)
 
     for i in range (0, len(effHistoList)):
@@ -206,8 +329,7 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
             g3 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
             g3.SetName("RelIso")
 
-
-    # Create & draw the plot
+    # Create the Rate Vs Efficiency TGraphs
     p = plots.ComparisonManyPlot(g0, [g1,g2, g3], saveFormats=[])
     
     # Set individual styles
@@ -215,7 +337,7 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
         hName = h.getName()
         legendDict[hName] = styles.getCaloLegend(index)
         p.histoMgr.forHisto(hName, styles.getCaloStyle(index))
-        p.histoMgr.setHistoDrawStyle(h.getName(), "LX")                                                                                                     
+        p.histoMgr.setHistoDrawStyle(h.getName(), "LX") # "X" = Do not draw error bars
         p.histoMgr.setHistoLegendStyle(h.getName(), "LP")
 
     # Set legend labels
@@ -223,7 +345,8 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
 
     # Draw and save the plot
     plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
-    # Draw
+
+    # Draw Error bands
     for i, g in enumerate([g0, g1, g2, g3]):
         shapes, min, max = DrawErrorBand(g) 
         for shape in shapes:
@@ -376,7 +499,9 @@ def DrawErrorBand(graph):
     return shapes, min, max 
 
 def GetHistoKwargs(h, opts):
-    _moveLegend = {"dx": -0.15, "dy": -0.55, "dh": -0.15}
+    _mvLeg1 = {"dx": -0.15, "dy": -0.55, "dh": -0.15}
+    _mvLeg2 = {"dx": -0.0, "dy": -0.05, "dh": -0.15}
+    _mvLeg3 = {"dx": -0.15, "dy": -0.05, "dh": -0.15}
     logY    = True
     yMin    = 0.0
     if logY:
@@ -393,21 +518,35 @@ def GetHistoKwargs(h, opts):
         "addCmsText"       : True,
         "cmsExtraText"     : "Phase-2 Simulation",
         "cmsTextPosition"  : "outframe",
-        "opts"             : {"xmin": 0.0, "xmax": 0.6, "ymin": yMin, "ymax":1000, "ymaxfactor": yMaxF},
+        "opts"             : {"xmin": 0.0, "xmax": 1.0, "ymin": yMin, "ymax":1000, "ymaxfactor": yMaxF},
         "opts2"            : {"ymin": 0.59, "ymax": 1.41},
         "log"              : logY,
-        "moveLegend"       : _moveLegend,
+        "moveLegend"       : _mvLeg1,
         "xtitlesize"       : 0.1,#xlabelSize,
         "ytitlesize"       : 0.1,#ylabelSize,
         "cutBoxY"           : {"cutValue": 50, "fillColor": 16, "box": False, "line": True, "cutGreaterThan"   : False}
         }
 
-    kwargs = copy.deepcopy(_kwargs)
-    
-    if "ditau" in h.lower():
-        kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.6, "ymin": yMin, "ymax":1000, "ymaxfactor": yMaxF}
-
-    return kwargs
+    if "_RateVsEff_" in h:
+        if "ditau" in h.lower():
+            _kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.6, "ymin": yMin, "ymax":1000, "ymaxfactor": yMaxF}
+        return _kwargs
+    elif "Rate_" in h:
+        _kwargs["xlabel"]     = "E_{T} (GeV)"
+        _kwargs["ylabel"]     = "Rate (kHz)"
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 200.0, "ymin": yMin, "ymax":1e5, "ymaxfactor": yMaxF}
+        _kwargs["moveLegend"] = _mvLeg2
+        _kwargs["cutBoxY"]    = {"cutValue": 50, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}
+    elif "Efficiency_" in h:
+        _kwargs["xlabel"]     = "E_{T} (GeV)"
+        _kwargs["ylabel"]     = "Efficiency"
+        _kwargs["log"]        = False
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 200.0, "ymin": 0.0, "ymax": 1.0, "ymaxfactor": yMaxF}
+        _kwargs["moveLegend"] = _mvLeg3
+        _kwargs["cutBoxY"]    = {"cutValue": 50, "fillColor": 16, "box": False, "line": False, "cutGreaterThan": False}
+    else:
+        pass
+    return _kwargs
 
 
     if binWidth < 0.01:
@@ -464,7 +603,7 @@ if __name__ == "__main__":
     SAVEDIR      = None
     SAVEFORMATS = [".png"] #[".C", ".png", ".pdf"]
     SEARCHMODE   = None
-    URL          = True
+    URL          = False
     VERBOSE      = False
 
     # Define the available script options

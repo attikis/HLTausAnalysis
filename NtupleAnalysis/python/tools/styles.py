@@ -348,16 +348,16 @@ regionStyle3      = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.
 
 caloStyle1        = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
                                    StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kBlack, fillStyle=3001)])
+                                   StyleFill(fillColor=ROOT.kBlack, fillStyle=0)]) #3001
 caloStyle2        = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
                                    StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kSolid, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kRed, fillStyle=3001)])
+                                   StyleFill(fillColor=ROOT.kRed, fillStyle=0)])
 caloStyle3        = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kAzure, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
                                    StyleLine(lineColor=ROOT.kAzure, lineStyle=ROOT.kSolid, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kAzure, fillStyle=3001)])
+                                   StyleFill(fillColor=ROOT.kAzure, fillStyle=0)])
 caloStyle4        = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kGreen+2, markerSizes=None, markerStyle=ROOT.kFullSquare),
                                    StyleLine(lineColor=ROOT.kGreen+2, lineStyle=ROOT.kSolid, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kGreen+2, fillStyle=3001)])
+                                   StyleFill(fillColor=ROOT.kGreen+2, fillStyle=0)])
 
 caloTkStyle       = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
                                    StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
@@ -476,6 +476,22 @@ def getRegionStyle(i):
     else:
         styles[index]
 
+
+def getTauAlgoStyle(algo):
+    allowedAlgos = ["Calo", "Tk", "VtxIso", "RelIso", "TkCalo", "PFTau"]
+    if algo not in allowedAlgos:
+        raise Exception("No style available for tau algorithm \"%s\"" % (algo))
+
+    if algo == "Calo":
+        return getCaloStyle(0)
+    elif algo == "Tk":
+        return getCaloStyle(1)
+    elif algo == "VtxIso":
+        return getCaloStyle(2)
+    elif algo == "RelIso":
+        return getCaloStyle(3)
+    else:
+        raise Exception("This should never be reached")
 
 def getCaloStyle(i):
     if i==0:
