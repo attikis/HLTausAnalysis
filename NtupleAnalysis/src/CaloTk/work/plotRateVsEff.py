@@ -150,8 +150,6 @@ def main(opts):
             else:
                 dsets_signal.append(d)
 
-        #datasetSignal = "GluGluHToTauTau_14TeV_L1TPU140" #"TT_TuneCUETP8M2T4_14TeV_L1TPU140"#"GluGluHToTauTau_14TeV_L1TPU140" #"ChargedHiggs200_14TeV_L1TPU140"
-
         # ROC curve ingredients (histograms)
         effLists  = [["Calo_Eff", "Tk_Eff", "VtxIso_Eff", "RelIso_Eff"], ["DiTau_Eff_Calo", "DiTau_Eff_Tk", "DiTau_Eff_VtxIso", "DiTau_Eff_RelIso"]]
         rateLists = [["Calo_Rate", "Tk_Rate", "VtxIso_Rate", "RelIso_Rate"], ["DiTau_Rate_Calo", "DiTau_Rate_Tk", "DiTau_Rate_VtxIso", "DiTau_Rate_RelIso"]]
@@ -244,7 +242,8 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
 
     # Get Histogram name and its kwargs
     taus     = "SingleTau"
-    saveName = "Efficiency_%s_PU%s_%s" % (taus, PU, signal)
+    #saveName = "Efficiency_%s_PU%s_%s" % (taus, PU, signal)
+    saveName = "Efficiency_%s_%s" % (taus, signal)
     kwargs   = GetHistoKwargs(saveName, opts)
     hList    = []
     legDict  = {}
@@ -285,7 +284,8 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
     p.histoMgr.setHistoLegendLabelMany(legDict)
 
     # Draw and save the plot
-    saveName = "Efficiency_%s_PU%s_%s" % (taus, PU, signal)
+    #saveName = "Efficiency_%s_PU%s_%s" % (taus, PU, signal)
+    saveName = "Efficiency_%s_%s" % (taus, signal)
     plots.drawPlot(p, saveName, **kwargs)
 
     # Add additional canvas text
@@ -534,14 +534,14 @@ def GetHistoKwargs(h, opts):
     elif "Rate_" in h:
         _kwargs["xlabel"]     = "E_{T} (GeV)"
         _kwargs["ylabel"]     = "Rate (kHz)"
-        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 200.0, "ymin": yMin, "ymax":1e5, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 300.0, "ymin": yMin, "ymax":1e5, "ymaxfactor": yMaxF}
         _kwargs["moveLegend"] = _mvLeg2
         _kwargs["cutBoxY"]    = {"cutValue": 50, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}
     elif "Efficiency_" in h:
         _kwargs["xlabel"]     = "E_{T} (GeV)"
         _kwargs["ylabel"]     = "Efficiency"
         _kwargs["log"]        = False
-        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 200.0, "ymin": 0.0, "ymax": 1.0, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 300.0, "ymin": 0.0, "ymax": 1.0, "ymaxfactor": yMaxF}
         _kwargs["moveLegend"] = _mvLeg3
         _kwargs["cutBoxY"]    = {"cutValue": 50, "fillColor": 16, "box": False, "line": False, "cutGreaterThan": False}
     else:
@@ -601,7 +601,7 @@ if __name__ == "__main__":
     PRECISION    = 3
     RATIO        = False
     SAVEDIR      = None
-    SAVEFORMATS = [".png"] #[".C", ".png", ".pdf"]
+    SAVEFORMATS = [".C", ".png", ".pdf"]
     SEARCHMODE   = None
     URL          = False
     VERBOSE      = False

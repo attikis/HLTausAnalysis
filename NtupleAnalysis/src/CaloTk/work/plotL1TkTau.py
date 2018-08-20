@@ -104,10 +104,11 @@ def GetDatasetsFromDir(opts):
     
 def PlotHisto(datasetsMgr, h):
     dsetsMgr = datasetsMgr.deepCopy()
-    
+
     if "_eff" in h.lower():
         dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False) 
         dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False) 
+        opts.normalizeToOne = False
     elif "_deltargenp" in h.lower():
         dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False) 
         dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False) 
@@ -127,12 +128,25 @@ def PlotHisto(datasetsMgr, h):
     # Create the MC Plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
     kwargs = {}
     if opts.normalizeToOne:
-        p = plots.MCPlot(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
+        #p = plots.MCPlot(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
+        p = plots.PlotSameBase(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
     else:
-        p = plots.MCPlot(dsetsMgr, h, normalizeToLumi=opts.intLumi, saveFormats=[], **kwargs)
+        #p = plots.MCPlot(dsetsMgr, h, normalizeToLumi=opts.intLumi, saveFormats=[], **kwargs)
+        p = plots.PlotSameBase(dsetsMgr, h, saveFormats=[], **kwargs) #def __init__(self, datasetMgr, name, normalizeToOne=False, datasetRootHistoArgs={}, **kwargs):
     
+    # Set default styles (Called by default in MCPlot)
+    p._setLegendStyles()
+    p._setLegendLabels()
+    p._setPlotStyles()
+
     # Customise legend
-    p.histoMgr.setHistoLegendStyleAll("L")
+    # p.histoMgr.setHistoLegendStyleAll("L")
+    for d in dsetsMgr.getAllDatasetNames():
+        if "SingleNeutrino" in d:
+            p.histoMgr.setHistoLegendStyle(d, "F")
+        else:
+            p.histoMgr.setHistoLegendStyle(d, "L")
+
     p.setLegend(histograms.createLegend(0.68, 0.85-0.05*len(dsetsMgr.getAllDatasetNames()), 0.92, 0.92))
     #p.histoMgr.setHistoLegendStyle("histo_" + dataset, "LP")
 
@@ -215,7 +229,7 @@ def GetHistoKwargs(h, opts):
         _units  = ""
         _format = "%0.1f " + _units
         _xLabel = "charged hadron fraction"
-        _cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
         _rebinX = 1
         _yLabel = _yNorm + " / " + _format
         _xMax   = 2.0
@@ -223,7 +237,7 @@ def GetHistoKwargs(h, opts):
         _units  = ""
         _format = "%0.1f " + _units
         _xLabel = "neutral hadron fraction"
-        _cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
         _rebinX = 1
         _yLabel = _yNorm + " / " + _format
         _xMin   = -1.0
@@ -312,10 +326,10 @@ def GetHistoKwargs(h, opts):
     elif "_redchisquared" in hName:
         _units  = ""
         _format = "%0.1f " + _units
-        # _xLabel = "#frac{#chi^{2}}{d.o.f}"
-        _xLabel = "#chi^{2} / #nu"
+        #_xLabel = "#chi^{2} / #nu"
+        _xLabel = "#chi^{2}_{#nu}"
         _cutBox = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        _rebinX = 5
+        _rebinX = 10 #5
         _yLabel = _yNorm + " / " + _format
         _log    = True
         _xMax   = 80.0
@@ -394,7 +408,7 @@ def GetHistoKwargs(h, opts):
         _format = "%0.0f " + _units
         _xLabel = "p_{T} (%s)" % (_units)
         _cutBox = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-        _rebinX = 1
+        _rebinX = 5
         _xMax   = +200.0
         _yLabel = _yNorm + " / " + _format
         _log    = True
@@ -403,7 +417,7 @@ def GetHistoKwargs(h, opts):
             _format = "%0.2f " + _units
             _xLabel = "p_{T}^{rel} (%s)" % (_units)
             _cutBox = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-            _rebinX = 5
+            _rebinX = 10
             _xMax   = +10.0
             _yLabel = _yNorm + " / " + _format
             _log    = True
@@ -497,21 +511,22 @@ def GetHistoKwargs(h, opts):
         #_xLabel = "(E_{T}^{calo} - p_{T}^{vis}) / p_{T}^{vis}"
         _xLabel = "#deltaE_{T} / p_{T}^{vis}"
         _rebinX = 1
-        _xMin   = +0.0
-        _xMax   = +5.0 #+10.0
+        _xMin   = -1.5
+        _xMax   = +5.5 #+10.0
         _yLabel = _yNorm + " / " + _format
         _log    = True
         if "_resolutioncaloeta" in hName:
             #_xLabel = "(#eta^{calo} - #eta^{vis}) / #eta^{vis}"
             _xLabel = "#delta#eta / #eta^{vis}"
-            _xMin   = -5.0
-            _xMax   = +5.0
+            _xMin   = -1.5
+            _xMax   = +5.5
             _yLabel = _yNorm + " / " + _format
             _log    = True
     elif "_resolutioncalophi" in hName:
         _units  = ""
         _format = "%0.2f " + _units
-        _xLabel = "#phi^{calo} - #phi^{vis} / #phi^{vis}"
+        #_xLabel = "#phi^{calo} - #phi^{vis} / #phi^{vis}"
+        _xLabel = "#delta#phi / #phi^{vis}"
         _rebinX = 1
         _xMin   = -5.0
         _xMax   = +5.0
@@ -620,9 +635,18 @@ def main(opts):
         intLumi = datasetsMgr.getDataset("Data").getLuminosity()
 
     # Apply new dataset order?
-    newOrder = ["SingleNeutrino_L1TPU140", "TT_TuneCUETP8M2T4_14TeV_L1TnoPU"]
-    if 0:
-        datasetsMgr.selectAndReorder(newOrder)
+    newOrder = datasetsMgr.getAllDatasetNames()
+    for i, d in  enumerate(datasetsMgr.getAllDatasetNames(), 0):
+        if "noPU" in d:
+            newOrder.insert(0, newOrder.pop(i))
+        if "PU200" in d:
+            newOrder.insert(2, newOrder.pop(i))
+    for i, d in  enumerate(datasetsMgr.getAllDatasetNames(), 0):
+        if "PU140" in d:
+            newOrder.insert(1, newOrder.pop(i))
+        if "Neutrino" in d:
+            newOrder.insert(len(newOrder), newOrder.pop(i))
+    datasetsMgr.selectAndReorder(newOrder)
 
     # Print dataset information (after merge)
     if 0:
@@ -632,16 +656,30 @@ def main(opts):
     histoList  = datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDirectoryContent(opts.folder)
     histoPaths = [os.path.join(opts.folder, h) for h in histoList]
     histoType  = type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram())
+    plotCount  = 0
+    skipList   = ["L1TkTau_MatchTk_d0", "L1TkTau_MatchTk_d0Abs", "L1TkTau_SigTks_d0", 
+                  "L1TkTau_SigTks_d0Abs", "L1TkTau_SigTks_d0Sig", "L1TkTau_SigTks_d0SigAbs",
+                  "L1TkTau_IsoTks_d0", "L1TkTau_IsoTks_d0Abs", "L1TkTau_IsoTks_d0Sig", "L1TkTau_IsoTks_d0SigAbs",
+                  "L1TkTau_ResolutionCaloEt_F", "L1TkTau_ResolutionCaloEta_F", "L1TkTau_ResolutionCaloPhi_F", 
+                  "DiTau_Rate_Calo_F", "DiTau_Rate_Tk_F", "DiTau_Rate_VtxIso_F", "DiTau_Rate_RelIso_F",
+                  "Calo_Rate_F", "Tk_Rate_F", "VtxIso_Rate_F", "RelIso_Rate_F"]
 
     # For-loop: All histos in opts.folder
     for i, h in enumerate(histoPaths, 1):
+        
+        # Obsolete quantity
+        if h in skipList:
+            continue
+
         histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))
         if "TH1" not in histoType:
             continue
         
-        
+        aux.PrintFlushed(h, plotCount==0)
+        plotCount += 1
         PlotHisto(datasetsMgr, h)
 
+    print
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
     return
 
@@ -660,7 +698,7 @@ if __name__ == "__main__":
     INTLUMI     = 1.0
     NORMTOONE   = False
     SAVEDIR     = None
-    SAVEFORMATS = [".png"] #[".C", ".png", ".pdf"]
+    SAVEFORMATS = [".C", ".png", ".pdf"]
     VERBOSE     = False
 
     parser = OptionParser(usage="Usage: %prog [options]" , add_help_option=False,conflict_handler="resolve")
