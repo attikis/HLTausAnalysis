@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-Description:
+DESCRIPTION:
 This script is used to create a pseudo multicrab directory, using an input ROOT file (raw2TTree.root).
 The purpose is primarily to enable the easy testing of local changes to the  code and the 
 NtupleAnalysis code using the hplusGenerateDataFormats.py script.
@@ -8,19 +8,22 @@ A script execution will thus create an empty multicrab with identical name and s
 by the multicrab.py script. It will contain a single dataset with a single ROOT file under results/ dir, which is 
 a mere copy of the file used as input for the script execution (only renamed) to histograms-<dataset>.root.
 
-Usage:
+
+USAGE:
 hltausPseudoMulticrab.py -f test.root [opts]
 
 To add  a dataset to an existing <multicrab_dir>:
 hltausPseudoMulticrab.py -f test.root -r <multicrab_dir> 
 
-Examples:
-hltausPseudoMulticrab.py -f histograms-SingleTau_PU140.root
-hltausPseudoMulticrab.py -f histograms-SingleTau_PU200.root --dir <multicrab_dir>
 
-Last Used:
-hltausPseudoMulticrab.py -f CaloPlusTracks_Histograms_VBF.root
-hltausPseudoMulticrab.py -f CaloPlusTracks_Histograms_MinBias.root --dataset Neutrino_Pt2to20_gun --dir multicrab_CaloPlusTracks_v61XSLHC6_20170421T1554
+EXAMPLES:
+hltausPseudoMulticrab.py -f histograms-TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU140_93X.root --dir multicrab_test
+hltausPseudoMulticrab.py -f histograms-PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PhaseIIFall17D_L1TPU140_93X.root --dir multicrab_test
+
+
+LAST USED:
+hltausPseudoMulticrab.py
+
 '''
 
 #================================================================================================
@@ -37,37 +40,73 @@ from optparse import OptionParser
 import ROOT
 
 import HLTausAnalysis.NtupleAnalysis.tools.git as git
+import HLTausAnalysis.NtupleAnalysis.tools.aux as aux
 from HLTausAnalysis.NtupleAnalysis.tools.datasets import *
+import HLTausAnalysis.NtupleAnalysis.tools.ShellStyles as ShellStyles
 
+#================================================================================================ 
+# Variable definition
+#================================================================================================ 
+ss = ShellStyles.SuccessStyle()
+ns = ShellStyles.NormalStyle()
+ts = ShellStyles.NoteStyle()
+hs = ShellStyles.HighlightAltStyle()
+ls = ShellStyles.HighlightStyle()
+es = ShellStyles.ErrorStyle()
+cs = ShellStyles.CaptionStyle()
 
 #================================================================================================ 
 # Function Definitions
 #================================================================================================ 
-def FileExists(filePath, opts):
-    '''
-    Checks that a file exists by executing the ls command for its full path, 
-    or the corresponding "EOS" command if opts.filesInEOS is enabled.
-    '''
-    Verbose("FileExists()", False)
-    
-    if "CRAB3_TransferData" in filePath: # fixme: just a better alternative to "if opts.filesInEOS:"
-        cmd = ConvertCommandToEOS("ls", opts) + " " + filePath
-        ret = Execute("%s" % (cmd) )
-        # If file is not found there won't be a list of files; there will be an error message
-        errMsg = ret[0]
-        if "Unable to stat" in errMsg:
-            return False
-        elif errMsg == filePath.split("/")[-1]:
-            return True
-        else:
-            raise Exception("This should not be reached! Execution of command %s returned %s" % (cmd, errMsg))
-    else:
-        if os.path.isfile(filePath):
-            return True
-        else:
-            return False
-    return True
+def getDatasetInfo(opts):
+    try:
+        opts.datasetName = re.search('histograms-(.+?).root', opts.rootFile).group(1)
+        Verbose("File \"%s\" corresponds to dataset is \"%s\""% (opts.rootFile, opts.datasetName), False)
+    except AttributeError:
+        raise Exception("Could not determine the dataset corresponding to the file \"%s\"" % (opts.rootFile) )
 
+    # Get dataset info
+    dgroup = DatasetGroup(opts.dataEra)
+    opts.dataset = None
+    opts.datasetAlias = None
+    opts.dataVersion = None    
+    opts.pileup = None    
+
+    # For-loop: All datasets objects 
+    for d in dgroup.GetDatasetList():
+
+        name  = opts.datasetName
+        alias = d.getAlias()
+
+        # Stupid "hack" for special case (one-off!)
+        if "RelVal" in name:
+            name  = opts.datasetName.replace("RelValSingleTauFlatPt2To100_pythia8", "SingleTau").replace("2023D17", "L1T")
+
+        if 0:
+            print "%s in %s?" % (alias.split("_"), name.split("_"))
+
+        if set(alias.split("_")).issubset(name.split("_")):
+            opts.dataset = d
+            opts.datasetAlias = alias
+            Verbose("Alias for dataset %s is %s" % (d.getName(), alias), True)
+            break
+        else:
+            pass
+
+    if opts.datasetAlias == None:
+        raise Exception("%sCould not determine the alias of datasets \"%s\"%s. Check the file \"datasets.py\"" % (es, opts.datasetAlias, ns) )
+
+    # Get data-version, <PU>, and lumi
+    opts.dataVersion = d.getDataVersion()
+    opts.pileup = d.getPU()
+    if opts.pileup == 140:
+        opts.lumi = 5 # 5e34 (<PU>=140)
+    elif opts.pileup == 200:
+        opts.lumi = 7 # 7e34 (<PU>=200)
+    else:
+        opts.lumi = 0 # 7e34 (<PU>=200)
+
+    return
 
 def writeConfigInfoToRootFile(fileName, opts):
     '''
@@ -76,9 +115,7 @@ def writeConfigInfoToRootFile(fileName, opts):
     - codeVersion (git commit id)
     - configinfo (histogram with COM energy, luminosity, pileup, etc..)
     '''
-    Verbose("writeConfigInfoToRootFile()", True)
-    
-    if FileExists(fileName, opts ) == False:
+    if os.path.isfile(fileName) == False:
         raise Exception("The file %s does not exist!" % (fileName) )
 
     # Definitions
@@ -126,7 +163,6 @@ def writeConfigInfoToRootFile(fileName, opts):
     # Close the ROOT file
     Verbose("Closing file %s" % (fOUT.GetName()) )
     fOUT.Close()
-
     return
 
 
@@ -137,9 +173,7 @@ def writeCounters(fileName, opts):
     - codeVersion (git commit id)
     - configinfo (histogram with COM energy, luminosity, pileup, etc..)
     '''
-    Verbose("writeCounters()", True)
-    
-    if FileExists(fileName, opts ) == False:
+    if os.path.isfile(fileName) == False:
         raise Exception("The file %s does not exist!" % (fileName) )
 
     # Definitions
@@ -188,17 +222,13 @@ def writeCounters(fileName, opts):
     # Close the ROOT file
     Verbose("Closing file %s" % (fOUT.GetName()) )
     fOUT.Close()
-
     return
-
 
 def moveAllHistosIntoAnalysisFolder(fileName, opts):
     '''
     Moves all histograms into an analysis folder
     '''
-    Verbose("moveAllHistosIntoAnalysisFolder()", True)
-    
-    if FileExists(fileName, opts ) == False:
+    if os.path.isfile(fileName) == False:
         raise Exception("The file %s does not exist!" % (fileName) )
 
     # Go to home directory
@@ -235,12 +265,7 @@ def moveAllHistosIntoAnalysisFolder(fileName, opts):
     fOUT.Close()
     return
 
-
 def GetRootFile(fileName, fileMode="UPDATE"):
-    '''
-    '''
-    Verbose("GetRootFile()", True)
-
     # Definitions
     filePath    = fileName
     fileMode    = "UPDATE"
@@ -266,11 +291,8 @@ def GetRootFile(fileName, fileMode="UPDATE"):
         Verbose("Successfully opened %s in %s mode (after %s attempts)" % (filePath, fileMode, nAttempts) )
     return fOUT
 
-
 def GetSelfName():
-    Verbose("GetSelfName()")    
     return __file__.split("/")[-1]
-
 
 def Verbose(msg, printHeader=False):
     '''
@@ -280,7 +302,6 @@ def Verbose(msg, printHeader=False):
 	return
     Print(msg, printHeader)
     return
-
 
 def Print(msg, printHeader=True):
     '''
@@ -292,14 +313,11 @@ def Print(msg, printHeader=True):
     print "\t", msg
     return
 
-
 def AskUser(msg):
     '''
     Prompts user for keyboard feedback to a certain question. 
     Returns true if keystroke is \"y\", false otherwise.
     '''
-    Verbose("AskUser()")
-    
     keystroke = raw_input("\t" +  msg + " (y/n): ")
     if (keystroke.lower()) == "y":
         return True
@@ -307,15 +325,13 @@ def AskUser(msg):
         return False
     else:
         AskUser(msg)
-    
+    return False
 
 def GetCMSSW(opts):
     '''
     Get a command-line-friendly format of the CMSSW version currently use.
     https://docs.python.org/2/howto/regex.html
     '''
-    Verbose("GetCMSSW()")
-
     if opts.cmssw != "":
         return opts.cmssw
             
@@ -337,259 +353,117 @@ def GetCMSSW(opts):
 	version = version.replace("patch","p")
     return version
 
-
-def GetAnalysis():
-    '''
-    Get the analysis type. This will later-on help determine the datasets to be used.
-    https://docs.python.org/2/howto/regex.html
-    '''
-    Verbose("GetAnalysis()")
-    
-    # Create a compiled regular expression object
-    leg_re = re.compile("raw2TTree_(?P<leg>\S+)_cfg.py")
-
-    # Scan through the string 'pwd' & look for any location where the compiled RE 'cmssw_re' matches
-    match = leg_re.search(opts.pset)
-
-    # Return the string matched by the RE. Convert to desirable format
-    analysis = "DUMMY"
-    if match:
-	analysis = match.group("leg")
-    else:
-        raise Exception("Could not determine the analysis type from the PSET \"%s\"" % (opts.pset) )
-
-    return analysis
-
-
-def AskToContinue(taskDirName, analysis, opts):
-    '''
-    Inform user of the analysis type and datasets to be user in the multicrab job creation. Offer chance to abort sequence 
-    '''
-    Verbose("AskToContinue()")
-
-    Print("Creating pseudo-multicrab directory \"%s\" using the file \"%s\" as input." % (taskDirName, opts.rootFile) )
-    #DatasetGroup(analysis).PrintDatasets(False)
-    
-    AbortTask(keystroke="q")
-    return
-
-
-def AbortTask(keystroke):
-    '''
-    Give user last chance to abort CRAB task creation.
-    '''
-    Verbose("AbortTask()")
-
-    #message  = "=== %s:\n\tPress \"%s\" to abort, any other key to proceed: " % (GetSelfName(), keystroke)
-    message  = "\tPress \"%s\" to abort, any other key to proceed: " % (keystroke)
-    response = raw_input(message)
-    if (response!= keystroke):
-        return
-    else:
-        print "=== %s:\n\tEXIT" % (GetSelfName())
-        sys.exit()
-    return
-
-
-def GetTaskDirName(analysis, version, datasets):
+def GetTaskDirName(analysis):
     '''
     Get the name of the CRAB task directory to be created. For the user's benefit this
     will include the CMSSW version and possibly important information from
     the dataset used, such as the bunch-crossing time.
     '''
-    Verbose("GetTaskDirName()")
 
     # Constuct basic task directory name
     dirName = "multicrab"
-    dirName+= "_"  + analysis
-    dirName+= "_v" + version
-    
-    # Add dataset-specific info, like bunch-crossing info
-    bx_re = re.compile("\S+(?P<bx>\d\dns)_\S+")
-    match = bx_re.search(datasets[0].URL)
-    if match:
-	dirName+= "_"+match.group("bx")
+    dirName+= "_" + analysis
+    dirName+= "_v" + GetCMSSW(opts)
+    dirName+= "_" + opts.datetime.strftime("%Hh%Mm%Ss_%d%h%Y")
 
-    # Append the creation time to the task directory name    
-    # time = datetime.datetime.now().strftime("%d%b%Y_%Hh%Mm%Ss")
-    time = datetime.datetime.now().strftime("%Y%m%dT%H%M")
-    dirName+= "_" + time
+    if opts.dirName == "":
+        opts.dirName = dirName
 
     # If directory already exists (resubmission)
     if os.path.exists(opts.dirName) and os.path.isdir(opts.dirName):
 	dirName = opts.dirName
     return dirName
 
-
-def CreateTaskDir(dirName):
+def CreateTaskDirAndCfg(dirName, cfg):
     '''
-    Create the CRAB task directory and copy inside it the PSET to be used for the CRAB job.
+    Create the CRAB task directory and copy inside relevant files (e.g. multicrab.cfg)
     '''
-    Verbose("CreateTaskDir()")
-    
-    if  os.path.exists(dirName):
+    # Create the pseudo-multicrab main directory ?
+    if os.path.exists(dirName):
         msg = "Cannot create directory \"%s\". It already exists!" % (dirName)
         #raise Exception(msg)
-        Print(msg)
-        return
+        Verbose(msg)
+    else:
+        Verbose("%sCreated pseudo-multicrab directory %s%s" % (hs, dirName, ns))
+        os.mkdir(dirName)
 
-    # Create the pseudo multicrab directory
-    Verbose("mkidr %s" % (dirName))
-    os.mkdir(dirName)
-
-    # Place an empty PSet file inside the pseudo multicrab directory
-    cmd = "touch %s" % dirName + "/" + opts.pset
-    Verbose(cmd)
-    os.system(cmd)
-
-    # Create the multicrab.cfg
-    multicrabCfg = dirName + "/" + "multicrab.cfg"
-    cmd = "touch %s" % multicrabCfg
-    if not os.path.exists(multicrabCfg):
-        Verbose(cmd)
-        os.system(cmd)
+    # Create the "multicrab.cfg" file
+    CreateCfgFile(dirName, cfg)
 
     # Write the commit id, "git status", "git diff" command output the directory created for the multicrab task
     gitFileList = git.writeCodeGitInfo(dirName, False)    
     Verbose("Copied %s to '%s'." % ("'" + "', '".join(gitFileList) + "'", dirName) )
     return
 
-
-def GetRequestName(dataset):
-    '''
-    Return the file name and path to an (empty) crabConfig_*.py file where "*" 
-    contains the dataset name and other information such as tune, COM, Run number etc..
-    of the Data or MC sample used
-    '''
-    Verbose("GetRequestName()")
-    
-    # New regular expressions for HLTausAnalysis
-    mcdataset_re   = re.compile("^/(?P<name>\S+?)/")
-    tune_re        = re.compile("Tune\w+_")
-    tev_re         = re.compile("\d*TeV")
-    pileup_re      = re.compile("\w*PU\d*")
-
-    # Scan through the string 'dataset' & look for any location where the compiled RE 'mcdataset_re' matches
-    match = mcdataset_re.search(dataset.URL)
-    if match:
-        requestName = match.group().split("_")[0]        
-
-    # Append the MC-tune
-    tune_match = tune_re.search(dataset.URL)
-    if tune_match:
-        requestName += "_" + tune_match.group()
-
-    # Append the COM Energy
-    tev_match = tev_re.search(dataset.URL)
-    if tev_match:
-        requestName += tev_match.group()
-
-    # Append the Pileup
-    pileup_match = pileup_re.search(dataset.URL)
-    if pileup_match:
-        requestName += "_" + pileup_match.group()
-
-    # Append the Run Range (for Data samples only)
-    if dataset.isData():
-	runRangeMatch = runRange_re.search(dataset.lumiMask)
-	if runRangeMatch:
-	    runRange     = runRangeMatch.group("RunRange")
-	    runRange     = runRange.replace("-","_")
-	    requestName += "_" + runRange #+ bunchSpace
-
-    # Finally, replace dashes with underscores    
-    requestName = requestName.replace("-","_")
-    requestName = requestName.replace("/","")
-    return requestName
-
-
-def EnsurePathDoesNotExist(taskDirName, requestName):
-    '''
-    Ensures that file does not already exist
-    '''
-    Verbose("EnsurePathDoesNotExist()")
-    
-    filePath = os.path.join(taskDirName, requestName)
-    
-    if not os.path.exists(filePath):
-	return
+def CreateCfgFile(irName, fileName="multicrab.cfg"):
+    fullPath = os.path.join(dirName, fileName)
+    cmd = "touch %s" % fullPath
+    if os.path.exists(fullPath):
+        Verbose("Cannot created file %s. It already exists" % (fullPath), True)
     else:
-        msg = "File '%s' already exists!" % (filePath)
-        if AskUser(msg + " Proceed and overwrite it?"):
-            return
-	else:
-            raise Exception(msg)
+        Verbose(cmd, True)
+        os.system(cmd)
     return
 
+def CreateDatasetDir(dirName, dsetName):
+
+    datasetDir = os.path.join(dirName, dsetName)
+    if os.path.exists(datasetDir) and os.path.isdir(datasetDir):
+        Verbose("%sCannot create directory \"%s\". It already exists%s" % (es, datasetDir, ns), True)
+    else:
+        Verbose("%sCreated dataset directory %s%s" % (hs, datasetDir, ns))
+        os.mkdir(datasetDir)
+    return
 
 def CreateJob(opts, args):
     '''
-    Create & submit a CRAB task, using the user-defined PSET and list of datasets.
-    '''
-    Verbose("CreateJob()")
-    
+    Create a pseudo-multicrab directory.
+    '''    
+
     # Get general info
-    version  = GetCMSSW(opts)
-    analysis = GetAnalysis()
-    dataset  = None
-    for d in DatasetGroup(opts.dataEra).GetDatasetList():
-        dataset = d
-    if dataset == None:
-        raise Exception("Could not find dataset object for dataset with name \"%s\"." % (opts.dataset) )
-    else:
-        datasets= [dataset]
+    getDatasetInfo(opts)
 
     if opts.dirName == "":
-        taskDirName = GetTaskDirName(analysis, version, datasets)
+        opts.taskDirName = GetTaskDirName(opts.analysis)
     else:
-        taskDirName = opts.dirName
-
-    # Give user last chance to abort
-    if 0:
-        AskToContinue(taskDirName, analysis, opts)
+        opts.taskDirName = opts.dirName
     
     # Create CRAB task diractory
-    if opts.dirName == "":
-        CreateTaskDir(taskDirName)
-
-    # Create the "multicrab.cfg" file
-    multicrabCfg = open(taskDirName + "/" + "multicrab.cfg", 'a')
+    cfg="multicrab.cfg"
+    CreateTaskDirAndCfg(opts.taskDirName, cfg)
 
     # Create the dataset subdirectory
-    datasetDir   = os.path.join(taskDirName, opts.dataset)
-    if os.path.exists(datasetDir) and os.path.isdir(datasetDir):
-        raise Exception("Cannot create directory \"%s\". It already exists!" % (datasetDir))
-    else:
-        os.mkdir(datasetDir)
+    CreateDatasetDir(opts.taskDirName, opts.datasetAlias)
         
     # Write the new dataset to multicrab.cfg
-    multicrabCfg.write("[" + str(opts.dataset) + "]")
+    multicrabCfg = open(cfg, "a")
+    multicrabCfg.write("[" + str(opts.datasetAlias) + "]")
     multicrabCfg.write("\n")
-        
-    Verbose("Creating directory structure for dataset with name \"%s\"" % (opts.dataset))
+    multicrabCfg.close()
+
+    Verbose("Creating directory structure for dataset with name \"%s\"" % (opts.datasetName))
     dirs = ["results", "inputs"]
+    # For-loop: All sub-directories to be created
     for d in dirs:
-        newDir = os.path.join(datasetDir, d)
+        newDir = os.path.join(opts.taskDirName, opts.datasetAlias, d)
         if os.path.exists(newDir) and os.path.isdir(newDir):
-            raise Exception("Cannot create directory \"%s\". It already exists!" % (newDir))
+            #raise Exception("Cannot create directory \"%s\". It already exists!" % (newDir))
+            Verbose("Cannot create directory \"%s\". It already exists!" % (newDir), True)
         else:
             os.mkdir(newDir)
 
-        resultsDir  = os.path.join(datasetDir, "results")
-        resultsFile = "histograms-%s.root" % (opts.dataset)
+        # The "results" directory
+        resultsDir  = os.path.join(opts.taskDirName, opts.datasetAlias, "results")
+        resultsFile = "histograms-%s.root" % (opts.datasetName)
         resultsPath = os.path.join(resultsDir, resultsFile)
 	Verbose("Copying the ROOT file \"%s\" in the directory \"%s\"" % (opts.rootFile, resultsDir))
         cmd = "cp %s %s" % (opts.rootFile, resultsPath)
 	os.system(cmd)
 
+        # Save Auxiliary information and count4ers
         writeConfigInfoToRootFile(resultsPath, opts)
         moveAllHistosIntoAnalysisFolder(resultsPath, opts)
         writeCounters(resultsPath, opts) 
-
-    Print("Successfully created pseudo-multicrab directory \"%s\" " % (taskDirName), False)
-    multicrabCfg.close()
-    if 0:
-        os.system("ls -lt")
     return 0
 
 
@@ -612,31 +486,21 @@ if __name__ == "__main__":
 
     # Default Values
     VERBOSE      = False
-    ASK          = False
-    PSET         = "raw2TTree_CaloTkSkim_cfg.py"
     DIRNAME      = ""
-    DATASET      = None #"VBF_HToTauTau_125_14TeV_powheg_pythia6"
-    CMSSW        = "92X" #"910pre2" #"61XSLHC6"
+    CMSSW        = "92X"
     ANALYSIS     = "HLTausAnalysis"
-    DATAERA      = "ID2017" #"TDR2019" #"ID2017"
-    DATAVERSION  = CMSSW + "mc"
-    ROOTFILE     = "test.root"
-    NOMINALLUMI  = 5 # 5e34 (<PU>=140)
-    ULTIMATELUMI = 7 # 7e34 (<PU>=200)
-
+    DATAERA      = "TDR2019" #"ID2017"
+    DATAVERSION  = None
+    ROOTFILE     = None
+    DATETIME     = datetime.datetime.now()
+    
     parser = OptionParser(usage="Usage: %prog [options]")
 
     parser.add_option("-v", "--verbose", dest="verbose", default=VERBOSE, action="store_true",
                       help="Verbose mode for debugging purposes [default: %s]" % (VERBOSE))
 
-    parser.add_option("--dataset", dest="dataset", default=DATASET, 
-                      help="Dataset to include in multicrab dir [default: %s]" % (DATASET))
-
     parser.add_option("-f", "--rootFile", dest="rootFile", default= ROOTFILE,
                       help="The ROOT file (raw2TTree.root) to be copied inside the multicrab dir[default: %s]" % (ROOTFILE) )
-
-    parser.add_option("-p", "--pset", dest="pset", default=PSET, type="string",
-                      help="The python cfg file to be used by cmsRun [default: %s]" % (PSET))
 
     parser.add_option("--dir", dest="dirName", default=DIRNAME, type="string",
                       help="Custom name for CRAB directory name. Overwrite automatic naming [default: %s]" % (DIRNAME))
@@ -647,19 +511,16 @@ if __name__ == "__main__":
     parser.add_option("--dataVersion", dest="dataVersion", default=DATAVERSION,
                       help="Data version (<xy> where x=CMSSW release and y=mc or data) [default: %s]" % (DATAVERSION))
 
-    parser.add_option("--ask", dest="ask", default=ASK,
-                      help="Ask before proceeding to create the pseudo-multicrab directory [default: %s]" % (ASK))
-
-    parser.add_option("--lumi", dest="lumi", default=NOMINALLUMI, type=int,
-                      help="The lumonisoty coefficient \"a\" that corresponds to the luminosity of the samples  \"a\"E+34 [default: %s]" % (NOMINALLUMI))
-
     parser.add_option("--analysisName", dest="analysisName", default=ANALYSIS, type="string",
                       help="The analysis name which corresponds to the folder where all histograms will be moved to in the new ROOT file [default: %s]" % (ANALYSIS))
 
     parser.add_option("--dataEra", dest="dataEra", default=DATAERA, type="string",
                       help="The dataEra name which will be appended to the analysis folder where all histograms will be moved to in the new ROOT file [default: %s]" % (DATAERA))
 
+    parser.add_option("--datetime", dest="datetime", default=DATETIME, type="string",
+                      help="Datetime to be appended to the pseudo-multicrab directory name[default: %s]" % (DATETIME))
 
+    
     (opts, args) = parser.parse_args()
 
     # Require at least one argument (input ROOT file)
@@ -668,14 +529,22 @@ if __name__ == "__main__":
         sys.exit(1)
         
     # The ROOT file options must be provided
+    opts.analysis  = "CaloTk"
+    opts.rootFiles = []
     if opts.rootFile == None:
-        raise Exception("Must provide a ROOT file (raw2TTree.root) as argument!")
-
-    # Luminosity setting
-    validLumis = [NOMINALLUMI, ULTIMATELUMI]
-    if opts.lumi not in validLumis:
-        Print("Invalid value for lumi (\"%s\"). Luminosity value must correspond to either the HL-LHC nominal luminosity %s (E+34) or the HL-LHC ultimate luminosity %s (E+34)." % (opts.lumi, NOMINALLUMI, ULTIMATELUMI), True)
-        sys.exit()
+        # For-loop: dir contents
+        for dirName, subdirList, fileList in os.walk("."):
+            for f in fileList:
+                if f.endswith(".root"):
+                    opts.rootFiles.append(f)
+            # Do it just once
+            break
+        if len(opts.rootFiles) < 1:
+            raise Exception("No specific ROOT file provided and no ROOT files found in current working directory")
+        else:
+            Print("No specific ROOT file provided. Will use all %d ROOT files in current directory (if any)" % (len(opts.rootFiles)), True)
+    else:
+        Verbose("The ROOT file(s) to be copied inside the multicrab dir is \"%s\"" % (opts.rootFile), True)
 
     # Data-era setting
     validEras = ["TP2015", "ID2017", "TDR2019"]
@@ -683,31 +552,31 @@ if __name__ == "__main__":
         Print("Invalid data-eta \"%s\". Please select one of the following:\n\t%s" % (opts.dataEra, ", ".join(validEras)), True)
         sys.exit()
 
-    # Pileup setting        
-    if opts.lumi == NOMINALLUMI:
-        opts.pileup = 140
-    else:
-        opts.pileup = 200
-    Print("The average pileup for the HL-LHC luminosity %sE+34 is set to <PU>=%s" % (opts.lumi, opts.pileup), True)
-
-    # Dataset check
-    if opts.dataset is None:
-        text = 'sample'
-        try:
-            opts.dataset = re.search('histograms-(.+?).root', opts.rootFile).group(1)
-            Print("File \"%s\" corresponds to dataset is \"%s\""% (opts.rootFile, opts.dataset), False)
-        except AttributeError:
-            raise Exception("Could not determine the dataset corresponding to the file \"%s\"" % (opts.rootFile) )
-
-    # For-loop: All data-era datasets
-    datasets     = DatasetGroup(opts.dataEra).GetDatasetList()
-    datasetNames = [GetRequestName(d) for d in datasets]
-    #if opts.dataset not in datasetNames:
-    #    Print("Invalid dataset \"%s\". Please select one of the following:\n\t%s" % (opts.dataset, "\n\t".join(datasetNames)), True)
-    #    sys.exit()
-    
     # Create the pseudo-multicrab dir (if the ROOT file exists)
-    if os.path.exists(opts.rootFile):
-        sys.exit( CreateJob(opts, args) )
+    nFiles = len(opts.rootFiles)    
+    if opts.rootFile != None:
+        Verbose("Single ROOT file mode", True)
+        if not os.path.exists(opts.rootFile):        
+            raise Exception("The ROOT file provided (%s) does not exists!" % (opts.rootFile) )
+        else:
+            CreateJob(opts, args)
+        Print("Created pseudo-multicrab directory %s!" % (ss + opts.dirName + ns), True)        
+        sys.exit()
+    elif nFiles > 0: 
+        Verbose("Multiple ROOT files mode", True)
+
+        # For-loop: All ROOT files
+        for i, f in enumerate(opts.rootFiles, 1):
+            opts.rootFile = f
+            if not os.path.exists(opts.rootFile):        
+                raise Exception("The ROOT file provided (%s) does not exists!" % (opts.rootFile) )
+            else:
+                CreateJob(opts, args)
+            aux.PrintFlushed("%sFile %d/%d: %s%s" % (hs, i, nFiles, f, ns), i==1)
+            # aux.Print("%sFile %d/%d: %s%s" % (hs, i, nFiles, f, ns), i==1)
+        print
+
+        Print("Created pseudo-multicrab %s" % (ss + opts.taskDirName + ns), True)
+        sys.exit()
     else:
-        raise Exception("The ROOT file provided (%s) does not exists!" % (opts.rootFile) )
+        sys.exit()

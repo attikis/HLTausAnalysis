@@ -67,9 +67,9 @@ class Datasets{
   void IsValidMcProduction_(const string mcProduction,
 			    vector<Datasets> &myDatasets);
 
-  void IsValidDatasetAlias(const string datasetName);
+  bool IsValidDatasetAlias(const string datasetName);
 
-  void IsValidDatasetName(const string datasetName);
+  bool IsValidDatasetName(const string datasetName);
 
 };
 

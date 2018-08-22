@@ -87,19 +87,30 @@ void Datasets::IsValidMcProduction_(const string mcProduction,
 
 
 //****************************************************************************
-void Datasets::IsValidDatasetName(const string datasetName)
+bool Datasets::IsValidDatasetName(const string datasetName)
 //****************************************************************************
 {
-
 
   // First create the tables for the known MC Productions
   if (datasets_TTI2023Updg14D.size() < 1 ) CreateMcProductions_();
 
   // Check if the selected MC Prodution is valid
   for( int iD = 0 ; iD < (int) datasets_TTI2023Updg14D.size(); iD++){
-    if ( datasetName.compare( datasets_TTI2023Updg14D.at(iD).datasetPath_) == 0) return;
+    if ( datasetName.compare( datasets_TTI2023Updg14D.at(iD).datasetPath_) == 0) return true;
   }
   
+  // Check if the selected MC Prodution is valid
+  for( int iD = 0 ; iD < (int) datasets_PhaseIISpring17D.size(); iD++)
+    {
+      if ( datasetName.compare( datasets_PhaseIISpring17D.at(iD).datasetPath_) == 0) return true;
+    }
+
+  // Check if the selected MC Prodution is valid                                                                                                                        
+  for( int iD = 0 ; iD < (int) datasets_PhaseIIFall17D.size(); iD++)
+    {
+      if ( datasetName.compare( datasets_PhaseIIFall17D.at(iD).datasetPath_) == 0) return true;
+    }
+
   // If this is reached then the dataset sample is invalid
   cout << "=== Datasets::IsValidDataset() - Unknown dataset name \"" << datasetName << "\". See below all available dataset names." << endl;
   for( int iD = 0 ; iD < (int) datasets_TTI2023Updg14D.size(); iD++){
@@ -108,15 +119,14 @@ void Datasets::IsValidDatasetName(const string datasetName)
   cout << "EXIT" << endl;
   exit(1);
   
-  return;
+  return true;
 }
 
 
 //****************************************************************************
-void Datasets::IsValidDatasetAlias(const string datasetName)
+bool Datasets::IsValidDatasetAlias(const string datasetName)
 //****************************************************************************
 {
-
 
   // First create the tables for the known MC Productions
   // if (datasets_TTI2023Updg14D.size() < 1 )   CreateMcProductions_(); // obsolete
@@ -127,21 +137,20 @@ void Datasets::IsValidDatasetAlias(const string datasetName)
   // Check if the selected MC Prodution is valid
   for( int iD = 0 ; iD < (int) datasets_TTI2023Updg14D.size(); iD++)
     {
-      if ( datasetName.compare( datasets_TTI2023Updg14D.at(iD).alias_) == 0) return;
+      if ( datasetName.compare( datasets_TTI2023Updg14D.at(iD).alias_) == 0) return true;
     }
 
-    // Check if the selected MC Prodution is valid
+  // Check if the selected MC Prodution is valid
   for( int iD = 0 ; iD < (int) datasets_PhaseIISpring17D.size(); iD++)
     {
-      if ( datasetName.compare( datasets_PhaseIISpring17D.at(iD).alias_) == 0) return;
+      if ( datasetName.compare( datasets_PhaseIISpring17D.at(iD).alias_) == 0) return true;
     }
 
   // Check if the selected MC Prodution is valid                                                                                                                        
   for( int iD = 0 ; iD < (int) datasets_PhaseIIFall17D.size(); iD++)
     {
-      if ( datasetName.compare( datasets_PhaseIIFall17D.at(iD).alias_) == 0) return;
+      if ( datasetName.compare( datasets_PhaseIIFall17D.at(iD).alias_) == 0) return true;
     }
-
 
   // If this is reached then the dataset sample is invalid
   cout << "=== Datasets::IsValidDatasetAlias() - Unknown dataset alias \"" << datasetName << "\". See below all available dataset aliases. EXIT" << endl;
@@ -158,7 +167,7 @@ void Datasets::IsValidDatasetAlias(const string datasetName)
   cout << "EXIT" << endl;
   exit(1);
   
-  return;
+  return true;
 }
 
 
@@ -409,12 +418,14 @@ Datasets Datasets::GetDataset(const string datasetAlias)
   // Check if the selected MC Prodution is valid
   for( int iD = 0 ; iD < (int) datasets_PhaseIIFall17D.size(); iD++){
 
-    if ( datasetAlias.compare( datasets_PhaseIIFall17D.at(iD).alias_) != 0) continue;
+    bool foundAlias = datasetAlias.compare( datasets_PhaseIIFall17D.at(iD).alias_);
+    bool foundDset  = datasetAlias.compare( datasets_PhaseIIFall17D.at(iD).datasetPath_);
+
+    // Sanity check
+    if ( foundAlias != 0 && foundDset !=0) continue;
     bSuccess = true;
     d = datasets_PhaseIIFall17D.at(iD);
   }
-
-
     
   if(!bSuccess){
     cout << "=== Datasets::GetDataset() - Unexpected error! Could not find dataset alias \"" << datasetAlias << "\"." << endl;
@@ -438,7 +449,7 @@ const string Datasets::GetDatasetPathFromAlias(const string datasetAlias)
   if (datasets_PhaseIIFall17D.size() < 1 ) CreateMcProductions_();
 
   // Ensure that the supplied sample name is valids
-  IsValidDatasetAlias(datasetAlias);  
+  if (!IsValidDatasetName(datasetAlias)) bool isValidAlias = IsValidDatasetAlias(datasetAlias);
 
   // Check if the selected MC Prodution is valid
   for( int iD = 0 ; iD < (int) datasets_PhaseIIFall17D.size(); iD++){
@@ -460,7 +471,12 @@ const string Datasets::GetDatasetPathFromAlias(const string datasetAlias)
 	datasetPath = datasets_PhaseIIFall17D.at(iD).datasetPath_;
 	return datasetPath;
       }
-
+    
+    if  ( datasetAlias.compare( datasets_PhaseIIFall17D.at(iD).datasetPath_) == 0)
+      {
+	datasetPath = datasets_PhaseIIFall17D.at(iD).datasetPath_;
+	return datasetPath;
+      }
 
   }
   

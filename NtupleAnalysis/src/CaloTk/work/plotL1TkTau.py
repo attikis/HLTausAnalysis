@@ -691,7 +691,7 @@ if __name__ == "__main__":
     # Default Settings 
     ANALYSIS    = "HLTausAnalysis"
     BATCHMODE   = True
-    DATAERA     = "ID2017" #"TDR2019"
+    DATAERA     = "TDR2019"
     FOLDER      = ""
     GRIDX       = False
     GRIDY       = False    

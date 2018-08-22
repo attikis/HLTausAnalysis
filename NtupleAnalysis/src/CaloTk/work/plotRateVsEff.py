@@ -151,9 +151,11 @@ def main(opts):
                 dsets_signal.append(d)
 
         # ROC curve ingredients (histograms)
-        effLists  = [["Calo_Eff", "Tk_Eff", "VtxIso_Eff", "RelIso_Eff"], ["DiTau_Eff_Calo", "DiTau_Eff_Tk", "DiTau_Eff_VtxIso", "DiTau_Eff_RelIso"]]
-        rateLists = [["Calo_Rate", "Tk_Rate", "VtxIso_Rate", "RelIso_Rate"], ["DiTau_Rate_Calo", "DiTau_Rate_Tk", "DiTau_Rate_VtxIso", "DiTau_Rate_RelIso"]]
-
+        effLists    = [["Calo_Eff", "Tk_Eff", "VtxIso_Eff", "RelIso_Eff"], ["DiTau_Eff_Calo", "DiTau_Eff_Tk", "DiTau_Eff_VtxIso", "DiTau_Eff_RelIso"]]
+        rateLists   = [["Calo_Rate", "Tk_Rate", "VtxIso_Rate", "RelIso_Rate"], ["DiTau_Rate_Calo", "DiTau_Rate_Tk", "DiTau_Rate_VtxIso", "DiTau_Rate_RelIso"]]
+        turnOnLists = [["Calo_TurnOn25", "Tk_TurnOn25", "RelIso_TurnOn25", "VtxIso_TurnOn25"], 
+                       ["Calo_TurnOn50", "Tk_TurnOn50", "RelIso_TurnOn50", "VtxIso_TurnOn50"]]
+        
         # For-loop: All background histos (min bias)
         for i, b in enumerate(dsets_minBias, 1):
             bPU = b.split("PU")[1]
@@ -161,7 +163,7 @@ def main(opts):
             # Create rate plots (SingleTau, DiTau)
             PlotRate(datasetsMgr, rateLists[0], b, bPU)
             PlotRate(datasetsMgr, rateLists[1], b, bPU)
-
+            
             # For-loop: All signal histos
             for j, s in enumerate(dsets_signal, 1):
                 sPU = s.split("PU")[1]
@@ -176,11 +178,21 @@ def main(opts):
                     PU = sPU
 
                 # For-loop: All triggers (Calo, Calo+Tk, Calo+VtxIso)
-                for i in range(0, len(effLists)):
-                    eff  = effLists[i]
-                    rate = rateLists[i]
+                for k in range(0, len(effLists)):
+                    eff  = effLists[k]
+                    rate = rateLists[k]
                     Verbose("Bkg = %s, Signal = %s" % (b, s), False)
                     PlotRateVsEff(datasetsMgr, eff, rate, s, b, PU)
+
+
+        # For-loop: All signal histos
+        for i, s in enumerate(dsets_signal, 1):
+            PU = s.split("PU")[1]
+            
+            # Create rate plots (SingleTau, DiTau)
+            PlotTurnOns(datasetsMgr, turnOnLists[0], s, PU)
+            PlotTurnOns(datasetsMgr, turnOnLists[1], s, PU)
+        print
 
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
     return
@@ -201,13 +213,13 @@ def PlotRate(datasetsMgr, histoList, bkg, PU):
         if algo == "DiTau":
             taus = "DiTau"
             algo = hName.split("_")[-1]
-            
-        Print("Rate for \"%s\" algorithm (%s)" % (algo, taus), i==0)
+        
+        aux.PrintFlushed("Plotting rate (%s-%s)" % (algo, taus), False)
         h = datasetsMgr.getDataset(bkg).getDatasetRootHisto(hName).getHistogram()
         h.SetName(hName)
         legDict[hName] = algo
         hList.append(h)
-
+        
     # Create the rate histograms
     p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[])
 
@@ -224,7 +236,6 @@ def PlotRate(datasetsMgr, histoList, bkg, PU):
     # Set legend labels
     p.histoMgr.setHistoLegendLabelMany(legDict)
 
-
     # Draw and save the plot
     saveName = "Rate_%s_PU%s" % (taus, PU)
     plots.drawPlot(p, saveName, **kwargs)
@@ -236,19 +247,20 @@ def PlotRate(datasetsMgr, histoList, bkg, PU):
 
     # Save the plots in custom list of saveFormats
     aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, True)
+    #print
     return
 
 def PlotEfficiency(datasetsMgr, histoList, signal, PU):
 
     # Get Histogram name and its kwargs
     taus     = "SingleTau"
-    #saveName = "Efficiency_%s_PU%s_%s" % (taus, PU, signal)
     saveName = "Efficiency_%s_%s" % (taus, signal)
     kwargs   = GetHistoKwargs(saveName, opts)
     hList    = []
     legDict  = {}
 
     # For-loop: All tau algorithms
+    count = -1
     for i, hName in enumerate(histoList, 0):
         algo = hName.split("_")[0]
         if algo == "DiTau":
@@ -260,8 +272,8 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
 
             taus = "DiTau"
             algo = hName.split("_")[-1]
-            
-        Print("Efficiency for \"%s\" algorithm (%s, %s)" % (algo, taus, signal), i==0)
+        count+=1  
+        aux.PrintFlushed("Plotting efficiency (%s-%s-%s)" % (algo, taus, signal), False) #count==0)
         h = datasetsMgr.getDataset(signal).getDatasetRootHisto(hName).getHistogram()
         h.SetName(hName)
         legDict[hName] = algo
@@ -284,7 +296,6 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
     p.histoMgr.setHistoLegendLabelMany(legDict)
 
     # Draw and save the plot
-    #saveName = "Efficiency_%s_PU%s_%s" % (taus, PU, signal)
     saveName = "Efficiency_%s_%s" % (taus, signal)
     plots.drawPlot(p, saveName, **kwargs)
 
@@ -295,14 +306,66 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
 
     # Save the plots in custom list of saveFormats
     aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, True)
+    #print
     return
 
+
+def PlotTurnOns(datasetsMgr, histoList, signal, PU):
+
+    # Get Histogram name and its kwargs
+    myRegex   = "(?:TurnOn)(.*)"
+    m         = re.search(myRegex, histoList[0])
+    threshold = m.group(1)
+    saveName  = "TurnOns_%sGeV_%s" % (threshold, signal)
+    kwargs    = GetHistoKwargs(saveName, opts)
+    hList     = []
+    legDict   = {}
+
+    # For-loop: All tau algorithms
+    for l, hName in enumerate(histoList, 0):
+        
+        algo = hName.split("_")[0]
+        aux.PrintFlushed("Turn-on for \"%s\" algorithm (%s)" % (algo, signal), False) #l==0)
+        h = datasetsMgr.getDataset(signal).getDatasetRootHisto(hName).getHistogram()
+        h.SetName(hName)
+        legDict[hName] = algo
+        hList.append(h)
+
+    # Create the rate histograms
+    p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[])
+
+    # Set legend labels
+    for h in p.histoMgr.getHistos():
+        hName = h.getName()
+        algo  = h.getName().split("_")[0]
+        if algo == "DiTau":
+            algo = hName.split("_")[-1]
+        p.histoMgr.forHisto(hName, styles.getTauAlgoStyle(algo))
+        p.histoMgr.setHistoDrawStyle(hName, "AP")
+        p.histoMgr.setHistoLegendStyle(hName, "LP")
+    
+    # Set legend labels
+    p.histoMgr.setHistoLegendLabelMany(legDict)
+
+    # Draw and save the plot
+    plots.drawPlot(p, saveName, **kwargs)
+
+    # Add additional canvas text
+    histograms.addPileupText("PU=%s" % (PU) )
+    # histograms.addText(0.75, 0.88, taus, 17)
+    histograms.addText(0.60, 0.88-0.50, plots._legendLabels[signal], 17)
+
+    # Save the plots in custom list of saveFormats
+    aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, True)
+    #print
+    return
 
 def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
 
     # Definitions
     tgraphs = []
     legendDict = {}
+    aux.PrintFlushed("Plotting ROC (%s-%s)" % (bkg, signal), False) #count==0)
 
     # Get Histogram name and its kwargs
     if "ditau" in effHistoList[0].lower():
@@ -500,8 +563,9 @@ def DrawErrorBand(graph):
 
 def GetHistoKwargs(h, opts):
     _mvLeg1 = {"dx": -0.15, "dy": -0.55, "dh": -0.15}
-    _mvLeg2 = {"dx": -0.0, "dy": -0.05, "dh": -0.15}
+    _mvLeg2 = {"dx": -0.00, "dy": -0.05, "dh": -0.15}
     _mvLeg3 = {"dx": -0.15, "dy": -0.05, "dh": -0.15}
+    _mvLeg4 = {"dx": -0.15, "dy": -0.55, "dh": -0.15}
     logY    = True
     yMin    = 0.0
     if logY:
@@ -538,28 +602,26 @@ def GetHistoKwargs(h, opts):
         _kwargs["moveLegend"] = _mvLeg2
         _kwargs["cutBoxY"]    = {"cutValue": 50, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}
     elif "Efficiency_" in h:
-        _kwargs["xlabel"]     = "E_{T} (GeV)"
-        _kwargs["ylabel"]     = "Efficiency"
+        units = "GeV"
+        _kwargs["xlabel"]     = "E_{T} (%s)" % (units)
+        _kwargs["ylabel"]     = "Efficiency / %0.0f " + units
         _kwargs["log"]        = False
         _kwargs["opts"]       = {"xmin": 0.0, "xmax": 300.0, "ymin": 0.0, "ymax": 1.0, "ymaxfactor": yMaxF}
         _kwargs["moveLegend"] = _mvLeg3
         _kwargs["cutBoxY"]    = {"cutValue": 50, "fillColor": 16, "box": False, "line": False, "cutGreaterThan": False}
+    elif "TurnOn" in h:
+        units = "GeV"
+        _kwargs["xlabel"]     = "#tau_{h} E_{T} (%s)" % (units)
+        _kwargs["ylabel"]     = "Efficiency / %0.0f " + units
+        _kwargs["log"]        = False
+        _kwargs["rebinX"]     = 1 # do NOT change
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 200.0, "ymin": 0.0, "ymax": 1.2, "ymaxfactor": yMaxF}
+        _kwargs["moveLegend"] = _mvLeg4
+        #_kwargs["cutBoxY"]    = {"cutValue": 20, "fillColor": 16, "box": False, "line": False, "cutGreaterThan": False}
     else:
         pass
+
     return _kwargs
-
-
-    if binWidth < 0.01:
-        dec =  " %0.3f"
-    if binWidth < 0.001:
-        dec =  " %0.4f"
-    if binWidth < 0.0001:
-        dec =  " %0.5f"
-    if binWidth < 0.00001:
-        dec =  " %0.6f"
-    if binWidth < 0.000001:
-        dec =  " %0.7f"
-    return dec
 
 def getHistos(datasetsMgr, histoName):
 
@@ -591,9 +653,9 @@ if __name__ == "__main__":
     '''
     
     # Default Settings
-    ANALYSIS    = "HLTausAnalysis"
+    ANALYSIS     = "HLTausAnalysis"
     BATCHMODE    = True
-    DATAERA     = "ID2017" #"TDR2019"
+    DATAERA      = "TDR2019" #"ID2017" #"TDR2019"
     FOLDER       = ""
     GRIDX        = True
     GRIDY        = True
