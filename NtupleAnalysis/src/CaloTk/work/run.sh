@@ -9,7 +9,8 @@
 #
 # EXAMPLES:
 # ./run.sh <multicrab_path>
-
+# ./run.sh /eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650
+# ./run.sh /eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650 -1 test
 #
 # LAST USED:
 #
@@ -70,7 +71,6 @@ else
     echo "=== Multicrab directory ${MCRABDIR} not found. EXIT"
     exit
 fi
-echo "=== Finished running analyzer over all datasets!"
 
 # echo "=== Creating pseudo-multicrab directory"
 # # For-loop: All root files!
