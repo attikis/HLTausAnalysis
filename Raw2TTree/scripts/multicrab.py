@@ -1472,55 +1472,6 @@ def GetRequestName(dataset):
     '''
     Verbose("GetRequestName()")
 
-    if len(dataset.getName()) > 0:
-	return dataset.getName()
-    
-    # Create compiled regular expression objects
-    # datadataset_re = re.compile("^/(?P<name>\S+?)/(?P<run>Run\S+?)/")
-    # mcdataset_re   = re.compile("^/(?P<name>\S+?)/")
-    # tune_re        = re.compile("(?P<name>\S+)_Tune")
-    # tev_re         = re.compile("(?P<name>\S+)_13TeV")
-    # ext_re         = re.compile("(?P<name>_ext\d+)-")
-    # runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_")
-    # pileup_re      = re.compile("(?P<name>\S+?<PU>\d+)-")
-    # runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_13TeV_PromptReco_Collisions15(?P<BunchSpacing>\S*)_JSON(?P<Silver>(_\S+|))\.")
-    # runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_13TeV_PromptReco_Collisions15(?P<BunchSpacing>\S*)_JSON")
-    # runRange_re    = re.compile("Cert_(?P<RunRange>\d+-\d+)_13TeV_PromptReco_Collisions15_(?P<BunchSpacing>\d+ns)_JSON_v")
-    # Scan through the string 'dataset.URL' & look for any location where the compiled RE 'mcdataset_re' matches
-    # match = mcdataset_re.search(dataset.URL)
-    # if dataset.isData():
-    #     match = datadataset_re.search(dataset.URL)
-    #     
-    # # Append the dataset name
-    # if match:
-    #     requestName = match.group("name")
-    # 
-    # # Append the Run number (for Data samples only)
-    # if dataset.isData():
-    #     requestName+= "_"
-    #     requestName+= match.group("run")
-    # 
-    # # Append the MC-tune (for MC samples only) 
-    # tune_match = tune_re.search(requestName)
-    # if tune_match:
-    #     requestName += tune_match.group("name")
-    # 
-    # # Append the COM Energy (for MC samples only) 
-    # tev_match = tev_re.search(requestName)
-    # if tev_match:
-    #     requestName += tev_match.group("name")
-    # 
-    # # Append the Ext
-    # ext_match = ext_re.search(dataset.URL)
-    # if ext_match:
-    #     requestName+=ext_match.group("name")
-    # 
-    # # Append the Pileup
-    # pileup_match = pileup_re.search(dataset.URL)
-    # if pileup_match:
-    #     #requestName+=pileup_match.group("PU")
-    #     requestName += pileup_match.group()
-
     # New regular expressions for HLTausAnalysis
     mcdataset_re   = re.compile("^/(?P<name>\S+?)/")
     tune_re        = re.compile("Tune\w+_")
@@ -1892,13 +1843,12 @@ def CreateJob(opts, args):
     for dataset in datasets:
         
         Verbose("Task %s, creating CRAB configuration file" % (dataset) )
-        requestName = GetRequestName(dataset)
-    
+        requestName = GetRequestName(dataset) #dataset.getAlias()
         fullDir     = taskDirName + "/" + requestName
 
         if os.path.exists(fullDir) and os.path.isdir(fullDir):
             Verbose("Task %s already exists! Skipping ..." % (requestName), False)
-            continue 
+            continue
 
         Verbose("Task %s, creating crabConfig_%s.py file" % (dataset, dataset), True)
 	CreateCfgFile(dataset, taskDirName, requestName, "crabConfig.py", opts)
@@ -1929,7 +1879,7 @@ if __name__ == "__main__":
     # Default Values
     VERBOSE = False
     PSET    = "raw2TTree_CaloTk_cfg.py"
-    SITE    =  "T3_US_FNALLPC" #"T2_CH_CERN" #"T2_FI_HIP"
+    SITE    = "T2_CH_CERN"
     DIRNAME = ""
 
     parser = OptionParser(usage="Usage: %prog [options]")
