@@ -19,10 +19,11 @@ hltausPseudoMulticrab.py -f test.root -r <multicrab_dir>
 EXAMPLES:
 hltausPseudoMulticrab.py -f histograms-TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU140_93X.root --dir multicrab_test
 hltausPseudoMulticrab.py -f histograms-PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PhaseIIFall17D_L1TPU140_93X.root --dir multicrab_test
+hltausPseudoMulticrab.py
 
 
 LAST USED:
-hltausPseudoMulticrab.py
+hltausPseudoMulticrab.py --dir multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0
 
 '''
 
@@ -58,11 +59,29 @@ cs = ShellStyles.CaptionStyle()
 #================================================================================================ 
 # Function Definitions
 #================================================================================================ 
+def CheckRootFile(fileName):
+
+    if not os.path.exists(fileName):        
+        raise Exception("The ROOT file provided (%s) does not exists!" % (opts.rootFile) )
+
+    # Attempty to open ROOT file (determine if null, zombie, etc..)
+    rf = ROOT.TFile.Open(f)
+    if rf == None:
+        raise Exception("The file %s is NULL" % (es + f + ns) )
+    elif rf.IsZombie():
+        raise Exception("The ROOT file %s is a Zombie" % (es + f + ns) )
+    else:
+        Verbose("The ROOT file %s is healthy" % (hs + f + ns) )
+    return
+
+
 def getDatasetInfo(opts):
     try:
         opts.datasetName = re.search('histograms-(.+?).root', opts.rootFile).group(1)
         Verbose("File \"%s\" corresponds to dataset is \"%s\""% (opts.rootFile, opts.datasetName), False)
     except AttributeError:
+        print "2) opts.rootFile = ", opts.rootFile
+        print "2) opts.datasetName = ", opts.datasetName
         raise Exception("Could not determine the dataset corresponding to the file \"%s\"" % (opts.rootFile) )
 
     # Get dataset info
@@ -361,17 +380,17 @@ def GetTaskDirName(analysis):
     '''
 
     # Constuct basic task directory name
-    dirName = "multicrab"
-    dirName+= "_" + analysis
-    dirName+= "_v" + GetCMSSW(opts)
-    dirName+= "_" + opts.datetime.strftime("%Hh%Mm%Ss_%d%h%Y")
-
     if opts.dirName == "":
-        opts.dirName = dirName
+        dirName = "multicrab"
+        dirName+= "_" + analysis
+        dirName+= "_v" + GetCMSSW(opts)
+        dirName+= "_" + opts.datetime.strftime("%Hh%Mm%Ss_%d%h%Y")
+    else:
+        dirName = opts.dirName + "_" + opts.datetime.strftime("%Hh%Mm%Ss_%d%h%Y")
 
-    # If directory already exists (resubmission)
-    if os.path.exists(opts.dirName) and os.path.isdir(opts.dirName):
-	dirName = opts.dirName
+    # If directory already exists
+    if os.path.exists(dirName) and os.path.isdir(dirName):
+	Verbose("The directory %s already exists" % (hs+dirName+ns), True)
     return dirName
 
 def CreateTaskDirAndCfg(dirName, cfg):
@@ -423,11 +442,9 @@ def CreateJob(opts, args):
     # Get general info
     getDatasetInfo(opts)
 
-    if opts.dirName == "":
-        opts.taskDirName = GetTaskDirName(opts.analysis)
-    else:
-        opts.taskDirName = opts.dirName
-    
+    # Determine pseudo-multicrab directory name
+    opts.taskDirName = GetTaskDirName(opts.algorithm)
+
     # Create CRAB task diractory
     cfg="multicrab.cfg"
     CreateTaskDirAndCfg(opts.taskDirName, cfg)
@@ -489,6 +506,7 @@ if __name__ == "__main__":
     DIRNAME      = ""
     CMSSW        = "92X"
     ANALYSIS     = "HLTausAnalysis"
+    ALGORITHM    = "CaloTk"
     DATAERA      = "TDR2019" #"ID2017"
     DATAVERSION  = None
     ROOTFILE     = None
@@ -514,13 +532,15 @@ if __name__ == "__main__":
     parser.add_option("--analysisName", dest="analysisName", default=ANALYSIS, type="string",
                       help="The analysis name which corresponds to the folder where all histograms will be moved to in the new ROOT file [default: %s]" % (ANALYSIS))
 
+    parser.add_option("--algorithm", dest="algorithm", default=ALGORITHM, type="string",
+                      help="The tau algorithm analyzer used to create the output ROOT files (informative) [default: %s]" % (ALGORITHM))
+
     parser.add_option("--dataEra", dest="dataEra", default=DATAERA, type="string",
                       help="The dataEra name which will be appended to the analysis folder where all histograms will be moved to in the new ROOT file [default: %s]" % (DATAERA))
 
     parser.add_option("--datetime", dest="datetime", default=DATETIME, type="string",
                       help="Datetime to be appended to the pseudo-multicrab directory name[default: %s]" % (DATETIME))
 
-    
     (opts, args) = parser.parse_args()
 
     # Require at least one argument (input ROOT file)
@@ -529,7 +549,6 @@ if __name__ == "__main__":
         sys.exit(1)
         
     # The ROOT file options must be provided
-    opts.analysis  = "CaloTk"
     opts.rootFiles = []
     if opts.rootFile == None:
         # For-loop: dir contents
@@ -552,14 +571,23 @@ if __name__ == "__main__":
         Print("Invalid data-eta \"%s\". Please select one of the following:\n\t%s" % (opts.dataEra, ", ".join(validEras)), True)
         sys.exit()
 
+
+    #  Set ROOT ingore level for verbosity
+    ROOT.gErrorIgnoreLevel = ROOT.kFatal #kPrint = 0,  kInfo = 1000, kWarning = 2000, kError = 3000, kBreak = 4000, kSysError = 5000, kFatal = 6000   
+    
     # Create the pseudo-multicrab dir (if the ROOT file exists)
     nFiles = len(opts.rootFiles)    
     if opts.rootFile != None:
         Verbose("Single ROOT file mode", True)
-        if not os.path.exists(opts.rootFile):        
-            raise Exception("The ROOT file provided (%s) does not exists!" % (opts.rootFile) )
-        else:
-            CreateJob(opts, args)
+
+        # Check & assign ROOT file 
+        CheckRootFile(f)
+        opts.rootFile = f
+        
+        # Create directory and subdirectories
+        CreateJob(opts, args)
+        aux.Print("%sFile %d/%d: %s%s" % (hs, i, nFiles, f, ns), i==1)
+        
         Print("Created pseudo-multicrab directory %s!" % (ss + opts.dirName + ns), True)        
         sys.exit()
     elif nFiles > 0: 
@@ -567,13 +595,14 @@ if __name__ == "__main__":
 
         # For-loop: All ROOT files
         for i, f in enumerate(opts.rootFiles, 1):
+            
+            # Check & assign ROOT file 
+            CheckRootFile(f)
             opts.rootFile = f
-            if not os.path.exists(opts.rootFile):        
-                raise Exception("The ROOT file provided (%s) does not exists!" % (opts.rootFile) )
-            else:
-                CreateJob(opts, args)
+            
+            # Create directory and subdirectories
+            CreateJob(opts, args)
             aux.PrintFlushed("%sFile %d/%d: %s%s" % (hs, i, nFiles, f, ns), i==1)
-            # aux.Print("%sFile %d/%d: %s%s" % (hs, i, nFiles, f, ns), i==1)
         print
 
         Print("Created pseudo-multicrab %s" % (ss + opts.taskDirName + ns), True)

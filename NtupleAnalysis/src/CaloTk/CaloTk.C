@@ -107,6 +107,8 @@ void CaloTk::PrintSettings(void)
 //============================================================================
 {
 
+  if (!DEBUG) return;
+
   // Inform user of settings
   Table settings("Variable | Cut | Value | TP 2015 | Units", "Text");  // Table settingsTable("Variable & Value & Units", "LaTeX", "l l l");
   settings.AddRowColumn(0, "MC Sample");
