@@ -8,7 +8,7 @@ lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13T
 import os
 
 class Dataset:
-    def __init__(self, url, dbs="global", dataVersion="80Xmc", dasQuery="", lumiMask=lumiMask, name=""):
+    def __init__(self, url, dbs="global", dataVersion="80Xmc", dasQuery="", alias="", lumiMask=lumiMask):
         self.URL = url
         self.DBS = dbs
         self.dataVersion = dataVersion
@@ -16,157 +16,128 @@ class Dataset:
             lumiMask = os.path.join(os.environ['CMSSW_BASE'],"src/HiggsAnalysis/MiniAOD2TTree/data",lumiMask)
         self.lumiMask = lumiMask
         self.DASquery = dasQuery
-	self.name = name
+	self.alias = alias
+        return
 
     def isData(self):
         if "data" in self.dataVersion:
             return True
         return False
 
+    def isMC(self):
+        return not self.isData()
+
+    def getAlias(self):
+	return self.alias
+
+    def getFriendlyUrl(self):
+        if self.URL.startswith("/"):
+            friendlyURL = self.URL[1:]
+        else:
+            friendlyURL = self.URL[1:]
+
+        friendlyURL = friendlyURL.replace("-", "_").replace("/", "_")
+	return friendlyURL
+
     def getName(self):
-	return self.name
+	return self.getUrl()
+
+
+    def getUrl(self):
+	return self.URL
+
+    def getDBS(self):
+	return self.DBS
+
+    def getDataVersion(self):
+	return self.dataVersion
+
+    def getDataVersion(self):
+	return self.dataVersion
+
+    def getDasQuery(self):
+	return self.DASquery
+
+    def getLumiMask(self):
+	return self.lumiMask
+
+    def getPU(self):
+        return self.getPileup()
+
+    def getPileup(self):
+        pu = self.alias.split("L1T")[1]
+        if "noPU" in pu:
+            return 0
+        elif "140" in pu:
+            return 140
+        elif "200" in pu:
+            return 200
+        else:
+            raise Exception("Could not determine Pileup value for dataset=%s (alias = %s)" % (self.URL, self.alias) )
 
 
 #================================================================================================ 
 # Data
 #================================================================================================ 
-datasetsTauData = []
+datasetsData = []
 das = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset%3D%2FTau%2FRun2016*-PromptReco-v2%2FMINIAOD"
-#datasetsTauData.append(Dataset('/Tau/Run2016B-03Feb2017_ver2-v2/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_273150-275376_13TeV_PromptReco_Collisions16_JSON_Tau_Run2016B.txt"))
-#datasetsTauData.append(Dataset('/Tau/Run2016C-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_275420-276283_13TeV_PromptReco_Collisions16_JSON_Tau_Run2016C.txt"))
-#datasetsTauData.append(Dataset('/Tau/Run2016D-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_276315-276437_13TeV_PromptReco_Collisions16_JSON_Tau_Run2016D_MET80.txt"))
-#datasetsTauData.append(Dataset('/Tau/Run2016D-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_276453-276811_13TeV_PromptReco_Collisions16_JSON_Tau_Run2016D_noMET80.txt"))
-#datasetsTauData.append(Dataset('/Tau/Run2016E-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_276824-277420_13TeV_PromptReco_Collisions16_JSON_NoL1T_Tau_Run2016E.txt"))
-#datasetsTauData.append(Dataset('/Tau/Run2016F-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_277816-278800_13TeV_PromptReco_Collisions16_JSON_NoL1T_Tau_Run2016F_HIP.txt"))
-#datasetsTauData.append(Dataset('/Tau/Run2016F-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_278801-278808_13TeV_PromptReco_Collisions16_JSON_NoL1T_Tau_Run2016F_HIPfixed.txt"))
-#datasetsTauData.append(Dataset('/Tau/Run2016G-03Feb2017-v1/MINIAOD', dataVersion="80Xdata", dasQuery=das, lumiMask="Cert_278816-280385_13TeV_PromptReco_Collisions16_JSON_NoL1T_Tau_Run2016G.txt"))
-#datasetsTauData.append(Dataset('/Tau/Run2016H-PromptReco-v1/MINIAOD', dataVersion="80Xdata2016H", dasQuery=das, lumiMask="Cert_281010-281202_13TeV_PromptReco_Collisions16_JSON_NoL1T_Tau_Run2016H.txt"))
-#datasetsTauData.append(Dataset('/Tau/Run2016H-03Feb2017_ver2-v1/MINIAOD', dataVersion="80Xdata2016H", dasQuery=das, lumiMask="Cert_281207-284035_13TeV_PromptReco_Collisions16_JSON_NoL1T_Tau_Run2016H.txt"))
 #datasetsTauData.append(Dataset('/Tau/Run2016H-03Feb2017_ver3-v1/MINIAOD', dataVersion="80Xdata2016H", dasQuery=das, lumiMask="Cert_284036-284068_13TeV_PromptReco_Collisions16_JSON_NoL1T_Tau_Run2016H.txt"))
 
 #================================================================================================ 
-# PhaseIISpring17D
+# PhaseIIFall17D
 #================================================================================================ 
-dasAll  = "https://cmsweb.cern.ch/das/request?view=list&limit=100&instance=prod%2Fglobal&input=dataset%3D%2F*%2FPhaseIIFall17D*%2FGEN-SIM-DIGI-RAW"
-dasTauGun = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=%2FRelValSingleTauFlatPt2To100_pythia8%2FCMSSW_9_3_7*D17*%2FGEN-SIM-DIGI-RAW"
-das     = dasAll
+das = "https://cmsweb.cern.ch/das/request?view=list&limit=100&instance=prod%2Fglobal&input=dataset%3D%2F*%2FPhaseIIFall17D*%2FGEN-SIM-DIGI-RAW"
+datasetsSingleNu = []
+datasetsSingleNu.append(Dataset('/SingleNeutrino/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das, alias="SingleNeutrino_L1TPU140")) 
+datasetsSingleNu.append(Dataset('/SingleNeutrino/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das, alias="SingleNeutrino_L1TPU200")) 
 
-## FOR PHASAE 2 L1 2017FALL SALMPLES: https://cmsweb.cern.ch/das/request?view=list&limit=100&instance=prod%2Fglobal&input=dataset%3D%2F*%2FPhaseIIFall17D*%2FGEN-SIM-DIGI-RAW
+das = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=%2FRelValSingleTauFlatPt2To100_pythia8%2FCMSSW_9_3_7*D17*%2FGEN-SIM-DIGI-RAW"
+datasetsSingleTau = []
+datasetsSingleTau.append(Dataset('/RelValSingleTauFlatPt2To100_pythia8/CMSSW_9_3_7-93X_upgrade2023_realistic_v5_2023D17noPU-v2/GEN-SIM-DIGI-RAW'        , dataVersion="93Xmc" , dasQuery=das, alias="SingleTau_L1TnoPU"))
+datasetsSingleTau.append(Dataset('/RelValSingleTauFlatPt2To100_pythia8/CMSSW_9_3_7-PU25ns_93X_upgrade2023_realistic_v5_2023D17PU200-v1/GEN-SIM-DIGI-RAW', dataVersion= "93Xmc", dasQuery=das, alias="SingleTau_L1TPU200"))
 
-datasetsBs = []
-#datasetsBs.append(Dataset('/BsToPhiPhi_SoftQCDnonD_TuneCUEP8M1_14TeV_Pythia8/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
-#datasetsBs.append(Dataset('/BsToPhiPhi_SoftQCDnonD_TuneCUEP8M1_14TeV_Pythia8/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
-#datasetsBs.append(Dataset('/BsToPhiPhi_SoftQCDnonD_TuneCUEP8M1_14TeV_Pythia8/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
+das = "https://cmsweb.cern.ch/das/request?view=list&limit=100&instance=prod%2Fglobal&input=dataset%3D%2F*%2FPhaseIIFall17D*%2FGEN-SIM-DIGI-RAW"
+datasetsTT = []
+datasetsTT.append(Dataset('/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW' , dataVersion="93Xmc", dasQuery=das, alias="TT_TuneCUETP8M2T4_14TeV_L1TnoPU"))
+datasetsTT.append(Dataset('/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das, alias="TT_TuneCUETP8M2T4_14TeV_L1TPU140"))
+datasetsTT.append(Dataset('/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das, alias="TT_TuneCUETP8M2T4_14TeV_L1TPU200"))
+
+das = "https://cmsweb.cern.ch/das/request?view=list&limit=100&instance=prod%2Fglobal&input=dataset%3D%2F*%2FPhaseIIFall17D*%2FGEN-SIM-DIGI-RAW"
+datasetsH2tautau = []
+datasetsH2tautau.append(Dataset('/GluGluHToTauTau_M125_14TeV_powheg_pythia8/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW' , dataVersion="93Xmc", dasQuery=das, alias="GluGluHToTauTau_14TeV_L1TnoPU"))
+datasetsH2tautau.append(Dataset('/GluGluHToTauTau_M125_14TeV_powheg_pythia8/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das, alias="GluGluHToTauTau_14TeV_L1TPU140"))
+datasetsH2tautau.append(Dataset('/GluGluHToTauTau_M125_14TeV_powheg_pythia8/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das, alias="GluGluHToTauTau_14TeV_L1TPU200"))
+
+das = "https://cmsweb.cern.ch/das/request?view=list&limit=100&instance=prod%2Fglobal&input=dataset%3D%2F*%2FPhaseIIFall17D*%2FGEN-SIM-DIGI-RAW"
+datasetsHPlus = []
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW'  , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs200_14TeV_L1TnoPU"))
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW' , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs200_14TeV_L1TPU140"))
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW' , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs200_14TeV_L1TPU200"))
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW'  , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs500_14TeV_L1TnoPU"))
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW' , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs500_14TeV_L1TPU140"))
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW' , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs500_14TeV_L1TPU200"))
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW' , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs1000_14TeV_L1TnoPU"))
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs1000_14TeV_L1TPU140"))
+datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs1000_14TeV_L1TPU200"))
 
 datasetsSingleE = []
-#datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-#datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-#datasetsSingleE.append(Dataset('/SingleE_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-
-datasetsSingleMu = []
-#datasetsSingleMu.append(Dataset('/SingleMu_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-#datasetsSingleMu.append(Dataset('/SingleMu_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-#datasetsSingleMu.append(Dataset('/SingleMu_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-
-datasetsSingleNu = []
-#datasetsSingleNu.append(Dataset('/SingleNeutrino/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
-#datasetsSingleNu.append(Dataset('/SingleNeutrino/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-
-datasetsSingleNu.append(Dataset('/SingleNeutrino/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das)) 
-datasetsSingleNu.append(Dataset('/SingleNeutrino/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das)) 
-
-
-datasetsSinglePhoton = []
-#datasetsSinglePhoton.append(Dataset('/SinglePhoton_FlatPt-8to150/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-#datasetsSinglePhoton.append(Dataset('/SinglePhoton_FlatPt-8to150/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-#datasetsSinglePhoton.append(Dataset('/SinglePhoton_FlatPt-8to150/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-
-datasetsSinglePion0 = []
-#datasetsSinglePion0.append(Dataset('/SinglePion0_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-#datasetsSinglePion0.append(Dataset('/SinglePion0_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-#datasetsSinglePion0.append(Dataset('/SinglePion0_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-
-datasetsSinglePion = []
-#datasetsSinglePion.append(Dataset('/SinglePion_FlatPt-8to100/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-#datasetsSinglePion.append(Dataset('/SinglePion_FlatPt-8to100/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-#datasetsSinglePion.append(Dataset('/SinglePion_FlatPt-8to100/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-
-datasetsSingleTau = []
-datasetsSingleTau.append(Dataset('/RelValSingleTauFlatPt2To100_pythia8/CMSSW_9_3_7-PU25ns_93X_upgrade2023_realistic_v5_2023D17PU200-v1/GEN-SIM-DIGI-RAW',dataVersion= "93Xmc", dasQuery=dasTauGun))
-datasetsSingleTau.append(Dataset('/RelValSingleTauFlatPt2To100_pythia8/CMSSW_9_3_7-93X_upgrade2023_realistic_v5_2023D17noPU-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=dasTauGun))
-#datasetsSingleTau.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-NoPU_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
-#datasetsSingleTau.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-PU140_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
-#datasetsSingleTau.append(Dataset('/SingleTau_FlatPt-8to150/PhaseIISpring17D-PU200_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
-
-datasetsTTJpsiFilter = []
-#datasetsTTJpsiFilter.append(Dataset('/TT_JpsiFilter_TuneCUETP8M1_mtop166_5_14TeV-powheg-tauola-pythia8/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-#datasetsTTJpsiFilter.append(Dataset('/TT_JpsiFilter_TuneCUETP8M1_mtop166_5_14TeV-powheg-tauola-pythia8/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-
-datasetsTT = []
-#datasetsTT.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-#datasetsTT.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
-#datasetsTT.append(Dataset('/TT_TuneCUETP8M1_14TeV-powheg-pythia8/PhaseIISpring17D-PU200_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das))
-
-datasetsTT.append(Dataset('/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
-datasetsTT.append(Dataset('/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
-datasetsTT.append(Dataset('/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
-
-
-datasetsTTbar = []
-#datasetsTTbar.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-NoPU_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-#datasetsTTbar.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-PU140_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-#datasetsTTbar.append(Dataset('/TTbar_14TeV_TuneCUETP8M1_PhaseIIFall16/PhaseIISpring17D-PU200_pilot_90X_upgrade2023_realistic_v9-v1/GEN-SIM-DIGI-RAW', dataVersion="90Xmc", dasQuery=das)) 
-
-datasetsH2tautau = []
-datasetsH2tautau.append(Dataset('/GluGluHToTauTau_M125_14TeV_powheg_pythia8/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
-datasetsH2tautau.append(Dataset('/GluGluHToTauTau_M125_14TeV_powheg_pythia8/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
-datasetsH2tautau.append(Dataset('/GluGluHToTauTau_M125_14TeV_powheg_pythia8/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
-
-datasetsChargedHiggs = []
-datasetsChargedHiggs.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
-datasetsChargedHiggs.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
-datasetsChargedHiggs.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
-
-datasetsChargedHiggs.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
-datasetsChargedHiggs.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
-datasetsChargedHiggs.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
-
-datasetsChargedHiggs.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
-datasetsChargedHiggs.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
-datasetsChargedHiggs.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das))
+datasetsSingleE.append(Dataset('/SingleE_FlatPt-2to100/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW',dataVersion="93Xmc", dasQuery=das, alias="SingleE_L1TnoPU"))
+datasetsSingleE.append(Dataset('/SingleE_FlatPt-2to100/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das, alias="SingleE_L1TPU140"))
+datasetsSingleE.append(Dataset('/SingleE_FlatPt-2to100/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das, alias="SingleE_L1TPU200"))
 
 #================================================================================================ 
 # Dataset Grouping
 #================================================================================================ 
-L1TauDatasets = []
-#L1TauDatasets.extend(datasetsSinglePion0)
-#L1TauDatasets.extend(datasetsSinglePion)
-#L1TauDatasets.extend(datasetsSingleTau)
-#L1TauDatasets.extend(datasetsSingleNu)
-#L1TauDatasets.extend(datasetsTTJpsiFilter)
-#L1TauDatasets.extend(datasetsTT)
-#L1TauDatasets.extend(datasetsTTbar)
-
-MyDatasets = []
-#MyDatasets.extend(datasetsSingleNu)
-#MyDatasets.extend(datasetsTT)
-#MyDatasets.extend(datasetsH2tautau)
-#MyDatasets.extend(datasetsChargedHiggs)
-MyDatasets.extend(datasetsSingleTau)
+PhaseIIFall17D = []
+PhaseIIFall17D.extend(datasetsSingleNu)
+PhaseIIFall17D.extend(datasetsTT)
+PhaseIIFall17D.extend(datasetsH2tautau)
+PhaseIIFall17D.extend(datasetsHPlus)
+PhaseIIFall17D.extend(datasetsSingleTau)
+PhaseIIFall17D.extend(datasetsSingleE)
 
 AllDatasets = []
-AllDatasets.extend(datasetsBs)
-AllDatasets.extend(datasetsSingleE)
-AllDatasets.extend(datasetsSingleMu)
-AllDatasets.extend(datasetsSingleNu)
-AllDatasets.extend(datasetsSinglePhoton)
-AllDatasets.extend(datasetsSinglePion0)
-AllDatasets.extend(datasetsSinglePion)
-AllDatasets.extend(datasetsSingleTau)
-AllDatasets.extend(datasetsTTJpsiFilter)
-AllDatasets.extend(datasetsTT)
-AllDatasets.extend(datasetsTTbar)
-
+AllDatasets += PhaseIIFall17D
 
 #================================================================================================ 
 # Class Definition
@@ -210,14 +181,15 @@ class DatasetGroup:
         '''
         Create dataset grouping in a dictionary for easy access.
         '''
-        analyses = ["CaloTk", "TkCalo", "PFTau", "CaloPix", "NEW", "All"]
+        analyses = ["CaloTk", "TkCalo", "PFTau", "CaloPix", "NEW", "All", "TDR2019"]
         if self.analysis not in analyses:
             raise Exception("Unknown analysis \"%s\". Please select one of the following: \"%s" % (self.analysis, "\", \"".join(analyses) + "\".") )
-        self.GroupDict["CaloTk"]  = L1TauDatasets
-        self.GroupDict["TkCalo"]  = L1TauDatasets
-        self.GroupDict["PFTau"]   = L1TauDatasets
-        self.GroupDict["CaloPix"] = L1TauDatasets
-	self.GroupDict["NEW"]	  = MyDatasets
+        self.GroupDict["CaloTk"]  = PhaseIIFall17D
+        self.GroupDict["TkCalo"]  = PhaseIIFall17D
+        self.GroupDict["PFTau"]   = PhaseIIFall17D
+        self.GroupDict["CaloPix"] = PhaseIIFall17D
+	self.GroupDict["NEW"]	  = PhaseIIFall17D
+	self.GroupDict["TDR2019"] = PhaseIIFall17D
         self.GroupDict["All"]     = AllDatasets
         return
 
@@ -228,6 +200,13 @@ class DatasetGroup:
         Uses pre-defined dictionary mapping: analysis->dataset list
         '''
         return self.GroupDict[self.analysis]
+
+    def GetDatasetListAlt(self):
+        '''
+        Return the dataset list according to the analysis name. 
+        Uses pre-defined dictionary mapping: analysis->dataset list
+        '''
+        return self.GroupDict["TDR2019"]
 
 
     def PrintDatasets(self, printHeader=False):
