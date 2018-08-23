@@ -617,7 +617,7 @@ def GetHistoKwargs(h, opts):
         _kwargs["rebinX"]     = 1 # do NOT change
         _kwargs["opts"]       = {"xmin": 0.0, "xmax": 200.0, "ymin": 0.0, "ymax": 1.2, "ymaxfactor": yMaxF}
         _kwargs["moveLegend"] = _mvLeg4
-        #_kwargs["cutBoxY"]    = {"cutValue": 20, "fillColor": 16, "box": False, "line": False, "cutGreaterThan": False}
+        _kwargs["cutBoxY"]    = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}
     else:
         pass
 

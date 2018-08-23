@@ -347,6 +347,7 @@ def GetHistoKwargs(h, opts):
         _rebinX = 1
         _yLabel = _yNorm + " / " + _format
         _log    = True
+        _xMax   = 400.0
     elif "_redchisquared" in hName:
         _units  = ""
         _format = "%0.1f " + _units
@@ -356,7 +357,7 @@ def GetHistoKwargs(h, opts):
         _rebinX = 10 #5
         _yLabel = _yNorm + " / " + _format
         _log    = True
-        _xMax   = 80.0
+        _xMax   = 200.0
     elif "_deltapocaz" in hName:
         _units  = "cm"
         _format = "%0.2f " + _units

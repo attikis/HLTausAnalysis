@@ -333,8 +333,6 @@ vector<TTTrack> TreeReaderMC::GetTTTracks(const double minPt,
 				      const double maxEta,
 				      const double maxChiSqRed,
 				      const unsigned int minStubs,
-					  //const unsigned int minStubsPS,
-					  //const unsigned int maxStubsPS,
 				      const unsigned nFitParams,
 				      bool bPrintList)
 //============================================================================

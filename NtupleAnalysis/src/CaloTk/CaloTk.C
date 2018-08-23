@@ -20,7 +20,6 @@ void CaloTk::InitObjects(void)
 {
 
   // pvProducer = new L1TkPrimaryVertex(this->s);
-
   return; 
 }
 
@@ -42,11 +41,9 @@ void CaloTk::InitVars_()
   matchTk_nFitParams  =   4;         // TP:   5
   matchTk_minPt       =   5.00;      // TP:   5.0
   matchTk_minEta      =   0.0;       // TP:   0.0
-  matchTk_maxEta      = 999.9;       // TP: 999.9  
-  matchTk_maxChiSqRed = 200.0;       // TP: 200.0
+  matchTk_maxEta      =  999.9;      // TP: 999.9  
+  matchTk_maxChiSqRed =  200.0;      // TP: 200.0
   matchTk_minStubs    =   0;         // TP:   0
-  matchTk_minStubsPS  =   0;         // TP:   0 (unused)
-  matchTk_maxStubsPS  = 999;         // TP: 999 (unused)
   matchTk_caloDeltaR  =   0.10;      // TP:   0.10
 
   // Signal cone tracks
@@ -57,8 +54,6 @@ void CaloTk::InitVars_()
   sigConeTks_maxEta      = 999.9;              // TP: 999.9
   sigConeTks_maxChiSqRed = 200.0;              // TP: 200.0
   sigConeTks_minStubs    =   0;                // TP:   0
-  sigConeTks_minStubsPS  =   0;                // TP:   0 (unused)
-  sigConeTks_maxStubsPS  = 999;                // TP: 999 (unused)
 
   // Isolation cone tracks
   isoConeTks_Collection  = matchTk_Collection;    // TP: "TTTracks" (not "TTPixelTracks")
@@ -68,8 +63,6 @@ void CaloTk::InitVars_()
   isoConeTks_maxEta      = 999.9;                 // TP: 999.9
   isoConeTks_maxChiSqRed = 200.0;                 // TP: 200.0
   isoConeTks_minStubs    =   0;                   // TP:   0
-  isoConeTks_minStubsPS  =   0;                   // TP:   0 (unused)
-  isoConeTks_maxStubsPS  = 999;                   // TP: 999 (unused)
   
   // Signal cone parameters
   sigCone_Constant        = +0.00; // TP: 0.00
@@ -84,7 +77,7 @@ void CaloTk::InitVars_()
   isoCone_VtxIsoWP = +0.50;         // TP: 1.0 cm
   isoCone_RelIsoWP = +0.20;         // TP: N/A
   isoCone_dRMin    = sigCone_dRMax; // TP: 0.4
-  isoCone_dRMax    = +0.40;         // TP: 0.4
+  isoCone_dRMax    = +0.30;         // TP: 0.4
   diTau_deltaPOCAz = +1.00;         // TP: 1.0 cm
 
   // MC matching
@@ -155,19 +148,7 @@ void CaloTk::PrintSettings(void)
   settings.AddRowColumn(7, auxTools_.ToString( matchTk_minStubs) );
   settings.AddRowColumn(7, "0" );
   settings.AddRowColumn(7, "" );
-  /*
-  settings.AddRowColumn(8, "Matching Tracks: PS-Stubs (min)");
-  settings.AddRowColumn(8, ">=");
-  settings.AddRowColumn(8, auxTools_.ToString( matchTk_minStubsPS) );
-  settings.AddRowColumn(8, "" );
-  settings.AddRowColumn(8, "" );
 
-  settings.AddRowColumn(9, "Matching Tracks: PS-Stubs (max)");
-  settings.AddRowColumn(9, "<=");
-  settings.AddRowColumn(9, auxTools_.ToString( matchTk_maxStubsPS) );
-  settings.AddRowColumn(9, "N/A" );
-  settings.AddRowColumn(9, "" );
-  */
   settings.AddRowColumn(8, "Matching Tracks: DeltaR");
   settings.AddRowColumn(8, "<=");
   settings.AddRowColumn(8, auxTools_.ToString(matchTk_caloDeltaR) );
@@ -215,19 +196,7 @@ void CaloTk::PrintSettings(void)
   settings.AddRowColumn(15, auxTools_.ToString( sigConeTks_minStubs) );
   settings.AddRowColumn(15, "" );
   settings.AddRowColumn(15, "" );
-  /*
-  settings.AddRowColumn(18, "Signal Cone Tks: PS-Stubs (min)");
-  settings.AddRowColumn(18, ">=");
-  settings.AddRowColumn(18, auxTools_.ToString( sigConeTks_minStubsPS) );
-  settings.AddRowColumn(18, "0" );
-  settings.AddRowColumn(18, "" );
 
-  settings.AddRowColumn(19, "Signal Cone Tks: PS-Stubs (max)");
-  settings.AddRowColumn(19, "<=");
-  settings.AddRowColumn(19, auxTools_.ToString( sigConeTks_maxStubsPS) );
-  settings.AddRowColumn(19, "N/A" );
-  settings.AddRowColumn(19, "" );
-  */
   settings.AddRowColumn(16, "Isolation Cone Tks: Collection");
   settings.AddRowColumn(16, "==");
   settings.AddRowColumn(16, isoConeTks_Collection);
@@ -269,19 +238,7 @@ void CaloTk::PrintSettings(void)
   settings.AddRowColumn(22, auxTools_.ToString( isoConeTks_minStubs) );
   settings.AddRowColumn(22, "" );
   settings.AddRowColumn(22, "" );
-  /*
-  settings.AddRowColumn(27, "Isolation Cone Tks: PS-Stubs (min)");
-  settings.AddRowColumn(27, ">=");
-  settings.AddRowColumn(27, auxTools_.ToString( isoConeTks_minStubsPS) );
-  settings.AddRowColumn(27, "0" );
-  settings.AddRowColumn(27, "" );
 
-  settings.AddRowColumn(28, "Isolation Cone Tks: PS-Stubs (max)");
-  settings.AddRowColumn(28, "<=");
-  settings.AddRowColumn(28, auxTools_.ToString( isoConeTks_maxStubsPS) );
-  settings.AddRowColumn(28, "N/A" );
-  settings.AddRowColumn(28, "" );
-  */
   settings.AddRowColumn(23, "Signal Cone: Shrink Constant");
   settings.AddRowColumn(23, "==");
   settings.AddRowColumn(23, auxTools_.ToString(sigCone_Constant) );
@@ -466,7 +423,7 @@ void CaloTk::Loop()
     vector<TrackingParticle> TPs = GetTrackingParticles(false);
     
     vector<TTTrack> matchTTTracks = GetTTTracks(matchTk_minPt, matchTk_minEta, matchTk_maxEta, matchTk_maxChiSqRed,
-    matchTk_minStubs, matchTk_nFitParams, false);
+						matchTk_minStubs, matchTk_nFitParams, false);
     
     vector<TTTrack> sigTTTracks = GetTTTracks(sigConeTks_minPt , sigConeTks_minEta, sigConeTks_maxEta, sigConeTks_maxChiSqRed,
 					      sigConeTks_minStubs, sigConeTks_nFitParams, false);
@@ -491,12 +448,10 @@ void CaloTk::Loop()
     vector<L1TkTauParticle> L1TkTaus_Tk;
     vector<L1TkTauParticle> L1TkTaus_VtxIso;    
     vector<L1TkTauParticle> L1TkTaus_RelIso;
-    // -------------------------------------- ALEX-START -------------------------------------- 
     // Jet Collections
     vector<L1Jet> L1Jets = GetL1Jets(false);
     vector<L1EG> L1EGs   = GetL1EGs(false);
     vector<L1Sum> L1Sums = GetL1Sums(false);
-    // -------------------------------------- ALEX-END -------------------------------------- 
 
     // Ensure that all taus are found
     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
@@ -2019,7 +1974,7 @@ void CaloTk::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
   for (vector<GenParticle>::iterator tau = hadGenTaus.begin(); tau != hadGenTaus.end(); tau++)
     {
       // If no hadronic decay products found (pi+/-, pi0, K+/-, K0, K0L), skip this tau
-      if (tau->finalDaughtersCharged().size() < 1) continue;
+      if (tau->finalDaughtersCharged().size() < 1) continue; //iro
 
       double deltaR = auxTools_.DeltaR( L1TkTau.GetCaloTau().eta(), L1TkTau.GetCaloTau().phi(), tau->eta(), tau->phi() );
       if (deltaR > mcMatching_dRMax) continue;

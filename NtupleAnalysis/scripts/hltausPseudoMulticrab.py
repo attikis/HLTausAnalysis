@@ -405,24 +405,23 @@ def CreateTaskDirAndCfg(dirName, cfg):
         os.mkdir(dirName)
 
     # Create the "multicrab.cfg" file
-    CreateCfgFile(dirName, cfg)
+    CreateCfgFile(cfg)
 
     # Write the commit id, "git status", "git diff" command output the directory created for the multicrab task
     gitFileList = git.writeCodeGitInfo(dirName, False)    
     Verbose("Copied %s to '%s'." % ("'" + "', '".join(gitFileList) + "'", dirName) )
     return
 
-def CreateCfgFile(dirName, fileName="multicrab.cfg"):
+def CreateCfgFile(filePath="multicrab.cfg"):
     '''
     Alternative way
     cd <pseudo-multicrab>
     find * -maxdepth 0 -type d | awk '{print "["$1"]"}' > multicrab.cfg
     '''
 
-    fullPath = os.path.join(dirName, fileName)
-    cmd = "touch %s" % fullPath
-    if os.path.exists(fullPath):
-        Verbose("Cannot created file %s. It already exists" % (fullPath), True)
+    cmd = "touch %s" % filePath
+    if os.path.isfile(filePath):
+        Verbose("Cannot created file %s. It already exists" % (filePath), True)
     else:
         Verbose(cmd, True)
         os.system(cmd)
@@ -450,7 +449,7 @@ def CreateJob(opts, args):
     opts.taskDirName = GetTaskDirName(opts.algorithm)
 
     # Create CRAB task diractory
-    cfg="multicrab.cfg"
+    cfg = os.path.join(opts.taskDirName, "multicrab.cfg")
     CreateTaskDirAndCfg(opts.taskDirName, cfg)
 
     # Create the dataset subdirectory

@@ -317,8 +317,6 @@ void Datasets::CreateMcProductions_(void)
   datasets_PhaseIISpring17D.push_back(TTPU140_PhaseIISpring17D);
   datasets_PhaseIISpring17D.push_back(TTPU200_PhaseIISpring17D);
 
-
-
   // PhaseIIFall17D                                                                                                                                                     
   string path_NoPU_v1  = "/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW";
   string path_NoPU_v2  = "/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW"; 
@@ -336,9 +334,8 @@ void Datasets::CreateMcProductions_(void)
 
   Datasets TTPU200_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TPU200", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU200_93X", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_PU200_v2, CP, cmssw, geometry, 200, 99328, 24, 2);
 
-  Datasets SingleTauNoPU_2023D17("SingleTau_L1TnoPU", "RelValSingleTauFlatPt2To100_pythia8_93X_upgrade2023_realistic_v5_2023D17noPU_93X", "/RelValSingleTauFlatPt2To100_pythia8/CMSSW_9_3_7-93X_upgrade2023_realistic_v5_2023D17noPU-v2/GEN-SIM-DIGI-RAW", CP, cmssw, geometry, 0, 9000, 0, 1);
-
-  Datasets SingleTauPU200_2023D17("SingleTau_L1TPU200", "RelValSingleTauFlatPt2To100_pythia8_PU25ns_93X_upgrade2023_realistic_v5_2023D17PU200_93X", "/RelValSingleTauFlatPt2To100_pythia8/CMSSW_9_3_7-PU25ns_93X_upgrade2023_realistic_v5_2023D17PU200-v1/GEN-SIM-DIGI-RAW", CP, cmssw, geometry, 0, 9000, 0, 1);
+  Datasets SingleTauNoPU_2023D17("SingleTau_L1TnoPU", "RelValSingleTauFlatPt2To100_pythia8_93X_upgrade2023_realistic_v5_2023D17noPU_93X", "/RelValSingleTauFlatPt2To100_pythia8/CMSSW_9_3_7-93X_upgrade2023_realistic_v5_2023D17noPU-v2/GEN-SIM-DIGI-RAW", CP, cmssw, geometry, 0, 9000, 0, 2); // not 1 tau but 2!
+  Datasets SingleTauPU200_2023D17("SingleTau_L1TPU200", "RelValSingleTauFlatPt2To100_pythia8_PU25ns_93X_upgrade2023_realistic_v5_2023D17PU200_93X", "/RelValSingleTauFlatPt2To100_pythia8/CMSSW_9_3_7-PU25ns_93X_upgrade2023_realistic_v5_2023D17PU200-v1/GEN-SIM-DIGI-RAW", CP, cmssw, geometry, 0, 9000, 0, 2); // not 1 tau but 2!
 
   Datasets SingleNeutrinoPU140_PhaseIIFall17D("SingleNeutrino_L1TPU140", "SingleNeutrino_PhaseIIFall17D_L1TPU140_93X", "/SingleNeutrino" + path_PU140_v1, CP, cmssw, geometry, 140, 500000, 0, 0);
   Datasets SingleNeutrinoPU200_PhaseIIFall17D("SingleNeutrino_L1TPU200", "SingleNeutrino_PhaseIIFall17D_L1TPU200_93X", "/SingleNeutrino" + path_PU200_v1, CP, cmssw, geometry, 200, 498400, 0, 0);
