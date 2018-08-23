@@ -359,6 +359,10 @@ void Datasets::CreateMcProductions_(void)
   Datasets HPlus1000PU140_PhaseIIFall17D ( "ChargedHiggs1000_14TeV_L1TPU140"  , "PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PhaseIIFall17D_L1TPU140_93X" , "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV" + path_PU140_v2, CP, cmssw, geometry, 140, 100000, 37, 1);
   Datasets HPlus1000PU200_PhaseIIFall17D ( "ChargedHiggs1000_14TeV_L1TPU200"  , "PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PhaseIIFall17D_L1TPU200_93X" , "/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV" + path_PU200_v2, CP, cmssw, geometry, 200, 100000, 37, 1);
 
+  Datasets SingleElectronNoPU_PhaseIIFall17D("SingleE_L1TnoPU", "SingleE_FlatPt_2to100_PhaseIIFall17D_L1TnoPU_93X","/SingleE_FlatPt-2to100" + path_NoPU_v1, CP, cmssw, geometry, 0, 243571, 0, 0);
+  Datasets SingleElectronPU140_PhaseIIFall17D("SingleE_L1TPU140", "SingleE_FlatPt_2to100_PhaseIIFall17D_L1TPU140_93X","/SingleE_FlatPt-2to100" + path_NoPU_v1, CP, cmssw, geometry, 0, 250000, 0, 0);
+  Datasets SingleElectronPU200_PhaseIIFall17D("SingleE_L1TPU200", "SingleE_FlatPt_2to100_PhaseIIFall17D_L1TPU200_93X","/SingleE_FlatPt-2to100" + path_NoPU_v1, CP, cmssw, geometry, 0, 248000, 0, 0);
+
   // datasets_PhaseIIFall17D.push_back(SinglePionNoPU_PhaseIIFall17D);
   datasets_PhaseIIFall17D.push_back(TTNoPU_PhaseIIFall17D);
   datasets_PhaseIIFall17D.push_back(TTPU140_PhaseIIFall17D);
@@ -379,8 +383,10 @@ void Datasets::CreateMcProductions_(void)
   datasets_PhaseIIFall17D.push_back(HPlus1000NoPU_PhaseIIFall17D);
   datasets_PhaseIIFall17D.push_back(HPlus1000PU140_PhaseIIFall17D);
   datasets_PhaseIIFall17D.push_back(HPlus1000PU200_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(SingleElectronNoPU_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(SingleElectronPU140_PhaseIIFall17D);
+  datasets_PhaseIIFall17D.push_back(SingleElectronPU200_PhaseIIFall17D);
 
-  
   return;
 }
 

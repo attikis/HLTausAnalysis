@@ -391,9 +391,9 @@ SingleTauPU200     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT
 VBFnoPU  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kSpring, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
                            StyleLine(lineColor=ROOT.kSpring, lineStyle=ROOT.kSolid, lineWidth=3), StyleFill(fillColor=ROOT.kSpring, fillStyle=0)])
 VBFPU140  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kSpring+10, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
-                           StyleLine(lineColor=ROOT.kSpring+10, lineStyle=ROOT.kSolid, lineWidth=3), StyleFill(fillColor=ROOT.kSpring+10, fillStyle=0)])
+                           StyleLine(lineColor=ROOT.kSpring+10, lineStyle=ROOT.kDotted, lineWidth=3), StyleFill(fillColor=ROOT.kSpring+10, fillStyle=0)])
 VBFPU200  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kSpring-7, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
-                           StyleLine(lineColor=ROOT.kSpring-7, lineStyle=ROOT.kSolid, lineWidth=3), StyleFill(fillColor=ROOT.kSpring-7, fillStyle=0)])
+                           StyleLine(lineColor=ROOT.kSpring-7, lineStyle=ROOT.kDashed, lineWidth=3), StyleFill(fillColor=ROOT.kSpring-7, fillStyle=0)])
 
 TTBarNoPU  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
                            StyleLine(lineColor=ROOT.kAzure, lineStyle=ROOT.kSolid, lineWidth=3), StyleFill(fillColor=ROOT.kMagenta, fillStyle=0)])
@@ -404,7 +404,7 @@ TTBarPU200 = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure-
 
 MinBiasPU140 = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kGray, markerSizes=None, markerStyle=ROOT.kFullCircle),
                               StyleLine(lineColor=ROOT.kGray, lineStyle=ROOT.kSolid, lineWidth=3), 
-                              StyleFill(fillColor=ROOT.kGray, fillStyle=3353)]) #3002
+                              StyleFill(fillColor=ROOT.kGray, fillStyle=3002)]) #3002, 3353
 MinBiasPU200 = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kGray+2, markerSizes=None, markerStyle=ROOT.kFullCircle),
                               StyleLine(lineColor=ROOT.kGray+2, lineStyle=ROOT.kSolid, lineWidth=3), 
                               StyleFill(fillColor=ROOT.kGray+2, fillStyle=1001)])

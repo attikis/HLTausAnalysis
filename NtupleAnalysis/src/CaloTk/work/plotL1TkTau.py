@@ -8,10 +8,11 @@ USAGE:
 ./plotL1TkTau.py -m <multicrab_directory> [opts]
 ./plotL1TkTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU" -n
 ./plotL1TkTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU|TT_TuneCUETP8M2T4_14TeV_L1TPU140" -n
-
+./plotL1TkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|SingleTau|Higgs1000|Higgs500" -n
+./plotL1TkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|SingleTau|Higgs" -n 
 
 LAST USED:
-/plotL1TkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|SingleTau|Higgs1000|Higgs500" -n
+./plotL1TkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|Higgs" -n
 
 '''
 #================================================================================================
@@ -126,14 +127,24 @@ def PlotHisto(datasetsMgr, h):
     else:
         pass
 
-    # Create the MC Plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
+    # Create the plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
     kwargs = {}
+    hList  = getHistoList(dsetsMgr, h)
+
     if opts.normalizeToOne:
-        #p = plots.MCPlot(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
-        p = plots.PlotSameBase(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
+        if 1:
+            p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[], **kwargs)
+            p.histoMgr.forEachHisto(lambda h: h.getRootHisto().Scale(1.0/h.getRootHisto().Integral()))
+        else:
+            # p = plots.MCPlot(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
+            p = plots.PlotSameBase(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
     else:
-        #p = plots.MCPlot(dsetsMgr, h, normalizeToLumi=opts.intLumi, saveFormats=[], **kwargs)
-        p = plots.PlotSameBase(dsetsMgr, h, saveFormats=[], **kwargs) #def __init__(self, datasetMgr, name, normalizeToOne=False, datasetRootHistoArgs={}, **kwargs):
+        if 1:
+            p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[], **kwargs) #FIXME
+        else:
+            # p = plots.MCPlot(dsetsMgr, h, normalizeToLumi=opts.intLumi, saveFormats=[], **kwargs)
+            p = plots.PlotSameBase(dsetsMgr, h, saveFormats=[], **kwargs)
+            
     
     # Set default styles (Called by default in MCPlot)
     p._setLegendStyles()
@@ -141,7 +152,6 @@ def PlotHisto(datasetsMgr, h):
     p._setPlotStyles()
 
     # Customise legend
-    # p.histoMgr.setHistoLegendStyleAll("L")
     for d in dsetsMgr.getAllDatasetNames():
         if "SingleNeutrino" in d:
             p.histoMgr.setHistoLegendStyle(d, "F")
@@ -165,12 +175,23 @@ def PlotHisto(datasetsMgr, h):
     aux.SavePlot(p, opts.saveDir, h, opts.saveFormats, opts.url)
     return
 
+def getHistoList(datasetsMgr, histoName):
+    hList = []
+    # For-loop: All dataset names
+    for d in datasetsMgr.getAllDatasetNames():
+        h = datasetsMgr.getDataset(d).getDatasetRootHisto(histoName)
+        hList.append(h)
+    return hList
 
 def GetHistoKwargs(h, opts):
     
     hName   = h.lower()
     _xLabel = ""
-    _yLabel = "Arbitrary Units / %.2f "
+    if opts.normalizeToOne:
+        _yNorm = "Arbitrary Units"
+    else:
+        _yNorm = "Events"
+    _yLabel = _yNorm + " / %.2f "
     _rebinX = 1
     _rebinY = None
     _units  = ""
@@ -183,7 +204,6 @@ def GetHistoKwargs(h, opts):
     _yMaxF = 1.25 #1.2
     _xMin  = None
     _xMax  = None
-    _yNorm = "Arbitrary Units"
 
     if "_eff" in hName:
         _units  = "GeV"
@@ -492,6 +512,7 @@ def GetHistoKwargs(h, opts):
         _xMax   = +5.0
         _yLabel = _yNorm + " / " + _format
         _log    = True
+        _cutBox = {"cutValue": 0.2, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
     elif "_vtxiso" in hName:
         _units  = "cm"
         _format = "%0.2f " + _units
@@ -501,7 +522,8 @@ def GetHistoKwargs(h, opts):
         _xMax   = +10.0
         _yLabel = _yNorm + " / " + _format
         _log    = True
-        _cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        #_cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _cutBox = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
     elif "_viset" in hName:
         _units  = "GeV"
         _format = "%0.0f " + _units
@@ -542,7 +564,10 @@ def GetHistoKwargs(h, opts):
 
     if _log:
         if _yMin == 0.0:
-            _yMin = 1e-4
+            if opts.normalizeToOne:
+                _yMin = 0.9e-4
+            else:
+                _yMin = 1e0
         _yMaxF = 10
 
     _opts = {"ymin": _yMin, "ymaxfactor": _yMaxF}
@@ -551,21 +576,24 @@ def GetHistoKwargs(h, opts):
     if _xMin != None:
         _opts["xmin"] = _xMin
 
+    _opts2 = {"ymin": 0.0, "ymax": 2.3}
+
     _kwargs = {
         "xlabel"           : _xLabel,
         "ylabel"           : _yLabel,
         "rebinX"           : _rebinX,
         "rebinY"           : _rebinY,
-        "ratioYlabel"      : "Ratio",
-        #"ratio"            : _ratio,
+        "ratioYlabel"      : "1/Ratio ", #"Ratio "
+        "ratio"            : _ratio, # only plots.ComparisonManyPlot(). Eitherwise comment out
         "stackMCHistograms": False,
-        "ratioInvert"      : False,
+        "ratioInvert"      : True,
         "addMCUncertainty" : True,
         "addLuminosityText": False,
         "addCmsText"       : True,
         "cmsExtraText"     : "Phase-2 Simulation",
         "cmsTextPosition"  : "outframe",
         "opts"             : _opts,
+        "opts2"            : _opts2,
         "log"              : _log,
         "cutBox"           : _cutBox,
         "createLegend"     : None #_leg,
@@ -640,11 +668,6 @@ def main(opts):
     if opts.verbose:
         datasetsMgr.PrintCrossSections()
         datasetsMgr.PrintInfo()
-
-    # Get all the histograms and their paths
-    #hList = datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDirectoryContent(opts.folder)
-    #print hList
-    #sys.exit()
 
     # Setup & configure the dataset manager (no collision data => not needed)
     if 0:

@@ -61,17 +61,17 @@ cs = ShellStyles.CaptionStyle()
 #================================================================================================ 
 def CheckRootFile(fileName):
 
-    if not os.path.exists(fileName):        
+    if not os.path.isfile(fileName):        
         raise Exception("The ROOT file provided (%s) does not exists!" % (opts.rootFile) )
 
     # Attempty to open ROOT file (determine if null, zombie, etc..)
-    rf = ROOT.TFile.Open(f)
+    rf = ROOT.TFile.Open(fileName)
     if rf == None:
-        raise Exception("The file %s is NULL" % (es + f + ns) )
+        raise Exception("The file %s is NULL" % (es + fileName + ns) )
     elif rf.IsZombie():
-        raise Exception("The ROOT file %s is a Zombie" % (es + f + ns) )
+        raise Exception("The ROOT file %s is a Zombie" % (es + fileName + ns) )
     else:
-        Verbose("The ROOT file %s is healthy" % (hs + f + ns) )
+        Verbose("The ROOT file %s is healthy" % (hs + fileName + ns) )
     return
 
 
@@ -80,8 +80,6 @@ def getDatasetInfo(opts):
         opts.datasetName = re.search('histograms-(.+?).root', opts.rootFile).group(1)
         Verbose("File \"%s\" corresponds to dataset is \"%s\""% (opts.rootFile, opts.datasetName), False)
     except AttributeError:
-        print "2) opts.rootFile = ", opts.rootFile
-        print "2) opts.datasetName = ", opts.datasetName
         raise Exception("Could not determine the dataset corresponding to the file \"%s\"" % (opts.rootFile) )
 
     # Get dataset info

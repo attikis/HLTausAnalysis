@@ -81,8 +81,8 @@ void CaloTk::InitVars_()
 
   // Isolation cone
   isoCone_Constant = +3.50;         // TP: 3.50 GeV
-  isoCone_VtxIsoWP = +1.00;         // TP: 1.0 cm
-  isoCone_RelIsoWP = +0.10;
+  isoCone_VtxIsoWP = +0.50;         // TP: 1.0 cm
+  isoCone_RelIsoWP = +0.20;         // TP: N/A
   isoCone_dRMin    = sigCone_dRMax; // TP: 0.4
   isoCone_dRMax    = +0.40;         // TP: 0.4
   diTau_deltaPOCAz = +1.00;         // TP: 1.0 cm
@@ -769,7 +769,7 @@ void CaloTk::Loop()
 	    hL1TkTau_SigTks_PtMinusCaloEt->Fill( sigTk->getPt() - tau->GetCaloTau().et() );
 
 	    // Other variables
-	    //sigTks_sumCharge += sigTk->getCharge(); //marina
+	    // sigTks_sumCharge += sigTk->getCharge(); //
 	    
 	  }// SigCone_TTTracks
 
@@ -832,12 +832,12 @@ void CaloTk::Loop()
     FillTurnOn_Numerator_(L1TkTaus_Calo   , 66.0, hCalo_TurnOn_SingleTau50KHz  );
     FillTurnOn_Numerator_(L1TkTaus_Tk     , 65.0, hTk_TurnOn_SingleTau50KHz    );
     FillTurnOn_Numerator_(L1TkTaus_VtxIso , 50.0, hVtxIso_TurnOn_SingleTau50KHz);    
-    FillTurnOn_Numerator_(L1TkTaus_RelIso , 50.0, hRelIso_TurnOn_SingleTau50KHz); // marina: ET threshold???
+    FillTurnOn_Numerator_(L1TkTaus_RelIso , 50.0, hRelIso_TurnOn_SingleTau50KHz);
 
     FillTurnOn_Numerator_(L1TkTaus_Calo   , 42.0, hCalo_TurnOn_DiTau50KHz  );
     FillTurnOn_Numerator_(L1TkTaus_Tk     , 40.0, hTk_TurnOn_DiTau50KHz    );
     FillTurnOn_Numerator_(L1TkTaus_VtxIso , 25.0, hVtxIso_TurnOn_DiTau50KHz);
-    FillTurnOn_Numerator_(L1TkTaus_RelIso , 25.0, hRelIso_TurnOn_DiTau50KHz); // marina: ET threshold???
+    FillTurnOn_Numerator_(L1TkTaus_RelIso , 25.0, hRelIso_TurnOn_DiTau50KHz);
     
     ////////////////////////////////////////////////
     // SingleTau
@@ -2019,8 +2019,7 @@ void CaloTk::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
   for (vector<GenParticle>::iterator tau = hadGenTaus.begin(); tau != hadGenTaus.end(); tau++)
     {
       // If no hadronic decay products found (pi+/-, pi0, K+/-, K0, K0L), skip this tau
-      //marina (needed?)
-      //if (tau->finalDaughtersCharged().size() < 1) continue;
+      if (tau->finalDaughtersCharged().size() < 1) continue;
 
       double deltaR = auxTools_.DeltaR( L1TkTau.GetCaloTau().eta(), L1TkTau.GetCaloTau().phi(), tau->eta(), tau->phi() );
       if (deltaR > mcMatching_dRMax) continue;
