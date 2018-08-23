@@ -83,7 +83,7 @@ void TreeDefinitionGenP::InitGenP(TChain *chain)
   // code, but the routine can be extended by the user if needed.
   // Init() will be called many times when running on PROOF
   // (once per file to be processed).
-  std::cout << "=== TreeDefinitionGenP::InitGenP()" << std::endl;
+  if (0) std::cout << "=== TreeDefinitionGenP::InitGenP()" << std::endl;
 
   weight  = 0;
   pthat   = 0;

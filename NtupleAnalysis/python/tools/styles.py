@@ -275,6 +275,18 @@ signal500Style = StyleCompound([
         StyleFill(fillStyle=1001, fillColor=ROOT.kBlue+3), 
         StyleLine(lineStyle=ROOT.kDashed, lineWidth=3, lineColor=ROOT.kBlue+3) ])
 """
+signal200noPU  = signalStyle = StyleCompound([Style(34, ROOT.kRed)  , StyleLine(lineStyle=ROOT.kSolid, lineWidth=4) ])
+signal200PU140 = signalStyle = StyleCompound([Style(34, ROOT.kRed+3), StyleLine(lineStyle=ROOT.kDotted, lineWidth=4) ])
+signal200PU200 = signalStyle = StyleCompound([Style(34, ROOT.kRed-7), StyleLine(lineStyle=ROOT.kDashed, lineWidth=4) ])
+
+signal500noPU  = signalStyle = StyleCompound([Style(34, ROOT.kViolet)  , StyleLine(lineStyle=ROOT.kSolid, lineWidth=4) ])
+signal500PU140 = signalStyle = StyleCompound([Style(34, ROOT.kViolet+10), StyleLine(lineStyle=ROOT.kDotted, lineWidth=4) ])
+signal500PU200 = signalStyle = StyleCompound([Style(34, ROOT.kViolet-7), StyleLine(lineStyle=ROOT.kDashed, lineWidth=4) ])
+
+signal1000noPU  = signalStyle = StyleCompound([Style(34, ROOT.kMagenta)  , StyleLine(lineStyle=ROOT.kSolid, lineWidth=4) ])
+signal1000PU140 = signalStyle = StyleCompound([Style(34, ROOT.kMagenta+3), StyleLine(lineStyle=ROOT.kDotted, lineWidth=4) ])
+signal1000PU200 = signalStyle = StyleCompound([Style(34, ROOT.kMagenta-7), StyleLine(lineStyle=ROOT.kDashed, lineWidth=4) ])
+
 signal200Style = signalStyle.clone()
 signal220Style = signalStyle.clone()
 signal250Style = signalStyle.clone()
@@ -376,18 +388,29 @@ SingleTauPU200     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT
                                    StyleLine(lineColor=ROOT.kOrange-7, lineStyle=ROOT.kDashed, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kOrange-7, fillStyle=0)])#3001)])
 
-TTBarNoPU         = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
-                                   StyleLine(lineColor=ROOT.kAzure, lineStyle=ROOT.kSolid, lineWidth=3), StyleFill(fillColor=ROOT.kMagenta, fillStyle=0)])
-TTBarPU140        = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure+10, markerSizes=None, markerStyle=ROOT.kFullCircle),
-                                   StyleLine(lineColor=ROOT.kAzure+10, lineStyle=ROOT.kDotted, lineWidth=3)])
-TTBarPU200        = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure-7, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+VBFnoPU  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kSpring, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+                           StyleLine(lineColor=ROOT.kSpring, lineStyle=ROOT.kSolid, lineWidth=3), StyleFill(fillColor=ROOT.kSpring, fillStyle=0)])
+VBFPU140  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kSpring+10, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+                           StyleLine(lineColor=ROOT.kSpring+10, lineStyle=ROOT.kSolid, lineWidth=3), StyleFill(fillColor=ROOT.kSpring+10, fillStyle=0)])
+VBFPU200  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kSpring-7, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+                           StyleLine(lineColor=ROOT.kSpring-7, lineStyle=ROOT.kSolid, lineWidth=3), StyleFill(fillColor=ROOT.kSpring-7, fillStyle=0)])
+
+TTBarNoPU  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+                           StyleLine(lineColor=ROOT.kAzure, lineStyle=ROOT.kSolid, lineWidth=3), StyleFill(fillColor=ROOT.kMagenta, fillStyle=0)])
+TTBarPU140 = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure+10, markerSizes=None, markerStyle=ROOT.kFullCircle),
+                           StyleLine(lineColor=ROOT.kAzure+10, lineStyle=ROOT.kDotted, lineWidth=3)])
+TTBarPU200 = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure-7, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
                                    StyleLine(lineColor=ROOT.kAzure-7, lineStyle=ROOT.kDashed, lineWidth=3)])
 
-MinBiasStyle      = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kGray, markerSizes=None, markerStyle=ROOT.kFullCircle),
-                                   StyleLine(lineColor=ROOT.kGray, lineStyle=ROOT.kSolid, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kGray, fillStyle=1001)])
-SingleNeutrinoPU140 = MinBiasStyle
-SingleNeutrinoPU200 = MinBiasStyle
+MinBiasPU140 = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kGray, markerSizes=None, markerStyle=ROOT.kFullCircle),
+                              StyleLine(lineColor=ROOT.kGray, lineStyle=ROOT.kSolid, lineWidth=3), 
+                              StyleFill(fillColor=ROOT.kGray, fillStyle=3353)]) #3002
+MinBiasPU200 = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kGray+2, markerSizes=None, markerStyle=ROOT.kFullCircle),
+                              StyleLine(lineColor=ROOT.kGray+2, lineStyle=ROOT.kSolid, lineWidth=3), 
+                              StyleFill(fillColor=ROOT.kGray+2, fillStyle=1001)])
+
+SingleNeutrinoPU140 = MinBiasPU140
+SingleNeutrinoPU200 = MinBiasPU200
 
 styles = [ 
     Style(26, ROOT.kBlue),

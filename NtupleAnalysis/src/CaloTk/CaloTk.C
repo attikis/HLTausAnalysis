@@ -6,7 +6,6 @@
 #include "CaloTk.h"
 //#include "../Framework/interface/TreeReaderReco.h"
 
-
 // ROOT
 #include "TFitResult.h"
 #include "TF1.h"
@@ -82,19 +81,19 @@ void CaloTk::InitVars_()
 
   // Isolation cone
   isoCone_Constant = +3.50;         // TP: 3.50 GeV
-  isoCone_VtxIsoWP = +0.50;         // TP: 1.0 cm
+  isoCone_VtxIsoWP = +1.00;         // TP: 1.0 cm
   isoCone_RelIsoWP = +0.10;
   isoCone_dRMin    = sigCone_dRMax; // TP: 0.4
-  isoCone_dRMax    = +0.30;         // TP: 0.4
+  isoCone_dRMax    = +0.40;         // TP: 0.4
   diTau_deltaPOCAz = +1.00;         // TP: 1.0 cm
 
   // MC matching
-  mcMatching_dRMax  = +0.10;        // TP: 0.05
+  mcMatching_dRMax  = +0.1;        // TP: 0.05
   mcMatching_unique = true;
 
   // Eta Regions
-  _eta_C             =   0.8;
-  _eta_F             =   1.6;
+  _eta_C = 0.8;
+  _eta_F = 1.6;
 
   PrintSettings();
 
@@ -393,7 +392,8 @@ void CaloTk::Loop()
   
   const Long64_t nEntries = (MaxEvents == -1) ? fChain->GetEntries() : min((int)fChain->GetEntries(), MaxEvents);
   
-  cout << "=== CaloTk:\n\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
+  if (DEBUG) cout << "=== CaloTk:\n\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
+
   // Initialisations
   InitVars_();
   BookHistos_();
@@ -410,11 +410,11 @@ void CaloTk::Loop()
   if (found!=std::string::npos)
     {
       isMinBias = true;
-      std::cout << "Minimum Bias sample" << std::endl;
+      if (DEBUG) std::cout << "Minimum Bias sample" << std::endl;
     }
   else
     {
-      std::cout << "Not a Minimum Bias sample." << std::endl;
+      if (DEBUG) std::cout << "Not a Minimum Bias sample." << std::endl;
     }
   
   
@@ -1039,7 +1039,7 @@ void CaloTk::Loop()
   // Write the histograms to the file
   ////////////////////////////////////////////////
   WriteHistos_();
-  auxTools_.StopwatchStop(5, "minutes", "Total Time");
+  if (DEBUG) auxTools_.StopwatchStop(5, "minutes", "Total Time");
 
 
 }

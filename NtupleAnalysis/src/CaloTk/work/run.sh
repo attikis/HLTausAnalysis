@@ -48,7 +48,8 @@ if [ -z "$3" ]
     STIME=`date '+%Hh%Mm%Ss_%d%h%Y'`
     OUTPUTDIR="multicrab_CaloTkSkim_v92X_${STIME}"
 else
-    OUTPUTDIR=${3}
+    STIME=`date '+%Hh%Mm%Ss_%d%h%Y'`
+    OUTPUTDIR="${3}_${STIME}"
 fi
 
 #====================================================================================================

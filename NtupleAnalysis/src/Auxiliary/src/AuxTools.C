@@ -35,7 +35,9 @@ void AuxTools::ProgressBar(Long64_t entry,
   Int_t completed     = ratio*barWidth;
 
   // Show the percentage completed
-  cout << "Progress: " << setprecision(3) << percentage << " % " << " (" << entry << "/" << total << ")";
+  // cout << "=== AuxTools::ProgressBar() " << setprecision(3) << percentage << " % " << " (" << entry << "/" << total << ")";
+  // cout << "=== AuxTools::ProgressBar() " << setprecision(3) << entry << "/" << total << " completed";
+  cout << "=== AuxTools::ProgressBar() " << setprecision(3) << percentage << " % ";
   
   // Show the progress bar
   // for (Int_t i=0; i < completed; i++) cout << "=";
@@ -279,7 +281,7 @@ double AuxTools::Divide(int numerator,
 {
 
   if (denominator <= 0){
-    cout << "W A R N I N G ! AuxTools::Divide(...) - "
+    cout << "=== AuxTools::Divide(...) - "
               << "denominator has illegal value \"" << denominator;
     cout << "Returning 0.";
     // cout << "Exiting \n";

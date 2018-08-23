@@ -30,7 +30,7 @@ TChain* FileOpener::OpenFiles(const string multicrabPath, const string dataset, 
 	cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << "! EXIT" << endl;
 	exit(1);      
       }
-    else cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << endl;
+    else if (0) cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << endl;
   }
 
   // For-loop: All ROOT files
@@ -56,7 +56,7 @@ TChain* FileOpener::OpenFiles(const string multicrabPath, const string dataset, 
 string FileOpener::GetFirstFileName(const string multicrabPath, const string dataset)
 {
 
-  cout << "=== FileOpener::GetFirstFileName()" << endl;
+  if (0) cout << "=== FileOpener::GetFirstFileName()" << endl;
 
   // Get the dataset attributes
   string rootFileName;
@@ -70,7 +70,7 @@ string FileOpener::GetFirstFileName(const string multicrabPath, const string dat
       cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << "! EXIT" << endl;
       exit(1);      
     }
-  else cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << endl;
+  else if(0) cout << "\tFound " << dirs.size() << " ROOT files under directory " << fullPath << endl;
 
   vector<string>::iterator f = dirs.begin();
   rootFileName = *f;

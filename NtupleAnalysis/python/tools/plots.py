@@ -284,8 +284,6 @@ _physicalToLogical.update({
     "GluGluHToTauTau_14TeV_L1TPU140" : "GluGluHToTauTau_14TeV_L1TPU140",
     "GluGluHToTauTau_14TeV_L1TPU200" : "GluGluHToTauTau_14TeV_L1TPU200",
 
-
-
 })
 
 ## Map the datasets to be merged to the name of the merged dataset.
@@ -615,15 +613,16 @@ _legendLabels = {
     "TT_TuneCUETP8M2T4_14TeV_L1TPU140" : "t#bar{t} (PU=140)",
     "TT_TuneCUETP8M2T4_14TeV_L1TPU200" : "t#bar{t} (PU=200)",
 
-    "ChargedHiggs200_14TeV_L1TnoPU"   : "H^{+} m_{H^{+}}=200 GeV (PU=0)",
-    "ChargedHiggs200_14TeV_L1TPU140"  : "H^{+} m_{H^{+}}=200 GeV (PU=140)",
-    "ChargedHiggs200_14TeV_L1TPU200"  : "H^{+} m_{H^{+}}=200 GeV (PU=200)",
-    "ChargedHiggs500_14TeV_L1TnoPU"   : "H^{+} m_{H^{+}}=500 GeV (PU=0)",
-    "ChargedHiggs500_14TeV_L1TPU140"  : "H^{+} m_{H^{+}}=500 GeV (PU=140)",
-    "ChargedHiggs500_14TeV_L1TPU200"  : "H^{+} m_{H^{+}}=500 GeV (PU=200)",
-    "ChargedHiggs1000_14TeV_L1TnoPU"  : "H^{+} m_{H^{+}}=1000 GeV (PU=0)",
-    "ChargedHiggs1000_14TeV_L1TPU140" : "H^{+} m_{H^{+}}=1000 GeV (PU=140)",
-    "ChargedHiggs1000_14TeV_L1TPU200" : "H^{+} m_{H^{+}}=1000 GeV (PU=200)",
+    #"ChargedHiggs200_14TeV_L1TnoPU"   : "H^{+} m_{H^{+}}=200 GeV (PU=0)",
+    "ChargedHiggs200_14TeV_L1TnoPU"   : "m_{H^{+}}=200 GeV (PU=0)",
+    "ChargedHiggs200_14TeV_L1TPU140"  : "m_{H^{+}}=200 GeV (PU=140)",
+    "ChargedHiggs200_14TeV_L1TPU200"  : "m_{H^{+}}=200 GeV (PU=200)",
+    "ChargedHiggs500_14TeV_L1TnoPU"   : "m_{H^{+}}=500 GeV (PU=0)",
+    "ChargedHiggs500_14TeV_L1TPU140"  : "m_{H^{+}}=500 GeV (PU=140)",
+    "ChargedHiggs500_14TeV_L1TPU200"  : "m_{H^{+}}=500 GeV (PU=200)",
+    "ChargedHiggs1000_14TeV_L1TnoPU"  : "m_{H^{+}}=1000 GeV (PU=0)",
+    "ChargedHiggs1000_14TeV_L1TPU140" : "m_{H^{+}}=1000 GeV (PU=140)",
+    "ChargedHiggs1000_14TeV_L1TPU200" : "m_{H^{+}}=1000 GeV (PU=200)",
 
     "GluGluHToTauTau_14TeV_L1TnoPU"    : "H^{0}#rightarrow#tau#tau (PU=0)",
     "GluGluHToTauTau_14TeV_L1TPU140"   : "H^{0}#rightarrow#tau#tau (PU=140)",
@@ -690,7 +689,8 @@ _plotStyles = {
     "WZ"            : styles.dibStyle,
     "ZZ"            : styles.dibStyle,
 
-    "MinBias"       : styles.MinBiasStyle,
+    "MinBiasPU140"  : styles.MinBiasPU140,
+    "MinBiasPU200"  : styles.MinBiasPU200,
     "VBF_HToTauTau" : styles.HToTauTauStyle,
     "TauThreeProngs": styles.Tau3prStyle,
 
@@ -736,19 +736,19 @@ _plotStyles = {
     "TT_TuneCUETP8M2T4_14TeV_L1TPU140": styles.TTBarPU140,
     "TT_TuneCUETP8M2T4_14TeV_L1TPU200": styles.TTBarPU200,
 
-    "ChargedHiggs200_14TeV_L1TnoPU"   : styles.signal200Style,
-    "ChargedHiggs200_14TeV_L1TPU140"  : styles.signal200Style,
-    "ChargedHiggs200_14TeV_L1TPU200"  : styles.signal200Style,
-    "ChargedHiggs500_14TeV_L1TnoPU"   : styles.signal500Style,
-    "ChargedHiggs500_14TeV_L1TPU140"  : styles.signal500Style,
-    "ChargedHiggs500_14TeV_L1TPU200"  : styles.signal500Style,
-    "ChargedHiggs1000_14TeV_L1TnoPU"  : styles.signal1000Style,
-    "ChargedHiggs1000_14TeV_L1TPU140" : styles.signal1000Style,
-    "ChargedHiggs1000_14TeV_L1TPU200" : styles.signal1000Style,
+    "ChargedHiggs200_14TeV_L1TnoPU"   : styles.signal200noPU,
+    "ChargedHiggs200_14TeV_L1TPU140"  : styles.signal200PU140,
+    "ChargedHiggs200_14TeV_L1TPU200"  : styles.signal200PU200,
+    "ChargedHiggs500_14TeV_L1TnoPU"   : styles.signal500noPU,
+    "ChargedHiggs500_14TeV_L1TPU140"  : styles.signal500PU140,
+    "ChargedHiggs500_14TeV_L1TPU200"  : styles.signal500PU200,
+    "ChargedHiggs1000_14TeV_L1TnoPU"  : styles.signal1000noPU,
+    "ChargedHiggs1000_14TeV_L1TPU140" : styles.signal1000PU140,
+    "ChargedHiggs1000_14TeV_L1TPU200" : styles.signal1000PU200,
 
-    "GluGluHToTauTau_14TeV_L1TnoPU"    : styles.ggtautauStyle,
-    "GluGluHToTauTau_14TeV_L1TPU140"   : styles.ggtautauStyle,
-    "GluGluHToTauTau_14TeV_L1TPU200"   : styles.ggtautauStyle,
+    "GluGluHToTauTau_14TeV_L1TnoPU"    : styles.VBFnoPU,
+    "GluGluHToTauTau_14TeV_L1TPU140"   : styles.VBFPU140,
+    "GluGluHToTauTau_14TeV_L1TPU200"   : styles.VBFPU200,
 
     }
 

@@ -58,7 +58,7 @@ void HistoTools::DivideHistos_1D(TH1D *hNumerator,
      int N    = hNumerator  ->GetBinContent(i);
      int D    = hDenominator->GetBinContent(i);
      double r = double(N)/double(D);
-     if ( r > 1.0) std::cout << "W A R N I N G ! HistoTools::DivideHistos_1D(...)  - bin " << i 
+     if ( r > 1.0) std::cout << "=== HistoTools::DivideHistos_1D()  - bin " << i 
    			    << " (eT = " << i*hNumerator->GetBinWidth(i) << " GeV): Numerator/Denominator = " 
    			    << N << "/" << D << " = " << r << std::endl;
    }
@@ -770,7 +770,7 @@ void HistoTools::FillAllBinsUpToValue_2D(TH2D *histo,
 
   if (yMaxValue != xMaxValue)
     {
-      std::cout << "W A R N I N G ! HistoTools::FillAllBinsUpToCaloEtHisto_2D(...) - X-axis max is different than Y-axis max.\nExiting \n";
+      std::cout << "=== HistoTools::FillAllBinsUpToCaloEtHisto_2D() - X-axis max is different than Y-axis max.\nExiting \n";
       exit(1);    
     }
   
