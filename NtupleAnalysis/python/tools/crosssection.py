@@ -222,6 +222,18 @@ backgroundCrossSections = CrossSectionList(
         "13": 1.0, 
         "14": 79e+09,#(100.0/1000.0)*1e12, #100 mb (40mb elastic + 60mb inelastic) # Dummy value. 
     }),
+    CrossSection("SingleE_L1TnoPU", {
+        "13": 1.0,
+        "14": 1.0,
+    }),
+    CrossSection("SingleE_L1TPU140", {
+        "13": 1.0,
+        "14": 1.0,
+    }),
+    CrossSection("SingleE_L1TPU200", {
+        "13": 1.0,
+        "14": 1.0,
+    }),
     CrossSection("WW", {
             "7": 43.0, # [3]
             "8": 54.838, # [9], took value for CTEQ PDF since CTEQ6L1 was used in pythia simulation
