@@ -7,10 +7,11 @@ Basic plotting script for making plots for CaloTk analyzer.
 USAGE:
 ./plotL1TkTau.py -m <multicrab_directory> [opts]
 ./plotL1TkTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU" -n
+./plotL1TkTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU|TT_TuneCUETP8M2T4_14TeV_L1TPU140" -n
 
 
 LAST USED:
-./plotL1TkTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU|TT_TuneCUETP8M2T4_14TeV_L1TPU140" -n
+/plotL1TkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|SingleTau|Higgs1000|Higgs500" -n
 
 '''
 #================================================================================================
@@ -147,8 +148,11 @@ def PlotHisto(datasetsMgr, h):
         else:
             p.histoMgr.setHistoLegendStyle(d, "L")
 
-    p.setLegend(histograms.createLegend(0.68, 0.85-0.05*len(dsetsMgr.getAllDatasetNames()), 0.92, 0.92))
-    #p.histoMgr.setHistoLegendStyle("histo_" + dataset, "LP")
+    # Create legend
+    if 0:
+        p.setLegend(histograms.createLegend(0.18, 0.86-0.04*len(dsetsMgr.getAllDatasetNames()), 0.42, 0.92))
+    else:
+        p.setLegend(histograms.createLegend(0.58, 0.86-0.04*len(dsetsMgr.getAllDatasetNames()), 0.92, 0.92))
 
     # Draw a customised plot
     plots.drawPlot(p, h, **GetHistoKwargs(h, opts) )
@@ -176,7 +180,7 @@ def GetHistoKwargs(h, opts):
     _ratio = True
     _log   = False
     _yMin  = 0.0
-    _yMaxF = 1.2
+    _yMaxF = 1.25 #1.2
     _xMin  = None
     _xMax  = None
     _yNorm = "Arbitrary Units"
@@ -303,7 +307,7 @@ def GetHistoKwargs(h, opts):
         _yLabel = _yNorm + " / " + _format
         _log    = False
         _xMin   = +0.0
-        _xMax   = +0.3
+        _xMax   = +0.2
         _log    = False
     elif "_isoconermax" in hName:
         _units  = ""
@@ -497,6 +501,7 @@ def GetHistoKwargs(h, opts):
         _xMax   = +10.0
         _yLabel = _yNorm + " / " + _format
         _log    = True
+        _cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
     elif "_viset" in hName:
         _units  = "GeV"
         _format = "%0.0f " + _units
@@ -585,6 +590,33 @@ def GetBinwidthDecimals(binWidth):
         dec =  " %0.7f"
     return dec
 
+def ReorderDatasets(datasets):
+    newOrder =  datasets
+    
+    for i, d in enumerate(datasets, 0):
+        if "PU200" in d:
+            newOrder.remove(d)
+            newOrder.insert(0, d)
+            #newOrder.insert(0, newOrder.pop(i))
+    for j, d in enumerate(datasets, 0):
+        if "PU140" in d:
+            newOrder.remove(d)
+            newOrder.insert(0, d)
+    for k, d in enumerate(datasets, 0):
+        if "noPU" in d:
+            newOrder.remove(d)
+            newOrder.insert(0, d)
+    
+    mb140 = "SingleNeutrino_L1TPU140"
+    mb200 = "SingleNeutrino_L1TPU200"
+    if mb140 in datasets:
+        newOrder.remove(mb140)
+        newOrder.insert(len(newOrder), mb140)
+    if mb200 in datasets:
+        newOrder.remove(mb200)
+        newOrder.insert(len(newOrder), mb200)
+    return newOrder
+
 
 def main(opts):
     
@@ -635,17 +667,7 @@ def main(opts):
         intLumi = datasetsMgr.getDataset("Data").getLuminosity()
 
     # Apply new dataset order?
-    newOrder = datasetsMgr.getAllDatasetNames()
-    for i, d in  enumerate(datasetsMgr.getAllDatasetNames(), 0):
-        if "noPU" in d:
-            newOrder.insert(0, newOrder.pop(i))
-        if "PU200" in d:
-            newOrder.insert(2, newOrder.pop(i))
-    for i, d in  enumerate(datasetsMgr.getAllDatasetNames(), 0):
-        if "PU140" in d:
-            newOrder.insert(1, newOrder.pop(i))
-        if "Neutrino" in d:
-            newOrder.insert(len(newOrder), newOrder.pop(i))
+    newOrder = ReorderDatasets(datasetsMgr.getAllDatasetNames())
     datasetsMgr.selectAndReorder(newOrder)
 
     # Print dataset information (after merge)
