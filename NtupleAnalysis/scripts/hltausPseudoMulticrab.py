@@ -412,7 +412,13 @@ def CreateTaskDirAndCfg(dirName, cfg):
     Verbose("Copied %s to '%s'." % ("'" + "', '".join(gitFileList) + "'", dirName) )
     return
 
-def CreateCfgFile(irName, fileName="multicrab.cfg"):
+def CreateCfgFile(dirName, fileName="multicrab.cfg"):
+    '''
+    Alternative way
+    cd <pseudo-multicrab>
+    find * -maxdepth 0 -type d | awk '{print "["$1"]"}' > multicrab.cfg
+    '''
+
     fullPath = os.path.join(dirName, fileName)
     cmd = "touch %s" % fullPath
     if os.path.exists(fullPath):
