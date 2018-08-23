@@ -216,30 +216,24 @@ class CaloTk : public TreeAnalyserMC{
   HistoTools histoTools_;
   bool bFoundAllTaus_;
 
-  // Event-Type Histograms
-  TH1D* hCounters;
-  TH1D* hHepMCEvt_VtxZ;
-  TH2D* hHepMCEvt_VtxX_VtxY;
-  TH1D* hL1TkPV_VtxZ;
-  TH1D* hPrimaryVertex_DeltaZ;
-  TH1D* hPrimaryVertex_AbsDeltaZ;  
-
   // GenParticles Histograms
   TH2D* h_GenP_VisET_dRMaxLdgPion;
   
+  // Counters
+  TH1D* hCounters;
+
   // L1TkTaus: Matching track
   TH1D* hL1TkTau_MatchTk_DeltaR;
   TH1D* hL1TkTau_MatchTk_PtRel;
   TH1D* hL1TkTau_MatchTk_Pt;
   TH1D* hL1TkTau_MatchTk_Eta;
   TH1D* hL1TkTau_MatchTk_POCAz;
-  TH1D* hL1TkTau_MatchTk_d0;
-  TH1D* hL1TkTau_MatchTk_d0Abs;
+  // TH1D* hL1TkTau_MatchTk_d0;
+  // TH1D* hL1TkTau_MatchTk_d0Abs;
   TH1D* hL1TkTau_MatchTk_NStubs;
   TH1D* hL1TkTau_MatchTk_NPsStubs;
   TH1D* hL1TkTau_MatchTk_NBarrelStubs;
   TH1D* hL1TkTau_MatchTk_NEndcapStubs;
-  TH1D* hL1TkTau_MatchTk_StubPtCons;
   TH1D* hL1TkTau_MatchTk_ChiSquared;
   TH1D* hL1TkTau_MatchTk_RedChiSquared;
   TH1D* hL1TkTau_MatchTk_IsGenuine;
@@ -253,11 +247,10 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkTau_SigTks_Eta;
   TH1D* hL1TkTau_SigTks_POCAz;
   TH1D* hL1TkTau_SigTks_DeltaPOCAz;
-  TH1D* hL1TkTau_SigTks_d0;
-  TH1D* hL1TkTau_SigTks_d0Abs;
-  TH1D* hL1TkTau_SigTks_d0Sig;
-  TH1D* hL1TkTau_SigTks_d0SigAbs;
-  TH1D* hL1TkTau_SigTks_StubPtCons;
+  // TH1D* hL1TkTau_SigTks_d0;
+  // TH1D* hL1TkTau_SigTks_d0Abs;
+  // TH1D* hL1TkTau_SigTks_d0Sig;
+  // TH1D* hL1TkTau_SigTks_d0SigAbs;
   TH1D* hL1TkTau_SigTks_DeltaR;
   TH1D* hL1TkTau_SigTks_NStubs;
   TH1D* hL1TkTau_SigTks_NPsStubs;
@@ -273,11 +266,10 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkTau_IsoTks_Eta;
   TH1D* hL1TkTau_IsoTks_POCAz;
   TH1D* hL1TkTau_IsoTks_DeltaPOCAz;
-  TH1D* hL1TkTau_IsoTks_d0;
-  TH1D* hL1TkTau_IsoTks_d0Abs;
-  TH1D* hL1TkTau_IsoTks_d0Sig;
-  TH1D* hL1TkTau_IsoTks_d0SigAbs;
-  TH1D* hL1TkTau_IsoTks_StubPtCons;
+  // TH1D* hL1TkTau_IsoTks_d0;
+  // TH1D* hL1TkTau_IsoTks_d0Abs;
+  // TH1D* hL1TkTau_IsoTks_d0Sig;
+  // TH1D* hL1TkTau_IsoTks_d0SigAbs;
   TH1D* hL1TkTau_IsoTks_DeltaR;
   TH1D* hL1TkTau_IsoTks_NStubs;
   TH1D* hL1TkTau_IsoTks_NPsStubs;
@@ -289,12 +281,18 @@ class CaloTk : public TreeAnalyserMC{
 
   // L1TkTaus: VtxIsolated
   TH1D* hL1TkTau_Multiplicity;
+  TH1D* hL1TkTau_CaloEt;
+  TH1D* hL1TkTau_CaloEta;
   TH1D* hL1TkTau_Rtau;
   TH1D* hL1TkTau_CHF;
   TH1D* hL1TkTau_NHF;
   TH1D* hL1TkTau_NHFAbs;
   TH1D* hL1TkTau_NSigTks;
+  TH1D* hL1TkTau_SigTksEt;
+  TH1D* hL1TkTau_SigTksEta;
   TH1D* hL1TkTau_NIsoTks;
+  TH1D* hL1TkTau_IsoTksEt;
+  TH1D* hL1TkTau_IsoTksEta;
   TH1D* hL1TkTau_InvMass;
   TH1D* hL1TkTau_InvMassIncl;
   TH1D* hL1TkTau_SigConeRMin;
@@ -302,7 +300,6 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkTau_IsoConeRMin;
   TH1D* hL1TkTau_IsoConeRMax;
   TH1D* hL1TkTau_Charge;
-  TH1D* hL1TkTau_ChargeAbs;
   TH1D* hL1TkTau_RelIso;
   TH1D* hL1TkTau_VtxIso;
   TH1D* hL1TkTau_VtxIsoAbs;

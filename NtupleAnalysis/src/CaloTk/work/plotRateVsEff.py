@@ -14,7 +14,7 @@ EXAMPLES:
 
 
 LAST USED:
-./plotRateVsEff.py -m multicrab_CaloTkSkim_v92X_20180801T1203
+./plotRateVsEff.py -m multicrab_CaloTk_v92X_IsoConeRMax0p3_VtxIso0p5_RelIso0p2_14h29m15s_23Aug2018 -e "SingleE"
 
 '''
 
