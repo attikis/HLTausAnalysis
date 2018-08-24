@@ -222,14 +222,6 @@ def GetHistoKwargs(h, opts):
         #_xMax   = +10.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
-    elif "_turnon" in hName:
-        _units  = "GeV"
-        _format = "%0.0f " + _units
-        _xLabel = "#tau_{h} E_{T} (%s)" % (_units)
-        _cutBox = {"cutValue": 20.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-        _rebinX = 1
-        _yLabel = "Efficiency / %.0f " + _units
-        _xMax   = 200.0
     elif "_rate" in hName:
         _units  = "GeV"
         _format = "%0.0f " + _units
@@ -346,7 +338,7 @@ def GetHistoKwargs(h, opts):
         _format = "%0.1f " + _units
         _xLabel = "#chi^{2}"
         _cutBox = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        _rebinX = 1
+        _rebinX = 2
         _yLabel = _yNorm + " / " + _format
         _log    = True
         _xMax   = 400.0
@@ -356,10 +348,10 @@ def GetHistoKwargs(h, opts):
         #_xLabel = "#chi^{2} / #nu"
         _xLabel = "#chi^{2}_{#nu}"
         _cutBox = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        _rebinX = 10 #5
+        _rebinX = 2
         _yLabel = _yNorm + " / " + _format
         _log    = True
-        _xMax   = 200.0
+        _xMax   = 100.0
     elif "_deltapocaz" in hName:
         _units  = "cm"
         _format = "%0.2f " + _units
@@ -378,12 +370,59 @@ def GetHistoKwargs(h, opts):
         _xMax   = +0.4
         _yLabel = _yNorm + " / " + _format
         _log    = True
+    elif "tkset" in hName:
+        _units  = "GeV"
+        _format = "%0.f " + _units
+        _xLabel = "E_{T} (%s)" % (_units)
+        if "_sig" in hName:
+            _cutBox = {"cutValue": 5.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+            _log    = False
+        else:
+            _cutBox = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+            _log    = True
+        _rebinX = 5 
+        _xMin   =   0.0
+        _xMax   = 100.0
+        _yLabel = _yNorm + " / " + _format
+        if "tkseta" in hName:
+            _units  = ""
+            _format = "%0.2f " + _units
+            _xLabel = "#eta"
+            _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+            _rebinX = 1 
+            _xMin   = -2.4
+            _xMax   = +2.4
+            _yLabel = _yNorm + " / " + _format
+            _log    = False
+            ROOT.gStyle.SetNdivisions(6, "X")
+    elif "_caloet" in hName:
+        _units  = "GeV"
+        _format = "%0.f " + _units
+        _xLabel = "E_{T} (%s)" % (_units)
+        _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _rebinX = 5 
+        _xMin   =   0.0
+        _xMax   = 300.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+        #ROOT.gStyle.SetNdivisions(6, "X")
+        if "_caloeta" in hName:
+            _units  = ""
+            _format = "%0.2f " + _units
+            _xLabel = "#eta"
+            _cutBox = {"cutValue": 1.479, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+            _rebinX = 1
+            _xMin   = -2.4
+            _xMax   = +2.4
+            _yLabel = _yNorm + " / " + _format
+            _log    = False
+            ROOT.gStyle.SetNdivisions(6, "X")
     elif "_eta" in hName:
         _units  = ""
         _format = "%0.2f " + _units
         _xLabel = "#eta"
         _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        _rebinX = 5 #1
+        _rebinX = 1 
         _xMin   = -2.4
         _xMax   = +2.4
         _yLabel = _yNorm + " / " + _format
@@ -454,7 +493,7 @@ def GetHistoKwargs(h, opts):
             _xLabel = "p_{T}^{tk} - E_{T}^{calo} (%s)" % (_units)
             _cutBox = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
             _rebinX = 1
-            _xMax   = +10.0
+            _xMax   = +50.0
             _yLabel = _yNorm + " / " + _format
             _log    = True
     elif "_iscombinatoric" in hName:

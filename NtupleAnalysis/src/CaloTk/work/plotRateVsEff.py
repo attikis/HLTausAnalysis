@@ -576,7 +576,7 @@ def GetHistoKwargs(h, opts):
         
     _kwargs = {
         "xlabel"           : "Efficiency",
-        "ylabel"           : "Rate (kHz)",
+        "ylabel"           : "Rate (kHz)", #"Rate (kHz) / %.0f GeV",
         "addMCUncertainty" : False, 
         "addLuminosityText": False,
         "addCmsText"       : True,
@@ -597,7 +597,7 @@ def GetHistoKwargs(h, opts):
         return _kwargs
     elif "Rate_" in h:
         _kwargs["xlabel"]     = "E_{T} (GeV)"
-        _kwargs["ylabel"]     = "Rate (kHz)"
+        _kwargs["ylabel"]     = "Rate (kHz)"# / %.0f GeV"
         _kwargs["opts"]       = {"xmin": 0.0, "xmax": 300.0, "ymin": yMin, "ymax":1e5, "ymaxfactor": yMaxF}
         _kwargs["moveLegend"] = _mvLeg2
         _kwargs["cutBoxY"]    = {"cutValue": 50, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}
