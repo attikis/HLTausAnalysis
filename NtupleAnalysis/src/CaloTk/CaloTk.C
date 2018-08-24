@@ -347,7 +347,7 @@ void CaloTk::Loop()
   // Sanity check
   if (fChain == 0) return;
   
-  const Long64_t nEntries = (MaxEvents == -1) ? fChain->GetEntries() : min((int)fChain->GetEntries(), MaxEvents);
+  const Long64_t nEntries   = (MaxEvents == -1) ? fChain->GetEntries() : min((int)fChain->GetEntries(), MaxEvents);
   
   if (DEBUG) cout << "=== CaloTk:\n\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
 
@@ -516,14 +516,38 @@ void CaloTk::Loop()
     // ======================================================================================
     // For-loop: L1Taus
     // ======================================================================================
+    unsigned int iCalo = -1;
     for (vector<L1Tau>::iterator calo = L1Taus.begin(); calo != L1Taus.end(); calo++)
       {
-	// Calculate the Et-dependent signal & isolation cone sizes
-	GetShrinkingConeSizes(calo->et(), sigCone_Constant, isoCone_Constant, sigCone_cutoffDeltaR,
-			      sigCone_dRMin, sigCone_dRMax, isoCone_dRMin, isoCone_dRMax);
+	iCalo += 1;
+	if (0) calo->PrintProperties(iCalo==0); //iro
+	// std::cout << calo->getNTT() << std::endl;
 
+	// Fill histograms
+	hL1CaloTau_Et        ->Fill( calo->getEt()    );
+	hL1CaloTau_Eta       ->Fill( calo->getEta()   );
+	hL1CaloTau_Phi       ->Fill( calo->getPhi()   );
+	hL1CaloTau_IEt       ->Fill( calo->getIEt()   );
+	hL1CaloTau_IEta      ->Fill( calo->getIEta()  );
+	hL1CaloTau_IPhi      ->Fill( calo->getIPhi()  );
+	hL1CaloTau_Iso       ->Fill( calo->getIso()   );
+	hL1CaloTau_TowerIPhi ->Fill( calo->getIPhi()  );
+	hL1CaloTau_TowerIEta ->Fill( calo->getIEta()  );
+	hL1CaloTau_RawEt     ->Fill( calo->getRawEt() );
+	hL1CaloTau_IsoEt     ->Fill( calo->getIsoEt() );
+	hL1CaloTau_NTT       ->Fill( calo->getNTT()   );
+	hL1CaloTau_HasEM     ->Fill( calo->getHasEM() );
+	hL1CaloTau_IsMerged  ->Fill( calo->getIsMerged() );
+
+	// Calculate the Et-dependent signal & isolation cone sizes
+	GetShrinkingConeSizes(calo->et(), sigCone_Constant, isoCone_Constant, 
+			      sigCone_cutoffDeltaR, sigCone_dRMin, sigCone_dRMax, 
+			      isoCone_dRMin, isoCone_dRMax);
+	
 	// Construct the CaloTk candidate
-	L1TkTauParticle	L1TkTauCandidate(0.0, matchTk_caloDeltaR, sigCone_dRMin, sigCone_dRMax, isoCone_dRMin, isoCone_dRMax);
+	L1TkTauParticle	L1TkTauCandidate(0.0, matchTk_caloDeltaR, 
+					 sigCone_dRMin, sigCone_dRMax, 
+					 isoCone_dRMin, isoCone_dRMax);
 
 
 	if ( matchTk_Collection.compare("TTTracks") != 0 )
@@ -647,7 +671,7 @@ void CaloTk::Loop()
 	TLorentzVector caloTau_p4;
       	caloTau_p4.SetPtEtaPhiE(tau->GetCaloTau().et(), tau->GetCaloTau().eta(), tau->GetCaloTau().phi(), tau->GetCaloTau().et() );
 	hL1TkTau_MatchTk_DeltaR        ->Fill( matchTk_dR );
-	hL1TkTau_MatchTk_PtRel         ->Fill( matchTk.p3().Perp(caloTau_p4.Vect()) ); // marina: ??
+	hL1TkTau_MatchTk_PtRel         ->Fill( matchTk.p3().Perp(caloTau_p4.Vect()) );
 	hL1TkTau_MatchTk_Pt            ->Fill( matchTk.getPt() );
 	hL1TkTau_MatchTk_Eta           ->Fill( matchTk.getEta() );
 	hL1TkTau_MatchTk_POCAz         ->Fill( matchTk.getZ0() );
@@ -662,20 +686,37 @@ void CaloTk::Loop()
 	hL1TkTau_MatchTk_PtMinusCaloEt ->Fill( matchTk.getPt() - tau->GetCaloTau().et() );
 
 	// Signal/Isolation Cone Variables
-	hL1TkTau_Rtau        ->Fill( tau->GetSigConeLdgTk().getPt() / tau->GetCaloTau().et() );
-	hL1TkTau_CaloEt      ->Fill( tau->GetCaloTau().et() );
-	hL1TkTau_CaloEta     ->Fill( tau->GetCaloTau().eta() );
-	hL1TkTau_CHF         ->Fill( sigTks_p4.Et()/tau->GetCaloTau().et() );
-	hL1TkTau_NHF         ->Fill( (tau->GetCaloTau().et() - sigTks_p4.Et())/tau->GetCaloTau().et() );
-	hL1TkTau_NHFAbs      ->Fill( abs( (tau->GetCaloTau().et() - sigTks_p4.Et())/tau->GetCaloTau().et() ) );
-	hL1TkTau_NSigTks     ->Fill( tau->GetSigConeTTTracks().size() );
-	hL1TkTau_SigTksEt    ->Fill( sigTks_p4.Et() );
-	hL1TkTau_SigTksEta   ->Fill( sigTks_p4.Eta() );
-	hL1TkTau_NIsoTks     ->Fill( tau->GetIsoConeTTTracks().size() );
-	hL1TkTau_IsoTksEt    ->Fill( isoTks_p4.Et() );
-	hL1TkTau_IsoTksEta   ->Fill( isoTks_p4.Eta() );
-	if (tau->GetSigConeTTTracks().size() > 1) hL1TkTau_InvMass->Fill( sigTks_p4.M() );
-	hL1TkTau_InvMassIncl ->Fill( sigTks_p4.M() );
+	hL1TkTau_Rtau         ->Fill( tau->GetSigConeLdgTk().getPt() / tau->GetCaloTau().et() );
+	hL1TkTau_CaloEt       ->Fill( tau->GetCaloTau().et() );
+	hL1TkTau_CaloEta      ->Fill( tau->GetCaloTau().eta() );
+	hL1TkTau_CaloEt       ->Fill( tau->GetCaloTau().getEt()    );
+	hL1TkTau_CaloEta      ->Fill( tau->GetCaloTau().getEta()   );
+	hL1TkTau_CaloPhi      ->Fill( tau->GetCaloTau().getPhi()   );
+	hL1TkTau_CaloIEt      ->Fill( tau->GetCaloTau().getIEt()   );
+	hL1TkTau_CaloIEta     ->Fill( tau->GetCaloTau().getIEta()  );
+	hL1TkTau_CaloIPhi     ->Fill( tau->GetCaloTau().getIPhi()  );
+	hL1TkTau_CaloIso      ->Fill( tau->GetCaloTau().getIso()   );
+	hL1TkTau_CaloTowerIPhi->Fill( tau->GetCaloTau().getIPhi()  );
+	hL1TkTau_CaloTowerIEta->Fill( tau->GetCaloTau().getIEta()  );
+	hL1TkTau_CaloRawEt    ->Fill( tau->GetCaloTau().getRawEt() );
+	hL1TkTau_CaloIsoEt    ->Fill( tau->GetCaloTau().getIsoEt() );
+	hL1TkTau_CaloNTT      ->Fill( tau->GetCaloTau().getNTT()   );
+	hL1TkTau_CaloHasEM    ->Fill( tau->GetCaloTau().getHasEM() );
+	hL1TkTau_CaloIsMerged ->Fill( tau->GetCaloTau().getIsMerged() );
+	hL1TkTau_CHF          ->Fill( tau->GetSigConeTTTracksP4().Et()/tau->GetCaloTau().et() );
+	hL1TkTau_NHF          ->Fill( (tau->GetCaloTau().et() - tau->GetSigConeTTTracksP4().Et())/tau->GetCaloTau().et() );
+	hL1TkTau_NHFAbs       ->Fill( abs( (tau->GetCaloTau().et() - tau->GetSigConeTTTracksP4().Et())/tau->GetCaloTau().et() ) );
+	hL1TkTau_NSigTks      ->Fill( tau->GetSigConeTTTracks().size() );
+	hL1TkTau_SigTksEt     ->Fill( tau->GetSigConeTTTracksP4().Et() );
+	hL1TkTau_SigTksEta    ->Fill( tau->GetSigConeTTTracksP4().Eta() );
+	hL1TkTau_NIsoTks      ->Fill( tau->GetIsoConeTTTracks().size() );
+	if (tau->GetIsoConeTTTracks().size() > 0) 
+	  {
+	    hL1TkTau_IsoTksEt    ->Fill( tau->GetIsoConeTTTracksP4().Et() );
+	    hL1TkTau_IsoTksEta   ->Fill( tau->GetIsoConeTTTracksP4().Eta() );
+	  }
+	if (tau->GetSigConeTTTracks().size() > 1) hL1TkTau_InvMass->Fill( tau->GetSigConeTTTracksP4().M() );
+	hL1TkTau_InvMassIncl ->Fill( tau->GetSigConeTTTracksP4().M() ); 
 	hL1TkTau_SigConeRMin ->Fill( tau->GetSigConeMin() );
 	hL1TkTau_IsoConeRMin ->Fill( tau->GetIsoConeMin() );
 	hL1TkTau_SigConeRMax ->Fill( tau->GetSigConeMax() );
@@ -1002,9 +1043,29 @@ void CaloTk::BookHistos_(void)
   const float minEt = 0.0;
   const float maxEt = +300.0;
 
+  const unsigned int nPt = 100;
+  const float minPt = 0.0;
+  const float maxPt = +100.0;
+
+  const unsigned int nPtR = 400;
+  const float minPtR = 0.0;
+  const float maxPtR = +20.0;
+
+  const unsigned int nIEta = 100;
+  const float minIEta = -50.0;
+  const float maxIEta = +50.0;
+
+  const unsigned int nIPhi = 200;
+  const float minIPhi =   0.0;
+  const float maxIPhi = 200.0;
+
   const unsigned int nEta = 60;
   const float minEta = -3.0;
   const float maxEta = +3.0;
+
+  const unsigned int nPhi = 64;
+  const float minPhi = -3.2;
+  const float maxPhi = +3.2;
 
   const unsigned int nN = 150;
   const float minN =  -0.5;
@@ -1026,13 +1087,43 @@ void CaloTk::BookHistos_(void)
   const float minDR = 0.0;
   const float maxDR = 1.0;
 
-  const unsigned int nChi = 200;
+  const unsigned int nChi = 500;
   const float minChi =   0.0;
-  const float maxChi = 200.0;
+  const float maxChi = 500.0;
+
+  const unsigned int nRChi = 200;
+  const float minRChi =   0.0;
+  const float maxRChi = 200.0;
 
   const unsigned int nZ0 = 600;
   const float minZ0 = -30.0;
   const float maxZ0 = +30.0;
+
+  const unsigned int nRIso = 1000;
+  const float minRIso =   0.0;
+  const float maxRIso = +50.0;
+
+  const unsigned int nVIso = 500;
+  const float minVIso =   0.0;
+  const float maxVIso = +50.0;
+  
+  const char* tEt   = ";E_{T} (GeV); Entries / %.0f GeV";
+  const char* tPt   = ";p_{T} (GeV/c);Entries / %.0f GeV/c";
+  const char* tPtR  = ";p_{T}^{rel} (GeV/c);Entries / %.1f GeV/c";
+  const char* tEta  = ";#eta;Entries / %.2f";
+  const char* tPhi  = ";#phi (rads);Entries / %.2f (rads)";
+  const char* tM    = ";M (GeV/c^{2});Entries / %.2f (GeV/c^{2});";
+  const char* tN    = ";multiplicity;Entries / %.0f";
+  const char* tQ    = ";charge (e);Entries / %.0f e";
+  const char* tR    = ";R;Entries / %.2f";
+  const char* tDR   = ";#DeltaR;Entries / %.2f";
+  const char* tZ0   = ";z_{0} (cm);Entries / %.2f cm";
+  const char* tDZ0  = ";#Deltaz_{0} (cm);Entries / %.2f cm";
+  const char* tRIso = ";relative isolation;Entries / %.2f";
+  const char* tVIso = ";min(z_{0}^{m} - z_{0}^{iso} (cm);Entries / %.2f cm";
+  const char* tChi  = ";#chi^{2};Entries / %.2f";
+  const char* tRChi = ";#chi^{2}_{#nu};Entries / %.2f";
+  const char* tRate = ";#E_{T} (GeV);Rate (kHz) / %.0f GeV";
 
   // GenParticles Histograms
   histoTools_.BookHisto_2D(h_GenP_VisET_dRMaxLdgPion, "GenP_VisET_dRMaxLdgPion", ";#DeltaR_{max}(#pi_{ldg}^{#pm},#pi^{#pm});E_{T}^{vis}",  50,  0.0, +0.25, 100, 0.0, +200.0);
@@ -1040,76 +1131,104 @@ void CaloTk::BookHistos_(void)
   // Counters
   histoTools_.BookHisto_1D(hCounters, "Counters",  "", 2, 0.0, +2.0);
 
+  // L1CaloTaus
+  histoTools_.BookHisto_1D(hL1CaloTau_Et       , "L1CaloTau_Et"       , tEt ,  nEt ,  minEt , maxEt   );
+  histoTools_.BookHisto_1D(hL1CaloTau_Eta      , "L1CaloTau_Eta"      , tEta,  nEta,  minEta, maxEta  );
+  histoTools_.BookHisto_1D(hL1CaloTau_Phi      , "L1CaloTau_Phi"      , tPhi,  nPhi,  minPhi, maxPhi  );
+  histoTools_.BookHisto_1D(hL1CaloTau_IEt      , "L1CaloTau_IEt"      , tEt ,  nEt ,  minEt , maxEt   );
+  histoTools_.BookHisto_1D(hL1CaloTau_IEta     , "L1CaloTau_IEta"     , tEta, nIEta, minIEta, maxIEta );
+  histoTools_.BookHisto_1D(hL1CaloTau_IPhi     , "L1CaloTau_IPhi"     , tPhi, nIPhi, minIPhi, maxIPhi );
+  histoTools_.BookHisto_1D(hL1CaloTau_Iso      , "L1CaloTau_Iso"      ,   "", nBool, minBool, maxBool );
+  histoTools_.BookHisto_1D(hL1CaloTau_TowerIEta, "L1CaloTau_TowerIEta", tEta, nIEta, minIEta, maxIEta );
+  histoTools_.BookHisto_1D(hL1CaloTau_TowerIPhi, "L1CaloTau_TowerIPhi", tPhi, nIPhi, minIPhi, maxIPhi );
+  histoTools_.BookHisto_1D(hL1CaloTau_RawEt    , "L1CaloTau_RawEt"    , tEt , nEt  , minEt  , maxEt   );
+  histoTools_.BookHisto_1D(hL1CaloTau_IsoEt    , "L1CaloTau_IsoEt"    , tEt , nEt  , minEt  , maxEt   );
+  histoTools_.BookHisto_1D(hL1CaloTau_NTT      , "L1CaloTau_NTT"      , tN  , nN*10, minN   , maxN*10 );
+  histoTools_.BookHisto_1D(hL1CaloTau_HasEM    , "L1CaloTau_HasEM"    , ""  , nBool, minBool, maxBool );
+  histoTools_.BookHisto_1D(hL1CaloTau_IsMerged , "L1CaloTau_IsMerged" , ""  , nBool, minBool, maxBool );
+
   // VtxIsolated L1TkTaus
-  histoTools_.BookHisto_1D(hL1TkTau_Multiplicity, "L1TkTau_Multiplicity", "",   nN  , minN  , maxN  );
-  histoTools_.BookHisto_1D(hL1TkTau_CaloEt      , "L1TkTau_CaloEt"      , "",   nEt , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1TkTau_CaloEta     , "L1TkTau_CaloEta"     , "",   nEta, minEta, maxEta);
-  histoTools_.BookHisto_1D(hL1TkTau_Rtau        , "L1TkTau_Rtau"        , "",   100,  0.0,   +5.0);
-  histoTools_.BookHisto_1D(hL1TkTau_CHF         , "L1TkTau_CHF"         , "",   500,  0.0,  +50.0);
-  histoTools_.BookHisto_1D(hL1TkTau_NHF         , "L1TkTau_NHF"         , "",   200, -5.0,   +5.0);
-  histoTools_.BookHisto_1D(hL1TkTau_NHFAbs      , "L1TkTau_NHFAbs"      , "",   100,  0.0,  +10.0);
-  histoTools_.BookHisto_1D(hL1TkTau_NSigTks     , "L1TkTau_NSigTks"     , "",   nN  , minN  , maxN  );
-  histoTools_.BookHisto_1D(hL1TkTau_SigTksEt    , "L1TkTau_SigTksEt"    , "",   nEt , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1TkTau_SigTksEta   , "L1TkTau_SigTksEta"   , "",   nEta, minEta, maxEta);
-  histoTools_.BookHisto_1D(hL1TkTau_NIsoTks     , "L1TkTau_NIsoTks"     , "",   nN  , minN  , maxN  );
-  histoTools_.BookHisto_1D(hL1TkTau_IsoTksEt    , "L1TkTau_IsoTksEt"    , "",   nEt , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1TkTau_IsoTksEta   , "L1TkTau_IsoTksEta"   , "",   nEta, minEta, maxEta);
-  histoTools_.BookHisto_1D(hL1TkTau_InvMass     , "L1TkTau_InvMass"     , "",   nM  , minM  , maxM  );
-  histoTools_.BookHisto_1D(hL1TkTau_InvMassIncl , "L1TkTau_InvMassIncl" , "",   nM  , minM  , maxM  );
-  histoTools_.BookHisto_1D(hL1TkTau_SigConeRMin , "L1TkTau_SigConeRMin" , "",   nR  , minR  , maxR  );
-  histoTools_.BookHisto_1D(hL1TkTau_SigConeRMax , "L1TkTau_SigConeRMax" , "",   nR  , minR  , maxR  );
-  histoTools_.BookHisto_1D(hL1TkTau_IsoConeRMin , "L1TkTau_IsoConeRMin" , "",   nR  , minR  , maxR  );
-  histoTools_.BookHisto_1D(hL1TkTau_IsoConeRMax , "L1TkTau_IsoConeRMax" , "",   nR  , minR  , maxR  );
-  histoTools_.BookHisto_1D(hL1TkTau_Charge      , "L1TkTau_Charge"      , "",   nN  , minN  , maxN);
-  histoTools_.BookHisto_1D(hL1TkTau_RelIso      , "L1TkTau_RelIso"      , "",   100,  0.0,   +5.0);
-  histoTools_.BookHisto_1D(hL1TkTau_VtxIso      , "L1TkTau_VtxIso"      , "",   300,  0.0,  +30.0);
-  histoTools_.BookHisto_1D(hL1TkTau_DeltaRGenP  , "L1TkTau_DeltaRGenP"  , "",   nR  , minR  , maxR  );
-  //
-  histoTools_.BookHisto_1D(hL1TkTau_SigTks_Pt   , "L1TkTau_SigTks_Pt"   , "",  nEt , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1TkTau_SigTks_Eta  , "L1TkTau_SigTks_Eta"  , "",  nEta, minEta, maxEta);
-  histoTools_.BookHisto_1D(hL1TkTau_SigTks_POCAz, "L1TkTau_SigTks_POCAz", "",  nZ0 , minZ0 , maxZ0 );
-  histoTools_.BookHisto_1D(hL1TkTau_SigTks_DeltaPOCAz, "L1TkTau_SigTks_DeltaPOCAz", "", nZ0 , minZ0 , maxZ0 );
+  histoTools_.BookHisto_1D(hL1TkTau_Multiplicity , "L1TkTau_Multiplicity" , tN   , nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(hL1TkTau_CaloEt       , "L1TkTau_CaloEt"       , tEt  , nEt  , minEt  , maxEt  );
+  histoTools_.BookHisto_1D(hL1TkTau_CaloEta      , "L1TkTau_CaloEta"      , tEta , nEta , minEta , maxEta );
+  histoTools_.BookHisto_1D(hL1TkTau_CaloPhi      , "L1TkTau_CaloPhi"      , tPhi , nPhi , minPhi , maxPhi );
+  histoTools_.BookHisto_1D(hL1TkTau_CaloIEt      , "L1TkTau_CaloIEt"      , tEt  , nEt  , minEt  , maxEt  );
+  histoTools_.BookHisto_1D(hL1TkTau_CaloIEta     , "L1TkTau_CaloIEta"     , tEta , nIEta, minIEta, maxIEta);
+  histoTools_.BookHisto_1D(hL1TkTau_CaloIPhi     , "L1TkTau_CaloIPhi"     , tPhi , nIPhi, minIPhi, maxIPhi);
+  histoTools_.BookHisto_1D(hL1TkTau_CaloIso      , "L1TkTau_CaloIso"      ,   "" , nBool, minBool, maxBool);
+  histoTools_.BookHisto_1D(hL1TkTau_CaloTowerIEta, "L1TkTau_CaloTowerIEta", tEta , nIEta, minIEta, maxIEta);
+  histoTools_.BookHisto_1D(hL1TkTau_CaloTowerIPhi, "L1TkTau_CaloTowerIPhi", tPhi , nIPhi, minIPhi, maxIPhi);
+  histoTools_.BookHisto_1D(hL1TkTau_CaloRawEt    , "L1TkTau_CaloRawEt"    , tEt  , nEt  , minEt  , maxEt  );
+  histoTools_.BookHisto_1D(hL1TkTau_CaloIsoEt    , "L1TkTau_CaloIsoEt"    , tEt  , nEt  , minEt  , maxEt  );
+  histoTools_.BookHisto_1D(hL1TkTau_CaloNTT      , "L1TkTau_CaloNTT"      , tN   , nN*10, minN   , maxN*10);
+  histoTools_.BookHisto_1D(hL1TkTau_CaloHasEM    , "L1TkTau_CaloHasEM"    , ""   , nBool, minBool, maxBool);
+  histoTools_.BookHisto_1D(hL1TkTau_CaloIsMerged , "L1TkTau_CaloIsMerged" , ""   , nBool, minBool, maxBool);
+  histoTools_.BookHisto_1D(hL1TkTau_NSigTks      , "L1TkTau_NSigTks"      , tN   , nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(hL1TkTau_SigTksEt     , "L1TkTau_SigTksEt"     , tEt  , nEt  , minEt  , maxEt  );
+  histoTools_.BookHisto_1D(hL1TkTau_SigTksEta    , "L1TkTau_SigTksEta"    , tEta , nEta , minEta , maxEta );
+  histoTools_.BookHisto_1D(hL1TkTau_NIsoTks      , "L1TkTau_NIsoTks"      , tN   , nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoTksEt     , "L1TkTau_IsoTksEt"     , tEt  , nEt  , minEt  , maxEt  );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoTksEta    , "L1TkTau_IsoTksEta"    , tEta , nEta , minEta , maxEta );
+  histoTools_.BookHisto_1D(hL1TkTau_InvMass      , "L1TkTau_InvMass"      , tM   , nM   , minM   , maxM   );
+  histoTools_.BookHisto_1D(hL1TkTau_InvMassIncl  , "L1TkTau_InvMassIncl"  , tM   , nM   , minM   , maxM   );
+  histoTools_.BookHisto_1D(hL1TkTau_SigConeRMin  , "L1TkTau_SigConeRMin"  , tR   , nR   , minR   , maxR   );
+  histoTools_.BookHisto_1D(hL1TkTau_SigConeRMax  , "L1TkTau_SigConeRMax"  , tR   , nR   , minR   , maxR   );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoConeRMin  , "L1TkTau_IsoConeRMin"  , tR   , nR   , minR   , maxR   );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoConeRMax  , "L1TkTau_IsoConeRMax"  , tR   , nR   , minR   , maxR   );
+  histoTools_.BookHisto_1D(hL1TkTau_Charge       , "L1TkTau_Charge"       , tQ   , nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(hL1TkTau_RelIso       , "L1TkTau_RelIso"       , tRIso, nRIso, minRIso, maxRIso);
+  histoTools_.BookHisto_1D(hL1TkTau_VtxIso       , "L1TkTau_VtxIso"       , tVIso, nVIso, minVIso, maxVIso);
+  histoTools_.BookHisto_1D(hL1TkTau_DeltaRGenP   , "L1TkTau_DeltaRGenP"   , tDR  , nR   , minR   , maxR   );
+  histoTools_.BookHisto_1D(hL1TkTau_Rtau         , "L1TkTau_Rtau"  , ";Entries / 0.1f; R_{#tau}", 100,  0.0,   +5.0);
+  histoTools_.BookHisto_1D(hL1TkTau_CHF          , "L1TkTau_CHF"   , ";Entries / 0.1f; CHF"     , 500,  0.0,  +50.0);
+  histoTools_.BookHisto_1D(hL1TkTau_NHF          , "L1TkTau_NHF"   , ";Entries / 0.1f; NHF"     , 200, -5.0,   +5.0);
+  histoTools_.BookHisto_1D(hL1TkTau_NHFAbs       , "L1TkTau_NHFAbs", ";Entries / 0.1f; |NHF|"   , 100,  0.0,  +10.0);
+
+  histoTools_.BookHisto_1D(hL1TkTau_SigTks_Pt           , "L1TkTau_SigTks_Pt"           , tPt  ,  nPt  , minPt  , maxPt   );
+  histoTools_.BookHisto_1D(hL1TkTau_SigTks_Eta          , "L1TkTau_SigTks_Eta"          , tEta ,  nEta , minEta , maxEta  );
+  histoTools_.BookHisto_1D(hL1TkTau_SigTks_POCAz        , "L1TkTau_SigTks_POCAz"        , tZ0  ,  nZ0  , minZ0  , maxZ0   );
+  histoTools_.BookHisto_1D(hL1TkTau_SigTks_DeltaPOCAz   , "L1TkTau_SigTks_DeltaPOCAz"   , tDZ0 ,  nZ0  ,     0  , maxZ0   );
+  histoTools_.BookHisto_1D(hL1TkTau_SigTks_PtRel        , "L1TkTau_SigTks_PtRel"        , tPtR ,  nPtR , minPtR , maxPtR  );
+  histoTools_.BookHisto_1D(hL1TkTau_SigTks_DeltaR       , "L1TkTau_SigTks_DeltaR"       , tDR  ,  nR   , minR   , maxR    );
+  histoTools_.BookHisto_1D(hL1TkTau_SigTks_NStubs       , "L1TkTau_SigTks_NStubs"       , tN   ,  nN   , minN   , maxN    );
+  histoTools_.BookHisto_1D(hL1TkTau_SigTks_ChiSquared   , "L1TkTau_SigTks_ChiSquared"   , tChi ,  nChi , minChi , maxChi  );
+  histoTools_.BookHisto_1D(hL1TkTau_SigTks_RedChiSquared, "L1TkTau_SigTks_RedChiSquared", tRChi,  nRChi, minRChi, maxRChi );
+  histoTools_.BookHisto_1D(hL1TkTau_SigTks_PtMinusCaloEt, "L1TkTau_SigTks_PtMinusCaloEt",    "",   300, -250.0, +50.0 );
   // histoTools_.BookHisto_1D(hL1TkTau_SigTks_d0           , "L1TkTau_SigTks_d0"           , "", 2000,  -10.0,   +10.0  );
   // histoTools_.BookHisto_1D(hL1TkTau_SigTks_d0Abs        , "L1TkTau_SigTks_d0Abs"        , "", 1000,    0.0,   +10.0  );
   // histoTools_.BookHisto_1D(hL1TkTau_SigTks_d0Sig        , "L1TkTau_SigTks_d0Sig"        , "",  400,  -20.0,   +20.0  );
   // histoTools_.BookHisto_1D(hL1TkTau_SigTks_d0SigAbs     , "L1TkTau_SigTks_d0SigAbs"     , "",  200,    0.0,   +20.0  );
-  histoTools_.BookHisto_1D(hL1TkTau_SigTks_PtRel        , "L1TkTau_SigTks_PtRel"        , "",  200,   +0.0,   +20.0  );
-  histoTools_.BookHisto_1D(hL1TkTau_SigTks_DeltaR       , "L1TkTau_SigTks_DeltaR"       , "",  200,   +0.0,    +2.0  );
-  histoTools_.BookHisto_1D(hL1TkTau_SigTks_NStubs       , "L1TkTau_SigTks_NStubs"       , "",   nN  , minN  , maxN);
-  histoTools_.BookHisto_1D(hL1TkTau_SigTks_ChiSquared   , "L1TkTau_SigTks_ChiSquared"   , "",   nChi, minChi, maxChi );
-  histoTools_.BookHisto_1D(hL1TkTau_SigTks_RedChiSquared, "L1TkTau_SigTks_RedChiSquared", "",   nChi, minChi, maxChi );
-  histoTools_.BookHisto_1D(hL1TkTau_SigTks_PtMinusCaloEt, "L1TkTau_SigTks_PtMinusCaloEt", "",  100, -100.0,  +100.0  );
-  //
-  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_Pt           , "L1TkTau_IsoTks_Pt"           , "",  nEt , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_Eta          , "L1TkTau_IsoTks_Eta"          , "",  nEta, minEta, maxEta);
-  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_POCAz        , "L1TkTau_IsoTks_POCAz"        , "",  nZ0 , minZ0 , maxZ0 );
-  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_DeltaPOCAz   , "L1TkTau_IsoTks_DeltaPOCAz"   , "",  nZ0 , minZ0 , maxZ0 );
+
+  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_Pt           , "L1TkTau_IsoTks_Pt"           , tPt  ,  nPt ,  minPt ,  maxPt  );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_Eta          , "L1TkTau_IsoTks_Eta"          , tEta ,  nEta,  minEta,  maxEta );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_POCAz        , "L1TkTau_IsoTks_POCAz"        , tZ0  ,  nZ0 ,  minZ0 ,  maxZ0  );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_DeltaPOCAz   , "L1TkTau_IsoTks_DeltaPOCAz"   , tDZ0 ,  nZ0 ,      0 ,  maxZ0  );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_PtRel        , "L1TkTau_IsoTks_PtRel"        , tPtR ,  nPtR,  minPtR,  maxPtR );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_DeltaR       , "L1TkTau_IsoTks_DeltaR"       , tDR  ,  nR  ,  minR  ,  maxR   );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_NStubs       , "L1TkTau_IsoTks_NStubs"       , tN   ,   nN ,  minN  ,  maxN   );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_ChiSquared   , "L1TkTau_IsoTks_ChiSquared"   , tChi ,  nChi,  minChi,  maxChi );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_RedChiSquared, "L1TkTau_IsoTks_RedChiSquared", tRChi,  nRChi, minRChi, maxRChi);
+  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_PtMinusCaloEt, "L1TkTau_IsoTks_PtMinusCaloEt",    "",  300, -250.0,   +50.0   );
   // histoTools_.BookHisto_1D(hL1TkTau_IsoTks_d0           , "L1TkTau_IsoTks_d0"           , "", 2000,   -10.0,   +10.0  );
   // histoTools_.BookHisto_1D(hL1TkTau_IsoTks_d0Abs        , "L1TkTau_IsoTks_d0Abs"        , "", 1000,     0.0,   +10.0  );
   // histoTools_.BookHisto_1D(hL1TkTau_IsoTks_d0Sig        , "L1TkTau_IsoTks_d0Sig"        , "", 4000,   -20.0,   +20.0  );
   // histoTools_.BookHisto_1D(hL1TkTau_IsoTks_d0SigAbs     , "L1TkTau_IsoTks_d0SigAbs"     , "", 2000,     0.0,   +20.0  );
-  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_PtRel        , "L1TkTau_IsoTks_PtRel"        , "", 2000,    +0.0,   +20.0  );
-  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_DeltaR       , "L1TkTau_IsoTks_DeltaR"       , "",  200,   +0.0,     +2.0  );
-  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_NStubs       , "L1TkTau_IsoTks_NStubs"       , "",   nN  , minN  , maxN);
-  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_ChiSquared   , "L1TkTau_IsoTks_ChiSquared"   , "",  nChi, minChi, maxChi );
-  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_RedChiSquared, "L1TkTau_IsoTks_RedChiSquared", "",  nChi, minChi, maxChi );
-  histoTools_.BookHisto_1D(hL1TkTau_IsoTks_PtMinusCaloEt, "L1TkTau_IsoTks_PtMinusCaloEt", "",  100, -100.0,   +100.0  );
 
   // VtxIsolated L1TkTaus, Signal TTTracks
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_DeltaR        , "L1TkTau_MatchTk_DeltaR"        , "",  200,   +0.0,   +2.0);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_PtRel         , "L1TkTau_MatchTk_PtRel"         , "",  200,   +0.0,  +20.0);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_Pt            , "L1TkTau_MatchTk_Pt"            , "",  150,   +0.0, +300.0);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_Eta           , "L1TkTau_MatchTk_Eta"           , "",  nEta, minEta, maxEta);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_POCAz         , "L1TkTau_MatchTk_POCAz"         , "",  nZ0 , minZ0 , maxZ0 );
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_DeltaR        , "L1TkTau_MatchTk_DeltaR"        , tDR  ,  nR  , minR   , maxR   );
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_PtRel         , "L1TkTau_MatchTk_PtRel"         , tPtR ,  nPtR, minPtR , maxPtR );
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_Pt            , "L1TkTau_MatchTk_Pt"            , tPt  ,  nPt , minPt  , maxPt  );
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_Eta           , "L1TkTau_MatchTk_Eta"           , tEta ,  nEta, minEta , maxEta );
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_POCAz         , "L1TkTau_MatchTk_POCAz"         , tZ0  ,  nZ0 , minZ0  , maxZ0  );
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_NStubs        , "L1TkTau_MatchTk_NStubs"        , tN   ,   nN , minN   , maxN   );
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_ChiSquared    , "L1TkTau_MatchTk_ChiSquared"    , tChi ,  nChi, minChi , maxChi );
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_RedChiSquared , "L1TkTau_MatchTk_RedChiSquared" , tRChi, nRChi, minRChi, maxRChi);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_IsGenuine     , "L1TkTau_MatchTk_IsGenuine"     ,    "", nBool, minBool, maxBool);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_IsUnknown     , "L1TkTau_MatchTk_IsUnknown"     ,    "", nBool, minBool, maxBool);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_IsCombinatoric, "L1TkTau_MatchTk_IsCombinatoric",    "", nBool, minBool, maxBool);
+  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_PtMinusCaloEt , "L1TkTau_MatchTk_PtMinusCaloEt" ,    "",   300,  -250.0,  +50.0 );
   // histoTools_.BookHisto_1D(hL1TkTau_MatchTk_d0            , "L1TkTau_MatchTk_d0"            , "", 2000,  -10.0,  +10.0);
   // histoTools_.BookHisto_1D(hL1TkTau_MatchTk_d0Abs         , "L1TkTau_MatchTk_d0Abs"         , "", 1000,    0.0,  +10.0);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_NStubs        , "L1TkTau_MatchTk_NStubs"        , "",   nN  , minN  , maxN);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_ChiSquared    , "L1TkTau_MatchTk_ChiSquared"    , "",  nChi, minChi, maxChi );
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_RedChiSquared , "L1TkTau_MatchTk_RedChiSquared" , "",  nChi, minChi, maxChi );
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_IsGenuine     , "L1TkTau_MatchTk_IsGenuine"     , "", nBool, minBool, maxBool);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_IsUnknown     , "L1TkTau_MatchTk_IsUnknown"     , "", nBool, minBool, maxBool);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_IsCombinatoric, "L1TkTau_MatchTk_IsCombinatoric", "", nBool, minBool, maxBool);
-  histoTools_.BookHisto_1D(hL1TkTau_MatchTk_PtMinusCaloEt , "L1TkTau_MatchTk_PtMinusCaloEt" , "",  100, -100.0, +100.0);
 
   // Resolutions 
   histoTools_.BookHisto_1D(hL1Tau_ResolutionCaloEt , "L1Tau_ResolutionCaloEt" , ";E_{T} (GeV);Events / %.0f GeV", 100,  -5.0,  +5.0);
@@ -1204,26 +1323,26 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hDiTau_Eff_RelIso_F , "DiTau_Eff_RelIso_F", "", nEt , minEt , maxEt );
   
   // Turn-Ons
-  histoTools_.BookHisto_1D(hMcHadronicTau_VisEt, "McHadronicTau_VisEt", "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hCalo_TurnOn50      , "Calo_TurnOn50"      , "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTk_TurnOn50        , "Tk_TurnOn50"        , "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hVtxIso_TurnOn50    , "VtxIso_TurnOn50"    , "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hRelIso_TurnOn50    , "RelIso_TurnOn50"    , "", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hMcHadronicTau_VisEt, "McHadronicTau_VisEt", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hCalo_TurnOn50      , "Calo_TurnOn50"      , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTk_TurnOn50        , "Tk_TurnOn50"        , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_TurnOn50    , "VtxIso_TurnOn50"    , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_TurnOn50    , "RelIso_TurnOn50"    , "", nEt , minEt , maxEt );
 
-  histoTools_.BookHisto_1D(hCalo_TurnOn25  , "Calo_TurnOn25"   , "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTk_TurnOn25    , "Tk_TurnOn25"     , "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hVtxIso_TurnOn25, "VtxIso_TurnOn25" , "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hRelIso_TurnOn25, "RelIso_TurnOn25" , "", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hCalo_TurnOn25  , "Calo_TurnOn25"   , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTk_TurnOn25    , "Tk_TurnOn25"     , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_TurnOn25, "VtxIso_TurnOn25" , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_TurnOn25, "RelIso_TurnOn25" , "", nEt , minEt , maxEt );
   
-  histoTools_.BookHisto_1D(hCalo_TurnOn_SingleTau50KHz  , "Calo_TurnOn_SingleTau50KHz"  , "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTk_TurnOn_SingleTau50KHz    , "Tk_TurnOn_SingleTau50KHz"    , "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hVtxIso_TurnOn_SingleTau50KHz, "VtxIso_TurnOn_SingleTau50KHz", "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hRelIso_TurnOn_SingleTau50KHz, "RelIso_TurnOn_SingleTau50KHz", "", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hCalo_TurnOn_SingleTau50KHz  , "Calo_TurnOn_SingleTau50KHz"  , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTk_TurnOn_SingleTau50KHz    , "Tk_TurnOn_SingleTau50KHz"    , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_TurnOn_SingleTau50KHz, "VtxIso_TurnOn_SingleTau50KHz", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_TurnOn_SingleTau50KHz, "RelIso_TurnOn_SingleTau50KHz", "", nEt , minEt , maxEt );
 
-  histoTools_.BookHisto_1D(hCalo_TurnOn_DiTau50KHz  , "Calo_TurnOn_DiTau50KHz"  , "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTk_TurnOn_DiTau50KHz    , "Tk_TurnOn_DiTau50KHz"    , "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hVtxIso_TurnOn_DiTau50KHz, "VtxIso_TurnOn_DiTau50KHz", "", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hRelIso_TurnOn_DiTau50KHz, "RelIso_TurnOn_DiTau50KHz", "", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hCalo_TurnOn_DiTau50KHz  , "Calo_TurnOn_DiTau50KHz"  , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTk_TurnOn_DiTau50KHz    , "Tk_TurnOn_DiTau50KHz"    , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_TurnOn_DiTau50KHz, "VtxIso_TurnOn_DiTau50KHz", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_TurnOn_DiTau50KHz, "RelIso_TurnOn_DiTau50KHz", "", nEt , minEt , maxEt );
 
   // DiTau (Calo-Other)
   histoTools_.BookHisto_2D(hDiTau_Rate_Calo_Tk    , "DiTau_Rate_Calo_Tk"    , "" , nEt, minEt, maxEt, nEt, minEt, maxEt);
@@ -1254,6 +1373,22 @@ void CaloTk::WriteHistos_(void)
 
   // Counters
   hCounters->Write();
+
+  // L1CaloTaus
+  hL1CaloTau_Et->Write();
+  hL1CaloTau_Eta->Write();
+  hL1CaloTau_Phi->Write();
+  hL1CaloTau_IEt->Write();
+  hL1CaloTau_IEta->Write();
+  hL1CaloTau_IPhi->Write();
+  hL1CaloTau_Iso->Write();
+  hL1CaloTau_TowerIEta->Write();
+  hL1CaloTau_TowerIPhi->Write();
+  hL1CaloTau_RawEt->Write();
+  hL1CaloTau_IsoEt->Write();
+  hL1CaloTau_NTT->Write();
+  hL1CaloTau_HasEM->Write();
+  hL1CaloTau_IsMerged->Write();
 
   // L1TkTaus: Matching track
   hL1TkTau_MatchTk_DeltaR->Write();
@@ -1306,6 +1441,20 @@ void CaloTk::WriteHistos_(void)
   hL1TkTau_Multiplicity->Write();
   hL1TkTau_CaloEt->Write();
   hL1TkTau_CaloEta->Write();
+  hL1TkTau_CaloPhi->Write();
+  hL1TkTau_CaloIEt->Write();
+  hL1TkTau_CaloIEta->Write();
+  hL1TkTau_CaloIPhi->Write();
+  hL1TkTau_CaloIso->Write();
+  hL1TkTau_CaloTowerIEta->Write();
+  hL1TkTau_CaloTowerIPhi->Write();
+  hL1TkTau_CaloRawEt->Write();
+  hL1TkTau_CaloIsoEt->Write();
+  hL1TkTau_CaloNTT->Write();
+  hL1TkTau_CaloHasEM->Write();
+  hL1TkTau_CaloIsMerged->Write();
+  // hL1TkTau_CaloEt->Write();
+  // hL1TkTau_CaloEta->Write();
   hL1TkTau_Rtau->Write();
   hL1TkTau_CHF->Write();
   hL1TkTau_NHF->Write();

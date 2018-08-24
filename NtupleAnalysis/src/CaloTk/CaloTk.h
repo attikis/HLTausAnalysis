@@ -222,6 +222,26 @@ class CaloTk : public TreeAnalyserMC{
   // Counters
   TH1D* hCounters;
 
+  // L1CaloTaus
+  // http://cmsdoxygen.web.cern.ch/cmsdoxygen/CMSSW_9_3_7/doc/html/d9/d40/L1Trigger_2interface_2Tau_8h_source.html#l00019
+  // http://cmsdoxygen.web.cern.ch/cmsdoxygen/CMSSW_9_3_7/doc/html/d1/dc8/classl1t_1_1CaloTools.html
+  TH1D* hL1CaloTau_Et; 
+  TH1D* hL1CaloTau_Eta;
+  TH1D* hL1CaloTau_Phi;
+  TH1D* hL1CaloTau_IEt;
+  TH1D* hL1CaloTau_IEta; // ieta of seed tower
+  TH1D* hL1CaloTau_IPhi; // iphi of seed tower
+  TH1D* hL1CaloTau_Iso;
+  // TH1D* hL1CaloTau_Bx;
+  TH1D* hL1CaloTau_TowerIEta;
+  TH1D* hL1CaloTau_TowerIPhi;
+  TH1D* hL1CaloTau_RawEt; // raw (uncalibrated) cluster sum
+  TH1D* hL1CaloTau_IsoEt; // raw isolation sum - cluster sum
+  TH1D* hL1CaloTau_NTT;   // n towers above threshold
+  TH1D* hL1CaloTau_HasEM;
+  TH1D* hL1CaloTau_IsMerged;
+  // TH1D* hL1CaloTau_HwQual; //integer hardware (hw) value
+
   // L1TkTaus: Matching track
   TH1D* hL1TkTau_MatchTk_DeltaR;
   TH1D* hL1TkTau_MatchTk_PtRel;
@@ -281,8 +301,21 @@ class CaloTk : public TreeAnalyserMC{
 
   // L1TkTaus: VtxIsolated
   TH1D* hL1TkTau_Multiplicity;
-  TH1D* hL1TkTau_CaloEt;
+  TH1D* hL1TkTau_CaloEt; 
   TH1D* hL1TkTau_CaloEta;
+  TH1D* hL1TkTau_CaloPhi;
+  TH1D* hL1TkTau_CaloIEt;
+  TH1D* hL1TkTau_CaloIEta; // ieta of seed tower
+  TH1D* hL1TkTau_CaloIPhi; // iphi of seed tower
+  TH1D* hL1TkTau_CaloIso;
+  TH1D* hL1TkTau_CaloTowerIEta;
+  TH1D* hL1TkTau_CaloTowerIPhi;
+  TH1D* hL1TkTau_CaloRawEt; // raw (uncalibrated) cluster sum
+  TH1D* hL1TkTau_CaloIsoEt; // raw isolation sum - cluster sum
+  TH1D* hL1TkTau_CaloNTT;   // n towers above threshold
+  TH1D* hL1TkTau_CaloHasEM;
+  TH1D* hL1TkTau_CaloIsMerged;
+
   TH1D* hL1TkTau_Rtau;
   TH1D* hL1TkTau_CHF;
   TH1D* hL1TkTau_NHF;
