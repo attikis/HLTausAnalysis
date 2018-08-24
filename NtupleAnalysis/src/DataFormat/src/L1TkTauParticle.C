@@ -339,7 +339,7 @@ void L1TkTauParticle::SetIsoConeTTTracksP4_(void)
       isoTks_p4 += p4;
     }
 
-  theSigConeTTTracksP4 = isoTks_p4;
+  theIsoConeTTTracksP4 = isoTks_p4;
   return;
 }
 

@@ -650,23 +650,23 @@ L1Tau TreeReaderMC::GetL1Tau(unsigned int Index)
     }
   
   L1Tau theL1Tau(Index,
-			 L1TauEmu_Et.at(Index),
-			 L1TauEmu_Eta.at(Index),
-			 L1TauEmu_Phi.at(Index),
-			 L1TauEmu_IEt.at(Index),
-			 L1TauEmu_IEta.at(Index),
-			 L1TauEmu_IPhi.at(Index),
-			 L1TauEmu_Iso.at(Index),
-		         L1TauEmu_Bx.at(Index),
-			 L1TauEmu_TowerIPhi.at(Index),
-			 L1TauEmu_TowerIEta.at(Index),
-			 L1TauEmu_RawEt.at(Index),
-			 L1TauEmu_IsoEt.at(Index),
-			 L1TauEmu_NTT.at(Index),
-			 L1TauEmu_HasEM.at(Index),
-			 L1TauEmu_IsMerged.at(Index),
-			 L1TauEmu_HwQual.at(Index)
-			 );
+		 L1TauEmu_Et.at(Index),
+		 L1TauEmu_Eta.at(Index),
+		 L1TauEmu_Phi.at(Index),
+		 L1TauEmu_IEt.at(Index),
+		 L1TauEmu_IEta.at(Index),
+		 L1TauEmu_IPhi.at(Index),
+		 L1TauEmu_Iso.at(Index),
+		 L1TauEmu_Bx.at(Index),
+		 L1TauEmu_TowerIPhi.at(Index),
+		 L1TauEmu_TowerIEta.at(Index),
+		 L1TauEmu_RawEt.at(Index),
+		 L1TauEmu_IsoEt.at(Index),
+		 L1TauEmu_NTT.at(Index),
+		 L1TauEmu_HasEM.at(Index),
+		 L1TauEmu_IsMerged.at(Index),
+		 L1TauEmu_HwQual.at(Index)
+		 );
 
   return theL1Tau;
 }
