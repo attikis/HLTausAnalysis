@@ -289,8 +289,8 @@ def GetHistoKwargs(h, opts):
         _rebinX = 2
         _yLabel = _yNorm + " / " + _format
         _log    = True
-        #_xMin   = +0.0
-        #_xMax   = +1.0
+        _xMin   = +0.0
+        _xMax   = +5.0
     if "_sigconermin" in hName:
         _units  = ""
         _format = "%0.2f " + _units
@@ -424,11 +424,11 @@ def GetHistoKwargs(h, opts):
         _log    = False
     if "ntt" in hName:
         _units  = ""
-        _format = "%0.f " + _units
+        _format = "%0.0f " + _units
         _xLabel = "towers above threshold"
-        _rebinX = 1
-        _xMin   = 0.0
-        _xMax   = 500.0
+        _rebinX = 20 #10 #5
+        _xMin   =  50.0
+        _xMax   = 400.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
     if "et" in hName or  "iet" in hName or "_caloisoet" in hName or "_calorawet" in hName:
@@ -570,9 +570,9 @@ def GetHistoKwargs(h, opts):
             _format = "%0.0f " + _units
             _xLabel = "p_{T}^{tk} - E_{T}^{calo} (%s)" % (_units)
             _cutBox = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-            _rebinX = 2
+            _rebinX = 5 #2
             _xMin   = -250.0
-            _xMax   = +150.0
+            _xMax   = +200.0
             _yLabel = _yNorm + " / " + _format
             _log    = True
     if "_iscombinatoric" in hName:
@@ -827,6 +827,7 @@ def main(opts):
                   "L1TkTau_SigTks_d0Abs", "L1TkTau_SigTks_d0Sig", "L1TkTau_SigTks_d0SigAbs",
                   "L1TkTau_IsoTks_d0", "L1TkTau_IsoTks_d0Abs", "L1TkTau_IsoTks_d0Sig", "L1TkTau_IsoTks_d0SigAbs",
                   "L1TkTau_ResolutionCaloEt_F", "L1TkTau_ResolutionCaloEta_F", "L1TkTau_ResolutionCaloPhi_F", 
+                  "L1TkIsoTau_ResolutionCaloEt_F", "L1TkIsoTau_ResolutionCaloEta_F", "L1TkIsoTau_ResolutionCaloPhi_F", 
                   "DiTau_Rate_Calo_F", "DiTau_Rate_Tk_F", "DiTau_Rate_VtxIso_F", "DiTau_Rate_RelIso_F",
                   "Calo_Rate_F", "Tk_Rate_F", "VtxIso_Rate_F", "RelIso_Rate_F"]
 

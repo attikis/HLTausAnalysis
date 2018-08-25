@@ -447,6 +447,10 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hRelIso_Rate_C;
   TH1D* hRelIso_Rate_I;
   TH1D* hRelIso_Rate_F;
+  TH1D* hIso_Rate;
+  TH1D* hIso_Rate_C;
+  TH1D* hIso_Rate_I;
+  TH1D* hIso_Rate_F;
   // SingleTau: Efficiencies
   TH1D* hCalo_Eff;  // Inclusive = C+I+F
   TH1D* hCalo_Eff_C;
@@ -464,6 +468,10 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hRelIso_Eff_C;
   TH1D* hRelIso_Eff_I;
   TH1D* hRelIso_Eff_F;      
+  TH1D* hIso_Eff;
+  TH1D* hIso_Eff_C;
+  TH1D* hIso_Eff_I;
+  TH1D* hIso_Eff_F;      
 
   // DiTau: Rates
   TH1D* hDiTau_Rate_Calo; // Inclusive = C+I+F
@@ -482,6 +490,10 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hDiTau_Rate_RelIso_C;
   TH1D* hDiTau_Rate_RelIso_I;
   TH1D* hDiTau_Rate_RelIso_F;
+  TH1D* hDiTau_Rate_Iso;
+  TH1D* hDiTau_Rate_Iso_C;
+  TH1D* hDiTau_Rate_Iso_I;
+  TH1D* hDiTau_Rate_Iso_F;
 
   // DiTau: Efficiencies
   TH1D* hDiTau_Eff_Calo; // Inclusive = C+I+F
@@ -500,43 +512,55 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hDiTau_Eff_RelIso_C;
   TH1D* hDiTau_Eff_RelIso_I;
   TH1D* hDiTau_Eff_RelIso_F;
+  TH1D* hDiTau_Eff_Iso;
+  TH1D* hDiTau_Eff_Iso_C;
+  TH1D* hDiTau_Eff_Iso_I;
+  TH1D* hDiTau_Eff_Iso_F;
 
   // DiTau: (Calo-Other)
   TH2D* hDiTau_Rate_Calo_Tk;
   TH2D* hDiTau_Rate_Calo_VtxIso;
   TH2D* hDiTau_Rate_Calo_RelIso;
+  TH2D* hDiTau_Rate_Calo_Iso;
   TH2D* hDiTau_Eff_Calo_Tk;
   TH2D* hDiTau_Eff_Calo_VtxIso;
   TH2D* hDiTau_Eff_Calo_RelIso;
+  TH2D* hDiTau_Eff_Calo_Iso;
 
   // DiTau (Tk-Other)
   TH2D* hDiTau_Rate_Tk_VtxIso;
   TH2D* hDiTau_Rate_Tk_RelIso;
+  TH2D* hDiTau_Rate_Tk_Iso;
   TH2D* hDiTau_Eff_Tk_VtxIso;
   TH2D* hDiTau_Eff_Tk_RelIso;
+  TH2D* hDiTau_Eff_Tk_Iso;
 
   // Turn-Ons
-  // TEfficiency* pEff;
+  // TEfficiency* pEff; //fixme: convert all turn-ons
   TH1D* hMcHadronicTau_VisEt;
   TH1D* hCalo_TurnOn50;
   TH1D* hTk_TurnOn50;
   TH1D* hVtxIso_TurnOn50;
   TH1D* hRelIso_TurnOn50;
+  TH1D* hIso_TurnOn50;
   //
   TH1D* hCalo_TurnOn25;
   TH1D* hTk_TurnOn25;
   TH1D* hVtxIso_TurnOn25;
   TH1D* hRelIso_TurnOn25;
+  TH1D* hIso_TurnOn25;
   //
   TH1D* hCalo_TurnOn_SingleTau50KHz;
   TH1D* hTk_TurnOn_SingleTau50KHz;
   TH1D* hVtxIso_TurnOn_SingleTau50KHz;
   TH1D* hRelIso_TurnOn_SingleTau50KHz;
+  TH1D* hIso_TurnOn_SingleTau50KHz;
   //
   TH1D* hCalo_TurnOn_DiTau50KHz;
   TH1D* hTk_TurnOn_DiTau50KHz;
   TH1D* hVtxIso_TurnOn_DiTau50KHz;
   TH1D* hRelIso_TurnOn_DiTau50KHz;
+  TH1D* hIso_TurnOn_DiTau50KHz;
 
 };
 
