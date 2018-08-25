@@ -18,7 +18,6 @@
 void CaloTk::InitObjects(void)
 //============================================================================
 {
-
   // pvProducer = new L1TkPrimaryVertex(this->s);
   return; 
 }
@@ -616,7 +615,7 @@ void CaloTk::Loop()
     ////////////////////////////////////////////////
     /// L1Tktau Properties 
     ////////////////////////////////////////////////
-    vector<L1TkTauParticle> myL1TkTaus = L1TkTaus_Tk; // L1TkTaus_Calo, L1TkTaus_Tk, L1TkTaus_VtxIso, L1TkTaus_RelIso
+    vector<L1TkTauParticle> myL1TkTaus = L1TkTaus_Tk;
     hL1TkTau_Multiplicity ->Fill( myL1TkTaus.size() );
     for (vector<L1TkTauParticle>::iterator tau = myL1TkTaus.begin(); tau != myL1TkTaus.end(); tau++)
       {
@@ -1020,11 +1019,14 @@ void CaloTk::Loop()
     ////////////////////////////////////////////////
     // DiTau
     ////////////////////////////////////////////////
-    FillDiTau_(L1TkTaus_Calo   , L1TkTaus_Tk    , hDiTau_Rate_Calo_Tk        , hDiTau_Eff_Calo_Tk        );
-    FillDiTau_(L1TkTaus_Calo   , L1TkTaus_VtxIso, hDiTau_Rate_Calo_VtxIso    , hDiTau_Eff_Calo_VtxIso    );
-    FillDiTau_(L1TkTaus_Calo   , L1TkTaus_RelIso, hDiTau_Rate_Calo_RelIso    , hDiTau_Eff_Calo_RelIso    );
-    FillDiTau_(L1TkTaus_Tk     , L1TkTaus_VtxIso, hDiTau_Rate_Tk_VtxIso      , hDiTau_Eff_Tk_VtxIso      );
-    FillDiTau_(L1TkTaus_Tk     , L1TkTaus_RelIso, hDiTau_Rate_Tk_RelIso      , hDiTau_Eff_Tk_RelIso      ); // fixme; iro; more?
+    FillDiTau_(L1TkTaus_Calo, L1TkTaus_Tk    , hDiTau_Rate_Calo_Tk    , hDiTau_Eff_Calo_Tk     );
+    FillDiTau_(L1TkTaus_Calo, L1TkTaus_VtxIso, hDiTau_Rate_Calo_VtxIso, hDiTau_Eff_Calo_VtxIso );
+    FillDiTau_(L1TkTaus_Calo, L1TkTaus_RelIso, hDiTau_Rate_Calo_RelIso, hDiTau_Eff_Calo_RelIso );
+    FillDiTau_(L1TkTaus_Calo, L1TkTaus_Iso   , hDiTau_Rate_Calo_Iso   , hDiTau_Eff_Calo_Iso    );
+
+    FillDiTau_(L1TkTaus_Tk  , L1TkTaus_VtxIso, hDiTau_Rate_Tk_VtxIso  , hDiTau_Eff_Tk_VtxIso   );
+    FillDiTau_(L1TkTaus_Tk  , L1TkTaus_RelIso, hDiTau_Rate_Tk_RelIso  , hDiTau_Eff_Tk_RelIso   );
+    FillDiTau_(L1TkTaus_Tk  , L1TkTaus_Iso   , hDiTau_Rate_Tk_Iso     , hDiTau_Eff_Tk_Iso      );
 
     ////////////////////////////////////////////////
     // WARNING: Erases L1TkTaus from vector!
@@ -1556,7 +1558,7 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hIso_Eff_C    , "Iso_Eff_C"    , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hIso_Eff_I    , "Iso_Eff_I"    , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hIso_Eff_F    , "Iso_Eff_F"    , "", nEt , minEt , maxEt );
-  
+
   // DiTau
   histoTools_.BookHisto_1D(hDiTau_Rate_Calo    , "DiTau_Rate_Calo"    , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hDiTau_Rate_Calo_C  , "DiTau_Rate_Calo_C"  , "", nEt , minEt , maxEt );
@@ -1578,7 +1580,7 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hDiTau_Rate_Iso_C   , "DiTau_Rate_Iso_C"   , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hDiTau_Rate_Iso_I   , "DiTau_Rate_Iso_I"   , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hDiTau_Rate_Iso_F   , "DiTau_Rate_Iso_F"   , "", nEt , minEt , maxEt );
-    
+
   histoTools_.BookHisto_1D(hDiTau_Eff_Calo     , "DiTau_Eff_Calo"    , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hDiTau_Eff_Calo_C   , "DiTau_Eff_Calo_C"  , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hDiTau_Eff_Calo_I   , "DiTau_Eff_Calo_I"  , "", nEt , minEt , maxEt );
@@ -1640,6 +1642,8 @@ void CaloTk::BookHistos_(void)
   // DiTau (Tk-Other)
   histoTools_.BookHisto_2D(hDiTau_Rate_Tk_VtxIso, "DiTau_Rate_Tk_VtxIso", "", nEt, minEt, maxEt, nEt, minEt, maxEt);
   histoTools_.BookHisto_2D(hDiTau_Rate_Tk_RelIso, "DiTau_Rate_Tk_RelIso", "", nEt, minEt, maxEt, nEt, minEt, maxEt);
+  histoTools_.BookHisto_2D(hDiTau_Rate_Tk_Iso   , "DiTau_Rate_Tk_Iso"   , "", nEt, minEt, maxEt, nEt, minEt, maxEt);
+
   histoTools_.BookHisto_2D(hDiTau_Eff_Tk_VtxIso , "DiTau_Eff_Tk_VtxIso" , "", nEt, minEt, maxEt, nEt, minEt, maxEt);
   histoTools_.BookHisto_2D(hDiTau_Eff_Tk_RelIso , "DiTau_Eff_Tk_RelIso" , "", nEt, minEt, maxEt, nEt, minEt, maxEt);
   histoTools_.BookHisto_2D(hDiTau_Eff_Tk_Iso    , "DiTau_Eff_Tk_Iso"    , "", nEt, minEt, maxEt, nEt, minEt, maxEt);
@@ -1743,7 +1747,7 @@ void CaloTk::WriteHistos_(void)
   hL1TkTau_RelIso->Write();
   hL1TkTau_VtxIso->Write();
   hL1TkTau_DeltaRGenP->Write();
-  
+
   // L1TkIsoTaus: Matching track
   hL1TkIsoTau_MatchTk_DeltaR->Write();
   hL1TkIsoTau_MatchTk_PtRel->Write();
@@ -2184,9 +2188,9 @@ void CaloTk::FillDiTau_(vector<L1TkTauParticle> L1TkTaus,
 
 //============================================================================
 void CaloTk::FillDiTau_(vector<L1TkTauParticle> L1TkTaus1,
-				vector<L1TkTauParticle> L1TkTaus2, 
-				TH2D *hRate,
-				TH2D *hEfficiency)
+			vector<L1TkTauParticle> L1TkTaus2, 
+			TH2D *hRate,
+			TH2D *hEfficiency)
 //============================================================================
 {
 
@@ -2248,7 +2252,7 @@ void CaloTk::FillDiTau_(vector<L1TkTauParticle> L1TkTaus1,
 
 //============================================================================
 void CaloTk::FillRate_(TH1D *hRate,
-			   const double ldgEt)
+		       const double ldgEt)
 //============================================================================
 {
   
@@ -2261,8 +2265,8 @@ void CaloTk::FillRate_(TH1D *hRate,
 
 //============================================================================
 void CaloTk::FillRate_(TH2D *hRate,
-			   const double ldgEt1,
-			   const double ldgEt2)
+		       const double ldgEt1,
+		       const double ldgEt2)
 //============================================================================
 {
   
