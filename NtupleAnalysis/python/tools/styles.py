@@ -345,36 +345,46 @@ Tau3prStyle       = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.
                                    StyleLine(lineColor=ROOT.kViolet-3, lineStyle=ROOT.kDotted, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kViolet-3, fillStyle=1001)])
 
-regionStyle1      = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kRed-4, markerSizes=None, markerStyle=ROOT.kFullCircle),
-                                   StyleLine(lineColor=ROOT.kRed-4, lineStyle=ROOT.kSolid, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kRed-4, fillStyle=1001)])
-regionStyle2      = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure+6, markerSizes=None, markerStyle=ROOT.kFullSquare),
-                                   StyleLine(lineColor=ROOT.kAzure+6, lineStyle=ROOT.kSolid, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kAzure+6, fillStyle=1001)])
-regionStyle3      = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kSpring+5, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
-                                   StyleLine(lineColor=ROOT.kSpring+5, lineStyle=ROOT.kSolid, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kSpring+5, fillStyle=1001)])
-
-caloStyle1        = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
-                                   StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kBlack, fillStyle=0)]) #3001
-caloStyle2        = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
-                                   StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kSolid, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kRed, fillStyle=0)])
-caloStyle3        = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kAzure, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
-                                   StyleLine(lineColor=ROOT.kAzure, lineStyle=ROOT.kSolid, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kAzure, fillStyle=0)])
-caloStyle4        = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kGreen+2, markerSizes=None, markerStyle=ROOT.kFullSquare),
-                                   StyleLine(lineColor=ROOT.kGreen+2, lineStyle=ROOT.kSolid, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kGreen+2, fillStyle=0)])
-
-caloTkStyle       = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
-                                   StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kBlack, fillStyle=3001)])
-tkCaloStyle       = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
-                                   StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
-                                   StyleFill(fillColor=ROOT.kBlack, fillStyle=3001)])
-pfTauStyle        = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlue, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+regionC = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                         StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kSolid, lineWidth=3), 
+                         StyleFill(fillColor=ROOT.kRed, fillStyle=1001)])
+regionI = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure-4, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                         StyleLine(lineColor=ROOT.kAzure-4, lineStyle=ROOT.kSolid, lineWidth=3), 
+                         StyleFill(fillColor=ROOT.kAzure-4, fillStyle=1001)])
+regionF = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kTeal+9, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                         StyleLine(lineColor=ROOT.kTeal+9, lineStyle=ROOT.kSolid, lineWidth=3), 
+                         StyleFill(fillColor=ROOT.kTeal+9, fillStyle=1001)])
+regionL = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kOrange+7, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                         StyleLine(lineColor=ROOT.kOrange+7, lineStyle=ROOT.kSolid, lineWidth=3), 
+                         StyleFill(fillColor=ROOT.kOrange+7, fillStyle=1001)])
+regionM = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                         StyleLine(lineColor=ROOT.kAzure, lineStyle=ROOT.kSolid, lineWidth=3), 
+                         StyleFill(fillColor=ROOT.kAzure, fillStyle=1001)])
+regionH = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta+2, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                         StyleLine(lineColor=ROOT.kMagenta+2, lineStyle=ROOT.kSolid, lineWidth=3), 
+                         StyleFill(fillColor=ROOT.kMagenta+2, fillStyle=1001)])
+caloStyle1   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
+                              StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
+                              StyleFill(fillColor=ROOT.kBlack, fillStyle=0)]) #3001
+caloStyle2   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                              StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kSolid, lineWidth=3), 
+                              StyleFill(fillColor=ROOT.kRed, fillStyle=0)])
+caloStyle3   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kAzure, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+                              StyleLine(lineColor=ROOT.kAzure, lineStyle=ROOT.kSolid, lineWidth=3), 
+                              StyleFill(fillColor=ROOT.kAzure, fillStyle=0)])
+caloStyle4   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kGreen+2, markerSizes=None, markerStyle=ROOT.kFullSquare),
+                              StyleLine(lineColor=ROOT.kGreen+2, lineStyle=ROOT.kSolid, lineWidth=3), 
+                              StyleFill(fillColor=ROOT.kGreen+2, fillStyle=0)])
+caloStyle5   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kTeal+2, markerSizes=None, markerStyle=ROOT.kFullSquare),
+                              StyleLine(lineColor=ROOT.kTeal+2, lineStyle=ROOT.kSolid, lineWidth=3), 
+                              StyleFill(fillColor=ROOT.kTeal+2, fillStyle=0)])
+caloTkStyle  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
+                              StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
+                              StyleFill(fillColor=ROOT.kBlack, fillStyle=3001)])
+tkCaloStyle  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+                              StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
+                              StyleFill(fillColor=ROOT.kBlack, fillStyle=3001)])
+pfTauStyle   = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlue, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
                                    StyleLine(lineColor=ROOT.kBlue, lineStyle=ROOT.kSolid, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kBlue, fillStyle=3001)])
 
@@ -483,19 +493,25 @@ def getQCDLineStyle():
 def getBaselineStyle():
     return baselineStyle
 
-def getRegionStyle(i):
-    if i==0:
-        return regionStyle1
-    elif i==1:
-        return regionStyle2
-    elif i==2:
-        return regionStyle3
+def getRegionStyle(region):
+    if region=="C":
+        return regionC
+    elif region=="I":
+        return regionI
+    elif region=="F":
+        return regionF
+    elif region=="L":
+        return regionL
+    elif region=="M":
+        return regionM
+    elif region=="H":
+        return regionH
     else:
-        styles[index]
+        raise Exception("Unkown region \"%s\". Cannot determine region style" % (region) )
 
 
 def getTauAlgoStyle(algo):
-    allowedAlgos = ["Calo", "Tk", "VtxIso", "RelIso", "TkCalo", "PFTau"]
+    allowedAlgos = ["Calo", "Tk", "VtxIso", "RelIso", "TkCalo", "PFTau", "Iso"]
     if algo not in allowedAlgos:
         raise Exception("No style available for tau algorithm \"%s\"" % (algo))
 
@@ -507,6 +523,8 @@ def getTauAlgoStyle(algo):
         return getCaloStyle(2)
     elif algo == "RelIso":
         return getCaloStyle(3)
+    elif algo == "Iso":
+        return getCaloStyle(4)
     else:
         raise Exception("This should never be reached")
 
@@ -519,6 +537,8 @@ def getCaloStyle(i):
         return caloStyle3
     elif i==3:
         return caloStyle4
+    elif i==4:
+        return caloStyle5
     else:
         styles[index]
 
@@ -592,6 +612,8 @@ def getCaloLegend(i):
         return "CaloTk #it{Vtx Iso}"
     elif i==3:
         return "CaloTk #it{Rel Iso}"
+    elif i==4:
+        return "CaloTk #it{Iso}"
     else:
         return "Unknown"
 

@@ -721,7 +721,7 @@ def GetHistoKwargs(h, opts):
         }
     return _kwargs
 
-def GetBinwidthDecimals(binWidth):                                                                                                                                        
+def GetBinwidthDecimals(binWidth):
     dec =  " %0.0f"
     if binWidth < 1:
         dec = " %0.1f"
@@ -777,7 +777,6 @@ def main(opts):
     style.setGridX(opts.gridX)
     style.setGridY(opts.gridY)
     style.setOptStat(False)
-
 
     # Obtain dsetMgrCreator and register it to module selector
     dsetMgrCreator = dataset.readFromMulticrabCfg(directory=opts.mcrab)
@@ -913,7 +912,7 @@ if __name__ == "__main__":
                       help="Formats in which all plots will be saved in. Provide as list of comma-separated (NO SPACE!) formats. [default: %s]" % (DATAERA))
 
     parser.add_option("--folder", dest="folder", type="string", default = FOLDER,
-                      help="ROOT file folder under which all histograms to be plotted are located [default: %s]" % (FOLDER) )
+                      help="ROOT file folder under which all histograms to be plotted are located [default: %s]" % (FOoLDER) )
 
     (opts, parseArgs) = parser.parse_args()
 

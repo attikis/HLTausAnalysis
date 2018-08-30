@@ -665,7 +665,7 @@ void CaloTk::Loop()
 	// Apply isolation? 
 	if (0) if (tau->GetVtxIsolation() <= isoCone_VtxIsoWP) continue; // Vertex Isolation
 	if (0) if (tau->GetRelIsolation() >= isoCone_RelIsoWP) continue; // Relative Isolation
-
+      
 	// Matching Track Variables
 	TTTrack matchTk   = tau->GetMatchingTk();
 	double matchTk_dR = auxTools_.DeltaR(matchTk.getEta(), matchTk.getPhi(), tau->GetCaloTau().eta(), tau->GetCaloTau().phi() ); // marina: can't we get the tau->GetMatchingTkDeltaR
@@ -1268,8 +1268,8 @@ void CaloTk::BookHistos_(void)
   const float maxPhi = +3.2;
 
   const unsigned int nN = 15;
-  const float minN =  -0.5;
-  const float maxN = +14.5;
+  const float minN =   0.0;
+  const float maxN = +15.0;
 
   const unsigned int nBool = 2;
   const float minBool = -0.5;
