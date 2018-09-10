@@ -27,8 +27,8 @@ void run(const std::string MulticrabDir = "",
   //const std::string absolutePath = "/afs/cern.ch/user/m/mtoumazo/workspace/multicrab";
 
   // Mikko's files
-  const std::string absolutePath = "/eos/user/m/mlotti";
+  //const std::string absolutePath = "/eos/user/m/mlotti";
   
-  Tracking macro(absolutePath + "/" + MulticrabDir, SampleName, text, maxEvents);
+  Tracking macro(MulticrabDir, SampleName, text, maxEvents);
   macro.Loop();
 }

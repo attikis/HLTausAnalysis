@@ -175,7 +175,8 @@ class TkEG : public TreeAnalyserMC{
   // Histogram declarations
 
   // Event-Type Histograms                                                                                                                                     
-  TH1D* hCounters;
+  TH1D* h_Counters;
+  TH1D* h_Counters_events_EGs;
 
   TH1D* h_genTausAll_N;
   TH1D* h_genTausAll_Pt;
@@ -193,16 +194,22 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_genTau_neutralDaugh_totalMass;
   TH1D* h_genTau_neutralDaugh_Et;
   TH2D* h_genTauHad_chargedPtVsneutralET;
+  TH1D* h_genTau_CHF;
+  TH1D* h_genTau_NHF;
   TH2D* h_genTau_chargedDaugh_visPt_dRmax;
   TH2D* h_genTau_chargedDaugh_PtLead_dRmax;
   TH2D* h_genTau_neutralDaugh_PtLead_dRmax;
 
   TH1D* h_trk_Chi2_all_4stubs;
   TH1D* h_trk_Chi2_all_5stubs;
+  TH1D* h_leadTrk4stubs_MCmatched_Chi2;
   TH1D* h_trk_Chi2_all;
   TH1D* h_trk_Chi2Red_all;
   TH1D* h_trk_NStubs_all;                                                                                                                                              
+  TH2D* h_trk_NStubsVsChi2_all;
+  
 
+  TH1D* h_Counters_leadTrks;
   TH1D* h_leadTrks_Multiplicity;
   
   TH1D* h_leadTrks_Pt;
@@ -212,6 +219,9 @@ class TkEG : public TreeAnalyserMC{
 
   TH1D* h_leadTrkSelection;
 
+  TH1D* h_leadTrk_clustTrks_dZ0;
+
+  TH1D* h_Counters_clustTrks;
   TH1D* h_clustTrks_Pt;
   TH1D* h_clustTrks_Eta;
   TH1D* h_clustTrks_Phi;
@@ -224,8 +234,11 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_trkClusters_Pt;
   TH1D* h_trkClusters_PtResolution;
   TH1D* h_trkClusters_M;
+  //TH1D* h_trkClusters_M_beforeCut;
 
   TH1D* h_EGs_N;
+  TH1D* h_EGs_N_OneHadTau;
+  TH1D* h_EGs_MCmatched_Et;
   TH1D* h_EGs_Et;
   TH1D* h_EGs_Eta;
   TH1D* h_EGs_Phi;
@@ -262,9 +275,13 @@ class TkEG : public TreeAnalyserMC{
   TH1D* hTkEG_genVisEt;
   TH1D* hMcHadronicTau_VisEt;
 
+  TH1D* h_nonMCmatched_EGenergyOverTracksPt;
+  TH1D* h_nonMCmatchedCandidates_decayMode;
+
   TH1D* h_MCmatch_counters;
   TH1D* h_MCmatch_dR;
   TH1D* h_leadTrk_MCmatch;
+  TH1D* h_leadTrk4stubs_MCmatch;
 
   TH1D* hTurnOn25_all;
   TH1D* hTurnOn25_relIso;

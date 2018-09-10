@@ -224,6 +224,9 @@ def GetHistoKwargs(h, opts):
         
     if "chargedptvsneutralet" in h.lower():
         kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": 0.0, "ymax": 100.0, "ymaxfactor": yMaxF}
+        
+    if "nstubsvschi2" in h.lower():
+        kwargs["opts"]   = {"xmin": 0, "xmax": 10.0, "ymin": 0.0, "ymax": 100.0, "ymaxfactor": yMaxF}
 
 
     '''
@@ -286,7 +289,7 @@ def PlotHistograms(datasetsMgr, histoName):
     Verbose("Plotting Data-MC Histograms")
 
     # Get Histogram name and its kwargs
-    saveName = histoName.rsplit("/")[-1] + "_" + datasetsMgr.getAllDatasets()[0].getName().split("_")[0]
+    saveName = histoName.rsplit("/")[-1] + "_" + datasetsMgr.getAllDatasets()[0].getName()#.split("_")[0]
     kwargs_  = GetHistoKwargs(saveName, opts)
     kwargs ={}
 

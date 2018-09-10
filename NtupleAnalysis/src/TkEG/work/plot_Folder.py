@@ -153,6 +153,26 @@ def main(opts):
             
         # Apply new dataset order!
         datasetsMgr.selectAndReorder(newOrder)
+
+        # Apply new dataset order?                                                                                                                                            
+        newOrder = datasetsMgr.getAllDatasetNames()
+        for i, d in  enumerate(datasetsMgr.getAllDatasetNames(), 0):
+            if "noPU" in d:
+                newOrder.insert(0, newOrder.pop(i))
+            if "PU200" in d:
+                newOrder.insert(2, newOrder.pop(i))
+            if "Neutrino" in d:
+                newOrder.insert(len(newOrder), newOrder.pop(i))
+        for i, d in  enumerate(datasetsMgr.getAllDatasetNames(), 0):
+            if "PU140" in d:
+                newOrder.insert(1, newOrder.pop(i))
+            if "Neutrino" in d:
+                newOrder.insert(len(newOrder), newOrder.pop(i))
+        datasetsMgr.selectAndReorder(newOrder)
+
+        # Print dataset information (after merge)                                                         
+        if 0:
+            datasetsMgr.PrintInfo() #Requires python 2.7.6 or 2.6.6                          
         
         # Print dataset information
         #datasetsMgr.PrintInfo()
@@ -247,10 +267,12 @@ def GetHistoKwargs(h, opts):
     if "chargeddaugh_totalmass" in h.lower():
         kwargs["log"]  = True
         kwargs["opts"] = {"xmin": 0.0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": yMaxF}
+        kwargs["cutBox"] = {"cutValue": 1.77, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if "neutraldaugh_totalmass" in h.lower():
         kwargs["log"]  = True
         kwargs["opts"] = {"xmin": 0.0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": yMaxF}
+        kwargs["cutBox"] = {"cutValue": 1.77, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if "chargeddaugh_pt" in h.lower():
         #kwargs["log"]  = True
@@ -269,6 +291,11 @@ def GetHistoKwargs(h, opts):
     if "trkClusters_M" == h:
         kwargs["log"]  = True
         kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": yMaxF}
+
+    if "trkClusters_M_beforeCut" == h:
+        kwargs["log"]  = True
+        kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": yMaxF}
+
         
     if "trkClusters_Pt" == h:
         kwargs["opts"]   = {"xmin": 0, "xmax": 150.0, "ymin": yMin, "ymaxfactor": yMaxF}
@@ -281,6 +308,12 @@ def GetHistoKwargs(h, opts):
 
     if "EGClusters_M" == h:
         kwargs["opts"]   = {"xmin": 0, "xmax": 4.0, "ymin": yMin, "ymaxfactor": yMaxF}
+
+    if "leadtrks_multiplicity" in h.lower():
+        kwargs["opts"]   = {"xmin": 0, "xmax": 10.0, "ymin": yMin, "ymaxfactor": yMaxF}
+
+    if "leadtrk_eg_drmin" in h.lower():
+        kwargs["opts"]   = {"xmin": 0, "xmax": 5.0, "ymin": yMin, "ymax" : 0.22, "ymaxfactor": yMaxF}
 
 
     if "leadtrks_pt" in h.lower():
@@ -304,6 +337,15 @@ def GetHistoKwargs(h, opts):
     if "EGs_Et" == h:
         kwargs["log"]  = True
         kwargs["opts"] = {"xmin": 0.0, "xmax": 100.0, "ymin": 0.001, "ymaxfactor": yMaxF}
+
+    if "mcmatch_dr" in h.lower():
+        kwargs["log"]  = True
+        kwargs["opts"] = {"xmin": 0.0, "xmax": 5.0, "ymin": 0.001, "ymaxfactor": yMaxF}
+
+    if "dz0" in h.lower():
+        kwargs["log"]  = True
+        kwargs["opts"] = {"xmin": 0.0, "xmax": 10.0, "ymin": 0.001, "ymaxfactor": yMaxF}
+
 
 
     return kwargs
@@ -329,19 +371,19 @@ def PlotHistograms(datasetsMgr, histoName):
     # Create the plotting object
     p = plots.MCPlot(datasetsMgr, histoName, saveFormats=[], normalizeToOne=True)
     # p = plots.ComparisonManyPlot(FakeB_inverted, compareHistos, saveFormats=[])
-
+        
     # For-loop: All histos                                                                                                                                               
     for index, h in enumerate(p.histoMgr.getHistos()):
-        if index == 0:
-            p.histoMgr.setHistoLegendStyle(h.getName(), "L")
+        #if index == 0:
+        #    p.histoMgr.setHistoLegendStyle(h.getName(), "L")
             #continue
-        else:
-            p.histoMgr.setHistoDrawStyle(h.getName(), "AP")
-            p.histoMgr.setHistoLegendStyle(h.getName(), "P")
+        #else:
+        #p.histoMgr.setHistoDrawStyle(h.getName(), "AP")
+        p.histoMgr.setHistoLegendStyle(h.getName(), "L")
 
     # Set default dataset style to all histos                                                                                                                            
-    for index, h in enumerate(p.histoMgr.getHistos()):
-        plots._plotStyles[p.histoMgr.getHistos()[index].getDataset().getName()].apply(p.histoMgr.getHistos()[index].getRootHisto())
+    #for index, h in enumerate(p.histoMgr.getHistos()):
+    #    plots._plotStyles[p.histoMgr.getHistos()[index].getDataset().getName()].apply(p.histoMgr.getHistos()[index].getRootHisto())
 
     # Draw and save the plot
     plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
