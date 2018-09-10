@@ -54,7 +54,7 @@ L1CaloTP::L1CaloTP(unsigned short Index,
   theCalIPhi     = CalIPhi;
   theEta         = getEtaFromIEta(IEta);
   thePhi         = getPhiFromIPhi(IPhi);
-//  theP4.SetPtEtaPhiM( sqrt(Et*Et-pionMass*pionMass), Eta, Phi, pionMass); // WARNING: Assumes pion mass for EG clusters //FIXME
+  // theP4.SetPtEtaPhiM( sqrt(Et*Et-pionMass*pionMass), Eta, Phi, pionMass); // WARNING: Assumes pion mass for EG clusters //FIXME
   
   if (0) PrintProperties();
 }

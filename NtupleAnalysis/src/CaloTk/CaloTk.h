@@ -14,7 +14,6 @@
 #include "../Auxiliary/src/Table.C"
 #include "../Auxiliary/src/MCTools.C"
 #include "../Auxiliary/src/HistoTools.C"
-// #include "../Auxiliary/src/L1Tracks.C" // needed?
 #include "../Auxiliary/src/Datasets.C" 
 
 #include "../DataFormat/src/L1TkTauParticle.C"
@@ -216,48 +215,53 @@ class CaloTk : public TreeAnalyserMC{
   HistoTools histoTools_;
   bool bFoundAllTaus_;
 
-  // Event-Type Histograms
-  TH1D* hCounters;
-  TH1D* hHepMCEvt_VtxZ;
-  TH2D* hHepMCEvt_VtxX_VtxY;
-  TH1D* hL1TkPV_VtxZ;
-  TH1D* hPrimaryVertex_DeltaZ;
-  TH1D* hPrimaryVertex_AbsDeltaZ;  
-
   // GenParticles Histograms
   TH2D* h_GenP_VisET_dRMaxLdgPion;
   
-  // L1TkTaus: Matching track
+  // Counters
+  TH1D* hCounters;
+
+  // L1CaloTaus
+  // http://cmsdoxygen.web.cern.ch/cmsdoxygen/CMSSW_9_3_7/doc/html/d9/d40/L1Trigger_2interface_2Tau_8h_source.html#l00019
+  // http://cmsdoxygen.web.cern.ch/cmsdoxygen/CMSSW_9_3_7/doc/html/d1/dc8/classl1t_1_1CaloTools.html
+  TH1D* hL1CaloTau_Et; 
+  TH1D* hL1CaloTau_Eta;
+  TH1D* hL1CaloTau_Phi;
+  TH1D* hL1CaloTau_IEt;
+  TH1D* hL1CaloTau_IEta; // ieta of seed tower
+  TH1D* hL1CaloTau_IPhi; // iphi of seed tower
+  TH1D* hL1CaloTau_Iso;
+  // TH1D* hL1CaloTau_Bx;
+  TH1D* hL1CaloTau_TowerIEta;
+  TH1D* hL1CaloTau_TowerIPhi;
+  TH1D* hL1CaloTau_RawEt; // raw (uncalibrated) cluster sum
+  TH1D* hL1CaloTau_IsoEt; // raw isolation sum - cluster sum
+  TH1D* hL1CaloTau_NTT;   // n towers above threshold
+  TH1D* hL1CaloTau_HasEM;
+  TH1D* hL1CaloTau_IsMerged;
+  // TH1D* hL1CaloTau_HwQual; //integer hardware (hw) value
+
+  // L1TkTaus
   TH1D* hL1TkTau_MatchTk_DeltaR;
   TH1D* hL1TkTau_MatchTk_PtRel;
   TH1D* hL1TkTau_MatchTk_Pt;
   TH1D* hL1TkTau_MatchTk_Eta;
   TH1D* hL1TkTau_MatchTk_POCAz;
-  TH1D* hL1TkTau_MatchTk_d0;
-  TH1D* hL1TkTau_MatchTk_d0Abs;
   TH1D* hL1TkTau_MatchTk_NStubs;
   TH1D* hL1TkTau_MatchTk_NPsStubs;
   TH1D* hL1TkTau_MatchTk_NBarrelStubs;
   TH1D* hL1TkTau_MatchTk_NEndcapStubs;
-  TH1D* hL1TkTau_MatchTk_StubPtCons;
   TH1D* hL1TkTau_MatchTk_ChiSquared;
   TH1D* hL1TkTau_MatchTk_RedChiSquared;
   TH1D* hL1TkTau_MatchTk_IsGenuine;
   TH1D* hL1TkTau_MatchTk_IsUnknown;
   TH1D* hL1TkTau_MatchTk_IsCombinatoric;
   TH1D* hL1TkTau_MatchTk_PtMinusCaloEt;
-
-  // L1TkTaus: Signal cone tracks
   TH1D* hL1TkTau_SigTks_Pt;
   TH1D* hL1TkTau_SigTks_PtRel;
   TH1D* hL1TkTau_SigTks_Eta;
   TH1D* hL1TkTau_SigTks_POCAz;
   TH1D* hL1TkTau_SigTks_DeltaPOCAz;
-  TH1D* hL1TkTau_SigTks_d0;
-  TH1D* hL1TkTau_SigTks_d0Abs;
-  TH1D* hL1TkTau_SigTks_d0Sig;
-  TH1D* hL1TkTau_SigTks_d0SigAbs;
-  TH1D* hL1TkTau_SigTks_StubPtCons;
   TH1D* hL1TkTau_SigTks_DeltaR;
   TH1D* hL1TkTau_SigTks_NStubs;
   TH1D* hL1TkTau_SigTks_NPsStubs;
@@ -266,18 +270,11 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkTau_SigTks_ChiSquared;
   TH1D* hL1TkTau_SigTks_RedChiSquared;
   TH1D* hL1TkTau_SigTks_PtMinusCaloEt;
-
-  // L1TkTaus: Isolation cone tracks
   TH1D* hL1TkTau_IsoTks_Pt;
   TH1D* hL1TkTau_IsoTks_PtRel;
   TH1D* hL1TkTau_IsoTks_Eta;
   TH1D* hL1TkTau_IsoTks_POCAz;
   TH1D* hL1TkTau_IsoTks_DeltaPOCAz;
-  TH1D* hL1TkTau_IsoTks_d0;
-  TH1D* hL1TkTau_IsoTks_d0Abs;
-  TH1D* hL1TkTau_IsoTks_d0Sig;
-  TH1D* hL1TkTau_IsoTks_d0SigAbs;
-  TH1D* hL1TkTau_IsoTks_StubPtCons;
   TH1D* hL1TkTau_IsoTks_DeltaR;
   TH1D* hL1TkTau_IsoTks_NStubs;
   TH1D* hL1TkTau_IsoTks_NPsStubs;
@@ -286,15 +283,31 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkTau_IsoTks_ChiSquared;
   TH1D* hL1TkTau_IsoTks_RedChiSquared;
   TH1D* hL1TkTau_IsoTks_PtMinusCaloEt;
-
-  // L1TkTaus: VtxIsolated
   TH1D* hL1TkTau_Multiplicity;
+  TH1D* hL1TkTau_CaloEt; 
+  TH1D* hL1TkTau_CaloEta;
+  TH1D* hL1TkTau_CaloPhi;
+  TH1D* hL1TkTau_CaloIEt;
+  TH1D* hL1TkTau_CaloIEta; // ieta of seed tower
+  TH1D* hL1TkTau_CaloIPhi; // iphi of seed tower
+  TH1D* hL1TkTau_CaloIso;
+  TH1D* hL1TkTau_CaloTowerIEta;
+  TH1D* hL1TkTau_CaloTowerIPhi;
+  TH1D* hL1TkTau_CaloRawEt; // raw (uncalibrated) cluster sum
+  TH1D* hL1TkTau_CaloIsoEt; // raw isolation sum - cluster sum
+  TH1D* hL1TkTau_CaloNTT;   // n towers above threshold
+  TH1D* hL1TkTau_CaloHasEM;
+  TH1D* hL1TkTau_CaloIsMerged;
   TH1D* hL1TkTau_Rtau;
   TH1D* hL1TkTau_CHF;
   TH1D* hL1TkTau_NHF;
   TH1D* hL1TkTau_NHFAbs;
   TH1D* hL1TkTau_NSigTks;
+  TH1D* hL1TkTau_SigTksEt;
+  TH1D* hL1TkTau_SigTksEta;
   TH1D* hL1TkTau_NIsoTks;
+  TH1D* hL1TkTau_IsoTksEt;
+  TH1D* hL1TkTau_IsoTksEta;
   TH1D* hL1TkTau_InvMass;
   TH1D* hL1TkTau_InvMassIncl;
   TH1D* hL1TkTau_SigConeRMin;
@@ -302,18 +315,95 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkTau_IsoConeRMin;
   TH1D* hL1TkTau_IsoConeRMax;
   TH1D* hL1TkTau_Charge;
-  TH1D* hL1TkTau_ChargeAbs;
   TH1D* hL1TkTau_RelIso;
   TH1D* hL1TkTau_VtxIso;
   TH1D* hL1TkTau_VtxIsoAbs;
   TH1D* hL1TkTau_DeltaRGenP;
 
-  // L1Taus: Resolutions
+  // L1TkIsoTaus
+  TH1D* hL1TkIsoTau_MatchTk_DeltaR;
+  TH1D* hL1TkIsoTau_MatchTk_PtRel;
+  TH1D* hL1TkIsoTau_MatchTk_Pt;
+  TH1D* hL1TkIsoTau_MatchTk_Eta;
+  TH1D* hL1TkIsoTau_MatchTk_POCAz;
+  TH1D* hL1TkIsoTau_MatchTk_NStubs;
+  TH1D* hL1TkIsoTau_MatchTk_NPsStubs;
+  TH1D* hL1TkIsoTau_MatchTk_NBarrelStubs;
+  TH1D* hL1TkIsoTau_MatchTk_NEndcapStubs;
+  TH1D* hL1TkIsoTau_MatchTk_ChiSquared;
+  TH1D* hL1TkIsoTau_MatchTk_RedChiSquared;
+  TH1D* hL1TkIsoTau_MatchTk_IsGenuine;
+  TH1D* hL1TkIsoTau_MatchTk_IsUnknown;
+  TH1D* hL1TkIsoTau_MatchTk_IsCombinatoric;
+  TH1D* hL1TkIsoTau_MatchTk_PtMinusCaloEt;
+  TH1D* hL1TkIsoTau_SigTks_Pt;
+  TH1D* hL1TkIsoTau_SigTks_PtRel;
+  TH1D* hL1TkIsoTau_SigTks_Eta;
+  TH1D* hL1TkIsoTau_SigTks_POCAz;
+  TH1D* hL1TkIsoTau_SigTks_DeltaPOCAz;
+  TH1D* hL1TkIsoTau_SigTks_DeltaR;
+  TH1D* hL1TkIsoTau_SigTks_NStubs;
+  TH1D* hL1TkIsoTau_SigTks_NPsStubs;
+  TH1D* hL1TkIsoTau_SigTks_NBarrelStubs;
+  TH1D* hL1TkIsoTau_SigTks_NEndcapStubs;
+  TH1D* hL1TkIsoTau_SigTks_ChiSquared;
+  TH1D* hL1TkIsoTau_SigTks_RedChiSquared;
+  TH1D* hL1TkIsoTau_SigTks_PtMinusCaloEt;
+  TH1D* hL1TkIsoTau_IsoTks_Pt;
+  TH1D* hL1TkIsoTau_IsoTks_PtRel;
+  TH1D* hL1TkIsoTau_IsoTks_Eta;
+  TH1D* hL1TkIsoTau_IsoTks_POCAz;
+  TH1D* hL1TkIsoTau_IsoTks_DeltaPOCAz;
+  TH1D* hL1TkIsoTau_IsoTks_DeltaR;
+  TH1D* hL1TkIsoTau_IsoTks_NStubs;
+  TH1D* hL1TkIsoTau_IsoTks_NPsStubs;
+  TH1D* hL1TkIsoTau_IsoTks_NBarrelStubs;
+  TH1D* hL1TkIsoTau_IsoTks_NEndcapStubs;
+  TH1D* hL1TkIsoTau_IsoTks_ChiSquared;
+  TH1D* hL1TkIsoTau_IsoTks_RedChiSquared;
+  TH1D* hL1TkIsoTau_IsoTks_PtMinusCaloEt;
+  TH1D* hL1TkIsoTau_Multiplicity;
+  TH1D* hL1TkIsoTau_CaloEt; 
+  TH1D* hL1TkIsoTau_CaloEta;
+  TH1D* hL1TkIsoTau_CaloPhi;
+  TH1D* hL1TkIsoTau_CaloIEt;
+  TH1D* hL1TkIsoTau_CaloIEta; // ieta of seed tower
+  TH1D* hL1TkIsoTau_CaloIPhi; // iphi of seed tower
+  TH1D* hL1TkIsoTau_CaloIso;
+  TH1D* hL1TkIsoTau_CaloTowerIEta;
+  TH1D* hL1TkIsoTau_CaloTowerIPhi;
+  TH1D* hL1TkIsoTau_CaloRawEt; // raw (uncalibrated) cluster sum
+  TH1D* hL1TkIsoTau_CaloIsoEt; // raw isolation sum - cluster sum
+  TH1D* hL1TkIsoTau_CaloNTT;   // n towers above threshold
+  TH1D* hL1TkIsoTau_CaloHasEM;
+  TH1D* hL1TkIsoTau_CaloIsMerged;
+  TH1D* hL1TkIsoTau_Rtau;
+  TH1D* hL1TkIsoTau_CHF;
+  TH1D* hL1TkIsoTau_NHF;
+  TH1D* hL1TkIsoTau_NHFAbs;
+  TH1D* hL1TkIsoTau_NSigTks;
+  TH1D* hL1TkIsoTau_SigTksEt;
+  TH1D* hL1TkIsoTau_SigTksEta;
+  TH1D* hL1TkIsoTau_NIsoTks;
+  TH1D* hL1TkIsoTau_IsoTksEt;
+  TH1D* hL1TkIsoTau_IsoTksEta;
+  TH1D* hL1TkIsoTau_InvMass;
+  TH1D* hL1TkIsoTau_InvMassIncl;
+  TH1D* hL1TkIsoTau_SigConeRMin;
+  TH1D* hL1TkIsoTau_SigConeRMax;
+  TH1D* hL1TkIsoTau_IsoConeRMin;
+  TH1D* hL1TkIsoTau_IsoConeRMax;
+  TH1D* hL1TkIsoTau_Charge;
+  TH1D* hL1TkIsoTau_RelIso;
+  TH1D* hL1TkIsoTau_VtxIso;
+  TH1D* hL1TkIsoTau_VtxIsoAbs;
+  TH1D* hL1TkIsoTau_DeltaRGenP;
+
+  // Resolutions
   TH1D* hL1Tau_ResolutionCaloEt;
   TH1D* hL1Tau_ResolutionCaloEta;
   TH1D* hL1Tau_ResolutionCaloPhi;
-
-  // L1TkTaus: Resolutions
+  // L1TkTau
   TH1D* hL1TkTau_ResolutionCaloEt;
   TH1D* hL1TkTau_ResolutionCaloEta;
   TH1D* hL1TkTau_ResolutionCaloPhi;
@@ -326,6 +416,19 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkTau_ResolutionCaloEt_F;
   TH1D* hL1TkTau_ResolutionCaloEta_F;
   TH1D* hL1TkTau_ResolutionCaloPhi_F;
+  // L1TkIsoTau
+  TH1D* hL1TkIsoTau_ResolutionCaloEt;
+  TH1D* hL1TkIsoTau_ResolutionCaloEta;
+  TH1D* hL1TkIsoTau_ResolutionCaloPhi;
+  TH1D* hL1TkIsoTau_ResolutionCaloEt_C;
+  TH1D* hL1TkIsoTau_ResolutionCaloEta_C;
+  TH1D* hL1TkIsoTau_ResolutionCaloPhi_C;
+  TH1D* hL1TkIsoTau_ResolutionCaloEt_I;
+  TH1D* hL1TkIsoTau_ResolutionCaloEta_I;
+  TH1D* hL1TkIsoTau_ResolutionCaloPhi_I;
+  TH1D* hL1TkIsoTau_ResolutionCaloEt_F;
+  TH1D* hL1TkIsoTau_ResolutionCaloEta_F;
+  TH1D* hL1TkIsoTau_ResolutionCaloPhi_F;
   
   // SingleTau: Rates
   TH1D* hCalo_Rate; // Inclusive = C+I+F
@@ -344,6 +447,10 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hRelIso_Rate_C;
   TH1D* hRelIso_Rate_I;
   TH1D* hRelIso_Rate_F;
+  TH1D* hIso_Rate;
+  TH1D* hIso_Rate_C;
+  TH1D* hIso_Rate_I;
+  TH1D* hIso_Rate_F;
   // SingleTau: Efficiencies
   TH1D* hCalo_Eff;  // Inclusive = C+I+F
   TH1D* hCalo_Eff_C;
@@ -361,6 +468,10 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hRelIso_Eff_C;
   TH1D* hRelIso_Eff_I;
   TH1D* hRelIso_Eff_F;      
+  TH1D* hIso_Eff;
+  TH1D* hIso_Eff_C;
+  TH1D* hIso_Eff_I;
+  TH1D* hIso_Eff_F;      
 
   // DiTau: Rates
   TH1D* hDiTau_Rate_Calo; // Inclusive = C+I+F
@@ -379,6 +490,10 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hDiTau_Rate_RelIso_C;
   TH1D* hDiTau_Rate_RelIso_I;
   TH1D* hDiTau_Rate_RelIso_F;
+  TH1D* hDiTau_Rate_Iso;
+  TH1D* hDiTau_Rate_Iso_C;
+  TH1D* hDiTau_Rate_Iso_I;
+  TH1D* hDiTau_Rate_Iso_F;
 
   // DiTau: Efficiencies
   TH1D* hDiTau_Eff_Calo; // Inclusive = C+I+F
@@ -397,43 +512,57 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hDiTau_Eff_RelIso_C;
   TH1D* hDiTau_Eff_RelIso_I;
   TH1D* hDiTau_Eff_RelIso_F;
+  TH1D* hDiTau_Eff_Iso;
+  TH1D* hDiTau_Eff_Iso_C;
+  TH1D* hDiTau_Eff_Iso_I;
+  TH1D* hDiTau_Eff_Iso_F;
 
   // DiTau: (Calo-Other)
   TH2D* hDiTau_Rate_Calo_Tk;
   TH2D* hDiTau_Rate_Calo_VtxIso;
   TH2D* hDiTau_Rate_Calo_RelIso;
+  TH2D* hDiTau_Rate_Calo_Iso;
+
   TH2D* hDiTau_Eff_Calo_Tk;
   TH2D* hDiTau_Eff_Calo_VtxIso;
   TH2D* hDiTau_Eff_Calo_RelIso;
+  TH2D* hDiTau_Eff_Calo_Iso;
 
   // DiTau (Tk-Other)
   TH2D* hDiTau_Rate_Tk_VtxIso;
   TH2D* hDiTau_Rate_Tk_RelIso;
+  TH2D* hDiTau_Rate_Tk_Iso;
+
   TH2D* hDiTau_Eff_Tk_VtxIso;
   TH2D* hDiTau_Eff_Tk_RelIso;
+  TH2D* hDiTau_Eff_Tk_Iso;
 
   // Turn-Ons
-  // TEfficiency* pEff;
+  // TEfficiency* pEff; //fixme: convert all turn-ons
   TH1D* hMcHadronicTau_VisEt;
   TH1D* hCalo_TurnOn50;
   TH1D* hTk_TurnOn50;
   TH1D* hVtxIso_TurnOn50;
   TH1D* hRelIso_TurnOn50;
-  //
+  TH1D* hIso_TurnOn50;
+
   TH1D* hCalo_TurnOn25;
   TH1D* hTk_TurnOn25;
   TH1D* hVtxIso_TurnOn25;
   TH1D* hRelIso_TurnOn25;
-  //
+  TH1D* hIso_TurnOn25;
+
   TH1D* hCalo_TurnOn_SingleTau50KHz;
   TH1D* hTk_TurnOn_SingleTau50KHz;
   TH1D* hVtxIso_TurnOn_SingleTau50KHz;
   TH1D* hRelIso_TurnOn_SingleTau50KHz;
-  //
+  TH1D* hIso_TurnOn_SingleTau50KHz;
+
   TH1D* hCalo_TurnOn_DiTau50KHz;
   TH1D* hTk_TurnOn_DiTau50KHz;
   TH1D* hVtxIso_TurnOn_DiTau50KHz;
   TH1D* hRelIso_TurnOn_DiTau50KHz;
+  TH1D* hIso_TurnOn_DiTau50KHz;
 
 };
 

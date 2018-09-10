@@ -14,7 +14,7 @@ EXAMPLES:
 
 
 LAST USED:
-./plotRateVsEff.py -m multicrab_CaloTkSkim_v92X_20180801T1203
+./plotRateVsEff.py -m multicrab_CaloTk_v92X_IsoConeRMax0p3_VtxIso0p5_RelIso0p2_14h29m15s_23Aug2018 -e "SingleE"
 
 '''
 
@@ -151,10 +151,14 @@ def main(opts):
                 dsets_signal.append(d)
 
         # ROC curve ingredients (histograms)
-        effLists    = [["Calo_Eff", "Tk_Eff", "VtxIso_Eff", "RelIso_Eff"], ["DiTau_Eff_Calo", "DiTau_Eff_Tk", "DiTau_Eff_VtxIso", "DiTau_Eff_RelIso"]]
-        rateLists   = [["Calo_Rate", "Tk_Rate", "VtxIso_Rate", "RelIso_Rate"], ["DiTau_Rate_Calo", "DiTau_Rate_Tk", "DiTau_Rate_VtxIso", "DiTau_Rate_RelIso"]]
-        turnOnLists = [["Calo_TurnOn25", "Tk_TurnOn25", "RelIso_TurnOn25", "VtxIso_TurnOn25"], 
-                       ["Calo_TurnOn50", "Tk_TurnOn50", "RelIso_TurnOn50", "VtxIso_TurnOn50"]]
+        effLists    = [["Calo_Eff", "Tk_Eff", "VtxIso_Eff", "RelIso_Eff", "Iso_Eff"], 
+                       ["DiTau_Eff_Calo", "DiTau_Eff_Tk", "DiTau_Eff_VtxIso", "DiTau_Eff_RelIso", "DiTau_Eff_Iso"]]
+
+        rateLists   = [["Calo_Rate", "Tk_Rate", "VtxIso_Rate", "RelIso_Rate", "Iso_Rate"], 
+                       ["DiTau_Rate_Calo", "DiTau_Rate_Tk", "DiTau_Rate_VtxIso", "DiTau_Rate_RelIso", "DiTau_Rate_Iso"]]
+
+        turnOnLists = [["Calo_TurnOn25", "Tk_TurnOn25", "RelIso_TurnOn25", "VtxIso_TurnOn25", "Iso_TurnOn25"], 
+                       ["Calo_TurnOn50", "Tk_TurnOn50", "RelIso_TurnOn50", "VtxIso_TurnOn50", "Iso_TurnOn50"]]
         
         # For-loop: All background histos (min bias)
         for i, b in enumerate(dsets_minBias, 1):
@@ -391,9 +395,12 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
         elif (i==3):
             g3 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
             g3.SetName("RelIso")
+        elif (i==4):
+            g4 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
+            g4.SetName("Iso")
 
     # Create the Rate Vs Efficiency TGraphs
-    p = plots.ComparisonManyPlot(g0, [g1,g2, g3], saveFormats=[])
+    p = plots.ComparisonManyPlot(g0, [g1,g2, g3, g4], saveFormats=[])
     
     # Set individual styles
     for index, h in enumerate(p.histoMgr.getHistos()):
@@ -410,7 +417,7 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
     plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
 
     # Draw Error bands
-    for i, g in enumerate([g0, g1, g2, g3]):
+    for i, g in enumerate([g0, g1, g2, g3, g4]):
         shapes, min, max = DrawErrorBand(g) 
         for shape in shapes:
             shape.SetFillColor( p.histoMgr.getHistos()[i].getRootHisto().GetFillColor())
@@ -576,7 +583,7 @@ def GetHistoKwargs(h, opts):
         
     _kwargs = {
         "xlabel"           : "Efficiency",
-        "ylabel"           : "Rate (kHz)",
+        "ylabel"           : "Rate (kHz)", #"Rate (kHz) / %.0f GeV",
         "addMCUncertainty" : False, 
         "addLuminosityText": False,
         "addCmsText"       : True,
@@ -597,7 +604,7 @@ def GetHistoKwargs(h, opts):
         return _kwargs
     elif "Rate_" in h:
         _kwargs["xlabel"]     = "E_{T} (GeV)"
-        _kwargs["ylabel"]     = "Rate (kHz)"
+        _kwargs["ylabel"]     = "Rate (kHz)"# / %.0f GeV"
         _kwargs["opts"]       = {"xmin": 0.0, "xmax": 300.0, "ymin": yMin, "ymax":1e5, "ymaxfactor": yMaxF}
         _kwargs["moveLegend"] = _mvLeg2
         _kwargs["cutBoxY"]    = {"cutValue": 50, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}

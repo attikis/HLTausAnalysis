@@ -49,22 +49,22 @@ L1Tau::~L1Tau()
 
 //****************************************************************************
 L1Tau::L1Tau(unsigned short Index,
-			     double Et,
-			     double Eta,
-			     double Phi,
-			     short int IEt,
-			     short int IEta,
-			     short int IPhi,
-			     short int Iso,
-			     short int Bx,
-			     short int TowerIPhi,
-			     short int TowerIEta,
-			     short int RawEt,
-			     short int IsoEt,
-			     short int NTT,
-			     short int HasEM,
-			     short int IsMerged,
-			     short int HwQual)
+	     double Et,
+	     double Eta,
+	     double Phi,
+	     short int IEt,
+	     short int IEta,
+	     short int IPhi,
+	     short int Iso,
+	     short int Bx,
+	     short int TowerIPhi,
+	     short int TowerIEta,
+	     short int RawEt,
+	     short int IsoEt,
+	     short int NTT,
+	     short int HasEM,
+	     short int IsMerged,
+	     short int HwQual)
 //****************************************************************************
 {
 
@@ -97,11 +97,10 @@ L1Tau::L1Tau(unsigned short Index,
 void L1Tau::PrintProperties(bool printHeader)
 //****************************************************************************
 {
-  
-  Table info("Index | Et | Eta | Phi | IET | IPhi | Iso | Bx | TowerIPhi | TowerIEta | RawEt | IsoEt | NTT | HasEM | IsMerged | HwQual | Type", "Text");
-
+  Table info("Index | Et | Eta | Phi | IEt | IEta | IPhi | Iso | Bx | TowerIPhi | TowerIEta | RawEt | IsoEt | NTT | HasEM | IsMerged | HwQual", "Text");
+    
   info.AddRowColumn(0, auxTools.ToString( getIndex() )       );
-  info.AddRowColumn(0, auxTools.ToString( getEt(), 3)        );
+  info.AddRowColumn(0, auxTools.ToString( getEt(), 2)        );
   info.AddRowColumn(0, auxTools.ToString( getEta(), 3)       );
   info.AddRowColumn(0, auxTools.ToString( getPhi(), 3)       );
   info.AddRowColumn(0, auxTools.ToString( getIEt() , 3)      );

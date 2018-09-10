@@ -10,9 +10,11 @@ USAGE:
 ./plotL1TkTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU|TT_TuneCUETP8M2T4_14TeV_L1TPU140" -n
 ./plotL1TkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|SingleTau|Higgs1000|Higgs500" -n
 ./plotL1TkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|SingleTau|Higgs" -n 
+./plotL1TkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|Higgs" -n
+
 
 LAST USED:
-./plotL1TkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|Higgs" -n
+./plotL1TkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p3_VtxIso0p5_RelIso0p2_14h29m15s_23Aug2018 -e "TT|SingleTau|Higgs|SingleE" -n
 
 '''
 #================================================================================================
@@ -134,7 +136,7 @@ def PlotHisto(datasetsMgr, h):
     if opts.normalizeToOne:
         if 1:
             p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[], **kwargs)
-            p.histoMgr.forEachHisto(lambda h: h.getRootHisto().Scale(1.0/h.getRootHisto().Integral()))
+            p.histoMgr.forEachHisto(lambda h: h.getRootHisto().Scale(1.0/h.getRootHisto().Integral()) )
         else:
             # p = plots.MCPlot(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
             p = plots.PlotSameBase(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
@@ -212,7 +214,7 @@ def GetHistoKwargs(h, opts):
         _cutBox = {"cutValue": 20.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
         _rebinX = 1
         _yLabel = "Efficiency / %.0f " + _units
-    elif "counters" in hName:
+    if "counters" in hName:
         _units  = ""
         _format = "%0.0f " + _units
         _xLabel = "counters"
@@ -220,15 +222,7 @@ def GetHistoKwargs(h, opts):
         #_xMax   = +10.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
-    elif "_turnon" in hName:
-        _units  = "GeV"
-        _format = "%0.0f " + _units
-        _xLabel = "#tau_{h} E_{T} (%s)" % (_units)
-        _cutBox = {"cutValue": 20.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-        _rebinX = 1
-        _yLabel = "Efficiency / %.0f " + _units
-        _xMax   = 200.0
-    elif "_rate" in hName:
+    if "_rate" in hName:
         _units  = "GeV"
         _format = "%0.0f " + _units
         _xLabel = "E_{T} (%s)" % (_units)
@@ -238,7 +232,7 @@ def GetHistoKwargs(h, opts):
         _log    = True
         _yMin   = 1e+0
         _xMax   = 250.0
-    elif "_rtau" in hName:
+    if "_rtau" in hName:
         _units  = ""
         _format = "%0.2f " + _units
         _xLabel = "R_{#tau}"# (%s)" % (_units)
@@ -249,7 +243,7 @@ def GetHistoKwargs(h, opts):
         # _yMin   = 1e+0
         _xMin   = +0.0
         _xMax   = +1.2
-    elif "_chf" in hName:
+    if "_chf" in hName:
         _units  = ""
         _format = "%0.1f " + _units
         _xLabel = "charged hadron fraction"
@@ -257,7 +251,7 @@ def GetHistoKwargs(h, opts):
         _rebinX = 1
         _yLabel = _yNorm + " / " + _format
         _xMax   = 2.0
-    elif "_nhf" in hName:
+    if "_nhf" in hName:
         _units  = ""
         _format = "%0.1f " + _units
         _xLabel = "neutral hadron fraction"
@@ -269,7 +263,7 @@ def GetHistoKwargs(h, opts):
         if "abs" in hName:
             _xLabel = "|neutral hadron fraction|" 
             _xMin   = 0.0
-    elif "_charge" in hName:
+    if "_charge" in hName:
         _units  = "e"
         _format = "%0.1f " + _units
         _xLabel = "charge (%s)" % (_units)
@@ -278,7 +272,7 @@ def GetHistoKwargs(h, opts):
         _yLabel = _yNorm + " / " + _format
         _xMin   = -2.0
         _xMax   = +2.0
-    elif "_deltargenp" in hName:
+    if "_deltargenp" in hName:
         _units  = ""
         _format = "%0.2f " + _units
         _xLabel = "#DeltaR" #(%s)" % (_units)
@@ -287,7 +281,7 @@ def GetHistoKwargs(h, opts):
         _yLabel = _yNorm + " / " + _format
         _xMin   = +0.0
         _xMax   = +1.0
-    elif "_invmass" in hName:
+    if "_invmass" in hName:
         _units  = "GeV/c^{2}"
         _format = "%0.1f " + _units
         _xLabel = "m (%s)" % (_units)
@@ -295,9 +289,9 @@ def GetHistoKwargs(h, opts):
         _rebinX = 2
         _yLabel = _yNorm + " / " + _format
         _log    = True
-        #_xMin   = +0.0
-        #_xMax   = +1.0
-    elif "_sigconermin" in hName:
+        _xMin   = +0.0
+        _xMax   = +5.0
+    if "_sigconermin" in hName:
         _units  = ""
         _format = "%0.2f " + _units
         _xLabel = "R_{min}^{sig}"
@@ -308,7 +302,7 @@ def GetHistoKwargs(h, opts):
         _xMin   = +0.0
         _xMax   = +0.3
         _log    = False
-    elif "_sigconermax" in hName:
+    if "_sigconermax" in hName:
         _units  = ""
         _format = "%0.2f " + _units
         _xLabel = "R_{max}^{sig}"
@@ -318,7 +312,7 @@ def GetHistoKwargs(h, opts):
         _log    = False
         _xMin   = +0.0
         _xMax   = +0.3
-    elif "_isoconermin" in hName:
+    if "_isoconermin" in hName:
         _units  = ""
         _format = "%0.2f " + _units
         _xLabel = "R_{min}^{iso}"
@@ -329,7 +323,7 @@ def GetHistoKwargs(h, opts):
         _xMin   = +0.0
         _xMax   = +0.2
         _log    = False
-    elif "_isoconermax" in hName:
+    if "_isoconermax" in hName:
         _units  = ""
         _format = "%0.2f " + _units
         _xLabel = "R_{max}^{iso}"
@@ -339,26 +333,26 @@ def GetHistoKwargs(h, opts):
         _log    = False
         _xMin   = +0.0
         _xMax   = +1.0
-    elif "_chisquared" in hName:
+    if "_chisquared" in hName:
         _units  = ""
         _format = "%0.1f " + _units
         _xLabel = "#chi^{2}"
         _cutBox = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        _rebinX = 1
+        _rebinX = 2
         _yLabel = _yNorm + " / " + _format
         _log    = True
         _xMax   = 400.0
-    elif "_redchisquared" in hName:
+    if "_redchisquared" in hName:
         _units  = ""
         _format = "%0.1f " + _units
         #_xLabel = "#chi^{2} / #nu"
         _xLabel = "#chi^{2}_{#nu}"
         _cutBox = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        _rebinX = 10 #5
+        _rebinX = 2
         _yLabel = _yNorm + " / " + _format
         _log    = True
-        _xMax   = 200.0
-    elif "_deltapocaz" in hName:
+        _xMax   = 100.0
+    if "_deltapocaz" in hName:
         _units  = "cm"
         _format = "%0.2f " + _units
         _xLabel = "#Deltaz_{0} (%s)" % (_units)
@@ -366,7 +360,7 @@ def GetHistoKwargs(h, opts):
         _rebinX = 4
         _yLabel = _yNorm + " / " + _format
         _log    = True
-    elif "_deltar" in hName:
+    if "_deltar" in hName:
         _units  = ""
         _format = "%0.2f " + _units
         _xLabel = "#DeltaR"# (%s)" % (_units)
@@ -376,18 +370,143 @@ def GetHistoKwargs(h, opts):
         _xMax   = +0.4
         _yLabel = _yNorm + " / " + _format
         _log    = True
-    elif "_eta" in hName:
+    if "tkset" in hName:
+        _units  = "GeV"
+        _format = "%0.f " + _units
+        _xLabel = "E_{T} (%s)" % (_units)
+        if "_sig" in hName:
+            _cutBox = {"cutValue": 5.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+            _log    = False
+        else:
+            _cutBox = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+            _log    = True
+        _rebinX = 5 
+        _xMin   =   0.0
+        _xMax   = 100.0
+        _yLabel = _yNorm + " / " + _format
+        if "tkseta" in hName:
+            _units  = ""
+            _format = "%0.2f " + _units
+            _xLabel = "#eta"
+            _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+            _rebinX = 1 
+            _xMin   = -2.4
+            _xMax   = +2.4
+            _yLabel = _yNorm + " / " + _format
+            _log    = False
+            ROOT.gStyle.SetNdivisions(6, "X")
+    if "hasem" in hName:
+        _units  = ""
+        _format = "%0.f " + _units
+        _xLabel = "has EM"
+        _rebinX = 1
+        _xMin   = 0.0
+        _xMax   = 1.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+    if "ismerged" in hName:
+        _units  = ""
+        _format = "%0.f " + _units
+        _xLabel = "is Merged"
+        _rebinX = 1
+        _xMin   = 0.0
+        _xMax   = 1.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+    if hName.endswith("caloiso"):
+        _units  = ""
+        _format = "%0.f " + _units
+        _xLabel = "is Isolated"
+        _rebinX = 1
+        _xMin   = 0.0
+        _xMax   = 1.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+    if "ntt" in hName:
+        _units  = ""
+        _format = "%0.0f " + _units
+        _xLabel = "towers above threshold"
+        _rebinX = 20 #10 #5
+        _xMin   =  50.0
+        _xMax   = 400.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+    if "et" in hName or  "iet" in hName or "_caloisoet" in hName or "_calorawet" in hName:
+        _units  = "GeV"
+        _format = "%0.f " + _units
+        _xLabel = "E_{T} (%s)" % (_units)
+        if "_caloiet" in hName: 
+            _xLabel = "iE_{T} (%s)" % (_units)
+        if  "_caloisoet" in hName:
+            _xLabel = "E_{T}^{iso} (%s)" % (_units)
+        if  "rawet" in hName:
+            _xLabel = "E_{T}^{raw} (%s)" % (_units)
+        _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _rebinX = 5 
+        _xMin   =   0.0
+        _xMax   = 300.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+        #ROOT.gStyle.SetNdivisions(6, "X")
+        if "eta" in hName:
+            _units  = ""
+            _format = "%0.2f " + _units
+            _xLabel = "#eta"
+            _cutBox = {"cutValue": 1.479, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+            _rebinX = 1
+            _xMin   = -2.4
+            _xMax   = +2.4
+            _yLabel = _yNorm + " / " + _format
+            _log    = False
+            ROOT.gStyle.SetNdivisions(6, "X")
+            if "ieta" in hName:
+                _units  = ""
+                _format = "%0.2f " + _units
+                _xLabel = "i#eta"
+                _xMin   = -40.0
+                _xMax   = +40.0
+                if "tower" in hName:
+                    _xLabel = "tower i#eta"
+                _cutBox = {"cutValue": 1.479, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+                _rebinX = 1
+                _xMin   = -40.0
+                _xMax   = +40.0
+                _yLabel = _yNorm + " / " + _format
+                _log    = False
+                ROOT.gStyle.SetNdivisions(6, "X")
+    if "phi" in hName:
+        _units  = "rads"
+        _format = "%0.2f " + _units
+        _xLabel = "#phi"
+        _rebinX = 1
+        _xMin   = -3.2
+        _xMax   = +3.2
+        if  "iphi" in hName:
+            _xMin   =   0.0
+            _xMax   = 150.0
+            _units  = ""
+            _xLabel = "i#phi"
+        if "tower" in hName:
+            _xMin   =   0.0
+            _xMax   = 150.0
+            _units  = ""
+            _xLabel = "tower i#phi"
+        #_cutBox = {"cutValue": 1.479, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+        ROOT.gStyle.SetNdivisions(6, "X")
+    if "_eta" in hName:
         _units  = ""
         _format = "%0.2f " + _units
         _xLabel = "#eta"
         _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        _rebinX = 5
+        _rebinX = 1 
         _xMin   = -2.4
         _xMax   = +2.4
         _yLabel = _yNorm + " / " + _format
         _log    = False
         ROOT.gStyle.SetNdivisions(6, "X")
-    elif "_nstubs" in hName:
+    if "_nstubs" in hName:
         _units  = ""
         _format = "%0.0f " + _units
         _xLabel = "stubs multiplicity"
@@ -396,7 +515,7 @@ def GetHistoKwargs(h, opts):
         _xMax   = +11.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
-    elif "_pocaz" in hName:
+    if "_pocaz" in hName:
         _units  = "cm"
         _format = "%0.1f " + _units
         _xLabel = "z_{0} (%s)" % (_units)
@@ -407,7 +526,7 @@ def GetHistoKwargs(h, opts):
         _yLabel = _yNorm + " / " + _format
         _log    = False
         ROOT.gStyle.SetNdivisions(6, "X")
-    elif "_d0" in hName:
+    if "_d0" in hName:
         _units  = "cm"
         _format = "%0.1f " + _units
         _xLabel = "d_{0} (%s)" % (_units)
@@ -428,7 +547,7 @@ def GetHistoKwargs(h, opts):
             _yLabel = _yNorm + " / " + _format
             _log    = False
             ROOT.gStyle.SetNdivisions(6, "X")
-    elif "_pt" in hName:
+    if "_pt" in hName:
         _units  = "GeV/c"
         _format = "%0.0f " + _units
         _xLabel = "p_{T} (%s)" % (_units)
@@ -451,11 +570,12 @@ def GetHistoKwargs(h, opts):
             _format = "%0.0f " + _units
             _xLabel = "p_{T}^{tk} - E_{T}^{calo} (%s)" % (_units)
             _cutBox = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-            _rebinX = 1
-            _xMax   = +10.0
+            _rebinX = 5 #2
+            _xMin   = -250.0
+            _xMax   = +200.0
             _yLabel = _yNorm + " / " + _format
             _log    = True
-    elif "_iscombinatoric" in hName:
+    if "_iscombinatoric" in hName:
         _units  = ""
         _format = "%0.0f " + _units
         _xLabel = "is combinatoric"
@@ -463,7 +583,7 @@ def GetHistoKwargs(h, opts):
         _xMax   = +2.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
-    elif "_isgenuine" in hName:
+    if "_isgenuine" in hName:
         _units  = ""
         _format = "%0.0f " + _units
         _xLabel = "is genuine"
@@ -471,7 +591,7 @@ def GetHistoKwargs(h, opts):
         _xMax   = +2.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
-    elif "_isunknown" in hName:
+    if "_isunknown" in hName:
         _units  = ""
         _format = "%0.0f " + _units
         _xLabel = "is unknown"
@@ -479,7 +599,7 @@ def GetHistoKwargs(h, opts):
         _xMax   = +2.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
-    elif "_multiplicity" in hName:
+    if "_multiplicity" in hName:
         _units  = ""
         _format = "%0.0f " + _units
         _xLabel = "tau candidate multiplicity"
@@ -487,7 +607,7 @@ def GetHistoKwargs(h, opts):
         _xMax   = +12.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
-    elif "_nisotks" in hName:
+    if "_nisotks" in hName:
         _units  = ""
         _format = "%0.0f " + _units
         _xLabel = "track multiplicity (isolation)"
@@ -495,7 +615,7 @@ def GetHistoKwargs(h, opts):
         _xMax   = +15.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
-    elif "_nsigtks" in hName:
+    if "_nsigtks" in hName:
         _units  = ""
         _format = "%0.0f " + _units
         _xLabel = "track multiplicity (signal)"
@@ -503,7 +623,7 @@ def GetHistoKwargs(h, opts):
         _xMax   = +15.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
-    elif "_reliso" in hName:
+    if "_reliso" in hName:
         _units  = ""
         _format = "%0.2f " + _units
         _xLabel = "relative isolation"
@@ -514,7 +634,7 @@ def GetHistoKwargs(h, opts):
         _yLabel = _yNorm + " / " + _format
         _log    = True
         _cutBox = {"cutValue": 0.2, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-    elif "_vtxiso" in hName:
+    if "_vtxiso" in hName:
         _units  = "cm"
         _format = "%0.2f " + _units
         #_xLabel = "vertex isolation"
@@ -525,7 +645,7 @@ def GetHistoKwargs(h, opts):
         _log    = True
         #_cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         _cutBox = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-    elif "_viset" in hName:
+    if "_viset" in hName:
         _units  = "GeV"
         _format = "%0.0f " + _units
         _xLabel = "#tau_{h} E_{T} (%s)" % (_units)
@@ -533,7 +653,7 @@ def GetHistoKwargs(h, opts):
         _xMax   = +200.0
         _yLabel = _yNorm + " / " + _format
         _log    = True
-    elif "_resolutioncaloet" in hName:
+    if "_resolutioncaloet" in hName:
         _units  = ""
         _format = "%0.2f " + _units
         #_xLabel = "(E_{T}^{calo} - p_{T}^{vis}) / p_{T}^{vis}"
@@ -550,7 +670,7 @@ def GetHistoKwargs(h, opts):
             _xMax   = +5.5
             _yLabel = _yNorm + " / " + _format
             _log    = True
-    elif "_resolutioncalophi" in hName:
+    if "_resolutioncalophi" in hName:
         _units  = ""
         _format = "%0.2f " + _units
         #_xLabel = "#phi^{calo} - #phi^{vis} / #phi^{vis}"
@@ -601,7 +721,7 @@ def GetHistoKwargs(h, opts):
         }
     return _kwargs
 
-def GetBinwidthDecimals(binWidth):                                                                                                                                        
+def GetBinwidthDecimals(binWidth):
     dec =  " %0.0f"
     if binWidth < 1:
         dec = " %0.1f"
@@ -658,7 +778,6 @@ def main(opts):
     style.setGridY(opts.gridY)
     style.setOptStat(False)
 
-
     # Obtain dsetMgrCreator and register it to module selector
     dsetMgrCreator = dataset.readFromMulticrabCfg(directory=opts.mcrab)
 
@@ -707,6 +826,7 @@ def main(opts):
                   "L1TkTau_SigTks_d0Abs", "L1TkTau_SigTks_d0Sig", "L1TkTau_SigTks_d0SigAbs",
                   "L1TkTau_IsoTks_d0", "L1TkTau_IsoTks_d0Abs", "L1TkTau_IsoTks_d0Sig", "L1TkTau_IsoTks_d0SigAbs",
                   "L1TkTau_ResolutionCaloEt_F", "L1TkTau_ResolutionCaloEta_F", "L1TkTau_ResolutionCaloPhi_F", 
+                  "L1TkIsoTau_ResolutionCaloEt_F", "L1TkIsoTau_ResolutionCaloEta_F", "L1TkIsoTau_ResolutionCaloPhi_F", 
                   "DiTau_Rate_Calo_F", "DiTau_Rate_Tk_F", "DiTau_Rate_VtxIso_F", "DiTau_Rate_RelIso_F",
                   "Calo_Rate_F", "Tk_Rate_F", "VtxIso_Rate_F", "RelIso_Rate_F"]
 
@@ -792,7 +912,7 @@ if __name__ == "__main__":
                       help="Formats in which all plots will be saved in. Provide as list of comma-separated (NO SPACE!) formats. [default: %s]" % (DATAERA))
 
     parser.add_option("--folder", dest="folder", type="string", default = FOLDER,
-                      help="ROOT file folder under which all histograms to be plotted are located [default: %s]" % (FOLDER) )
+                      help="ROOT file folder under which all histograms to be plotted are located [default: %s]" % (FOoLDER) )
 
     (opts, parseArgs) = parser.parse_args()
 
