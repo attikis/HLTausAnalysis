@@ -507,6 +507,7 @@ void CaloTk::Loop()
 	    
 	    // Fill histo
 	    h_GenP_VisET_dRMaxLdgPion -> Fill(pions_dRMax, tau->p4vis().Et());
+	    h_GenP_PtLdg_dRMaxLdgPion -> Fill(pions_dRMax, ldgPionPt);
 
 	  }// Ask for 3-prong or 5-prong decay
 
@@ -1327,6 +1328,7 @@ void CaloTk::BookHistos_(void)
 
   // GenParticles Histograms
   histoTools_.BookHisto_2D(h_GenP_VisET_dRMaxLdgPion, "GenP_VisET_dRMaxLdgPion", ";#DeltaR_{max}(#pi_{ldg}^{#pm},#pi^{#pm});E_{T}^{vis}",  50,  0.0, +0.25, 100, 0.0, +200.0);
+  histoTools_.BookHisto_2D(h_GenP_PtLdg_dRMaxLdgPion, "GenP_PtLdg_dRMaxLdgPion", ";#DeltaR_{max}(#pi_{ldg}^{#pm},#pi^{#pm});p_{T}^{#pi_{ldg}^{#pm}}",  50,  0.0, +0.25, 100, 0.0, +200.0);
 
   // Counters
   histoTools_.BookHisto_1D(hCounters, "Counters",  "", 2, 0.0, +2.0);
@@ -1660,6 +1662,7 @@ void CaloTk::WriteHistos_(void)
   
   // GenParticles Histograms
   h_GenP_VisET_dRMaxLdgPion->Write();
+  h_GenP_PtLdg_dRMaxLdgPion->Write();
 
   // Counters
   hCounters->Write();

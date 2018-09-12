@@ -217,7 +217,8 @@ class CaloTk : public TreeAnalyserMC{
 
   // GenParticles Histograms
   TH2D* h_GenP_VisET_dRMaxLdgPion;
-  
+  TH2D* h_GenP_PtLdg_dRMaxLdgPion;
+
   // Counters
   TH1D* hCounters;
 

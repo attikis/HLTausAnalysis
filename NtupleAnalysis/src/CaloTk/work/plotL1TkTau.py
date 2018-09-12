@@ -912,7 +912,7 @@ if __name__ == "__main__":
                       help="Formats in which all plots will be saved in. Provide as list of comma-separated (NO SPACE!) formats. [default: %s]" % (DATAERA))
 
     parser.add_option("--folder", dest="folder", type="string", default = FOLDER,
-                      help="ROOT file folder under which all histograms to be plotted are located [default: %s]" % (FOoLDER) )
+                      help="ROOT file folder under which all histograms to be plotted are located [default: %s]" % (FOLDER) )
 
     (opts, parseArgs) = parser.parse_args()
 
@@ -924,7 +924,7 @@ if __name__ == "__main__":
     
     # Determine path for saving plots
     if opts.saveDir == None:
-        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="", postfix="L1TkTau")
+        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/CaloTk/", postfix="L1TkTau")
     else:
         print "opts.saveDir = ", opts.saveDir
 
