@@ -4,10 +4,14 @@
 //
 // Example:
 // root -l
-// root[0] .x run.cc("multicrab_CaloTk_v910p2_20170520T1958", "SingleTau-PU140", "", -1);
+// root[0] .x run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "SingleNeutrino_L1TPU140", "", -1)
 //
+// EXAMPLE (batch mode):
+// sh
+// root -l -b -q "run.cc(\"/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650\", \"ChargedHiggs500_14TeV_L1TPU200\", \"\", -1)" 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "../Tracking.C+" // how to compile macro in ROOT6 (compatible with ROOT5 as well)
+#include <TError.h>
 
 void run(const std::string MulticrabDir = "", 
 	 const std::string SampleName = "", 
@@ -15,20 +19,15 @@ void run(const std::string MulticrabDir = "",
 	 const int maxEvents = -1)
 {
 
-  // Alexandros' files
-  //const std::string absolutePath = "/Users/attikis/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X";
-  // const std::string absolutePath = "/afs/cern.ch/user/a/attikis/workspace/multicrab/";
-  // const std::string absolutePath = "/Users/attikis/disk/hltaus/rootFiles/TTrees/P2L1T_HLTaus_91X/";
-  
-  // Santeri's files
-  // const std::string absolutePath = "/afs/cern.ch/work/s/slaurila/public/HLTaus/CMSSW_9_1_0_pre2/src/HLTausAnalysis/NtupleAnalysis/src/Tracking/work";
+  // Files on LXPLUS (CERNBOX)
+  // const std::string absolutePath = "/eos/user/m/mtoumazo";
+  // const std::string absolutePath = "/eos/user/m/mlotti";
+  // CaloTk macro(absolutePath + "/" + MulticrabDir, SampleName, text, maxEvents);
 
-  // Marina's files
-  //const std::string absolutePath = "/afs/cern.ch/user/m/mtoumazo/workspace/multicrab";
-
-  // Mikko's files
-  //const std::string absolutePath = "/eos/user/m/mlotti";
+  // Suppress ROOT warnings (https://root-forum.cern.ch/t/gerrorignorelevel-problem/13178/3)
+  gErrorIgnoreLevel = kFatal;
   
   Tracking macro(MulticrabDir, SampleName, text, maxEvents);
+
   macro.Loop();
 }

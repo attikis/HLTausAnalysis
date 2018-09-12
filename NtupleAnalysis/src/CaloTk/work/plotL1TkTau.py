@@ -659,27 +659,29 @@ def GetHistoKwargs(h, opts):
         #_xLabel = "(E_{T}^{calo} - p_{T}^{vis}) / p_{T}^{vis}"
         _xLabel = "#deltaE_{T} / p_{T}^{vis}"
         _rebinX = 1
-        _xMin   = -1.5
-        _xMax   = +5.5 #+10.0
+        _xMin   = -4.0 #-5.5
+        _xMax   = +4.0 #+5.5
         _yLabel = _yNorm + " / " + _format
         _log    = True
         if "_resolutioncaloeta" in hName:
             #_xLabel = "(#eta^{calo} - #eta^{vis}) / #eta^{vis}"
             _xLabel = "#delta#eta / #eta^{vis}"
-            _xMin   = -1.5
-            _xMax   = +5.5
+            _xMin   = -4.0 #-5.5
+            _xMax   = +4.0 #+5.5
             _yLabel = _yNorm + " / " + _format
             _log    = True
+            _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
     if "_resolutioncalophi" in hName:
         _units  = ""
         _format = "%0.2f " + _units
         #_xLabel = "#phi^{calo} - #phi^{vis} / #phi^{vis}"
         _xLabel = "#delta#phi / #phi^{vis}"
         _rebinX = 1
-        _xMin   = -5.0
-        _xMax   = +5.0
+        _xMin   = -2.0 #-5.0
+        _xMax   = +2.0 #+5.0
         _yLabel = _yNorm + " / " + _format
         _log    = True
+        _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
     else:
         ROOT.gStyle.SetNdivisions(8, "X")
 
