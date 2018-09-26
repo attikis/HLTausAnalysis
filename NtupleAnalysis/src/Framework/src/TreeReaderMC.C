@@ -744,24 +744,63 @@ L1EG TreeReaderMC::GetL1EG(unsigned int Index)
 {
   
   L1EG theL1EG(Index,
-	       L1EGEmu_Et.at(Index),
-	       L1EGEmu_Eta.at(Index),
-	       L1EGEmu_Phi.at(Index),
-	       L1EGEmu_IEt.at(Index),
-	       L1EGEmu_IEta.at(Index),
-	       L1EGEmu_IPhi.at(Index),
-	       L1EGEmu_Iso.at(Index),
-	       L1EGEmu_Bx.at(Index),
-	       L1EGEmu_TowerIPhi.at(Index),
-	       L1EGEmu_TowerIEta.at(Index),
-	       L1EGEmu_RawEt.at(Index),
-	       L1EGEmu_IsoEt.at(Index),
-	       L1EGEmu_FootprintEt.at(Index),
-	       L1EGEmu_NTT.at(Index),
-	       L1EGEmu_Shape.at(Index),
-	       L1EGEmu_TowerHoE.at(Index));
+               L1EGEmu_Et.at(Index),
+               L1EGEmu_Eta.at(Index),
+               L1EGEmu_Phi.at(Index),
+               L1EGEmu_IEt.at(Index),
+               L1EGEmu_IEta.at(Index),
+               L1EGEmu_IPhi.at(Index),
+               L1EGEmu_Iso.at(Index),
+               L1EGEmu_Bx.at(Index),
+               L1EGEmu_TowerIPhi.at(Index),
+               L1EGEmu_TowerIEta.at(Index),
+               L1EGEmu_RawEt.at(Index),
+               L1EGEmu_IsoEt.at(Index),
+               L1EGEmu_FootprintEt.at(Index),
+               L1EGEmu_NTT.at(Index),
+               L1EGEmu_Shape.at(Index),
+               L1EGEmu_TowerHoE.at(Index));
     
     return theL1EG;
+}
+
+//============================================================================
+vector<L1TKEM> TreeReaderMC::GetL1TKEMs(bool bPrintList)
+//============================================================================
+{
+  vector<L1TKEM> theL1EGs;
+  L1TKEM theL1EG;
+
+  // For-loop: All L1 EG
+  for (Size_t i = 0; i < tkEM_Et.size(); i++)
+    {
+      theL1EG = GetL1TKEM(i);
+      theL1EGs.push_back(theL1EG);
+    }
+  
+//  if (bPrintList) PrintL1EGCollection(theL1EGs); 
+  return theL1EGs;
+}
+
+//============================================================================
+L1TKEM TreeReaderMC::GetL1TKEM(unsigned int Index)
+//============================================================================
+{
+  
+  L1TKEM theL1EG(Index,
+	       tkEM_Et.at(Index),
+	       tkEM_Eta.at(Index),
+	       tkEM_Phi.at(Index),
+	       tkEM_EGRefPt.at(Index),
+               tkEM_EGRefEta.at(Index),
+               tkEM_EGRefPhi.at(Index),
+	       tkEM_TrkIso.at(Index),
+	       tkEM_Bx.at(Index),
+               tkEM_HwQual.at(Index),
+//               tkEM_zVtx.at(Index)); //is always empty?
+	       0);
+
+  return theL1EG;
 }
 
 //============================================================================

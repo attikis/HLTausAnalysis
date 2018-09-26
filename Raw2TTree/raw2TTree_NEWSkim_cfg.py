@@ -7,7 +7,7 @@ import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
 
-process = cms.Process('L1',eras.Phase2_timing)
+process = cms.Process('L1',eras.Phase2_trigger)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -29,6 +29,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring('/store/mc/PhaseIIFall17D/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/GEN-SIM-DIGI-RAW/L1TPU140_93X_upgrade2023_realistic_v5-v2/100000/04F85725-F254-E811-A503-002590490020.root'),
+#    fileNames = cms.untracked.vstring('/store/mc/PhaseIIFall17D/SingleNeutrino/GEN-SIM-DIGI-RAW/L1TPU200_93X_upgrade2023_realistic_v5-v1/80000/00157B11-405C-E811-89CA-0CC47AFB81B4.root'),
     secondaryFileNames = cms.untracked.vstring(),
     inputCommands = cms.untracked.vstring("keep *", 
         "drop l1tHGCalTowerMapBXVector_hgcalTriggerPrimitiveDigiProducer_towerMap_HLT",
@@ -77,15 +78,18 @@ process.hgcl1tpg_step = cms.Path(process.hgcalTriggerPrimitives)
 process.load('SimCalorimetry.EcalEBTrigPrimProducers.ecalEBTriggerPrimitiveDigis_cff')
 process.EcalEBtp_step = cms.Path(process.simEcalEBTriggerPrimitiveDigis)
 
+process.load("L1Trigger.L1TNtuples.l1PhaseIITreeProducer_cfi")
+
 #process.TTClusterAssociatorFromPixelDigis.digiSimLinks          = cms.InputTag( "simSiPixelDigis","Tracker" )
 process.L1TrackTrigger_step = cms.Path(process.L1TrackletTracksWithAssociators)
+
+process.VertexProducer.l1TracksInputTag = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks")
 
 # Path and EndPath definitions
 process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 
-#####
 
 process.l1TrackTree = cms.EDAnalyzer('L1TrackNtupleMaker',
 #process.L1TrackNtuple = cms.EDAnalyzer('L1TrackNtupleMaker',
@@ -111,10 +115,7 @@ process.l1TrackTree = cms.EDAnalyzer('L1TrackNtupleMaker',
                                        TrackingVertexInputTag = cms.InputTag("mix", "MergedTrackTruth"),
                                        )
 process.ana = cms.Path(process.l1TrackTree)
-#process.ana = cms.Path(process.L1TrackNtuple)
 
-
-#######
 
 process.l1GeneratorTree = cms.EDAnalyzer("L1CustomGenTreeProducer",
     genJetToken     = cms.untracked.InputTag("ak4GenJets"),
@@ -124,22 +125,14 @@ process.l1GeneratorTree = cms.EDAnalyzer("L1CustomGenTreeProducer",
 
 process.genAna = cms.Path(process.l1GeneratorTree)
 
-#######
-
-# use this if you want to re-run the stub making
-#process.schedule = cms.Schedule(process.TTClusterStub,process.TTClusterStubTruth,process.TTTracksWithTruth,process.ana)
-
-# use this if cluster/stub associators not available 
-#process.schedule = cms.Schedule(process.TTClusterStubTruth,process.TTTracksWithTruth,process.ana)
-
-#####
-
 # Schedule definition
-#process.schedule = cms.Schedule(process.L1simulation_step,process.endjob_step,process.FEVTDEBUGHLToutput_step)
-#process.schedule = cms.Schedule(process.L1simulation_step,process.EcalEBtp_step,process.hgcl1tpg_step,process.endjob_step,process.FEVTDEBUGHLToutput_step)
+#process.schedule = cms.Schedule(process.EcalEBtp_step,process.hgcl1tpg_step,process.L1TrackTrigger_step,process.L1simulation_step,process.endjob_step,process.FEVTDEBUGHLToutput_step)
 
+#process.schedule = cms.Schedule(process.L1TrackTrigger_step,process.L1simulation_step,process.endjob_step)
+
+process.schedule = cms.Schedule(process.L1TrackTrigger_step,process.L1simulation_step,process.extraCollectionsMenuTree,process.runmenutree,process.ana,process.genAna,process.endjob_step)#,process.FEVTDEBUGHLToutput_step)
+#process.schedule = cms.Schedule(process.L1TrackTrigger_step,process.L1simulation_step,process.runmenutree,process.ana,process.genAna,process.endjob_step)
 #process.schedule = cms.Schedule(process.EcalEBtp_step,process.hgcl1tpg_step,process.L1simulation_step,process.L1TrackTrigger_step,process.endjob_step,process.FEVTDEBUGHLToutput_step,process.ana,process.genAna)
-process.schedule = cms.Schedule(process.EcalEBtp_step,process.hgcl1tpg_step,process.L1simulation_step,process.L1TrackTrigger_step,process.endjob_step,process.ana,process.genAna)
 
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
@@ -149,9 +142,10 @@ associatePatAlgosToolsTask(process)
 
 # Automatic addition of the customisation function from L1Trigger.L1TNtuples.customiseL1Ntuple
 #from L1Trigger.L1TNtuples.customiseL1Ntuple import L1NtupleRAWEMUGEN_MC 
-from L1Trigger.L1TNtuples.customiseL1Ntuple import L1NtupleRAWEMU
+from L1Trigger.L1TNtuples.customiseL1Ntuple import L1NtupleRAWEMU 
 
 #call to customisation function L1NtupleEMU imported from L1Trigger.L1TNtuples.customiseL1Ntuple
+#process = L1NtupleRAWEMUGEN_MC(process)
 process = L1NtupleRAWEMU(process)
 
 # End of customisation functions

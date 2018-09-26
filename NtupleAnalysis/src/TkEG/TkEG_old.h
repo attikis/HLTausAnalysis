@@ -9,7 +9,7 @@
 #include "../Framework/src/TreeAnalyserMC.C"
 #include "../Auxiliary/src/AuxTools.C"
 #include "../DataFormat/interface/TTTrack.h"
-//#include "../DataFormat/src/L1EG.C"
+#include "../DataFormat/src/L1EG.C"
 #include "../DataFormat/src/L1TKEM.C"
 #include "../DataFormat/src//L1TkEGParticle.C"
 #include "../DataFormat/src/TrackingParticle.C" // for GetTTTrack function
@@ -163,7 +163,7 @@ class TkEG : public TreeAnalyserMC{
   float maxRelIso;  
   
   vector<TTTrack> TTTracks;
-  vector<L1TKEM> L1EGs;
+  vector<L1EG> L1EGs;
   vector< vector <TTTrack> > trackTauCandidates;
   vector<L1TkEGParticle> TauCandidates;
   vector<L1TkEGParticle> TauCandidatesIsolated;

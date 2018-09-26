@@ -12,7 +12,8 @@ using namespace std;
 class TreeDefinitionReco : public virtual TreeDefinitionBase
 {
  public:
-  
+
+
   // Event
   UInt_t          run;
   ULong64_t       event;
@@ -24,6 +25,22 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   Int_t           nPV_True;
   vector<TString> hlt;
   Double_t        puWeight;
+
+
+  // L1PhaseII
+
+  Short_t         tkEM_N;
+  vector<float>   tkEM_Et;
+  vector<float>   tkEM_Eta;
+  vector<float>   tkEM_Phi;
+  vector<short>   tkEM_Bx;
+  vector<short>   tkEM_TrkIso;
+  vector<short>   tkEM_zVtx;
+  vector<short>   tkEM_HwQual;
+  vector<float>   tkEM_EGRefPt;
+  vector<float>   tkEM_EGRefEta;
+  vector<float>   tkEM_EGRefPhi;
+
 
   // Calo Towers 
   //==Calo TPs
@@ -363,6 +380,7 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<bool>    mEmu_algoDecisionFinal;
 
  //********* List of branches **********
+  
 
   // Event
   TBranch        *b_Event_run;
@@ -375,6 +393,21 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_Event_nPV_True; 
   TBranch        *b_Event_hlt;  
   TBranch        *b_Event_puWeight;
+
+
+  //L1PhaseII
+  TBranch        *b_tkEM_N;
+  TBranch        *b_tkEM_Et;
+  TBranch        *b_tkEM_Eta;
+  TBranch        *b_tkEM_Phi;
+  TBranch        *b_tkEM_Bx;
+  TBranch        *b_tkEM_TrkIso;
+  TBranch        *b_tkEM_zVtx;
+  TBranch        *b_tkEM_HwQual;
+  TBranch        *b_tkEM_EGRefPt;
+  TBranch        *b_tkEM_EGRefEta;
+  TBranch        *b_tkEM_EGRefPhi;
+
 
   // Calo Towers
   //==CaloTP
@@ -734,6 +767,19 @@ void TreeDefinitionReco::InitReco(TChain *chain)
 
   if (0) cout << "=== TreeDefinitionReco::InitReco()" << endl;
   
+  //L1PhaseII
+  tkEM_N 	= 0;
+//  tkEM_Et 	= 0;
+//  tkEM_Eta 	= 0;
+//  tkEM_Phi 	= 0;
+//  tkEM_Bx	= 0;
+//  tkEM_TrkIso 	= 0;
+//  tkEM_zVtx 	= 0;
+//  tkEM_HwQual 	= 0;
+//  tkEM_EGRefPt 	= 0;
+//  tkEM_EGRefEta = 0;
+//  tkEM_EGRefPhi = 0;
+
   // Event
   run      = 0;
   event    = 0;
@@ -860,6 +906,25 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fChain->SetBranchAddress("puWeight", &puWeight, &b_Event_puWeight);
     }
   
+
+  //L1PhaseII
+  if(doL1PhaseII)
+    {
+      fL1PhaseII->SetBranchAddress("nTkEM", &tkEM_N, &b_tkEM_N);
+      fL1PhaseII->SetBranchAddress("tkEMEt", &tkEM_Et, &b_tkEM_Et);
+      fL1PhaseII->SetBranchAddress("tkEMEta", &tkEM_Eta, &b_tkEM_Eta);
+      fL1PhaseII->SetBranchAddress("tkEMPhi", &tkEM_Phi, &b_tkEM_Phi);
+      fL1PhaseII->SetBranchAddress("tkEMBx", &tkEM_Bx, &b_tkEM_Bx);
+      fL1PhaseII->SetBranchAddress("tkEMTrkIso", &tkEM_TrkIso, &b_tkEM_TrkIso);
+      fL1PhaseII->SetBranchAddress("tkEMzVtx", &tkEM_zVtx, &b_tkEM_zVtx);
+      fL1PhaseII->SetBranchAddress("tkEMHwQual", &tkEM_HwQual, &b_tkEM_HwQual);
+      fL1PhaseII->SetBranchAddress("tkEMEGRefPt", &tkEM_EGRefPt, &b_tkEM_EGRefPt);
+      fL1PhaseII->SetBranchAddress("tkEMEGRefEta", &tkEM_EGRefEta, &b_tkEM_EGRefEta);
+      fL1PhaseII->SetBranchAddress("tkEMEGRefPhi", &tkEM_EGRefPhi, &b_tkEM_EGRefPhi);
+
+      fChain -> AddFriend(fL1PhaseII);
+    }
+
   // Calo Towers
   if(doCaloTower)
     {

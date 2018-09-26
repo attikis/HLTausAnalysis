@@ -16,7 +16,7 @@ L1TkEGParticle::L1TkEGParticle()
 
 
 //****************************************************************************
-L1TkEGParticle::L1TkEGParticle(vector<TTTrack> tracks, vector<L1EG> EGs,
+L1TkEGParticle::L1TkEGParticle(vector<TTTrack> tracks, vector<L1TKEM> EGs,
                                GenParticle genTau, bool matching)
 //****************************************************************************
 {

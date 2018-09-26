@@ -18,6 +18,7 @@
 #include "../../DataFormat/interface/TTTrack.h"
 #include "../../DataFormat/interface/TTPixelTrack.h"
 #include "../../DataFormat/src/L1EG.C"
+#include "../../DataFormat/src/L1TKEM.C"
 #include "../../DataFormat/src/L1Jet.C"
 #include "../../DataFormat/src/L1Tau.C"
 #include "../../DataFormat/src/L1Sum.C"
@@ -102,7 +103,11 @@ class TreeReaderMC : public TreeReaderReco, public virtual TREEDEFINITIONGENP
   L1EG GetL1EG(unsigned int Index);
   
   vector<L1EG> GetL1EGs(bool bPrintList=false);
+
+  L1TKEM GetL1TKEM(unsigned int Index);
  
+  vector<L1TKEM> GetL1TKEMs(bool bPrintList=false);
+
   void GetL1Muon(unsigned int Index);
   
   void GetL1Muons(bool bPrintList=false);

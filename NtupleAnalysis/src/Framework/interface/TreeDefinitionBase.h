@@ -3,6 +3,7 @@
 #define TreeDefinitionBase_h
 
 #include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisCaloTPDataFormat.h"
+#include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisPhaseIIDataFormat.h"
 #include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisL1CaloTowerDataFormat.h"
 #include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisL1CaloClusterDataFormat.h"
 // #include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisCustomGeneratorDataFormat.h"
@@ -20,6 +21,7 @@ class TreeDefinitionBase
 {
    public:
      TChain  *fChain; //! pointer to the analysed Tree or Chain
+     TChain  *fL1PhaseII;
      TChain  *fCaloTower;
      TChain  *fUpgradeTfMuon;
      TChain  *fUpgrade;
@@ -34,6 +36,7 @@ class TreeDefinitionBase
      Int_t   fCurrent;  //! Current Tree number in a Chain
 
      bool doCaloTower;
+     bool doL1PhaseII;
      bool doUpgradeTfMuon;
      bool doUpgrade;
      bool douGT;

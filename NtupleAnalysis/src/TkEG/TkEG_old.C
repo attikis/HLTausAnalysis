@@ -465,12 +465,10 @@ void TkEG::Loop()
     // Debug prints
     if (cfg_DEBUG) std::cout << "Lead tracks:" << std::endl;
     if (cfg_DEBUG) std::cout << trackTauCandidates.size() << " lead tracks found, here are 3 first:" << std::endl;
-//    for (std::size_t i=0; i<3 && i<trackTauCandidates.size(); i++) {
-//      if (cfg_DEBUG*0) std::cout << "leading track index = " << trackTauCandidates[i][0].index() << ", Pt = " << trackTauCandidates[i][0].getPt() << std::endl;
-//    }  
+    for (std::size_t i=0; i<3 && i<trackTauCandidates.size(); i++) {
+      if (cfg_DEBUG) std::cout << "leading track index = " << trackTauCandidates[i][0].index() << ", Pt = " << trackTauCandidates[i][0].getPt() << std::endl;
+    }  
 
-
-     std::cout << "track clustering next" << endl;
 
     //============= Tracks Clustering =================
     
@@ -494,7 +492,7 @@ void TkEG::Loop()
       //pT = 0.0;
 
       
-      if (cfg_DEBUG) cout << "Starting to cluster lead track " << leadTrackPtr->index();
+      if (cfg_DEBUG*0) cout << "Starting to cluster lead track " << leadTrackPtr->index();
       // Loop over other tracks
       stopClustering = false;
 
@@ -580,8 +578,7 @@ void TkEG::Loop()
 
     }
     
-    std::cout << "match EG to gentau next " << endl;
-
+    
     ////////////////////////////////////////////////////////////////////////////
     // Match an EG to a Hadronic Gen-Tau independently from the track candidates 
     ////////////////////////////////////////////////////////////////////////////
@@ -599,7 +596,6 @@ void TkEG::Loop()
       double deltaR;
       double match_dR = 999;
      
-
       // For-loop: All hadronic GenTaus
       for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++) {
 	// If no hadronic decay products found (pi+/-, pi0, K+/-, K0, K0L), skip this tau
@@ -609,9 +605,9 @@ void TkEG::Loop()
 	  match_dR = deltaR;
 	  match_GenParticle = *tau;
 	}
+	
       } 
       
-
       bool EGhasGenTau = false;
       if (match_dR < maxDeltaR_MCmatch) {
 	
@@ -619,7 +615,7 @@ void TkEG::Loop()
 	EGhasGenTau = true; 
 	h_EGs_MCmatched_Et -> Fill(eg->getEt());
 	// Print EG and matching gen particle properties 
-	if (cfg_DEBUG*0){
+	if (cfg_DEBUG){
 	  eg->PrintProperties();
 	  match_GenParticle.PrintProperties();
 	  cout << "DeltaR of EG and its matching Gen-Particle = " << match_dR <<endl;
@@ -629,7 +625,6 @@ void TkEG::Loop()
 
     }
     
-     std::cout << "EG clustering stuff next" << endl;
 
     //============= EGs Clustering =================
         
@@ -647,14 +642,14 @@ void TkEG::Loop()
 	h_EGs_Et  -> Fill( eg->getEt() );
 	h_EGs_Eta -> Fill( eg->getEta() );
 	h_EGs_Phi -> Fill( eg->getPhi() );
-//	h_EGs_IEta -> Fill( eg->getIEta() );
-//	h_EGs_IPhi -> Fill( eg->getIPhi() );
+	h_EGs_IEta -> Fill( eg->getIEta() );
+	h_EGs_IPhi -> Fill( eg->getIPhi() );
 	
       }// For-loop: All the EGs in the event
     }
         
     // Build EG clusters and create tau candidates
-    vector<L1TKEM> EGcluster;
+    vector<L1EG> EGcluster;
     TauCandidates.clear();
     double ET;
     float deltaRmin;
@@ -949,7 +944,7 @@ void TkEG::Loop()
     */
        
 
-    std::cout << "fill histos " << endl;
+
     ////////////////////////////////////////////////
     // Fill Turn-On histograms
     ////////////////////////////////////////////////
@@ -1346,10 +1341,10 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_EGs_Phi, "EGs_Phi", ";#phi (rads);EGs / bin", 36,  -3.15,  +3.15);
 
   // EGs IEta
-//  histoTools_.BookHisto_1D(h_EGs_IEta, "EGs_IEta", ";i#eta;EGs / bin", 70, -35, +35); 
+  histoTools_.BookHisto_1D(h_EGs_IEta, "EGs_IEta", ";i#eta;EGs / bin", 70, -35, +35); 
 
   // EGs IPhi
-//  histoTools_.BookHisto_1D(h_EGs_IPhi, "EGs_IPhi", ";i#phi;EGs / bin", 36,  0,  145);
+  histoTools_.BookHisto_1D(h_EGs_IPhi, "EGs_IPhi", ";i#phi;EGs / bin", 36,  0,  145);
 
   // DR of lead trk and EGs
   histoTools_.BookHisto_1D(h_leadTrk_EG_dR, "leadTrk_EG_dR", ";#DeltaR(trk_{ldg}, EG); entries / bin",   60,  0.0,   +6.0);
@@ -1573,8 +1568,8 @@ void TkEG::WriteHistos_(void)
   h_EGs_Et->Write();
   h_EGs_Eta->Write();
   h_EGs_Phi->Write();
-//  h_EGs_IEta->Write();
-//  h_EGs_IPhi->Write();
+  h_EGs_IEta->Write();
+  h_EGs_IPhi->Write();
 
   h_clustEGs_allEGs      -> Write();
   h_clustEGs_passEt      -> Write();
