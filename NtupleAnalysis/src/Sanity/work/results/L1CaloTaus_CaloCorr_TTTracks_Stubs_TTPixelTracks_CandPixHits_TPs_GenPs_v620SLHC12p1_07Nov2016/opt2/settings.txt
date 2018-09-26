@@ -1,0 +1,52 @@
+// Matching tracks
+  matchTk_Collection  =  "TTTracks"; // TP: "TTTracks" (not "TTPixelTracks")
+  matchTk_nFitParams  =   5;         // TP:   5
+  matchTk_minPt       =   5.00;      // TP:   5.0
+  matchTk_minEta      =   0.0;       // TP:   N/A
+  matchTk_maxEta      = 999.9;       // TP: 999.9  
+  matchTk_maxChiSqRed =   2.0;       // TP: 200.0
+  matchTk_minStubs    =   4;         // TP:   0
+  matchTk_minStubsPS  =   0;         // TP:   0
+  matchTk_maxStubsPS  =   4;         // TP:   N/A
+  matchTk_caloDeltaR  =   0.10;      // TP: 0.10
+
+  // Signal cone tracks
+  sigConeTks_Collection  = matchTk_Collection; // TP: "TTTracks" (not "TTPixelTracks")
+  sigConeTks_nFitParams  = matchTk_nFitParams; // TP:   5
+  sigConeTks_minPt       =   2.0;              // TP:   2.0
+  sigConeTks_minEta      =   0.0;              // TP:   N/A
+  sigConeTks_maxEta      = 999.9;              // TP: 999.9
+  sigConeTks_maxChiSqRed = 200.0;              // TP: 200.0
+  sigConeTks_minStubs    =   0;                // TP:   0
+  sigConeTks_minStubsPS  =   0;                // TP:   0
+  sigConeTks_maxStubsPS  = 999;                // TP:   N/A
+
+  // Isolation cone tracks
+  isoConeTks_Collection  = matchTk_Collection;    // TP: "TTTracks" (not "TTPixelTracks")
+  isoConeTks_nFitParams  = matchTk_nFitParams;    // TP:   5
+  isoConeTks_minPt       =   2.0;                 // TP:   2.0
+  isoConeTks_minEta      =   0.0;                 // TP:   N/A
+  isoConeTks_maxEta      = 999.9;                 // TP: 999.9
+  isoConeTks_maxChiSqRed = 200.0;                 // TP: 200.0
+  isoConeTks_minStubs    =   0;                   // TP:   0
+  isoConeTks_minStubsPS  =   0;                   // TP:   0
+  isoConeTks_maxStubsPS  = 999;                   // TP:   N/A
+  
+  // Signal cone parameters
+  sigCone_Constant        = +0.00; // TP: 0.00
+  sigCone_dRMin           = +0.00; // WARNING! If > 0 the matching Track will NOT be added in sigCone_TTTracks.
+  sigCone_dRMax           = +0.12; // TP: 0.15
+  sigCone_cutoffDeltaR    = +0.12; // TP: 0.15
+  sigCone_maxTkInvMass    = +1.77; // TP: Unused (3-pr)
+  sigCone_maxTkDeltaPOCAz = +0.20; // TP: Unused (3-pr)
+
+  // Isolation cone
+  isoCone_Constant = +5.00;         // TP: 3.50 GeV
+  isoCone_VtxIsoWP = +0.50;         // TP: 1.0cm
+  isoCone_dRMin    = sigCone_dRMax; // TP: 0.4cm
+  isoCone_dRMax    = +0.30;         // TP: 0.4cm
+  diTau_deltaPOCAz = +0.50;         // TP: 1.0cm
+
+  // MC matching
+  mcMatching_dRMax  = +0.10;        // TP: 0.05
+  mcMatching_unique = true;

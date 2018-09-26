@@ -1,0 +1,33 @@
+# On branch mtoumazo
+# Changed but not updated:
+#   (use "git add <file>..." to update what will be committed)
+#   (use "git checkout -- <file>..." to discard changes in working directory)
+#
+#	modified:   ../../Auxiliary/src/AuxTools.C
+#	modified:   ../../DataFormat/interface/L1TkEGParticle.h
+#	modified:   ../../DataFormat/src/L1TkEGParticle.C
+#	modified:   ../../Framework/interface/TreeDefinitionBase.h
+#	modified:   ../../Framework/interface/TreeDefinitionReco.h
+#	modified:   ../../Framework/interface/TreeReaderMC.h
+#	modified:   ../../Framework/interface/TreeReaderReco.h
+#	modified:   ../../Framework/src/TreeReaderMC.C
+#	modified:   ../TkEG.C
+#	modified:   ../TkEG.h
+#	modified:   ../TkEG_C_ACLiC_dict_rdict.pcm
+#	modified:   ../../../../Raw2TTree/python/__init__.pyc
+#	modified:   ../../../../Raw2TTree/python/tools/HChDataVersion.pyc
+#	modified:   ../../../../Raw2TTree/python/tools/HChOptions.pyc
+#	modified:   ../../../../Raw2TTree/python/tools/__init__.pyc
+#	modified:   ../../../../Raw2TTree/python/tools/datasets.pyc
+#	modified:   ../../../../Raw2TTree/python/tools/git.pyc
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	../../DataFormat/interface/L1TKEM.h
+#	../../DataFormat/src/L1TKEM.C
+#	../TkEG_old.C
+#	../TkEG_old.h
+#	multicrab_CaloTk_v92X_15h57m54s_21Sep2018/
+no changes added to commit (use "git add" and/or "git commit -a")
+

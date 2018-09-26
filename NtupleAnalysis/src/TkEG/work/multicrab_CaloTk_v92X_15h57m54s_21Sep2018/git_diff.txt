@@ -1,0 +1,565 @@
+diff --git a/NtupleAnalysis/src/Auxiliary/src/AuxTools.C b/NtupleAnalysis/src/Auxiliary/src/AuxTools.C
+index 3a17580..c862b18 100644
+--- a/NtupleAnalysis/src/Auxiliary/src/AuxTools.C
++++ b/NtupleAnalysis/src/Auxiliary/src/AuxTools.C
+@@ -103,6 +103,12 @@ Double_t AuxTools::DeltaPhi(const Double_t phi1,
+ {
+   // See: https://cmssdt.cern.ch/SDT/doxygen/CMSSW_4_4_2/doc/html/d1/d92/DataFormats_2Math_2interface_2deltaPhi_8h_source.html
+   Double_t result = phi1 - phi2;
++  if(result > 100) {
++    result = PI;
++  }
++  if(result < -100) {
++    result = -PI;
++  }
+   while (result > PI) result -= 2*PI;
+   while (result <= -PI) result += 2*PI; 
+ 
+diff --git a/NtupleAnalysis/src/DataFormat/interface/L1TkEGParticle.h b/NtupleAnalysis/src/DataFormat/interface/L1TkEGParticle.h
+index 94358ee..302095b 100644
+--- a/NtupleAnalysis/src/DataFormat/interface/L1TkEGParticle.h
++++ b/NtupleAnalysis/src/DataFormat/interface/L1TkEGParticle.h
+@@ -8,6 +8,7 @@
+ #include "../../Auxiliary/src/AuxTools.C"
+ #include "../../DataFormat/interface/TTTrack.h"
+ #include "../../DataFormat/src/L1EG.C"
++#include "../../DataFormat/src/L1TKEM.C"
+ #include "../../DataFormat/interface/GenParticle.h"
+ //#include "../../DataFormat/interface/TTPixelTrack.h"
+ 
+@@ -17,7 +18,7 @@ class L1TkEGParticle{
+  public:
+   // Constructors
+   L1TkEGParticle();
+-  L1TkEGParticle(vector<TTTrack> tracks, vector<L1EG> EGs, GenParticle genTau, bool match);
++  L1TkEGParticle(vector<TTTrack> tracks, vector<L1TKEM> EGs, GenParticle genTau, bool match);
+   // Destructor
+   ~L1TkEGParticle() {};
+   
+@@ -27,7 +28,7 @@ class L1TkEGParticle{
+   void AddTrack(TTTrack trk) { theTracks.push_back(trk); }
+   TTTrack GetLeadingTrack() const { return theTracks[0]; } 
+   vector<TTTrack> GetTracks() const {return theTracks; }
+-  vector<L1EG> GetEGs() const{ return theEGs;}
++  vector<L1TKEM> GetEGs() const{ return theEGs;}
+   bool HasMatchingGenParticle(void) const{return theMatching;}
+   
+   double GetTrackBasedPt();  
+@@ -42,7 +43,7 @@ class L1TkEGParticle{
+  private:
+   AuxTools auxTools;
+   vector<TTTrack> theTracks;
+-  vector<L1EG> theEGs;
++  vector<L1TKEM> theEGs;
+   GenParticle theGenTau;
+   bool theMatching;
+ };
+diff --git a/NtupleAnalysis/src/DataFormat/src/L1TkEGParticle.C b/NtupleAnalysis/src/DataFormat/src/L1TkEGParticle.C
+index 0019c5c..b8975da 100644
+--- a/NtupleAnalysis/src/DataFormat/src/L1TkEGParticle.C
++++ b/NtupleAnalysis/src/DataFormat/src/L1TkEGParticle.C
+@@ -16,7 +16,7 @@ L1TkEGParticle::L1TkEGParticle()
+ 
+ 
+ //****************************************************************************
+-L1TkEGParticle::L1TkEGParticle(vector<TTTrack> tracks, vector<L1EG> EGs,
++L1TkEGParticle::L1TkEGParticle(vector<TTTrack> tracks, vector<L1TKEM> EGs,
+                                GenParticle genTau, bool matching)
+ //****************************************************************************
+ {
+diff --git a/NtupleAnalysis/src/Framework/interface/TreeDefinitionBase.h b/NtupleAnalysis/src/Framework/interface/TreeDefinitionBase.h
+index 3c80563..efa6069 100644
+--- a/NtupleAnalysis/src/Framework/interface/TreeDefinitionBase.h
++++ b/NtupleAnalysis/src/Framework/interface/TreeDefinitionBase.h
+@@ -3,6 +3,7 @@
+ #define TreeDefinitionBase_h
+ 
+ #include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisCaloTPDataFormat.h"
++#include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisPhaseIIDataFormat.h"
+ #include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisL1CaloTowerDataFormat.h"
+ #include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisL1CaloClusterDataFormat.h"
+ // #include "../../../../../L1Trigger/L1TNtuples/interface/L1AnalysisCustomGeneratorDataFormat.h"
+@@ -20,6 +21,7 @@ class TreeDefinitionBase
+ {
+    public:
+      TChain  *fChain; //! pointer to the analysed Tree or Chain
++     TChain  *fL1PhaseII;
+      TChain  *fCaloTower;
+      TChain  *fUpgradeTfMuon;
+      TChain  *fUpgrade;
+@@ -34,6 +36,7 @@ class TreeDefinitionBase
+      Int_t   fCurrent;  //! Current Tree number in a Chain
+ 
+      bool doCaloTower;
++     bool doL1PhaseII;
+      bool doUpgradeTfMuon;
+      bool doUpgrade;
+      bool douGT;
+diff --git a/NtupleAnalysis/src/Framework/interface/TreeDefinitionReco.h b/NtupleAnalysis/src/Framework/interface/TreeDefinitionReco.h
+index a7be0d7..adef12d 100644
+--- a/NtupleAnalysis/src/Framework/interface/TreeDefinitionReco.h
++++ b/NtupleAnalysis/src/Framework/interface/TreeDefinitionReco.h
+@@ -12,7 +12,8 @@ using namespace std;
+ class TreeDefinitionReco : public virtual TreeDefinitionBase
+ {
+  public:
+-  
++
++
+   // Event
+   UInt_t          run;
+   ULong64_t       event;
+@@ -25,6 +26,22 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
+   vector<TString> hlt;
+   Double_t        puWeight;
+ 
++
++  // L1PhaseII
++
++  Short_t         tkEM_N;
++  vector<float>   tkEM_Et;
++  vector<float>   tkEM_Eta;
++  vector<float>   tkEM_Phi;
++  vector<short>   tkEM_Bx;
++  vector<short>   tkEM_TrkIso;
++  vector<short>   tkEM_zVtx;
++  vector<short>   tkEM_HwQual;
++  vector<float>   tkEM_EGRefPt;
++  vector<float>   tkEM_EGRefEta;
++  vector<float>   tkEM_EGRefPhi;
++
++
+   // Calo Towers 
+   //==Calo TPs
+   Short_t         hcalTP_N;
+@@ -363,6 +380,7 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
+   vector<bool>    mEmu_algoDecisionFinal;
+ 
+  //********* List of branches **********
++  
+ 
+   // Event
+   TBranch        *b_Event_run;
+@@ -376,6 +394,21 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
+   TBranch        *b_Event_hlt;  
+   TBranch        *b_Event_puWeight;
+ 
++
++  //L1PhaseII
++  TBranch        *b_tkEM_N;
++  TBranch        *b_tkEM_Et;
++  TBranch        *b_tkEM_Eta;
++  TBranch        *b_tkEM_Phi;
++  TBranch        *b_tkEM_Bx;
++  TBranch        *b_tkEM_TrkIso;
++  TBranch        *b_tkEM_zVtx;
++  TBranch        *b_tkEM_HwQual;
++  TBranch        *b_tkEM_EGRefPt;
++  TBranch        *b_tkEM_EGRefEta;
++  TBranch        *b_tkEM_EGRefPhi;
++
++
+   // Calo Towers
+   //==CaloTP
+   TBranch        *b_hcalTP_N;  
+@@ -734,6 +767,19 @@ void TreeDefinitionReco::InitReco(TChain *chain)
+ 
+   if (0) cout << "=== TreeDefinitionReco::InitReco()" << endl;
+   
++  //L1PhaseII
++  tkEM_N 	= 0;
++//  tkEM_Et 	= 0;
++//  tkEM_Eta 	= 0;
++//  tkEM_Phi 	= 0;
++//  tkEM_Bx	= 0;
++//  tkEM_TrkIso 	= 0;
++//  tkEM_zVtx 	= 0;
++//  tkEM_HwQual 	= 0;
++//  tkEM_EGRefPt 	= 0;
++//  tkEM_EGRefEta = 0;
++//  tkEM_EGRefPhi = 0;
++
+   // Event
+   run      = 0;
+   event    = 0;
+@@ -860,6 +906,25 @@ void TreeDefinitionReco::InitReco(TChain *chain)
+       fChain->SetBranchAddress("puWeight", &puWeight, &b_Event_puWeight);
+     }
+   
++
++  //L1PhaseII
++  if(doL1PhaseII)
++    {
++      fL1PhaseII->SetBranchAddress("nTkEM", &tkEM_N, &b_tkEM_N);
++      fL1PhaseII->SetBranchAddress("tkEMEt", &tkEM_Et, &b_tkEM_Et);
++      fL1PhaseII->SetBranchAddress("tkEMEta", &tkEM_Eta, &b_tkEM_Eta);
++      fL1PhaseII->SetBranchAddress("tkEMPhi", &tkEM_Phi, &b_tkEM_Phi);
++      fL1PhaseII->SetBranchAddress("tkEMBx", &tkEM_Bx, &b_tkEM_Bx);
++      fL1PhaseII->SetBranchAddress("tkEMTrkIso", &tkEM_TrkIso, &b_tkEM_TrkIso);
++      fL1PhaseII->SetBranchAddress("tkEMzVtx", &tkEM_zVtx, &b_tkEM_zVtx);
++      fL1PhaseII->SetBranchAddress("tkEMHwQual", &tkEM_HwQual, &b_tkEM_HwQual);
++      fL1PhaseII->SetBranchAddress("tkEMEGRefPt", &tkEM_EGRefPt, &b_tkEM_EGRefPt);
++      fL1PhaseII->SetBranchAddress("tkEMEGRefEta", &tkEM_EGRefEta, &b_tkEM_EGRefEta);
++      fL1PhaseII->SetBranchAddress("tkEMEGRefPhi", &tkEM_EGRefPhi, &b_tkEM_EGRefPhi);
++
++      fChain -> AddFriend(fL1PhaseII);
++    }
++
+   // Calo Towers
+   if(doCaloTower)
+     {
+diff --git a/NtupleAnalysis/src/Framework/interface/TreeReaderMC.h b/NtupleAnalysis/src/Framework/interface/TreeReaderMC.h
+index 93dfb75..0534d73 100644
+--- a/NtupleAnalysis/src/Framework/interface/TreeReaderMC.h
++++ b/NtupleAnalysis/src/Framework/interface/TreeReaderMC.h
+@@ -18,6 +18,7 @@
+ #include "../../DataFormat/interface/TTTrack.h"
+ #include "../../DataFormat/interface/TTPixelTrack.h"
+ #include "../../DataFormat/src/L1EG.C"
++#include "../../DataFormat/src/L1TKEM.C"
+ #include "../../DataFormat/src/L1Jet.C"
+ #include "../../DataFormat/src/L1Tau.C"
+ #include "../../DataFormat/src/L1Sum.C"
+@@ -102,7 +103,11 @@ class TreeReaderMC : public TreeReaderReco, public virtual TREEDEFINITIONGENP
+   L1EG GetL1EG(unsigned int Index);
+   
+   vector<L1EG> GetL1EGs(bool bPrintList=false);
++
++  L1TKEM GetL1TKEM(unsigned int Index);
+  
++  vector<L1TKEM> GetL1TKEMs(bool bPrintList=false);
++
+   void GetL1Muon(unsigned int Index);
+   
+   void GetL1Muons(bool bPrintList=false);
+diff --git a/NtupleAnalysis/src/Framework/interface/TreeReaderReco.h b/NtupleAnalysis/src/Framework/interface/TreeReaderReco.h
+index ac8cec1..f44f169 100644
+--- a/NtupleAnalysis/src/Framework/interface/TreeReaderReco.h
++++ b/NtupleAnalysis/src/Framework/interface/TreeReaderReco.h
+@@ -47,6 +47,7 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
+ 
+     // Creat a new TChain pointer with the TTree name
+     TChain* fMainChain    = new TChain("l1EventTree/L1EventTree");
++    fL1PhaseII            = new TChain("l1PhaseIITree/L1PhaseIITree");
+     fCaloTower            = new TChain("l1CaloTowerTree/L1CaloTowerTree");
+     fUpgradeTfMuon        = new TChain("l1UpgradeTfMuonTree/L1UpgradeTfMuonTree");
+     fUpgrade              = new TChain("l1UpgradeTree/L1UpgradeTree");
+@@ -66,6 +67,7 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
+     OpenFiles(SamplePath, SampleName, fMainChain);
+     
+     // Add files to chains (if exist)
++    if (doL1PhaseII)           OpenFiles(SamplePath, SampleName, fL1PhaseII        );
+     if (doCaloTower)           OpenFiles(SamplePath, SampleName, fCaloTower        );
+     if (doUpgradeTfMuon)       OpenFiles(SamplePath, SampleName, fUpgradeTfMuon    );
+     if (doUpgrade)             OpenFiles(SamplePath, SampleName, fUpgrade          );
+@@ -132,6 +134,7 @@ bool TreeReaderReco::CheckTreesExistence(const std::string SamplePath, const std
+ {
+   
+   // 
++  doL1PhaseII        = true;
+   doCaloTower        = true;
+   doUpgradeTfMuon    = true;
+   doUpgrade          = true;
+@@ -163,6 +166,7 @@ bool TreeReaderReco::CheckTreesExistence(const std::string SamplePath, const std
+ 
+   // Take the trees
+   TTree *treeEvent            = (TTree*)file->Get("l1EventTree/L1EventTree");
++  TTree *treeL1PhaseII        = (TTree*)file->Get("l1PhaseIITree/L1PhaseIITree");
+   TTree *treeCaloTower        = (TTree*)file->Get("l1CaloTowerTree/L1CaloTowerTree");
+   TTree *treeUpgradeTfMuon    = (TTree*)file->Get("l1UpgradeTfMuonTree/L1UpgradeTfMuonTree");
+   TTree *treeUpgrade          = (TTree*)file->Get("l1UpgradeTree/L1UpgradeTree");
+@@ -181,6 +185,11 @@ bool TreeReaderReco::CheckTreesExistence(const std::string SamplePath, const std
+     return false;
+   }
+ 
++  if (!treeL1PhaseII) {
++    std::cout << treeL1PhaseII->GetName() << " not found!" << std::endl;
++    return false;
++  }
++
+   if (!treeCaloTower) {
+     std::cout << treeCaloTower->GetName() << " not found!" << std::endl;
+     doCaloTower = false;
+diff --git a/NtupleAnalysis/src/Framework/src/TreeReaderMC.C b/NtupleAnalysis/src/Framework/src/TreeReaderMC.C
+index 063d5b9..1859f25 100644
+--- a/NtupleAnalysis/src/Framework/src/TreeReaderMC.C
++++ b/NtupleAnalysis/src/Framework/src/TreeReaderMC.C
+@@ -744,27 +744,66 @@ L1EG TreeReaderMC::GetL1EG(unsigned int Index)
+ {
+   
+   L1EG theL1EG(Index,
+-	       L1EGEmu_Et.at(Index),
+-	       L1EGEmu_Eta.at(Index),
+-	       L1EGEmu_Phi.at(Index),
+-	       L1EGEmu_IEt.at(Index),
+-	       L1EGEmu_IEta.at(Index),
+-	       L1EGEmu_IPhi.at(Index),
+-	       L1EGEmu_Iso.at(Index),
+-	       L1EGEmu_Bx.at(Index),
+-	       L1EGEmu_TowerIPhi.at(Index),
+-	       L1EGEmu_TowerIEta.at(Index),
+-	       L1EGEmu_RawEt.at(Index),
+-	       L1EGEmu_IsoEt.at(Index),
+-	       L1EGEmu_FootprintEt.at(Index),
+-	       L1EGEmu_NTT.at(Index),
+-	       L1EGEmu_Shape.at(Index),
+-	       L1EGEmu_TowerHoE.at(Index));
++               L1EGEmu_Et.at(Index),
++               L1EGEmu_Eta.at(Index),
++               L1EGEmu_Phi.at(Index),
++               L1EGEmu_IEt.at(Index),
++               L1EGEmu_IEta.at(Index),
++               L1EGEmu_IPhi.at(Index),
++               L1EGEmu_Iso.at(Index),
++               L1EGEmu_Bx.at(Index),
++               L1EGEmu_TowerIPhi.at(Index),
++               L1EGEmu_TowerIEta.at(Index),
++               L1EGEmu_RawEt.at(Index),
++               L1EGEmu_IsoEt.at(Index),
++               L1EGEmu_FootprintEt.at(Index),
++               L1EGEmu_NTT.at(Index),
++               L1EGEmu_Shape.at(Index),
++               L1EGEmu_TowerHoE.at(Index));
+     
+     return theL1EG;
+ }
+ 
+ //============================================================================
++vector<L1TKEM> TreeReaderMC::GetL1TKEMs(bool bPrintList)
++//============================================================================
++{
++  vector<L1TKEM> theL1EGs;
++  L1TKEM theL1EG;
++
++  // For-loop: All L1 EG
++  for (Size_t i = 0; i < tkEM_Et.size(); i++)
++    {
++      theL1EG = GetL1TKEM(i);
++      theL1EGs.push_back(theL1EG);
++    }
++  
++//  if (bPrintList) PrintL1EGCollection(theL1EGs); 
++  return theL1EGs;
++}
++
++//============================================================================
++L1TKEM TreeReaderMC::GetL1TKEM(unsigned int Index)
++//============================================================================
++{
++  
++  L1TKEM theL1EG(Index,
++	       tkEM_Et.at(Index),
++	       tkEM_Eta.at(Index),
++	       tkEM_Phi.at(Index),
++	       tkEM_EGRefPt.at(Index),
++               tkEM_EGRefEta.at(Index),
++               tkEM_EGRefPhi.at(Index),
++	       tkEM_TrkIso.at(Index),
++	       tkEM_Bx.at(Index),
++               tkEM_HwQual.at(Index),
++//               tkEM_zVtx.at(Index)); //is always empty?
++	       0);
++
++  return theL1EG;
++}
++
++//============================================================================
+ L1Sum TreeReaderMC::GetL1Sum(unsigned int Index)
+ //============================================================================
+ {
+diff --git a/NtupleAnalysis/src/TkEG/TkEG.C b/NtupleAnalysis/src/TkEG/TkEG.C
+index 1022314..c0b9039 100644
+--- a/NtupleAnalysis/src/TkEG/TkEG.C
++++ b/NtupleAnalysis/src/TkEG/TkEG.C
+@@ -28,7 +28,7 @@ void TkEG::InitVars_()
+   datasets_  = datasets_.GetDataset(mcSample);
+   nMaxNumOfHTausPossible = datasets_.nMcTaus_;
+   
+-  cfg_DEBUG = false;
++  cfg_DEBUG = true;
+   if (cfg_DEBUG) std::cout << "=== TkEG::InitVars_()" << std::endl;
+   
+   cfg_AddL1Tks   = true;
+@@ -216,10 +216,11 @@ void TkEG::Loop()
+     
+     // EGs
+     if (cfg_AddEGs) {
+-      L1EGs = GetL1EGs(false);
++      L1EGs = GetL1TKEMs(false);
++      if (cfg_DEBUG) cout << "\n--eg getted "<< endl;
+       sort( L1EGs.begin(), L1EGs.end() ); // Sort from highest Et to lowest Et (should be already done by default)
+-      if (cfg_DEBUG*0) cout << "\n=== L1EGs (" << L1EGs.size() << ")" << endl;
+-      if (cfg_DEBUG*0) PrintL1EGCollection(L1EGs);
++      if (cfg_DEBUG) cout << "\n=== L1EGs (" << L1EGs.size() << ")" << endl;
++//      if (cfg_DEBUG*0) PrintL1EGCollection(L1EGs);
+     }
+     
+     // GenParticles (skip for MinBias samples as no real taus exist)
+@@ -464,11 +465,13 @@ void TkEG::Loop()
+     // Debug prints
+     if (cfg_DEBUG) std::cout << "Lead tracks:" << std::endl;
+     if (cfg_DEBUG) std::cout << trackTauCandidates.size() << " lead tracks found, here are 3 first:" << std::endl;
+-    for (std::size_t i=0; i<3 && i<trackTauCandidates.size(); i++) {
+-      if (cfg_DEBUG) std::cout << "leading track index = " << trackTauCandidates[i][0].index() << ", Pt = " << trackTauCandidates[i][0].getPt() << std::endl;
+-    }  
++//    for (std::size_t i=0; i<3 && i<trackTauCandidates.size(); i++) {
++//      if (cfg_DEBUG*0) std::cout << "leading track index = " << trackTauCandidates[i][0].index() << ", Pt = " << trackTauCandidates[i][0].getPt() << std::endl;
++//    }  
+ 
+ 
++     std::cout << "track clustering next" << endl;
++
+     //============= Tracks Clustering =================
+     
+     // Cluster surrounding tracks with lead tracks
+@@ -491,7 +494,7 @@ void TkEG::Loop()
+       //pT = 0.0;
+ 
+       
+-      if (cfg_DEBUG*0) cout << "Starting to cluster lead track " << leadTrackPtr->index();
++      if (cfg_DEBUG) cout << "Starting to cluster lead track " << leadTrackPtr->index();
+       // Loop over other tracks
+       stopClustering = false;
+ 
+@@ -577,7 +580,8 @@ void TkEG::Loop()
+ 
+     }
+     
+-    
++    std::cout << "match EG to gentau next " << endl;
++
+     ////////////////////////////////////////////////////////////////////////////
+     // Match an EG to a Hadronic Gen-Tau independently from the track candidates 
+     ////////////////////////////////////////////////////////////////////////////
+@@ -595,6 +599,7 @@ void TkEG::Loop()
+       double deltaR;
+       double match_dR = 999;
+      
++
+       // For-loop: All hadronic GenTaus
+       for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++) {
+ 	// If no hadronic decay products found (pi+/-, pi0, K+/-, K0, K0L), skip this tau
+@@ -604,9 +609,9 @@ void TkEG::Loop()
+ 	  match_dR = deltaR;
+ 	  match_GenParticle = *tau;
+ 	}
+-	
+       } 
+       
++
+       bool EGhasGenTau = false;
+       if (match_dR < maxDeltaR_MCmatch) {
+ 	
+@@ -614,7 +619,7 @@ void TkEG::Loop()
+ 	EGhasGenTau = true; 
+ 	h_EGs_MCmatched_Et -> Fill(eg->getEt());
+ 	// Print EG and matching gen particle properties 
+-	if (cfg_DEBUG){
++	if (cfg_DEBUG*0){
+ 	  eg->PrintProperties();
+ 	  match_GenParticle.PrintProperties();
+ 	  cout << "DeltaR of EG and its matching Gen-Particle = " << match_dR <<endl;
+@@ -624,6 +629,7 @@ void TkEG::Loop()
+ 
+     }
+     
++     std::cout << "EG clustering stuff next" << endl;
+ 
+     //============= EGs Clustering =================
+         
+@@ -641,14 +647,14 @@ void TkEG::Loop()
+ 	h_EGs_Et  -> Fill( eg->getEt() );
+ 	h_EGs_Eta -> Fill( eg->getEta() );
+ 	h_EGs_Phi -> Fill( eg->getPhi() );
+-	h_EGs_IEta -> Fill( eg->getIEta() );
+-	h_EGs_IPhi -> Fill( eg->getIPhi() );
++//	h_EGs_IEta -> Fill( eg->getIEta() );
++//	h_EGs_IPhi -> Fill( eg->getIPhi() );
+ 	
+       }// For-loop: All the EGs in the event
+     }
+         
+     // Build EG clusters and create tau candidates
+-    vector<L1EG> EGcluster;
++    vector<L1TKEM> EGcluster;
+     TauCandidates.clear();
+     double ET;
+     float deltaRmin;
+@@ -943,7 +949,7 @@ void TkEG::Loop()
+     */
+        
+ 
+-
++    std::cout << "fill histos " << endl;
+     ////////////////////////////////////////////////
+     // Fill Turn-On histograms
+     ////////////////////////////////////////////////
+@@ -1340,10 +1346,10 @@ void TkEG::BookHistos_(void)
+   histoTools_.BookHisto_1D(h_EGs_Phi, "EGs_Phi", ";#phi (rads);EGs / bin", 36,  -3.15,  +3.15);
+ 
+   // EGs IEta
+-  histoTools_.BookHisto_1D(h_EGs_IEta, "EGs_IEta", ";i#eta;EGs / bin", 70, -35, +35); 
++//  histoTools_.BookHisto_1D(h_EGs_IEta, "EGs_IEta", ";i#eta;EGs / bin", 70, -35, +35); 
+ 
+   // EGs IPhi
+-  histoTools_.BookHisto_1D(h_EGs_IPhi, "EGs_IPhi", ";i#phi;EGs / bin", 36,  0,  145);
++//  histoTools_.BookHisto_1D(h_EGs_IPhi, "EGs_IPhi", ";i#phi;EGs / bin", 36,  0,  145);
+ 
+   // DR of lead trk and EGs
+   histoTools_.BookHisto_1D(h_leadTrk_EG_dR, "leadTrk_EG_dR", ";#DeltaR(trk_{ldg}, EG); entries / bin",   60,  0.0,   +6.0);
+@@ -1567,8 +1573,8 @@ void TkEG::WriteHistos_(void)
+   h_EGs_Et->Write();
+   h_EGs_Eta->Write();
+   h_EGs_Phi->Write();
+-  h_EGs_IEta->Write();
+-  h_EGs_IPhi->Write();
++//  h_EGs_IEta->Write();
++//  h_EGs_IPhi->Write();
+ 
+   h_clustEGs_allEGs      -> Write();
+   h_clustEGs_passEt      -> Write();
+diff --git a/NtupleAnalysis/src/TkEG/TkEG.h b/NtupleAnalysis/src/TkEG/TkEG.h
+index 0920fa6..db01f4e 100644
+--- a/NtupleAnalysis/src/TkEG/TkEG.h
++++ b/NtupleAnalysis/src/TkEG/TkEG.h
+@@ -9,7 +9,8 @@
+ #include "../Framework/src/TreeAnalyserMC.C"
+ #include "../Auxiliary/src/AuxTools.C"
+ #include "../DataFormat/interface/TTTrack.h"
+-#include "../DataFormat/src/L1EG.C"
++//#include "../DataFormat/src/L1EG.C"
++#include "../DataFormat/src/L1TKEM.C"
+ #include "../DataFormat/src//L1TkEGParticle.C"
+ #include "../DataFormat/src/TrackingParticle.C" // for GetTTTrack function
+ 
+@@ -162,7 +163,7 @@ class TkEG : public TreeAnalyserMC{
+   float maxRelIso;  
+   
+   vector<TTTrack> TTTracks;
+-  vector<L1EG> L1EGs;
++  vector<L1TKEM> L1EGs;
+   vector< vector <TTTrack> > trackTauCandidates;
+   vector<L1TkEGParticle> TauCandidates;
+   vector<L1TkEGParticle> TauCandidatesIsolated;
+diff --git a/NtupleAnalysis/src/TkEG/TkEG_C_ACLiC_dict_rdict.pcm b/NtupleAnalysis/src/TkEG/TkEG_C_ACLiC_dict_rdict.pcm
+index c070c35..15bc6ea 100644
+Binary files a/NtupleAnalysis/src/TkEG/TkEG_C_ACLiC_dict_rdict.pcm and b/NtupleAnalysis/src/TkEG/TkEG_C_ACLiC_dict_rdict.pcm differ
+diff --git a/Raw2TTree/python/__init__.pyc b/Raw2TTree/python/__init__.pyc
+index 0547d15..71a6ef9 100644
+Binary files a/Raw2TTree/python/__init__.pyc and b/Raw2TTree/python/__init__.pyc differ
+diff --git a/Raw2TTree/python/tools/HChDataVersion.pyc b/Raw2TTree/python/tools/HChDataVersion.pyc
+index ebea5e1..24db88b 100644
+Binary files a/Raw2TTree/python/tools/HChDataVersion.pyc and b/Raw2TTree/python/tools/HChDataVersion.pyc differ
+diff --git a/Raw2TTree/python/tools/HChOptions.pyc b/Raw2TTree/python/tools/HChOptions.pyc
+index 439cf9b..c3fd3d3 100644
+Binary files a/Raw2TTree/python/tools/HChOptions.pyc and b/Raw2TTree/python/tools/HChOptions.pyc differ
+diff --git a/Raw2TTree/python/tools/__init__.pyc b/Raw2TTree/python/tools/__init__.pyc
+index e375f4d..80c3ebd 100644
+Binary files a/Raw2TTree/python/tools/__init__.pyc and b/Raw2TTree/python/tools/__init__.pyc differ
+diff --git a/Raw2TTree/python/tools/datasets.pyc b/Raw2TTree/python/tools/datasets.pyc
+index a7f98bc..5b28dc1 100644
+Binary files a/Raw2TTree/python/tools/datasets.pyc and b/Raw2TTree/python/tools/datasets.pyc differ
+diff --git a/Raw2TTree/python/tools/git.pyc b/Raw2TTree/python/tools/git.pyc
+index c25038e..e7e161a 100644
+Binary files a/Raw2TTree/python/tools/git.pyc and b/Raw2TTree/python/tools/git.pyc differ
+
