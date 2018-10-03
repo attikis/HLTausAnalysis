@@ -768,18 +768,18 @@ L1EG TreeReaderMC::GetL1EG(unsigned int Index)
 vector<L1TKEM> TreeReaderMC::GetL1TKEMs(bool bPrintList)
 //============================================================================
 {
-  vector<L1TKEM> theL1EGs;
-  L1TKEM theL1EG;
+  vector<L1TKEM> theL1TKEMs;
+  L1TKEM theL1TKEM;
 
   // For-loop: All L1 EG
   for (Size_t i = 0; i < tkEM_Et.size(); i++)
     {
-      theL1EG = GetL1TKEM(i);
-      theL1EGs.push_back(theL1EG);
+      theL1TKEM = GetL1TKEM(i);
+      theL1TKEMs.push_back(theL1TKEM);
     }
   
 //  if (bPrintList) PrintL1EGCollection(theL1EGs); 
-  return theL1EGs;
+  return theL1TKEMs;
 }
 
 //============================================================================
@@ -787,7 +787,7 @@ L1TKEM TreeReaderMC::GetL1TKEM(unsigned int Index)
 //============================================================================
 {
   
-  L1TKEM theL1EG(Index,
+  L1TKEM theL1TKEM(Index,
 	       tkEM_Et.at(Index),
 	       tkEM_Eta.at(Index),
 	       tkEM_Phi.at(Index),
@@ -800,8 +800,45 @@ L1TKEM TreeReaderMC::GetL1TKEM(unsigned int Index)
 //               tkEM_zVtx.at(Index)); //is always empty?
 	       0);
 
-  return theL1EG;
+  return theL1TKEM;
 }
+
+//============================================================================
+vector<EG> TreeReaderMC::GetEGs(bool bPrintList)
+//============================================================================
+{
+  vector<EG> theEGs;
+  EG theEG;
+
+  // For-loop: All L1 EG
+  for (Size_t i = 0; i < EG_Et.size(); i++)
+    {
+      theEG = GetEG(i);
+      theEGs.push_back(theEG);
+    }
+  
+//  if (bPrintList) PrintL1EGCollection(theL1EGs); 
+  return theEGs;
+}
+
+//============================================================================
+EG TreeReaderMC::GetEG(unsigned int Index)
+//============================================================================
+{
+
+  EG theEG(Index,
+	       EG_Et.at(Index),
+	       EG_Eta.at(Index),
+	       EG_Phi.at(Index),
+	       EG_Iso.at(Index),
+	       EG_Bx.at(Index),
+               EG_HwQual.at(Index),
+//               EG_zVtx.at(Index)); //is always empty?
+	       0);
+
+  return theEG;
+}
+
 
 //============================================================================
 L1Sum TreeReaderMC::GetL1Sum(unsigned int Index)

@@ -8,7 +8,7 @@
 #include "../../Auxiliary/src/AuxTools.C"
 #include "../../DataFormat/interface/TTTrack.h"
 #include "../../DataFormat/src/L1EG.C"
-#include "../../DataFormat/src/L1TKEM.C"
+#include "../../DataFormat/src/EG.C"
 #include "../../DataFormat/interface/GenParticle.h"
 //#include "../../DataFormat/interface/TTPixelTrack.h"
 
@@ -18,7 +18,7 @@ class L1TkEGParticle{
  public:
   // Constructors
   L1TkEGParticle();
-  L1TkEGParticle(vector<TTTrack> tracks, vector<L1TKEM> EGs, GenParticle genTau, bool match);
+  L1TkEGParticle(vector<TTTrack> tracks, vector<EG> EGs, GenParticle genTau, bool match);
   // Destructor
   ~L1TkEGParticle() {};
   
@@ -28,7 +28,7 @@ class L1TkEGParticle{
   void AddTrack(TTTrack trk) { theTracks.push_back(trk); }
   TTTrack GetLeadingTrack() const { return theTracks[0]; } 
   vector<TTTrack> GetTracks() const {return theTracks; }
-  vector<L1TKEM> GetEGs() const{ return theEGs;}
+  vector<EG> GetEGs() const{ return theEGs;}
   bool HasMatchingGenParticle(void) const{return theMatching;}
   
   double GetTrackBasedPt();  
@@ -43,7 +43,7 @@ class L1TkEGParticle{
  private:
   AuxTools auxTools;
   vector<TTTrack> theTracks;
-  vector<L1TKEM> theEGs;
+  vector<EG> theEGs;
   GenParticle theGenTau;
   bool theMatching;
 };

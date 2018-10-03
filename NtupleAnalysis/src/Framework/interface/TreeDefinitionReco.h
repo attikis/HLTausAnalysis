@@ -28,18 +28,26 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
 
 
   // L1PhaseII
-
-  Short_t         tkEM_N;
-  vector<float>   tkEM_Et;
-  vector<float>   tkEM_Eta;
-  vector<float>   tkEM_Phi;
-  vector<short>   tkEM_Bx;
-  vector<short>   tkEM_TrkIso;
-  vector<short>   tkEM_zVtx;
-  vector<short>   tkEM_HwQual;
-  vector<float>   tkEM_EGRefPt;
-  vector<float>   tkEM_EGRefEta;
-  vector<float>   tkEM_EGRefPhi;
+  UInt_t          EG_N;
+  vector<double>  EG_Et;
+  vector<double>  EG_Eta;
+  vector<double>  EG_Phi;
+  vector<int>     EG_Bx;
+  vector<double>  EG_Iso;
+  vector<double>  EG_zVtx;
+  vector<int>     EG_HwQual;
+  
+  UInt_t           tkEM_N;
+  vector<double>   tkEM_Et;
+  vector<double>   tkEM_Eta;
+  vector<double>   tkEM_Phi;
+  vector<int>      tkEM_Bx;
+  vector<double>   tkEM_TrkIso;
+  vector<double>   tkEM_zVtx;
+  vector<double>   tkEM_HwQual;
+  vector<double>   tkEM_EGRefPt;
+  vector<double>   tkEM_EGRefEta;
+  vector<double>   tkEM_EGRefPhi;
 
 
   // Calo Towers 
@@ -396,6 +404,15 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
 
 
   //L1PhaseII
+  TBranch        *b_EG_N; 
+  TBranch        *b_EG_Et; 
+  TBranch        *b_EG_Eta;
+  TBranch        *b_EG_Phi;
+  TBranch        *b_EG_Bx; 
+  TBranch        *b_EG_Iso;
+  TBranch        *b_EG_zVtx;
+  TBranch        *b_EG_HwQual;
+
   TBranch        *b_tkEM_N;
   TBranch        *b_tkEM_Et;
   TBranch        *b_tkEM_Eta;
@@ -768,17 +785,8 @@ void TreeDefinitionReco::InitReco(TChain *chain)
   if (0) cout << "=== TreeDefinitionReco::InitReco()" << endl;
   
   //L1PhaseII
-  tkEM_N 	= 0;
-//  tkEM_Et 	= 0;
-//  tkEM_Eta 	= 0;
-//  tkEM_Phi 	= 0;
-//  tkEM_Bx	= 0;
-//  tkEM_TrkIso 	= 0;
-//  tkEM_zVtx 	= 0;
-//  tkEM_HwQual 	= 0;
-//  tkEM_EGRefPt 	= 0;
-//  tkEM_EGRefEta = 0;
-//  tkEM_EGRefPhi = 0;
+  EG_N     = 0;
+  tkEM_N   = 0;
 
   // Event
   run      = 0;
@@ -910,6 +918,15 @@ void TreeDefinitionReco::InitReco(TChain *chain)
   //L1PhaseII
   if(doL1PhaseII)
     {
+      fL1PhaseII->SetBranchAddress("nEG", &EG_N, &b_EG_N);
+      fL1PhaseII->SetBranchAddress("EGEt", &EG_Et, &b_EG_Et);
+      fL1PhaseII->SetBranchAddress("EGEta", &EG_Eta, &b_EG_Eta);
+      fL1PhaseII->SetBranchAddress("EGPhi", &EG_Phi, &b_EG_Phi);
+      fL1PhaseII->SetBranchAddress("EGBx", &EG_Bx, &b_EG_Bx);
+      fL1PhaseII->SetBranchAddress("EGIso", &EG_Iso, &b_EG_Iso);
+      fL1PhaseII->SetBranchAddress("EGzVtx", &EG_zVtx, &b_EG_zVtx);
+      fL1PhaseII->SetBranchAddress("EGHwQual", &EG_HwQual, &b_EG_HwQual);
+
       fL1PhaseII->SetBranchAddress("nTkEM", &tkEM_N, &b_tkEM_N);
       fL1PhaseII->SetBranchAddress("tkEMEt", &tkEM_Et, &b_tkEM_Et);
       fL1PhaseII->SetBranchAddress("tkEMEta", &tkEM_Eta, &b_tkEM_Eta);

@@ -1,11 +1,11 @@
-#ifndef L1TKEM_cxx
-#define L1TKEM_cxx
+#ifndef EG_cxx
+#define EG_cxx
 
 // User
-#include "../interface/L1TKEM.h"
+#include "../interface/EG.h"
 
 //****************************************************************************
-L1TKEM::L1TKEM()
+EG::EG()
 //****************************************************************************
 {
 
@@ -14,7 +14,7 @@ L1TKEM::L1TKEM()
 }
 
 //****************************************************************************
-void L1TKEM::_InitVars(void)
+void EG::_InitVars(void)
 //****************************************************************************
 {
   theP4.SetPtEtaPhiE(0, 0, 0, 0);
@@ -22,10 +22,7 @@ void L1TKEM::_InitVars(void)
   theEt          = 0.0;
   theEta         = 0.0;
   thePhi         = 0.0;
-  theEGRefPt     = 0.0;
-  theEGRefEta    = 0.0;
-  theEGRefPhi    = 0.0;
-  theTrkIso      = 0;
+  theIso      = 0;
   theBx          = 0;
   theHwQual      = 0;
   thezVtx        = 0;
@@ -34,7 +31,7 @@ void L1TKEM::_InitVars(void)
 }
 
 //****************************************************************************
-L1TKEM::~L1TKEM()
+EG::~EG()
 //****************************************************************************
 {
 
@@ -42,16 +39,13 @@ L1TKEM::~L1TKEM()
 
 
 //****************************************************************************
-L1TKEM::L1TKEM(unsigned short Index,
+EG::EG(unsigned short Index,
 	   double Et,
 	   double Eta,
 	   double Phi,
-           double EGRefPt,
-           double EgREfEta,
-           double EGRefPhi,
-	   double TrkIso,
+     	   double Iso,
 	   int Bx,
-           double HwQual,
+           int HwQual,
            double zVtx)
 //****************************************************************************
 {
@@ -61,7 +55,7 @@ L1TKEM::L1TKEM(unsigned short Index,
   theEt          = Et;
   theEta         = Eta;
   thePhi         = Phi;
-  theTrkIso      = TrkIso;
+  theIso         = Iso;
   theBx          = Bx;
   thezVtx        = zVtx;
   theHwQual      = HwQual;
@@ -72,7 +66,7 @@ L1TKEM::L1TKEM(unsigned short Index,
 }
 
 //****************************************************************************
-void L1TKEM::PrintProperties(bool printHeader)
+void EG::PrintProperties(bool printHeader)
 //****************************************************************************
 {
   

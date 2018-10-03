@@ -1,5 +1,5 @@
-#ifndef L1TKEM_h
-#define L1TKEM_h
+#ifndef EG_h
+#define EG_h
 
 // System
 #include <iostream>
@@ -16,23 +16,20 @@
 
 using namespace std;
 
-class L1TKEM{     
+class EG{     
  public:
   // Constructors/Destructors
-  L1TKEM();
-  L1TKEM(unsigned short Index,
+  EG();
+  EG(unsigned short Index,
        double Et,
        double Eta,
        double Phi,
-       double EGRefPt,
-       double EGRefEta,
-       double EGRefPhi,
-       double TrkIso,
+       double Iso,
        int    Bx,
-       double HwQual,
+       int HwQual,
        double zVtx);
   
-  ~L1TKEM();
+  ~EG();
   
   void PrintProperties(bool printHeader=true);
   unsigned short index(void) const {return theIndex;}
@@ -44,15 +41,12 @@ class L1TKEM{
   double getEt(void) const {return theEt;}
   double getEta(void) const {return theEta;}
   double getPhi(void) const {return thePhi;}
-  double getEGRefPt(void) const {return theEGRefPt;}
-  double getEGRefEta(void) const {return theEGRefEta;}
-  double getEGRefPhi(void) const {return theEGRefPhi;}
-  double getTrkIso(void) const {return theTrkIso;}
+  double getIso(void) const {return theIso;}
   int getBx(void) const {return theBx;}
-  double getHwQual(void) const {return theHwQual;}
+  int getHwQual(void) const {return theHwQual;}
   double getzVtx(void) const {return thezVtx;}
 
-  bool operator<(const L1TKEM& other) const {return this->et() > other.et();}
+  bool operator<(const EG& other) const {return this->et() > other.et();}
   
  private:
   void _InitVars(void);
@@ -64,12 +58,9 @@ class L1TKEM{
   double theEt;
   double theEta;
   double thePhi;
-  double theEGRefPt;
-  double theEGRefEta;
-  double theEGRefPhi;
-  double theTrkIso;
+  double theIso;
   int theBx;
-  double theHwQual;
+  int theHwQual;
   double thezVtx;
   
 };

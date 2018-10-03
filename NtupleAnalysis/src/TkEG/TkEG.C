@@ -28,7 +28,7 @@ void TkEG::InitVars_()
   datasets_  = datasets_.GetDataset(mcSample);
   nMaxNumOfHTausPossible = datasets_.nMcTaus_;
   
-  cfg_DEBUG = true;
+  cfg_DEBUG = false;
   if (cfg_DEBUG) std::cout << "=== TkEG::InitVars_()" << std::endl;
   
   cfg_AddL1Tks   = true;
@@ -40,7 +40,7 @@ void TkEG::InitVars_()
   cfg_tk_nFitParams  = 4;           // Default: 4
   cfg_tk_minPt       = 2.00;        // Default: 2.0
   cfg_tk_minEta      = 0.0;         // Default: 0.0
-  cfg_tk_maxEta      = 1.44;        // Default: 1e6
+  cfg_tk_maxEta      = 2.5;        // Default: 1e6
   cfg_tk_maxChiSqRed = 1e6;         // Default: 1e6
   cfg_tk_minStubs    =   4;         // Default: 0
   cfg_tk_minStubsPS  =   0;         // Default: 0
@@ -63,7 +63,7 @@ void TkEG::InitVars_()
   maxChi2_trk       = 40.0; // GeV
   maxChi2_trk_alt   = 20.0; // GeV
   minPt_leadtrk     = 10.0; // GeV
-  maxEta_leadtrk    = 1.44;
+  maxEta_leadtrk    = 2.5;
   minDeltaR_leadtrk = 0.0;
   maxDeltaR_leadtrk = 0.3;
   maxDeltaZ_trk     = 0.8;  // cm
@@ -216,13 +216,13 @@ void TkEG::Loop()
     
     // EGs
     if (cfg_AddEGs) {
-      L1EGs = GetL1TKEMs(false);
+      L1EGs = GetEGs(false);
       if (cfg_DEBUG) cout << "\n--eg getted "<< endl;
       sort( L1EGs.begin(), L1EGs.end() ); // Sort from highest Et to lowest Et (should be already done by default)
       if (cfg_DEBUG) cout << "\n=== L1EGs (" << L1EGs.size() << ")" << endl;
 //      if (cfg_DEBUG*0) PrintL1EGCollection(L1EGs);
     }
-    
+
     // GenParticles (skip for MinBias samples as no real taus exist)
     vector<GenParticle> GenTaus;
     if (!isMinBias) GenTaus = GetGenParticles(15, true);
@@ -232,13 +232,13 @@ void TkEG::Loop()
     GenTausHadronic.clear();
     if (cfg_AddGenP) {
       if (cfg_DEBUG*0) cout << "\n=== GenParticles (" << GenP_Pt.size() << ")" << endl;
-      if (!isMinBias) GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 1.4);
+      if (!isMinBias) GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 2.5);
       if (cfg_DEBUG*0) PrintGenParticleCollection(GenTausHadronic);
     }
     
     // Triggred GenTaus (skip for MinBias samples)
     vector<GenParticle> GenTausTrigger;  
-    if (!isMinBias) GenTausTrigger = GetHadronicGenTaus(GenTaus, 20.0, 1.3);  
+    if (!isMinBias) GenTausTrigger = GetHadronicGenTaus(GenTaus, 20.0, 2.5);  
     
     // Ensure that all taus are found, needed by the current efficiency definition 
     // E.g. for ttbar, only events with two taus within trigger acceptance are considered for efficiency calculation)
@@ -261,9 +261,8 @@ void TkEG::Loop()
     // TkEG algorithm
     ////////////////////////////////////////////////    
     
-
     // Check whether EGs exist or not when asking for a specific number of gen hadronic taus
-
+    
     // Without asking for genuine hadronic taus 
     if (L1EGs.size() >=1 ) counters_events_EGs++;
 
@@ -469,8 +468,7 @@ void TkEG::Loop()
 //      if (cfg_DEBUG*0) std::cout << "leading track index = " << trackTauCandidates[i][0].index() << ", Pt = " << trackTauCandidates[i][0].getPt() << std::endl;
 //    }  
 
-
-     std::cout << "track clustering next" << endl;
+    if (cfg_DEBUG) std::cout << "track clustering next" << endl;
 
     //============= Tracks Clustering =================
     
@@ -580,7 +578,7 @@ void TkEG::Loop()
 
     }
     
-    std::cout << "match EG to gentau next " << endl;
+    if (cfg_DEBUG) std::cout << "match EG to gentau next " << endl;
 
     ////////////////////////////////////////////////////////////////////////////
     // Match an EG to a Hadronic Gen-Tau independently from the track candidates 
@@ -592,29 +590,27 @@ void TkEG::Loop()
       // Skip small-Et EGs 
       if (eg->getEt() < minEt_EG) continue;
       counter_allEGspassET++;
-      
 
       // Initialise the GenParticle (to be returned)
       GenParticle match_GenParticle;
       double deltaR;
       double match_dR = 999;
-     
 
       // For-loop: All hadronic GenTaus
       for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++) {
 	// If no hadronic decay products found (pi+/-, pi0, K+/-, K0, K0L), skip this tau
 	if (tau->finalDaughtersCharged().size() < 1) continue;
 	deltaR = auxTools_.DeltaR( eg->getEta(), eg->getPhi(), tau->eta(), tau->phi() );
+
 	if (deltaR < match_dR) {
 	  match_dR = deltaR;
 	  match_GenParticle = *tau;
 	}
+
       } 
       
-
       bool EGhasGenTau = false;
       if (match_dR < maxDeltaR_MCmatch) {
-	
 	counter_MCmatched_EG++;
 	EGhasGenTau = true; 
 	h_EGs_MCmatched_Et -> Fill(eg->getEt());
@@ -626,10 +622,9 @@ void TkEG::Loop()
 	}
 
       }
-
     }
     
-     std::cout << "EG clustering stuff next" << endl;
+    if (cfg_DEBUG) std::cout << "EG clustering stuff next" << endl;
 
     //============= EGs Clustering =================
         
@@ -654,7 +649,7 @@ void TkEG::Loop()
     }
         
     // Build EG clusters and create tau candidates
-    vector<L1TKEM> EGcluster;
+    vector<EG> EGcluster;
     TauCandidates.clear();
     double ET;
     float deltaRmin;
@@ -949,7 +944,7 @@ void TkEG::Loop()
     */
        
 
-    std::cout << "fill histos " << endl;
+    if (cfg_DEBUG) std::cout << "fill histos " << endl;
     ////////////////////////////////////////////////
     // Fill Turn-On histograms
     ////////////////////////////////////////////////
@@ -1340,7 +1335,7 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_EGs_Et, "EGs_Et", ";E_{T} (GeV) ;EGs / bin", 50, 0.0, +100.0);
 
   // EGs Eta 
-  histoTools_.BookHisto_1D(h_EGs_Eta, "EGs_Eta", ";#eta ;EGs / bin", 64, -1.6, +1.6);
+  histoTools_.BookHisto_1D(h_EGs_Eta, "EGs_Eta", ";#eta ;EGs / bin", 100, -2.5, +2.5);
 
   // EGs Phi
   histoTools_.BookHisto_1D(h_EGs_Phi, "EGs_Phi", ";#phi (rads);EGs / bin", 36,  -3.15,  +3.15);
