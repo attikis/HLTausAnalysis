@@ -194,7 +194,7 @@ void TkEG::Loop()
 
   for (int jentry = 0; jentry < nEntries; jentry++, nEvts++){
     
-    if (cfg_DEBUG) cout << "\t------------ Entry = " << jentry << endl;
+    if (1) cout << "\t------------ Entry = " << jentry << endl;
     
     // Init variables
     Long64_t ientry = LoadTree(jentry);
@@ -283,7 +283,7 @@ void TkEG::Loop()
 
 
     //================ Gen-Level ===================
-
+    cout <<"Hadronic taus = "<<GenTausHadronic.size()<<endl;
     // For-loop: All hadronic gen-taus
     for (vector<GenParticle>::iterator genTau = GenTausHadronic.begin(); genTau != GenTausHadronic.end(); genTau++) {
       counter_allHadGenTaus++;
@@ -292,6 +292,53 @@ void TkEG::Loop()
       h_genTausHad_chargedDaugh_N-> Fill(genTau->finalDaughtersCharged().size());
       h_genTausHad_neutralDaugh_N-> Fill(genTau->finalDaughtersNeutral().size());
 
+      if ((genTau->finalDaughtersCharged().size() == 1) && (genTau->finalDaughtersNeutral().size() == 1)) {
+	cout <<genTau->finalDaughtersNeutral().at(0).pdgId()<<endl;
+	if (genTau->finalDaughtersNeutral().at(0).pdgId() == 111) {
+	  cout <<"pion0---------"<<endl;
+	  //cout <<"daughter 1= "<< genTau->finalDaughtersNeutral().at(0).daughters().at(0).pdgId()<<endl;
+	  //cout <<"daughter 2= "<< genTau->finalDaughtersNeutral().at(0).daughters().at(1).pdgId()<<endl;	
+	  GenParticle photon_1 = genTau->finalDaughtersNeutral().at(0).daughters().at(0);
+	  GenParticle photon_2 = genTau->finalDaughtersNeutral().at(0).daughters().at(1);
+
+	  h_Photon_Et -> Fill (photon_1.et());
+	  h_Photon_Et -> Fill (photon_2.et());
+
+	  // Initialise the GenParticle (to be returned)
+	  EG match_EG;
+	  double deltaR1;
+	  double deltaR2;
+	  double match_dR = 999;
+	  cout<<"EGs multiplicity"<< L1EGs.size() <<endl;
+	  // For-loop: All the EGs in the event                                                                                                                         
+	  for (auto eg = L1EGs.begin(); eg != L1EGs.end() ; eg++) {
+	   
+	    cout<<"eg_index = "<< eg->index() <<endl;
+
+	    cout<<"----photon 1----"<<endl;
+	    deltaR1 = auxTools_.DeltaR( eg->getEta(), eg->getPhi(), photon_1.eta(), photon_1.phi() );
+	    
+	    if (deltaR1 < 0.15) {
+	      //match_dR = deltaR1;
+	      //match_EG = *eg;
+	      cout << "matched!!!!!!!!"<<endl;
+	    }
+
+	    cout<<"----photon 2----"<<endl;
+	    deltaR2 = auxTools_.DeltaR( eg->getEta(), eg->getPhi(), photon_2.eta(), photon_2.phi() );
+	    
+	    if (deltaR2 < 0.15) {
+	      //match_dR = deltaR1;
+	      //match_EG = *eg;
+	      cout << "matched!!!!!!!!"<<endl;
+	    }
+	    
+	  } // For-loop: All the EGs in the event                                                                                                                           
+	}
+   
+      }
+      
+      
       TLorentzVector p4sum;
       float deltaRcharged;
       float deltaRneutral;
@@ -583,10 +630,14 @@ void TkEG::Loop()
     ////////////////////////////////////////////////////////////////////////////
     // Match an EG to a Hadronic Gen-Tau independently from the track candidates 
     ////////////////////////////////////////////////////////////////////////////
-
+    h_EGs_N -> Fill( L1EGs.size() );
     // For-loop: All the EGs in the event                                                                                                                               
     for (auto eg = L1EGs.begin(); eg != L1EGs.end() ; eg++) {
 
+      h_EGs_Et  -> Fill( eg->getEt() );
+      h_EGs_Eta -> Fill( eg->getEta() );
+      h_EGs_Phi -> Fill( eg->getPhi() );
+      
       // Skip small-Et EGs 
       if (eg->getEt() < minEt_EG) continue;
       counter_allEGspassET++;
@@ -639,9 +690,9 @@ void TkEG::Loop()
       for (auto eg = L1EGs.begin(); eg != L1EGs.end() ; eg++) {
 	
 	// Fill histos with EGs properties 
-	h_EGs_Et  -> Fill( eg->getEt() );
-	h_EGs_Eta -> Fill( eg->getEta() );
-	h_EGs_Phi -> Fill( eg->getPhi() );
+	//h_EGs_Et  -> Fill( eg->getEt() );
+	//h_EGs_Eta -> Fill( eg->getEta() );
+	//h_EGs_Phi -> Fill( eg->getPhi() );
 //	h_EGs_IEta -> Fill( eg->getIEta() );
 //	h_EGs_IPhi -> Fill( eg->getIPhi() );
 	
@@ -657,7 +708,7 @@ void TkEG::Loop()
     //deltaR = 999.0; //marina
     for (size_t i=0; i<trackTauCandidates.size(); i++) {
       //cout << "Clustering EGs around trackTauCandidates[" << i << "]" << endl;
-      h_EGs_N -> Fill( L1EGs.size() );
+      //h_EGs_N -> Fill( L1EGs.size() );
       if (GenTausHadronic.size() == 1) h_EGs_N_OneHadTau -> Fill(L1EGs.size());
 
       EGcluster.clear();

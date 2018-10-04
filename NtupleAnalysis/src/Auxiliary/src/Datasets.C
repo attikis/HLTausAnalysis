@@ -113,8 +113,8 @@ bool Datasets::IsValidDatasetName(const string datasetName)
 
   // If this is reached then the dataset sample is invalid
   cout << "=== Datasets::IsValidDataset() - Unknown dataset name \"" << datasetName << "\". See below all available dataset names." << endl;
-  for( int iD = 0 ; iD < (int) datasets_TTI2023Updg14D.size(); iD++){
-    cout << "\"" << datasets_TTI2023Updg14D.at(iD).datasetPath_ << "\"" << endl;
+  for( int iD = 0 ; iD < (int) datasets_PhaseIIFall17D.size(); iD++){
+    cout << "\"" << datasets_PhaseIIFall17D.at(iD).datasetPath_ << "\"" << endl;
   }
   cout << "EXIT" << endl;
   exit(1);
@@ -330,8 +330,7 @@ void Datasets::CreateMcProductions_(void)
   Datasets SinglePionNoPU_PhaseIIFall17D("SinglePion_FlatPt_2to100_NoPU", "SinglePion_FlatPt_2to100_NoPU", "/SinglePion_FlatPt-2to100" + path_NoPU_v1 , CP, cmssw, geometry, 140, 500000, 0, 0);
 
   Datasets TTNoPU_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TnoPU", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TnoPU_93X", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_NoPU_v2, CP, cmssw, geometry, 0, 99328, 24, 2);
-  Datasets TTPU140_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TPU140", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU140_93X", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_PU140_v2, CP, cmssw, geometry, 140, 99328, 24, 2);
-
+  Datasets TTPU140_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TPU140", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU140_93X", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_PU140_v2, CP, cmssw, geometry, 140, 99328, 24, 2); 
   Datasets TTPU200_PhaseIIFall17D("TT_TuneCUETP8M2T4_14TeV_L1TPU200", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU200_93X", "/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8" + path_PU200_v2, CP, cmssw, geometry, 200, 99328, 24, 2);
 
   Datasets SingleTauNoPU_2023D17("SingleTau_L1TnoPU", "RelValSingleTauFlatPt2To100_pythia8_93X_upgrade2023_realistic_v5_2023D17noPU_93X", "/RelValSingleTauFlatPt2To100_pythia8/CMSSW_9_3_7-93X_upgrade2023_realistic_v5_2023D17noPU-v2/GEN-SIM-DIGI-RAW", CP, cmssw, geometry, 0, 9000, 0, 2); // not 1 tau but 2!
