@@ -202,6 +202,10 @@ class TkEG : public TreeAnalyserMC{
   TH2D* h_genTau_chargedDaugh_PtLead_dRmax;
   TH2D* h_genTau_neutralDaugh_PtLead_dRmax;
 
+  TH1D* h_Photons_Et;
+  TH1D* h_Photons_dR;
+  TH1D* h_Photons_EGs_Matching;
+
   TH1D* h_trk_Chi2_all_4stubs;
   TH1D* h_trk_Chi2_all_5stubs;
   TH1D* h_leadTrk4stubs_MCmatched_Chi2;
@@ -275,6 +279,8 @@ class TkEG : public TreeAnalyserMC{
   TH1D* hTkEG_matched_Et;
   TH1D* hTkEG_DeltaRmatch;
   TH1D* hTkEG_genVisEt;
+  TH1D* hTkEG_genVisEt_clustEG;
+  TH1D* hTkEG_genVisPt_clustEG;
   TH1D* hMcHadronicTau_VisEt;
 
   TH1D* h_nonMCmatched_EGenergyOverTracksPt;

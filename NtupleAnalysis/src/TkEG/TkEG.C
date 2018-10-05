@@ -292,53 +292,91 @@ void TkEG::Loop()
       h_genTausHad_chargedDaugh_N-> Fill(genTau->finalDaughtersCharged().size());
       h_genTausHad_neutralDaugh_N-> Fill(genTau->finalDaughtersNeutral().size());
 
+      // Consider only 1-prong decays with 1 neutral product (pion0)
       if ((genTau->finalDaughtersCharged().size() == 1) && (genTau->finalDaughtersNeutral().size() == 1)) {
-	//cout <<genTau->finalDaughtersNeutral().at(0).pdgId()<<endl;
+
 	if (genTau->finalDaughtersNeutral().at(0).pdgId() == 111) {
-	  //cout <<"pion0---------"<<endl;
-	  //cout <<"daughter 1= "<< genTau->finalDaughtersNeutral().at(0).daughters().at(0).pdgId()<<endl;
-	  //cout <<"daughter 2= "<< genTau->finalDaughtersNeutral().at(0).daughters().at(1).pdgId()<<endl;	
+
+	  // Get the photons from pion0
 	  GenParticle photon_1 = genTau->finalDaughtersNeutral().at(0).daughters().at(0);
 	  GenParticle photon_2 = genTau->finalDaughtersNeutral().at(0).daughters().at(1);
 
-	  //h_Photon_Et -> Fill (photon_1.et());
-	  //h_Photon_Et -> Fill (photon_2.et());
+	  double photons_dR = auxTools_.DeltaR( photon_1.eta(), photon_1.phi(), photon_2.eta(), photon_2.phi() );
 
-	  // Initialise the GenParticle (to be returned)
-	  EG match_EG;
+	  // Fill histos (photons properties)
+	  h_Photons_Et -> Fill (photon_1.et());
+	  h_Photons_Et -> Fill (photon_2.et());
+	  h_Photons_dR -> Fill (photons_dR);
+
+	  // Check if the photons from pion0 are matched with EGs
+	  EG match_EG1;
+	  EG match_EG2;
 	  double deltaR1;
 	  double deltaR2;
-	  double match_dR = 999;
-	  //cout<<"EGs multiplicity"<< L1EGs.size() <<endl;
+	  double match_dR1 = 999;
+	  double match_dR2 = 999;
+	  bool photon_1_matched = false;
+	  bool photon_2_matched = false;
+
+	  // Find the minimum dR between photons and EGs
+
 	  // For-loop: All the EGs in the event                                                                                                                         
 	  for (auto eg = L1EGs.begin(); eg != L1EGs.end() ; eg++) {
 	   
-	    //cout<<"eg_index = "<< eg->index() <<endl;
-
-	    //cout<<"----photon 1----"<<endl;
+	    // 1st photon
 	    deltaR1 = auxTools_.DeltaR( eg->getEta(), eg->getPhi(), photon_1.eta(), photon_1.phi() );
 	    
-	    if (deltaR1 < 0.15) {
-	      //match_dR = deltaR1;
-	      //match_EG = *eg;
-	      //cout << "matched!!!!!!!!"<<endl;
+	    if (deltaR1 < match_dR1) {
+	      match_dR1 = deltaR1;
+	      match_EG1 = *eg;
 	    }
 
-	    //cout<<"----photon 2----"<<endl;
+	    // 2nd photon
 	    deltaR2 = auxTools_.DeltaR( eg->getEta(), eg->getPhi(), photon_2.eta(), photon_2.phi() );
 	    
-	    if (deltaR2 < 0.15) {
-	      //match_dR = deltaR1;
-	      //match_EG = *eg;
-	      //cout << "matched!!!!!!!!"<<endl;
+	    if (deltaR2 < match_dR2) {
+	      match_dR2 = deltaR2;
+	      match_EG2 = *eg;
 	    }
 	    
-	  } // For-loop: All the EGs in the event                                                                                                                           
+	  } // For-loop: All the EGs in the event                                                                                                                    
+
+	  // Matching of 1st photon
+	  if (match_dR1 < 0.15) {
+	    photon_1_matched = true;
+	  }
+	  // Matching of 2nd photon
+	  if (match_dR2 < 0.15) {
+	    photon_2_matched = true;
+	  }
+	  
+	  // Fill histo for the photon-EG matching (splitted into cases)
+	  // None of the photons is matched
+	  if ((!photon_1_matched) && (!photon_2_matched)){
+	    h_Photons_EGs_Matching -> Fill(0);
+	  }
+	  // Only the 1 photon is matched
+	  else if ( ((photon_1_matched) && (!photon_2_matched)) || ((!photon_1_matched) && (photon_2_matched)) ){
+	    h_Photons_EGs_Matching  -> Fill(1);
+	  }
+	  // Both photons are matched
+	  else if ( photon_1_matched && photon_2_matched) {
+	    
+	    // --- with the same EG
+	    if (match_EG1.index() == match_EG2.index()) {
+	      h_Photons_EGs_Matching  -> Fill(2);
+	    }
+	    // --- with different EGs
+	    else {
+	      h_Photons_EGs_Matching  -> Fill(3);
+	    }
+	   
+	  }
+	    
 	}
-   
-      }
-      
-      
+      } 
+            
+      // Angular Separation of charged and neutral daughters of hadronic gen tau
       TLorentzVector p4sum;
       float deltaRcharged;
       float deltaRneutral;
@@ -846,6 +884,9 @@ void TkEG::Loop()
 	h_trkClusters_PtResolution->Fill(pTresolution);
 	// FIX ME: ET resolution
 	if (EGcluster.size() >=1) {
+	  hTkEG_genVisEt_clustEG -> Fill( genTau.p4vis().Et() );
+	  hTkEG_genVisPt_clustEG -> Fill( genTau.p4vis().Pt() );
+
 	  double ETresolution = ( ET -genTau.p4vis().Et() ) / genTau.p4vis().Et(); //marina
 	  h_EGClusters_EtResolution->Fill(ETresolution);
 	}
@@ -1283,6 +1324,19 @@ void TkEG::BookHistos_(void)
   // Pt of leading charged decay product  (leading pt>10GeV) Vs dRmax with  other neutral products
   histoTools_.BookHisto_2D(h_genTau_neutralDaugh_PtLead_dRmax, "genTau_neutralDaugh_PtLead_dRmax", ";p_{T} (charged^{ldg}) (GeV); #DeltaR_{max} (charged^{ldg}, neutral)", 100, 0.0, 100.0, 50, 0.0, 0.5);
 
+  // Et of the photons from pi0 (1 prong decay, 1 pi0 cases)
+  histoTools_.BookHisto_1D(h_Photons_Et, "Photons_Et", ";E_{T} (GeV); Particles / bin", 100, +0.0, +100.0);
+
+  // dR of the two photons from pi0 (1 prong decay, 1 pi0 cases)
+  histoTools_.BookHisto_1D(h_Photons_dR  , "Photons_dR"  , ";#Delta R; Entries / bin",   200,  0.0,   +2.0);
+
+  // Matching od EGs and Gen-Photons
+  histoTools_.BookHisto_1D(h_Photons_EGs_Matching, "Photons_EGs_Matching", "Entries / bin", 4, 0, 4);
+  h_Photons_EGs_Matching->GetXaxis()->SetBinLabel(1, "No matching");
+  h_Photons_EGs_Matching->GetXaxis()->SetBinLabel(2, "1 Photon Matched");
+  h_Photons_EGs_Matching->GetXaxis()->SetBinLabel(3, "2 Photons Matched (same EG)");
+  h_Photons_EGs_Matching->GetXaxis()->SetBinLabel(4, "2 Photons Matched (diff EG)");
+  h_Photons_EGs_Matching->GetXaxis()->SetLabelSize(15);
   // Number of stubs of all tracks
   histoTools_.BookHisto_1D(h_trk_NStubs_all, "trk_NStubs_all", ";N_{stubs} (all tracks); Events / bin", 16, -0.5, 15.5);
 
@@ -1464,7 +1518,13 @@ void TkEG::BookHistos_(void)
   
   // Visible Et of the matched generator taus
   histoTools_.BookHisto_1D(hTkEG_genVisEt, "TkEG_genVisEt", ";E_{T}^{vis} (gen) (GeV);Particles / bin", 40, 0.0,  +200.0);
+
+  // Visible Et of the matched generator taus (when there is at least one EG clustered)
+  histoTools_.BookHisto_1D(hTkEG_genVisEt_clustEG, "TkEG_genVisEt_clustEG", ";E_{T}^{vis} (gen) (GeV);Particles / bin", 40, 0.0,  +200.0);
   
+  // Visible Pt of the matched generator taus (when there is at least one EG clustered)
+  histoTools_.BookHisto_1D(hTkEG_genVisPt_clustEG, "TkEG_genVisPt_clustEG", ";p_{T}^{vis} (gen) (GeV);Particles / bin", 40, 0.0,  +200.0);
+
   // Visible Et of all generator taus
   histoTools_.BookHisto_1D(hMcHadronicTau_VisEt, "hMcHadronicTau_VisEt", ";VisEt (GeV);Particles / bin", 40, 0.0,  +200.0);
 
@@ -1578,6 +1638,10 @@ void TkEG::WriteHistos_(void)
   h_genTau_chargedDaugh_PtLead_dRmax->Write();
   h_genTau_neutralDaugh_PtLead_dRmax->Write();
 
+  h_Photons_Et->Write();
+  h_Photons_dR->Write();
+  h_Photons_EGs_Matching->Write();
+
   h_trk_NStubs_all->Write();
   h_trk_Chi2_all_4stubs->Write();
   h_trk_Chi2_all_5stubs->Write();
@@ -1642,6 +1706,8 @@ void TkEG::WriteHistos_(void)
   hTkEG_matched_Et->Write();
   hTkEG_DeltaRmatch->Write();
   hTkEG_genVisEt->Write();
+  hTkEG_genVisEt_clustEG->Write();
+  hTkEG_genVisPt_clustEG->Write();
   hMcHadronicTau_VisEt->Write();
   
   h_MCmatch_counters->Write(); 

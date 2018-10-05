@@ -133,6 +133,10 @@ def PlotHisto(datasetsMgr, h):
 
     # Draw a customised plot
     plots.drawPlot(p, h, **GetHistoKwargs(h, opts) )
+    if ("photons_egs_matching" in h.lower()):
+        p.getFrame().GetXaxis().SetLabelSize(14)
+        p.getFrame().GetXaxis().LabelsOption("u")
+        
 
     # Remove legend?
     if 0:
@@ -222,6 +226,9 @@ def GetHistoKwargs(h, opts):
     if "neutraldaugh_et" in h.lower():
         #kwargs["log"]  = True                                                                                                                                           
         kwargs["opts"] = {"xmin": 0.0, "xmax": 120.0, "ymin": _yMin, "ymax": 0.065, "ymaxfactor": _yMaxF}
+
+    if "photons_dr" in h.lower():
+        kwargs["opts"] = {"xmin": 0.0, "xmax": 0.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "chi2" in h.lower():
         kwargs["rebinX"] = 2
