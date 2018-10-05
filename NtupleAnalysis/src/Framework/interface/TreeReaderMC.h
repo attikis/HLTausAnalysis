@@ -87,8 +87,8 @@ class TreeReaderMC : public TreeReaderReco, public virtual TREEDEFINITIONGENP
 			      const double maxChiSqRed = 9999.9,
 			      const unsigned int minStubs = 0,
 			      const unsigned nFitParams = 4,
-			      // const bool bUseReducedChiSq = false,
-			      const bool bPrintList = false);
+			      const bool bPrintList = false,
+			      const bool bUseReducedChiSq = false);
 
   void SetGenParticleMomsAndDads(GenParticle &p);
 

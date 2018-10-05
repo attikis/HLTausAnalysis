@@ -334,14 +334,13 @@ vector<TTTrack> TreeReaderMC::GetTTTracks(const double minPt,
 					  const double maxChiSq,
 					  const unsigned int minStubs,
 					  const unsigned nFitParams,
-					  //const bool bUseReducedChiSq,
-					  const bool bPrintList)
+					  const bool bPrintList,
+					  const bool bUseReducedChiSq)
 //============================================================================
 {
   if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::GetTTTracks()" << std::endl;
 
   vector<TTTrack> theTTTracks;
-  const bool bUseReducedChiSq = false;
 
   // For-loop: All TTTracsk
   for (Size_t iTk = 0; iTk < L1Tks_Pt->size(); iTk++)

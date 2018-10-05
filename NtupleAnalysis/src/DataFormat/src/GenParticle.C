@@ -101,12 +101,33 @@ void GenParticle::PrintFinalDaughters(bool bPrintTitleRows)
 }
 
 //****************************************************************************
+TLorentzVector GenParticle::p4charged(bool verbose)
+//****************************************************************************
+{
+  TLorentzVector p4;
+  
+  // For-loop: All final daughters with charge
+  unsigned int i = 1;
+  for (vector<GenParticle>::iterator d = theFinalDaughtersCharged.begin(); 
+       d != theFinalDaughtersCharged.end(); d++){
+
+    if (0) d->PrintProperties(i==1);
+    p4 += d->p4();
+    i++;
+  }
+  
+  return p4;
+}
+
+
+//****************************************************************************
 void GenParticle::PrintFinalDaughtersCharged(bool bPrintTitleRows)
 //****************************************************************************
 {
   PrintDaughters_(theFinalDaughtersCharged, bPrintTitleRows);
   return;
 }
+
 
 //****************************************************************************
 void GenParticle::PrintFinalDaughtersNeutral(bool bPrintTitleRows)
