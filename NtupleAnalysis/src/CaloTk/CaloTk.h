@@ -103,7 +103,7 @@ class CaloTk : public TreeAnalyserMC{
   double matchTk_minPt;
   double matchTk_minEta;
   double matchTk_maxEta;
-  double matchTk_maxChiSqRed;
+  double matchTk_maxChiSq;
   double matchTk_minStubs;
   double matchTk_caloDeltaR;
   // Signal Cone Tracks
@@ -112,7 +112,7 @@ class CaloTk : public TreeAnalyserMC{
   double sigConeTks_minPt;
   double sigConeTks_minEta;
   double sigConeTks_maxEta;
-  double sigConeTks_maxChiSqRed;
+  double sigConeTks_maxChiSq;
   unsigned int sigConeTks_minStubs;
   // Isolation Cone Tracks
   string isoConeTks_Collection;
@@ -120,7 +120,7 @@ class CaloTk : public TreeAnalyserMC{
   double isoConeTks_minPt;
   double isoConeTks_minEta;
   double isoConeTks_maxEta;
-  double isoConeTks_maxChiSqRed;
+  double isoConeTks_maxChiSq;
   unsigned int isoConeTks_minStubs;
 
   double mcMatching_dRMax;

@@ -605,7 +605,8 @@ def GetHistoKwargs(h, opts):
     elif "Rate_" in h:
         _kwargs["xlabel"]     = "E_{T} (GeV)"
         _kwargs["ylabel"]     = "Rate (kHz)"# / %.0f GeV"
-        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 300.0, "ymin": yMin, "ymax":1e5, "ymaxfactor": yMaxF}
+        #_kwargs["opts"]       = {"xmin": 0.0, "xmax": 300.0, "ymin": yMin, "ymax":1e5, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 100.0, "ymin": 1, "ymax":5e4, "ymaxfactor": yMaxF}
         _kwargs["moveLegend"] = _mvLeg2
         _kwargs["cutBoxY"]    = {"cutValue": 50, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}
     elif "Efficiency_" in h:
@@ -741,7 +742,7 @@ if __name__ == "__main__":
 
     # Determine path for saving plots
     if opts.saveDir == None:
-        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="", postfix="ROC")
+        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="ROC")
     else:
         print "opts.saveDir = ", opts.saveDir
 

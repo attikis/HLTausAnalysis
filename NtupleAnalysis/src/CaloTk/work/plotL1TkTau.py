@@ -926,7 +926,7 @@ if __name__ == "__main__":
     
     # Determine path for saving plots
     if opts.saveDir == None:
-        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/CaloTk/", postfix="L1TkTau")
+        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="L1TkTau")
     else:
         print "opts.saveDir = ", opts.saveDir
 

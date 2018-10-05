@@ -41,8 +41,8 @@ void CaloTk::InitVars_()
   matchTk_minPt       =   5.00;      // TP:   5.0
   matchTk_minEta      =   0.0;       // TP:   0.0
   matchTk_maxEta      =  999.9;      // TP: 999.9  
-  matchTk_maxChiSqRed =  200.0;      // TP: 200.0
-  matchTk_minStubs    =   0;         // TP:   0
+  matchTk_maxChiSq    =  100.0;      // TP: 200.0 (Louise recommends a minimum of chi^2 < 100)
+  matchTk_minStubs    =   4;         // TP:   0   (Louise recommends 4)
   matchTk_caloDeltaR  =   0.10;      // TP:   0.10
 
   // Signal cone tracks
@@ -51,8 +51,8 @@ void CaloTk::InitVars_()
   sigConeTks_minPt       =   2.0;              // TP:   2.0
   sigConeTks_minEta      =   0.0;              // TP:   0.0
   sigConeTks_maxEta      = 999.9;              // TP: 999.9
-  sigConeTks_maxChiSqRed = 200.0;              // TP: 200.0
-  sigConeTks_minStubs    =   0;                // TP:   0
+  sigConeTks_maxChiSq    = 100.0;              // TP: 200.0 (Louise recommends a minimum of chi^2 < 100)
+  sigConeTks_minStubs    =   4;                // TP:   0   (Louise recommends 4)
 
   // Isolation cone tracks
   isoConeTks_Collection  = matchTk_Collection;    // TP: "TTTracks" (not "TTPixelTracks")
@@ -60,7 +60,7 @@ void CaloTk::InitVars_()
   isoConeTks_minPt       =   2.0;                 // TP:   2.0
   isoConeTks_minEta      =   0.0;                 // TP:   0.0
   isoConeTks_maxEta      = 999.9;                 // TP: 999.9
-  isoConeTks_maxChiSqRed = 200.0;                 // TP: 200.0
+  isoConeTks_maxChiSq    = 100.0;                 // TP: 200.00 (Louise recommends a minimum of chi^2 < 100)
   isoConeTks_minStubs    =   0;                   // TP:   0
   
   // Signal cone parameters
@@ -138,7 +138,7 @@ void CaloTk::PrintSettings(void)
   
   settings.AddRowColumn(6, "Matching Tracks: ChiSqRed");
   settings.AddRowColumn(6, "<=");
-  settings.AddRowColumn(6, auxTools_.ToString( matchTk_maxChiSqRed) );
+  settings.AddRowColumn(6, auxTools_.ToString( matchTk_maxChiSq) );
   settings.AddRowColumn(6, "200/DOF"); // Cut was on ChiSq, not ChiSqRed
   settings.AddRowColumn(6, "");
 
@@ -186,7 +186,7 @@ void CaloTk::PrintSettings(void)
   
   settings.AddRowColumn(14, "Signal Cone Tks: ChiSqRed");
   settings.AddRowColumn(14, "<=");
-  settings.AddRowColumn(14, auxTools_.ToString( sigConeTks_maxChiSqRed) );
+  settings.AddRowColumn(14, auxTools_.ToString( sigConeTks_maxChiSq) );
   settings.AddRowColumn(14, "200 (but on ChiSq, not ChiSqRed)");
   settings.AddRowColumn(14, "");
 
@@ -228,7 +228,7 @@ void CaloTk::PrintSettings(void)
 
   settings.AddRowColumn(21, "Isolation Cone Tks: ChiSqRed");
   settings.AddRowColumn(21, "<=");
-  settings.AddRowColumn(21, auxTools_.ToString( isoConeTks_maxChiSqRed) );
+  settings.AddRowColumn(21, auxTools_.ToString( isoConeTks_maxChiSq) );
   settings.AddRowColumn(21, "200 (but on ChiSq, not ChiSqRed)");
   settings.AddRowColumn(21, "");
 
@@ -423,14 +423,13 @@ void CaloTk::Loop()
     if(DEBUG) cout << "\tGetting the Tracks and Track Particles Collections" << endl;
     vector<TrackingParticle> TPs = GetTrackingParticles(false);
     
-    vector<TTTrack> matchTTTracks = GetTTTracks(matchTk_minPt, matchTk_minEta, matchTk_maxEta, matchTk_maxChiSqRed,
+    vector<TTTrack> matchTTTracks = GetTTTracks(matchTk_minPt, matchTk_minEta, matchTk_maxEta, matchTk_maxChiSq,
 						matchTk_minStubs, matchTk_nFitParams, false);
+						// matchTk_minStubs, matchTk_nFitParams, false, false);
     
-    vector<TTTrack> sigTTTracks = GetTTTracks(sigConeTks_minPt , sigConeTks_minEta, sigConeTks_maxEta, sigConeTks_maxChiSqRed,
-					      sigConeTks_minStubs, sigConeTks_nFitParams, false);
+    vector<TTTrack> sigTTTracks = GetTTTracks(sigConeTks_minPt , sigConeTks_minEta, sigConeTks_maxEta, sigConeTks_maxChiSq, matchTk_minStubs, matchTk_nFitParams, false);
     
-    vector<TTTrack> isoTTTracks = GetTTTracks(isoConeTks_minPt , isoConeTks_minEta, isoConeTks_maxEta, isoConeTks_maxChiSqRed,
-					      isoConeTks_minStubs, isoConeTks_nFitParams, false);
+    vector<TTTrack> isoTTTracks = GetTTTracks(isoConeTks_minPt , isoConeTks_minEta, isoConeTks_maxEta, isoConeTks_maxChiSq, isoConeTks_minStubs, isoConeTks_nFitParams, false);
     
 
     if (DEBUG)
@@ -524,7 +523,12 @@ void CaloTk::Loop()
 	if (0) calo->PrintProperties(iCalo==0);
 	// std::cout << "NTT = " << calo->getNTT() << std::endl;
 
-	// Fill histograms
+	// Only considered isolated CaloTaus
+	// if (!calo->getIso()) continue;
+	// if (!calo->getHasEM()) continue;
+	// if (calo->getIsMerged() ) continue;
+
+	// Fill histograms (http://cmsdoxygen.web.cern.ch/cmsdoxygen/CMSSW_9_3_7/doc/html/d9/d40/L1Trigger_2interface_2Tau_8h_source.html#l00019)
 	hL1CaloTau_Et        ->Fill( calo->getEt()    );
 	hL1CaloTau_Eta       ->Fill( calo->getEta()   );
 	hL1CaloTau_Phi       ->Fill( calo->getPhi()   );
@@ -575,7 +579,7 @@ void CaloTk::Loop()
     ////////////////////////////////////////////////
     for(vector<L1TkTauParticle>::iterator L1TkTau = L1TkTauCandidates.begin(); L1TkTau != L1TkTauCandidates.end(); L1TkTau++)
       {
-	// Calo
+	// Calo (isolated calorimeter clusters)
 	L1TkTaus_Calo.push_back(*L1TkTau);
 
 	// +Tk
@@ -1075,30 +1079,31 @@ void CaloTk::Loop()
   // Convert/Finalise Histos
   ////////////////////////////////////////////////
   // SingleTau
-  histoTools_.ConvertToRateHisto_1D(hCalo_Rate  , nEntries);
-  histoTools_.ConvertToRateHisto_1D(hCalo_Rate_C, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hCalo_Rate_I, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hCalo_Rate_F, nEntries);
+  double N = hCalo_Rate->GetEntries(); // double N = nEntries;
+  histoTools_.ConvertToRateHisto_1D(hCalo_Rate  , N);
+  histoTools_.ConvertToRateHisto_1D(hCalo_Rate_C, N);
+  histoTools_.ConvertToRateHisto_1D(hCalo_Rate_I, N);
+  histoTools_.ConvertToRateHisto_1D(hCalo_Rate_F, N);
   
-  histoTools_.ConvertToRateHisto_1D(hTk_Rate  , nEntries);
-  histoTools_.ConvertToRateHisto_1D(hTk_Rate_C, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hTk_Rate_I, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hTk_Rate_F, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hTk_Rate  , N);
+  histoTools_.ConvertToRateHisto_1D(hTk_Rate_C, N);
+  histoTools_.ConvertToRateHisto_1D(hTk_Rate_I, N);
+  histoTools_.ConvertToRateHisto_1D(hTk_Rate_F, N);
       
-  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate  , nEntries);
-  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_C, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_I, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_F, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate  , N);
+  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_C, N);
+  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_I, N);
+  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_F, N);
 
-  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate  , nEntries);
-  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_C, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_I, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_F, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate  , N);
+  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_C, N);
+  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_I, N);
+  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_F, N);
 
-  histoTools_.ConvertToRateHisto_1D(hIso_Rate  , nEntries);
-  histoTools_.ConvertToRateHisto_1D(hIso_Rate_C, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hIso_Rate_I, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hIso_Rate_F, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hIso_Rate  , N);
+  histoTools_.ConvertToRateHisto_1D(hIso_Rate_C, N);
+  histoTools_.ConvertToRateHisto_1D(hIso_Rate_I, N);
+  histoTools_.ConvertToRateHisto_1D(hIso_Rate_F, N);
 
   FinaliseEffHisto_( hCalo_Eff  , nEvtsWithMaxHTaus);
   FinaliseEffHisto_( hCalo_Eff_C, nEvtsWithMaxHTaus);
@@ -1126,30 +1131,30 @@ void CaloTk::Loop()
   FinaliseEffHisto_( hIso_Eff_F, nEvtsWithMaxHTaus);
 
   // DiTau
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Calo  , nEntries);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Calo_C, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Calo_I, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Calo_F, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Calo  , N);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Calo_C, N);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Calo_I, N);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Calo_F, N);
 
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk  , nEntries);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk_C, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk_I, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk_F, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk  , N);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk_C, N);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk_I, N);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk_F, N);
   
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso  , nEntries);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso_C, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso_I, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso_F, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso  , N);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso_C, N);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso_I, N);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso_F, N);
   
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso  , nEntries);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso_C, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso_I, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso_F, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso  , N);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso_C, N);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso_I, N);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso_F, N);
 
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Iso  , nEntries);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Iso_C, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Iso_I, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Iso_F, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Iso  , N);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Iso_C, N);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Iso_I, N);
+  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Iso_F, N);
   
   FinaliseEffHisto_( hDiTau_Eff_Calo  , nEvtsWithMaxHTaus);
   FinaliseEffHisto_( hDiTau_Eff_Calo_C, nEvtsWithMaxHTaus);
@@ -1177,10 +1182,10 @@ void CaloTk::Loop()
   FinaliseEffHisto_( hDiTau_Eff_Iso_F, nEvtsWithMaxHTaus);
 
   // DiTau (Calo-Other)
-  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Calo_Tk    , nEntries);
-  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Calo_VtxIso, nEntries);
-  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Calo_RelIso, nEntries);
-  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Calo_Iso   , nEntries);
+  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Calo_Tk    , N);
+  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Calo_VtxIso, N);
+  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Calo_RelIso, N);
+  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Calo_Iso   , N);
 
   FinaliseEffHisto_( hDiTau_Eff_Calo_Tk    , nEvtsWithMaxHTaus);;
   FinaliseEffHisto_( hDiTau_Eff_Calo_VtxIso, nEvtsWithMaxHTaus);;
@@ -1188,9 +1193,9 @@ void CaloTk::Loop()
   FinaliseEffHisto_( hDiTau_Eff_Calo_Iso   , nEvtsWithMaxHTaus);;
 
   // DiTau (Tk-Other)
-  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_VtxIso, nEntries);
-  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_RelIso, nEntries);
-  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_Iso   , nEntries);
+  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_VtxIso, N);
+  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_RelIso, N);
+  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_Iso   , N);
 
   FinaliseEffHisto_( hDiTau_Eff_Tk_VtxIso, nEvtsWithMaxHTaus);;
   FinaliseEffHisto_( hDiTau_Eff_Tk_RelIso, nEvtsWithMaxHTaus);;
@@ -1284,9 +1289,9 @@ void CaloTk::BookHistos_(void)
   const float minR = 0.0;
   const float maxR = 1.0;
 
-  const unsigned int nDR = 100;
-  const float minDR = 0.0;
-  const float maxDR = 1.0;
+  // const unsigned int nDR = 100;
+  // const float minDR = 0.0;
+  // const float maxDR = 1.0;
 
   const unsigned int nChi = 500;
   const float minChi =   0.0;
@@ -1324,7 +1329,7 @@ void CaloTk::BookHistos_(void)
   const char* tVIso = ";min(z_{0}^{m} - z_{0}^{iso} (cm);Entries / %.2f cm";
   const char* tChi  = ";#chi^{2};Entries / %.2f";
   const char* tRChi = ";#chi^{2}_{#nu};Entries / %.2f";
-  const char* tRate = ";#E_{T} (GeV);Rate (kHz) / %.0f GeV";
+  // const char* tRate = ";#E_{T} (GeV);Rate (kHz) / %.0f GeV";
 
   // GenParticles Histograms
   histoTools_.BookHisto_2D(h_GenP_VisET_dRMaxLdgPion, "GenP_VisET_dRMaxLdgPion", ";#DeltaR_{max}(#pi_{ldg}^{#pm},#pi^{#pm});E_{T}^{vis}",  50,  0.0, +0.25, 100, 0.0, +200.0);

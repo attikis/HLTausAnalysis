@@ -329,17 +329,19 @@ void TreeReaderMC::SetGenParticleFinalDaughters(GenParticle &p)
 
 //============================================================================
 vector<TTTrack> TreeReaderMC::GetTTTracks(const double minPt,
-				      const double minEta,
-				      const double maxEta,
-				      const double maxChiSqRed,
-				      const unsigned int minStubs,
-				      const unsigned nFitParams,
-				      bool bPrintList)
+					  const double minEta,
+					  const double maxEta,
+					  const double maxChiSq,
+					  const unsigned int minStubs,
+					  const unsigned nFitParams,
+					  //const bool bUseReducedChiSq,
+					  const bool bPrintList)
 //============================================================================
 {
   if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::GetTTTracks()" << std::endl;
 
   vector<TTTrack> theTTTracks;
+  const bool bUseReducedChiSq = false;
 
   // For-loop: All TTTracsk
   for (Size_t iTk = 0; iTk < L1Tks_Pt->size(); iTk++)
@@ -351,7 +353,14 @@ vector<TTTrack> TreeReaderMC::GetTTTracks(const double minPt,
       if (tk.getPt() < minPt) continue;
       if (abs(tk.getEta()) > maxEta) continue;
       if (abs(tk.getEta()) < minEta) continue;
-      if (tk.getChi2Red() > maxChiSqRed) continue;
+      if (bUseReducedChiSq)
+	{
+	  if (tk.getChi2Red() > maxChiSq) continue;
+	}
+      else
+	{
+	  if (tk.getChi2() > maxChiSq) continue;
+	}
       if (tk.getNumOfStubs() < minStubs) continue;
       double z0 = tk.getZ0();
       double d0 = tk.getD0();
@@ -612,7 +621,8 @@ vector<L1Tau> TreeReaderMC::GetL1Taus(bool bPrintList)
   L1Tau theL1Tau;
 
   // For-loop: All L1Taus
-  for (Size_t iCalo = 0; iCalo < L1TauEmu_Et.size(); iCalo++)
+  // for (Size_t iCalo = 0; iCalo < L1TauEmu_Et.size(); iCalo++)
+  for (Size_t iCalo = 0; iCalo < L1Tau_Et.size(); iCalo++)
     { 
       theL1Tau = GetL1Tau(iCalo);
       //if (bPrintList) theL1Tau.PrintProperties(false);
@@ -667,7 +677,7 @@ L1Tau TreeReaderMC::GetL1Tau(unsigned int Index)
 		 L1TauEmu_IsMerged.at(Index),
 		 L1TauEmu_HwQual.at(Index)
 		 );
-
+  
   return theL1Tau;
 }
 
