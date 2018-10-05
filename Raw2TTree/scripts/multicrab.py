@@ -926,7 +926,7 @@ def PrintTaskSummary(reportDict):
     for i, dataset in enumerate(ReportDict):
         report     = reportDict[dataset]
         index      = i+1
-        task       = dataset
+        task       = (dataset[:43] + '..') if len(dataset) > 45 else dataset #dataset
         status     = report.status
         idle       = '{0: >3}'.format(report.idle)
         allJobs    = '{0: <3}'.format(report.allJobs)

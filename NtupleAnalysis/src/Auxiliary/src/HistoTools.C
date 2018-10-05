@@ -697,12 +697,28 @@ void HistoTools::ConvertToRateHisto_1D(TH1D *histo,
 				       const Double_t crossingRate)
 //****************************************************************************
 {
+  /*
+    To normalize trigger rates, you can use the
+    fact that your background sample (NeutrinoGun aka Minimum Bias) 
+    corresponds to the crossing rate, since, as soon as PU >> 1, 
+    every crossing leads to an interaction. The crossing rate is not 
+    40 MHz because not all the bunches are filled. We usually take 
+    30 MHz for our normalizations. 
+
+    Hence, if you have n events that pass your trigger selection, out of
+    the N events of your sample (e.g. N = 500k for the full NeutrinoGun
+    sample at PU=140), then the rate is simply:
+    Rate = 30 MHz x  (n/N)
+
+    Note: default value for "crossingRate" is 30.0E+06
+  */
+
 
   // Variable declarations
   const Double_t convertTokHz  = ( 1.0E-03);  // 1Hz -> 1kHz
   const Double_t normFactor    = (crossingRate * convertTokHz) / (nEvents);
-
-  // Convert histogram to 1-cumulative
+  
+    // Convert histogram to 1-cumulative
   ConvertToOneMinusCumulativeHisto_1D(histo);
 
   // Scale to desired crossing-rate
@@ -710,6 +726,8 @@ void HistoTools::ConvertToRateHisto_1D(TH1D *histo,
 
 
 #ifdef DEBUG
+  // std::cout << "nEvents = " << nEvents << std::endl;
+  // std::cout << "histo->GetEntries() = " << histo->GetEntries() << std::endl;
   std::cout << "normFactor = Crossing_Rate x ConvertToKHz = " << crossingRate << " x " << convertTokHz << " = " << normFactor << std::endl;
 #endif
   return;

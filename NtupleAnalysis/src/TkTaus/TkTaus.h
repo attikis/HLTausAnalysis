@@ -1,5 +1,5 @@
-#ifndef CaloTk_h
-#define CaloTk_h
+#ifndef TkTaus_h
+#define TkTaus_h
 
 // System 
 #include <iostream>
@@ -43,11 +43,11 @@
 
 using namespace std;
 
-class CaloTk : public TreeAnalyserMC{
+class TkTaus : public TreeAnalyserMC{
  public:
   // Constructors/Destructors
-  ~CaloTk(){};
- CaloTk(const string SamplePath,
+  ~TkTaus(){};
+ TkTaus(const string SamplePath,
 	const string SampleName,
 	const string text_, 
 	const int maxEvents_ = -1, 
@@ -68,7 +68,7 @@ class CaloTk : public TreeAnalyserMC{
   void ApplyDiTauZMatching(string tkCollectionType,
 			   vector<L1TkTauParticle> &L1TkTaus);
 
-  void GetShrinkingConeSizes(double calo_et,
+  void GetShrinkingConeSizes(double tk_pt,
 			     double sigCone_Constant,
 			     double isoCone_Constant,
 			     const double sigCone_dRCutoff,
@@ -77,10 +77,9 @@ class CaloTk : public TreeAnalyserMC{
 			     double &isoCone_dRMin,
 			     double &isoCone_dRMax);
 
-  void GetMatchingTrack(L1TkTauParticle &L1TkTau,
-			L1Tau L1CaloTau,
-			vector<TTTrack> TTTracks);
-  
+  double GetJetWidth(vector<TTTrack> sigTks, vector<TTTrack> isoTks,
+		     TLorentzVector sigTks_p4, TLorentzVector isoTks_p4);
+
   void GetSigConeTracks(L1TkTauParticle &L1TkTau,
 			vector<TTTrack> TTTracks);
   
@@ -98,14 +97,15 @@ class CaloTk : public TreeAnalyserMC{
   double diTau_deltaPOCAz;
 
   // L1TkTau - Matching track
-  string matchTk_Collection;
-  int matchTk_nFitParams;
-  double matchTk_minPt;
-  double matchTk_minEta;
-  double matchTk_maxEta;
-  double matchTk_maxChiSq;
-  double matchTk_minStubs;
-  double matchTk_caloDeltaR;
+  string seedTk_Collection;
+  int seedTk_nFitParams;
+  double seedTk_minPt;
+  double seedTk_minEta;
+  double seedTk_maxEta;
+  double seedTk_maxChiSq;
+  double seedTk_minStubs;
+  double seedTk_caloDeltaR;
+
   // Signal Cone Tracks
   string sigConeTks_Collection;
   int sigConeTks_nFitParams;
@@ -114,6 +114,7 @@ class CaloTk : public TreeAnalyserMC{
   double sigConeTks_maxEta;
   double sigConeTks_maxChiSq;
   unsigned int sigConeTks_minStubs;
+
   // Isolation Cone Tracks
   string isoConeTks_Collection;
   int isoConeTks_nFitParams;
@@ -222,42 +223,22 @@ class CaloTk : public TreeAnalyserMC{
   // Counters
   TH1D* hCounters;
 
-  // L1CaloTaus
-  // http://cmsdoxygen.web.cern.ch/cmsdoxygen/CMSSW_9_3_7/doc/html/d9/d40/L1Trigger_2interface_2Tau_8h_source.html#l00019
-  // http://cmsdoxygen.web.cern.ch/cmsdoxygen/CMSSW_9_3_7/doc/html/d1/dc8/classl1t_1_1CaloTools.html
-  TH1D* hL1CaloTau_Et; 
-  TH1D* hL1CaloTau_Eta;
-  TH1D* hL1CaloTau_Phi;
-  TH1D* hL1CaloTau_IEt;
-  TH1D* hL1CaloTau_IEta; // ieta of seed tower
-  TH1D* hL1CaloTau_IPhi; // iphi of seed tower
-  TH1D* hL1CaloTau_Iso;
-  // TH1D* hL1CaloTau_Bx;
-  TH1D* hL1CaloTau_TowerIEta;
-  TH1D* hL1CaloTau_TowerIPhi;
-  TH1D* hL1CaloTau_RawEt; // raw (uncalibrated) cluster sum
-  TH1D* hL1CaloTau_IsoEt; // raw isolation sum - cluster sum
-  TH1D* hL1CaloTau_NTT;   // n towers above threshold
-  TH1D* hL1CaloTau_HasEM;
-  TH1D* hL1CaloTau_IsMerged;
-  // TH1D* hL1CaloTau_HwQual; //integer hardware (hw) value
-
   // L1TkTaus
-  TH1D* hL1TkTau_MatchTk_DeltaR;
-  TH1D* hL1TkTau_MatchTk_PtRel;
-  TH1D* hL1TkTau_MatchTk_Pt;
-  TH1D* hL1TkTau_MatchTk_Eta;
-  TH1D* hL1TkTau_MatchTk_POCAz;
-  TH1D* hL1TkTau_MatchTk_NStubs;
-  TH1D* hL1TkTau_MatchTk_NPsStubs;
-  TH1D* hL1TkTau_MatchTk_NBarrelStubs;
-  TH1D* hL1TkTau_MatchTk_NEndcapStubs;
-  TH1D* hL1TkTau_MatchTk_ChiSquared;
-  TH1D* hL1TkTau_MatchTk_RedChiSquared;
-  TH1D* hL1TkTau_MatchTk_IsGenuine;
-  TH1D* hL1TkTau_MatchTk_IsUnknown;
-  TH1D* hL1TkTau_MatchTk_IsCombinatoric;
-  TH1D* hL1TkTau_MatchTk_PtMinusCaloEt;
+  TH1D* hL1TkTau_SeedTk_DeltaR;
+  TH1D* hL1TkTau_SeedTk_PtRel;
+  TH1D* hL1TkTau_SeedTk_Pt;
+  TH1D* hL1TkTau_SeedTk_Eta;
+  TH1D* hL1TkTau_SeedTk_POCAz;
+  TH1D* hL1TkTau_SeedTk_NStubs;
+  TH1D* hL1TkTau_SeedTk_NPsStubs;
+  TH1D* hL1TkTau_SeedTk_NBarrelStubs;
+  TH1D* hL1TkTau_SeedTk_NEndcapStubs;
+  TH1D* hL1TkTau_SeedTk_ChiSquared;
+  TH1D* hL1TkTau_SeedTk_RedChiSquared;
+  TH1D* hL1TkTau_SeedTk_IsGenuine;
+  TH1D* hL1TkTau_SeedTk_IsUnknown;
+  TH1D* hL1TkTau_SeedTk_IsCombinatoric;
+
   TH1D* hL1TkTau_SigTks_Pt;
   TH1D* hL1TkTau_SigTks_PtRel;
   TH1D* hL1TkTau_SigTks_Eta;
@@ -270,7 +251,7 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkTau_SigTks_NEndcapStubs;
   TH1D* hL1TkTau_SigTks_ChiSquared;
   TH1D* hL1TkTau_SigTks_RedChiSquared;
-  TH1D* hL1TkTau_SigTks_PtMinusCaloEt;
+
   TH1D* hL1TkTau_IsoTks_Pt;
   TH1D* hL1TkTau_IsoTks_PtRel;
   TH1D* hL1TkTau_IsoTks_Eta;
@@ -283,26 +264,9 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkTau_IsoTks_NEndcapStubs;
   TH1D* hL1TkTau_IsoTks_ChiSquared;
   TH1D* hL1TkTau_IsoTks_RedChiSquared;
-  TH1D* hL1TkTau_IsoTks_PtMinusCaloEt;
+
   TH1D* hL1TkTau_Multiplicity;
-  TH1D* hL1TkTau_CaloEt; 
-  TH1D* hL1TkTau_CaloEta;
-  TH1D* hL1TkTau_CaloPhi;
-  TH1D* hL1TkTau_CaloIEt;
-  TH1D* hL1TkTau_CaloIEta; // ieta of seed tower
-  TH1D* hL1TkTau_CaloIPhi; // iphi of seed tower
-  TH1D* hL1TkTau_CaloIso;
-  TH1D* hL1TkTau_CaloTowerIEta;
-  TH1D* hL1TkTau_CaloTowerIPhi;
-  TH1D* hL1TkTau_CaloRawEt; // raw (uncalibrated) cluster sum
-  TH1D* hL1TkTau_CaloIsoEt; // raw isolation sum - cluster sum
-  TH1D* hL1TkTau_CaloNTT;   // n towers above threshold
-  TH1D* hL1TkTau_CaloHasEM;
-  TH1D* hL1TkTau_CaloIsMerged;
-  TH1D* hL1TkTau_Rtau;
-  TH1D* hL1TkTau_CHF;
-  TH1D* hL1TkTau_NHF;
-  TH1D* hL1TkTau_NHFAbs;
+  TH1D* hL1TkTau_JetWidth;
   TH1D* hL1TkTau_NSigTks;
   TH1D* hL1TkTau_SigTksEt;
   TH1D* hL1TkTau_SigTksEta;
@@ -322,21 +286,20 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkTau_DeltaRGenP;
 
   // L1TkIsoTaus
-  TH1D* hL1TkIsoTau_MatchTk_DeltaR;
-  TH1D* hL1TkIsoTau_MatchTk_PtRel;
-  TH1D* hL1TkIsoTau_MatchTk_Pt;
-  TH1D* hL1TkIsoTau_MatchTk_Eta;
-  TH1D* hL1TkIsoTau_MatchTk_POCAz;
-  TH1D* hL1TkIsoTau_MatchTk_NStubs;
-  TH1D* hL1TkIsoTau_MatchTk_NPsStubs;
-  TH1D* hL1TkIsoTau_MatchTk_NBarrelStubs;
-  TH1D* hL1TkIsoTau_MatchTk_NEndcapStubs;
-  TH1D* hL1TkIsoTau_MatchTk_ChiSquared;
-  TH1D* hL1TkIsoTau_MatchTk_RedChiSquared;
-  TH1D* hL1TkIsoTau_MatchTk_IsGenuine;
-  TH1D* hL1TkIsoTau_MatchTk_IsUnknown;
-  TH1D* hL1TkIsoTau_MatchTk_IsCombinatoric;
-  TH1D* hL1TkIsoTau_MatchTk_PtMinusCaloEt;
+  TH1D* hL1TkIsoTau_SeedTk_DeltaR;
+  TH1D* hL1TkIsoTau_SeedTk_PtRel;
+  TH1D* hL1TkIsoTau_SeedTk_Pt;
+  TH1D* hL1TkIsoTau_SeedTk_Eta;
+  TH1D* hL1TkIsoTau_SeedTk_POCAz;
+  TH1D* hL1TkIsoTau_SeedTk_NStubs;
+  TH1D* hL1TkIsoTau_SeedTk_NPsStubs;
+  TH1D* hL1TkIsoTau_SeedTk_NBarrelStubs;
+  TH1D* hL1TkIsoTau_SeedTk_NEndcapStubs;
+  TH1D* hL1TkIsoTau_SeedTk_ChiSquared;
+  TH1D* hL1TkIsoTau_SeedTk_RedChiSquared;
+  TH1D* hL1TkIsoTau_SeedTk_IsGenuine;
+  TH1D* hL1TkIsoTau_SeedTk_IsUnknown;
+  TH1D* hL1TkIsoTau_SeedTk_IsCombinatoric;
   TH1D* hL1TkIsoTau_SigTks_Pt;
   TH1D* hL1TkIsoTau_SigTks_PtRel;
   TH1D* hL1TkIsoTau_SigTks_Eta;
@@ -349,7 +312,6 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkIsoTau_SigTks_NEndcapStubs;
   TH1D* hL1TkIsoTau_SigTks_ChiSquared;
   TH1D* hL1TkIsoTau_SigTks_RedChiSquared;
-  TH1D* hL1TkIsoTau_SigTks_PtMinusCaloEt;
   TH1D* hL1TkIsoTau_IsoTks_Pt;
   TH1D* hL1TkIsoTau_IsoTks_PtRel;
   TH1D* hL1TkIsoTau_IsoTks_Eta;
@@ -362,26 +324,9 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkIsoTau_IsoTks_NEndcapStubs;
   TH1D* hL1TkIsoTau_IsoTks_ChiSquared;
   TH1D* hL1TkIsoTau_IsoTks_RedChiSquared;
-  TH1D* hL1TkIsoTau_IsoTks_PtMinusCaloEt;
+
   TH1D* hL1TkIsoTau_Multiplicity;
-  TH1D* hL1TkIsoTau_CaloEt; 
-  TH1D* hL1TkIsoTau_CaloEta;
-  TH1D* hL1TkIsoTau_CaloPhi;
-  TH1D* hL1TkIsoTau_CaloIEt;
-  TH1D* hL1TkIsoTau_CaloIEta; // ieta of seed tower
-  TH1D* hL1TkIsoTau_CaloIPhi; // iphi of seed tower
-  TH1D* hL1TkIsoTau_CaloIso;
-  TH1D* hL1TkIsoTau_CaloTowerIEta;
-  TH1D* hL1TkIsoTau_CaloTowerIPhi;
-  TH1D* hL1TkIsoTau_CaloRawEt; // raw (uncalibrated) cluster sum
-  TH1D* hL1TkIsoTau_CaloIsoEt; // raw isolation sum - cluster sum
-  TH1D* hL1TkIsoTau_CaloNTT;   // n towers above threshold
-  TH1D* hL1TkIsoTau_CaloHasEM;
-  TH1D* hL1TkIsoTau_CaloIsMerged;
-  TH1D* hL1TkIsoTau_Rtau;
-  TH1D* hL1TkIsoTau_CHF;
-  TH1D* hL1TkIsoTau_NHF;
-  TH1D* hL1TkIsoTau_NHFAbs;
+  TH1D* hL1TkIsoTau_JetWidth;
   TH1D* hL1TkIsoTau_NSigTks;
   TH1D* hL1TkIsoTau_SigTksEt;
   TH1D* hL1TkIsoTau_SigTksEta;
@@ -401,35 +346,18 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hL1TkIsoTau_DeltaRGenP;
 
   // Resolutions
-  TH1D* hL1Tau_ResolutionCaloEt;
-  TH1D* hL1Tau_ResolutionCaloEta;
-  TH1D* hL1Tau_ResolutionCaloPhi;
-  // L1TkTau
-  TH1D* hL1TkTau_ResolutionCaloEt;
-  TH1D* hL1TkTau_ResolutionCaloEta;
-  TH1D* hL1TkTau_ResolutionCaloPhi;
-  TH1D* hL1TkTau_ResolutionCaloEt_C;
-  TH1D* hL1TkTau_ResolutionCaloEta_C;
-  TH1D* hL1TkTau_ResolutionCaloPhi_C;
-  TH1D* hL1TkTau_ResolutionCaloEt_I;
-  TH1D* hL1TkTau_ResolutionCaloEta_I;
-  TH1D* hL1TkTau_ResolutionCaloPhi_I;
-  TH1D* hL1TkTau_ResolutionCaloEt_F;
-  TH1D* hL1TkTau_ResolutionCaloEta_F;
-  TH1D* hL1TkTau_ResolutionCaloPhi_F;
-  // L1TkIsoTau
-  TH1D* hL1TkIsoTau_ResolutionCaloEt;
-  TH1D* hL1TkIsoTau_ResolutionCaloEta;
-  TH1D* hL1TkIsoTau_ResolutionCaloPhi;
-  TH1D* hL1TkIsoTau_ResolutionCaloEt_C;
-  TH1D* hL1TkIsoTau_ResolutionCaloEta_C;
-  TH1D* hL1TkIsoTau_ResolutionCaloPhi_C;
-  TH1D* hL1TkIsoTau_ResolutionCaloEt_I;
-  TH1D* hL1TkIsoTau_ResolutionCaloEta_I;
-  TH1D* hL1TkIsoTau_ResolutionCaloPhi_I;
-  TH1D* hL1TkIsoTau_ResolutionCaloEt_F;
-  TH1D* hL1TkIsoTau_ResolutionCaloEta_F;
-  TH1D* hL1TkIsoTau_ResolutionCaloPhi_F;
+  TH1D* hL1TkIsoTau_ResolutionEt;
+  TH1D* hL1TkIsoTau_ResolutionEta;
+  TH1D* hL1TkIsoTau_ResolutionPhi;
+  TH1D* hL1TkIsoTau_ResolutionEt_C;
+  TH1D* hL1TkIsoTau_ResolutionEta_C;
+  TH1D* hL1TkIsoTau_ResolutionPhi_C;
+  TH1D* hL1TkIsoTau_ResolutionEt_I;
+  TH1D* hL1TkIsoTau_ResolutionEta_I;
+  TH1D* hL1TkIsoTau_ResolutionPhi_I;
+  TH1D* hL1TkIsoTau_ResolutionEt_F;
+  TH1D* hL1TkIsoTau_ResolutionEta_F;
+  TH1D* hL1TkIsoTau_ResolutionPhi_F;
   
   // SingleTau: Rates
   TH1D* hCalo_Rate; // Inclusive = C+I+F

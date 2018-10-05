@@ -1653,39 +1653,45 @@ void Tracking::FinaliseHistos_(void)
   for (int i=0; i < PT_BINS; i++) {
 
     // Cannot fit "gaus" to phi due to asymmetric distribution (lorentz-drift)
+    // std::cout << "resVsPt_pt = " << std::endl;
     FitAndFillHistoBinSL_( h2_resVsPt_pt  , h_resVsPt_pt[i]  , i+1, +0.005);
     FitAndFillHistoBinSL_( h2_resVsPt_pt_C, h_resVsPt_pt_C[i], i+1, +0.005);
     FitAndFillHistoBinSL_( h2_resVsPt_pt_I, h_resVsPt_pt_I[i], i+1, +0.005);
     FitAndFillHistoBinSL_( h2_resVsPt_pt_F, h_resVsPt_pt_F[i], i+1, +0.005);
 
-    FitAndFillHistoBinSL_( h2_resVsPt_ptRel  , h_resVsPt_ptRel[i]  , i+1, +0.005);
-    FitAndFillHistoBinSL_( h2_resVsPt_ptRel_C, h_resVsPt_ptRel_C[i], i+1, +0.005);
-    FitAndFillHistoBinSL_( h2_resVsPt_ptRel_I, h_resVsPt_ptRel_I[i], i+1, +0.005);
-    FitAndFillHistoBinSL_( h2_resVsPt_ptRel_F, h_resVsPt_ptRel_F[i], i+1, +0.005);
+    // std::cout << "resVsPt_ptRel = " << std::endl;
+    //FitAndFillHistoBinSL_( h2_resVsPt_ptRel  , h_resVsPt_ptRel[i]  , i+1, +0.005);
+    //FitAndFillHistoBinSL_( h2_resVsPt_ptRel_C, h_resVsPt_ptRel_C[i], i+1, +0.005);
+    //FitAndFillHistoBinSL_( h2_resVsPt_ptRel_I, h_resVsPt_ptRel_I[i], i+1, +0.005);
+    //FitAndFillHistoBinSL_( h2_resVsPt_ptRel_F, h_resVsPt_ptRel_F[i], i+1, +0.005);
     
     // Fit "gaus" to eta to get resolution
+    // std::cout << "resVsPt_eta = " << std::endl;
     FitAndFillHistoBinSL_( h2_resVsPt_eta  , h_resVsPt_eta[i]  , i+1, +0.005 );
     FitAndFillHistoBinSL_( h2_resVsPt_eta_C, h_resVsPt_eta_C[i], i+1, +0.005 );
     FitAndFillHistoBinSL_( h2_resVsPt_eta_I, h_resVsPt_eta_I[i], i+1, +0.005 );
     FitAndFillHistoBinSL_( h2_resVsPt_eta_F, h_resVsPt_eta_F[i], i+1, +0.005 );
 
     // Cannot fit "gaus" to phi due to asymmetric distribution (lorentz-drift)
+    // std::cout << "resVsPt_phi" << std::endl;
     FitAndFillHistoBinSL_( h2_resVsPt_phi  , h_resVsPt_phi[i]  , i+1, +0.005 );
     FitAndFillHistoBinSL_( h2_resVsPt_phi_C, h_resVsPt_phi_C[i], i+1, +0.005 );
     FitAndFillHistoBinSL_( h2_resVsPt_phi_I, h_resVsPt_phi_I[i], i+1, +0.005 );
     FitAndFillHistoBinSL_( h2_resVsPt_phi_F, h_resVsPt_phi_F[i], i+1, +0.005 );
 
     // Fit "gaus" to z0 to get resolution
+    // std::cout << "resVsPt_z0" << std::endl;
     FitAndFillHistoBinSL_( h2_resVsPt_z0  , h_resVsPt_z0[i]  , i+1, +0.005 );
     FitAndFillHistoBinSL_( h2_resVsPt_z0_C, h_resVsPt_z0_C[i], i+1, +0.005 );
     FitAndFillHistoBinSL_( h2_resVsPt_z0_I, h_resVsPt_z0_I[i], i+1, +0.005 );
     FitAndFillHistoBinSL_( h2_resVsPt_z0_F, h_resVsPt_z0_F[i], i+1, +0.005 );
 
     // Fit "gaus" to d0 to get resolution
-    FitAndFillHistoBinSL_( h2_resVsPt_d0  , h_resVsPt_d0[i]  , i+1, +0.005 );
-    FitAndFillHistoBinSL_( h2_resVsPt_d0_C, h_resVsPt_d0_C[i], i+1, +0.005 );
-    FitAndFillHistoBinSL_( h2_resVsPt_d0_I, h_resVsPt_d0_I[i], i+1, +0.005 );
-    FitAndFillHistoBinSL_( h2_resVsPt_d0_F, h_resVsPt_d0_F[i], i+1, +0.005 );
+    // std::cout << "resVsPt_d0 = " << std::endl;
+    // FitAndFillHistoBinSL_( h2_resVsPt_d0  , h_resVsPt_d0[i]  , i+1, +0.005 );
+    // FitAndFillHistoBinSL_( h2_resVsPt_d0_C, h_resVsPt_d0_C[i], i+1, +0.005 );
+    // FitAndFillHistoBinSL_( h2_resVsPt_d0_I, h_resVsPt_d0_I[i], i+1, +0.005 );
+    // FitAndFillHistoBinSL_( h2_resVsPt_d0_F, h_resVsPt_d0_F[i], i+1, +0.005 );
 
   }
 
@@ -1693,36 +1699,42 @@ void Tracking::FinaliseHistos_(void)
   for (int i=0; i < ETA_BINS; i++) {
 
     // double eta = i*ETA_BINWIDTH;
-    
+
+    // std::cout << "resVsEta_pt" << std::endl;
     FitAndFillHistoBinSL_(h2_resVsEta_pt  , h_resVsEta_pt[i]  , i+1, +0.005 );
     FitAndFillHistoBinSL_(h2_resVsEta_pt_L, h_resVsEta_pt_L[i], i+1, +0.005 );
     FitAndFillHistoBinSL_(h2_resVsEta_pt_M, h_resVsEta_pt_M[i], i+1, +0.005 );
     FitAndFillHistoBinSL_(h2_resVsEta_pt_H, h_resVsEta_pt_H[i], i+1, +0.005 );
-  
-    FitAndFillHistoBinSL_(h2_resVsEta_ptRel  , h_resVsEta_ptRel[i]  , i+1, +0.005 );
-    FitAndFillHistoBinSL_(h2_resVsEta_ptRel_L, h_resVsEta_ptRel_L[i], i+1, +0.005 );
-    FitAndFillHistoBinSL_(h2_resVsEta_ptRel_M, h_resVsEta_ptRel_M[i], i+1, +0.005 );
-    FitAndFillHistoBinSL_(h2_resVsEta_ptRel_H, h_resVsEta_ptRel_H[i], i+1, +0.005 );
 
+    // std::cout << "resVsEta_ptRel" << std::endl;  
+    // FitAndFillHistoBinSL_(h2_resVsEta_ptRel  , h_resVsEta_ptRel[i]  , i+1, +0.005 );
+    // FitAndFillHistoBinSL_(h2_resVsEta_ptRel_L, h_resVsEta_ptRel_L[i], i+1, +0.005 );
+    // FitAndFillHistoBinSL_(h2_resVsEta_ptRel_M, h_resVsEta_ptRel_M[i], i+1, +0.005 );
+    // FitAndFillHistoBinSL_(h2_resVsEta_ptRel_H, h_resVsEta_ptRel_H[i], i+1, +0.005 );
+
+    // std::cout << "resVsEta_eta" << std::endl;  
     FitAndFillHistoBinSL_(h2_resVsEta_eta  , h_resVsEta_eta[i]  , i+1, +0.005 );
     FitAndFillHistoBinSL_(h2_resVsEta_eta_L, h_resVsEta_eta_L[i], i+1, +0.005 );
     FitAndFillHistoBinSL_(h2_resVsEta_eta_M, h_resVsEta_eta_M[i], i+1, +0.005 );
     FitAndFillHistoBinSL_(h2_resVsEta_eta_H, h_resVsEta_eta_H[i], i+1, +0.005 );
-    
+
+    // std::cout << "resVsEta_phi" << std::endl;
     FitAndFillHistoBinSL_(h2_resVsEta_phi  , h_resVsEta_phi[i]  , i+1, +0.005 );
     FitAndFillHistoBinSL_(h2_resVsEta_phi_L, h_resVsEta_phi_L[i], i+1, +0.005 );
     FitAndFillHistoBinSL_(h2_resVsEta_phi_M, h_resVsEta_phi_M[i], i+1, +0.005 );
     FitAndFillHistoBinSL_(h2_resVsEta_phi_H, h_resVsEta_phi_H[i], i+1, +0.005 );
 
+    // std::cout << "resVsEta_z0" << std::endl;
     FitAndFillHistoBinSL_(h2_resVsEta_z0  , h_resVsEta_z0[i]  , i+1, +0.005 );
     FitAndFillHistoBinSL_(h2_resVsEta_z0_L, h_resVsEta_z0_L[i], i+1, +0.005 );
     FitAndFillHistoBinSL_(h2_resVsEta_z0_M, h_resVsEta_z0_M[i], i+1, +0.005 );
     FitAndFillHistoBinSL_(h2_resVsEta_z0_H, h_resVsEta_z0_H[i], i+1, +0.005 );
-
-    FitAndFillHistoBinSL_(h2_resVsEta_d0  , h_resVsEta_d0[i]  , i+1, +0.005 );
-    FitAndFillHistoBinSL_(h2_resVsEta_d0_L, h_resVsEta_d0_L[i], i+1, +0.005 );
-    FitAndFillHistoBinSL_(h2_resVsEta_d0_M, h_resVsEta_d0_M[i], i+1, +0.005 );
-    FitAndFillHistoBinSL_(h2_resVsEta_d0_H, h_resVsEta_d0_H[i], i+1, +0.005 );
+    
+    // std::cout << "resVsEta_d0" << std::endl;
+    // FitAndFillHistoBinSL_(h2_resVsEta_d0  , h_resVsEta_d0[i]  , i+1, +0.005 );
+    // FitAndFillHistoBinSL_(h2_resVsEta_d0_L, h_resVsEta_d0_L[i], i+1, +0.005 );
+    // FitAndFillHistoBinSL_(h2_resVsEta_d0_M, h_resVsEta_d0_M[i], i+1, +0.005 );
+    // FitAndFillHistoBinSL_(h2_resVsEta_d0_H, h_resVsEta_d0_H[i], i+1, +0.005 );
     
   }
   

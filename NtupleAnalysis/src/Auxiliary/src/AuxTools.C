@@ -272,7 +272,7 @@ template<class TYPE> string AuxTools::ConvertIntVectorToString(const vector<TYPE
     {       
 
       TYPE value = myVector[index];
-      if (value == 999999) value = 0;
+      // if (value == 999999) value = 0;
       if(index == (int) myVector.size()-1) text += ToString( value );
       else text += ToString( value ) + ","; 
 

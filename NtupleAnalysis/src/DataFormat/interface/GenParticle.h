@@ -47,6 +47,7 @@ class GenParticle{
   unsigned short index(void) const {return theIndex;}
   TLorentzVector p4(void) const {return theP4;}
   TLorentzVector p4vis(void);
+  TLorentzVector p4charged(bool verbose=false);
   double energy(void) const {return theP4.Energy();}
   double et(void) const {return theP4.Et();}
   double pt(void) const {return theP4.Pt();}

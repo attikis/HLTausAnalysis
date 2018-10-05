@@ -11,10 +11,10 @@ USAGE:
 
 EXAMPLES:
 ./plotResolution.py -m multicrab_CaloTkSkim_v92X_20180711T1118/ --gridX --gridY --formats .png,.pdf,.C
-
+./plotResolution.py -m multicrab_CaloTkSkim_v92X_20180711T1118/
 
 LAST USED:
-./plotResolution.py -m multicrab_CaloTkSkim_v92X_20180711T1118/
+./plotResolution.py -m multicrab_CaloTk_v92X_17h36m07s_12Sep2018 -i TT_TuneCUETP8M2T4_14TeV_L1TPU140 --url
 
 '''
 
