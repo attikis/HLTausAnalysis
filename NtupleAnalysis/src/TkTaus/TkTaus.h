@@ -81,7 +81,8 @@ class TkTaus : public TreeAnalyserMC{
 		     TLorentzVector sigTks_p4, TLorentzVector isoTks_p4);
 
   void GetSigConeTracks(L1TkTauParticle &L1TkTau,
-			vector<TTTrack> TTTracks);
+			vector<TTTrack> TTTracks,
+			double sigConeTks_dPOCAz);
   
   void GetIsoConeTracks(L1TkTauParticle &L1TkTau,
 			vector<TTTrack> TTTracks);
@@ -114,6 +115,7 @@ class TkTaus : public TreeAnalyserMC{
   double sigConeTks_maxEta;
   double sigConeTks_maxChiSq;
   unsigned int sigConeTks_minStubs;
+  double sigConeTks_dPOCAz;
 
   // Isolation Cone Tracks
   string isoConeTks_Collection;
