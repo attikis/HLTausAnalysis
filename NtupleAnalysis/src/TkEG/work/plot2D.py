@@ -228,6 +228,8 @@ def GetHistoKwargs(h, opts):
     if "nstubsvschi2" in h.lower():
         kwargs["opts"]   = {"xmin": 0, "xmax": 10.0, "ymin": 0.0, "ymax": 100.0, "ymaxfactor": yMaxF}
 
+    if "pion0et_vs_photonsdr" in h.lower():
+        kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": 0.0, "ymax": 1.0, "ymaxfactor": yMaxF}
 
     '''
     if "_eta" in h.lower():

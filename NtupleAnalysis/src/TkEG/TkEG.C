@@ -40,7 +40,7 @@ void TkEG::InitVars_()
   cfg_tk_nFitParams  = 4;           // Default: 4
   cfg_tk_minPt       = 2.00;        // Default: 2.0
   cfg_tk_minEta      = 0.0;         // Default: 0.0
-  cfg_tk_maxEta      = 2.5;        // Default: 1e6
+  cfg_tk_maxEta      = 2.4;        // Default: 1e6
   cfg_tk_maxChiSqRed = 1e6;         // Default: 1e6
   cfg_tk_minStubs    =   4;         // Default: 0
   cfg_tk_minStubsPS  =   0;         // Default: 0
@@ -63,7 +63,7 @@ void TkEG::InitVars_()
   maxChi2_trk       = 40.0; // GeV
   maxChi2_trk_alt   = 20.0; // GeV
   minPt_leadtrk     = 10.0; // GeV
-  maxEta_leadtrk    = 2.5;
+  maxEta_leadtrk    = 2.4;
   minDeltaR_leadtrk = 0.0;
   maxDeltaR_leadtrk = 0.3;
   maxDeltaZ_trk     = 0.8;  // cm
@@ -231,21 +231,24 @@ void TkEG::Loop()
     // Hadronic GenTaus (skip for MinBias samples)
     GenTausHadronic.clear();
     if (cfg_AddGenP) {
-      if (cfg_DEBUG*0) cout << "\n=== GenParticles (" << GenP_Pt.size() << ")" << endl;
-      if (!isMinBias) GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 2.5);
+      if (cfg_DEBUG) cout << "\n=== GenParticles (" << GenP_Pt.size() << ")" << endl;
+      if (!isMinBias) GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 2.4);
       if (cfg_DEBUG*0) PrintGenParticleCollection(GenTausHadronic);
     }
     
     // Triggred GenTaus (skip for MinBias samples)
     vector<GenParticle> GenTausTrigger;  
-    if (!isMinBias) GenTausTrigger = GetHadronicGenTaus(GenTaus, 20.0, 2.5);  
+    if (!isMinBias) GenTausTrigger = GetHadronicGenTaus(GenTaus, 20.0, 2.4);  
     
     // Ensure that all taus are found, needed by the current efficiency definition 
     // E.g. for ttbar, only events with two taus within trigger acceptance are considered for efficiency calculation)
     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
     if (bFoundAllTaus_) nEvtsWithMaxHTaus++;
 
+
     // Fill histos with genTau info
+    if (cfg_DEBUG) cout << "\n=== All gen-taus info " << endl;
+
     if (!isMinBias){
       h_genTausAll_N->Fill(GenTaus.size());
       for (vector<GenParticle>::iterator genTau = GenTaus.begin(); genTau != GenTaus.end(); genTau++) {
@@ -253,16 +256,20 @@ void TkEG::Loop()
 	h_genTausAll_Eta -> Fill(genTau->eta());
 	h_genTausAll_Phi -> Fill(genTau->phi());
       }
-      h_genTausAll_Eta1VsEta2 -> Fill (GenTaus.at(0).eta(), GenTaus.at(1).eta());
-      h_genTausAll_Phi1VsPhi2 -> Fill (GenTaus.at(0).phi(), GenTaus.at(1).phi());
+      
+      if (GenTaus.size() == 2) {
+	h_genTausAll_Eta1VsEta2 -> Fill (GenTaus.at(0).eta(), GenTaus.at(1).eta());
+	h_genTausAll_Phi1VsPhi2 -> Fill (GenTaus.at(0).phi(), GenTaus.at(1).phi());
+      }
     }
+    if (cfg_DEBUG) cout << "\n=== All gen-taus info -end" << endl;
 
     ////////////////////////////////////////////////
     // TkEG algorithm
     ////////////////////////////////////////////////    
     
     // Check whether EGs exist or not when asking for a specific number of gen hadronic taus
-    
+    if (cfg_DEBUG) cout << "\n=== Count EGs multiplicity" << endl;
     // Without asking for genuine hadronic taus 
     if (L1EGs.size() >=1 ) counters_events_EGs++;
 
@@ -273,17 +280,17 @@ void TkEG::Loop()
     // Ask for at least 1 genuine hadronic tau 
     if (L1EGs.size() >=1 ) counters_events_1GenTauHad_EGs++;
 
-
+    /*
     // Consider only events with at least two genuine hadronic taus (except for MinBias sample)
     if (GenTausHadronic.size() < 2 && !isMinBias) continue;
 
     // Ask for at least 2 genuine hadronic tau 
     if (L1EGs.size() >=1 ) counters_events_2GenTauHad_EGs++;
-
+    */
 
 
     //================ Gen-Level ===================
-    //cout <<"Hadronic taus = "<<GenTausHadronic.size()<<endl;
+
     // For-loop: All hadronic gen-taus
     for (vector<GenParticle>::iterator genTau = GenTausHadronic.begin(); genTau != GenTausHadronic.end(); genTau++) {
       counter_allHadGenTaus++;
@@ -304,10 +311,13 @@ void TkEG::Loop()
 	  double photons_dR = auxTools_.DeltaR( photon_1.eta(), photon_1.phi(), photon_2.eta(), photon_2.phi() );
 
 	  // Fill histos (photons properties)
+	  h_Pion0_Et   -> Fill (genTau->finalDaughtersNeutral().at(0).et());
 	  h_Photons_Et -> Fill (photon_1.et());
 	  h_Photons_Et -> Fill (photon_2.et());
 	  h_Photons_dR -> Fill (photons_dR);
 
+	  h_Pion0Et_Vs_PhotonsDR -> Fill (genTau->finalDaughtersNeutral().at(0).et(), photons_dR);
+	  
 	  // Check if the photons from pion0 are matched with EGs
 	  EG match_EG1;
 	  EG match_EG2;
@@ -319,10 +329,12 @@ void TkEG::Loop()
 	  bool photon_2_matched = false;
 
 	  // Find the minimum dR between photons and EGs
+	  
+	  // --- will check the matching only for pion0s with ET>10GeV (because EGs ET is >10GeV)
+	  if (genTau->finalDaughtersNeutral().at(0).et() < 10) continue;
 
 	  // For-loop: All the EGs in the event                                                                                                                         
-	  for (auto eg = L1EGs.begin(); eg != L1EGs.end() ; eg++) {
-	   
+	  for (auto eg = L1EGs.begin(); eg != L1EGs.end() ; eg++) { 
 	    // 1st photon
 	    deltaR1 = auxTools_.DeltaR( eg->getEta(), eg->getPhi(), photon_1.eta(), photon_1.phi() );
 	    
@@ -741,7 +753,8 @@ void TkEG::Loop()
     vector<EG> EGcluster;
     TauCandidates.clear();
     double ET;
-    float deltaRmin;
+    float deltaEta, deltaPhi;
+    float deltaRmin, deltaEtaMin, deltaPhiMin;
     float deltaR_beforecorrection;
     //deltaR = 999.0; //marina
     for (size_t i=0; i<trackTauCandidates.size(); i++) {
@@ -768,7 +781,9 @@ void TkEG::Loop()
       // Initialize the ET (scalar sum of the ET of EGs) and the InvMass as InvMass of the clustered tracks
       ET      = 0.0; //= p4sum.Et();
       invMass = p4sum.M();
-      deltaRmin = 1000000.0;
+      deltaRmin   = 1000000.0;
+      deltaEtaMin = 1000000.0;
+      deltaPhiMin = 1000000.0;
       // For-loop: All the EGs in the event
       for (auto eg = L1EGs.begin(); ( !stopClustering && (eg != L1EGs.end()) ); eg++) {
 	counter_allEG++;
@@ -781,11 +796,23 @@ void TkEG::Loop()
 	// Usage of CorrectedEta() of EG based on vertex position of the leading track
 	deltaR = auxTools_.DeltaR(leadTrackPtr->getEta(), leadTrackPtr->getPhi(), CorrectedEta(eg->getEta(), leadTrackPtr->getZ0()), eg->getPhi());
 	deltaR_beforecorrection = auxTools_.DeltaR(leadTrackPtr->getEta(), leadTrackPtr->getPhi(), eg->getEta(), eg->getPhi());
-	// Fill  dR histogram
+
+	deltaPhi = auxTools_.DeltaPhi( leadTrackPtr->getPhi(), eg->getPhi());
+	deltaEta = auxTools_.DeltaEta( leadTrackPtr->getEta(), CorrectedEta(eg->getEta(), leadTrackPtr->getZ0()));
+
+	// Fill  dR, dEta, dPhi histograms
 	h_leadTrk_EG_dR -> Fill (deltaR); 
 	h_leadTrk_EG_dR_beforecorrection -> Fill(deltaR_beforecorrection);
-	// Aply dR cuts
+	
+	h_leadTrk_EG_dPhi -> Fill (deltaPhi);
+	h_leadTrk_EG_dEta -> Fill (deltaEta);
+
+	// Find minimum dR, dEta, dPhi
 	if (deltaR < deltaRmin) deltaRmin=deltaR;
+	if (abs(deltaPhi) < abs(deltaPhiMin)) deltaPhiMin = deltaPhi;
+	if (abs(deltaEta) < abs(deltaEtaMin)) deltaEtaMin = deltaEta;
+
+	// Aply dR cuts
 	// Skip if EG is not within the signal cone 
 	if (deltaR > maxDeltaR_EG) continue;
 	counter_passDRmax++;
@@ -832,6 +859,8 @@ void TkEG::Loop()
       }
       
       h_leadTrk_EG_dRmin -> Fill (deltaRmin);
+      h_leadTrk_EG_dPhiMin -> Fill (abs(deltaPhiMin));      
+      h_leadTrk_EG_dEtaMin -> Fill (abs(deltaEtaMin));
 
       if (EGcluster.size()==1) counter_1eg++;
       if (EGcluster.size()==2) counter_2eg++;
@@ -1048,9 +1077,9 @@ void TkEG::Loop()
 
     // Fill turn-on numerators
     FillTurnOn_Numerator_(TauCandidates, 25.0, hTurnOn25_all);
-    FillTurnOn_Numerator_(TauCandidatesIsolated, 25.0, hTurnOn25_relIso);
+    //FillTurnOn_Numerator_(TauCandidatesIsolated, 25.0, hTurnOn25_relIso);
     FillTurnOn_Numerator_(TauCandidates, 50.0, hTurnOn50_all);
-    FillTurnOn_Numerator_(TauCandidatesIsolated, 50.0, hTurnOn50_relIso);
+    //FillTurnOn_Numerator_(TauCandidatesIsolated, 50.0, hTurnOn50_relIso);
 
     ////////////////////////////////////////////////
     // Rates and efficiencies for single tau
@@ -1060,7 +1089,7 @@ void TkEG::Loop()
     FillSingleTau_(TauCandidates, hRateSingleTau_I, hEffSingleTau_I, 1.0, 1.6);
     FillSingleTau_(TauCandidates, hRateSingleTau_F, hEffSingleTau_F, 1.6, 3.0); // 2.5 is max
 
-    FillSingleTau_(TauCandidatesIsolated, hRateSingleTau_relIso, hEffSingleTau_relIso);
+    //FillSingleTau_(TauCandidatesIsolated, hRateSingleTau_relIso, hEffSingleTau_relIso);
     
 
     ////////////////////////////////////////////////
@@ -1071,7 +1100,7 @@ void TkEG::Loop()
     FillDiTau_(TauCandidates, hRateDiTau_I, hEffDiTau_I, 1.0, 1.6);
     FillDiTau_(TauCandidates, hRateDiTau_F, hEffDiTau_F, 1.6, 3.0); // 2.5 is max
 
-    FillDiTau_(TauCandidatesIsolated, hRateDiTau_relIso, hEffDiTau_relIso);
+    //FillDiTau_(TauCandidatesIsolated, hRateDiTau_relIso, hEffDiTau_relIso);
 
     ////////////////////////////////////////////////
     // WARNING: Erases L1TkTaus from vector!
@@ -1153,9 +1182,9 @@ void TkEG::Loop()
 
   // Divide turn-on numerators by the denumerator
   histoTools_.DivideHistos_1D(hTurnOn25_all, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hTurnOn25_relIso, hMcHadronicTau_VisEt);
+  //histoTools_.DivideHistos_1D(hTurnOn25_relIso, hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hTurnOn50_all, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hTurnOn50_relIso, hMcHadronicTau_VisEt); 
+  //histoTools_.DivideHistos_1D(hTurnOn50_relIso, hMcHadronicTau_VisEt); 
   
   // Convert rate histograms
   histoTools_.ConvertToRateHisto_1D(hRateSingleTau_all, nEntries);
@@ -1163,14 +1192,14 @@ void TkEG::Loop()
   histoTools_.ConvertToRateHisto_1D(hRateSingleTau_I, nEntries);
   histoTools_.ConvertToRateHisto_1D(hRateSingleTau_F, nEntries);
 
-  histoTools_.ConvertToRateHisto_1D(hRateSingleTau_relIso, nEntries);
+  //histoTools_.ConvertToRateHisto_1D(hRateSingleTau_relIso, nEntries);
 
   histoTools_.ConvertToRateHisto_1D(hRateDiTau_all, nEntries);
   histoTools_.ConvertToRateHisto_1D(hRateDiTau_C, nEntries);
   histoTools_.ConvertToRateHisto_1D(hRateDiTau_I, nEntries);
   histoTools_.ConvertToRateHisto_1D(hRateDiTau_F, nEntries);
 
-  histoTools_.ConvertToRateHisto_1D(hRateDiTau_relIso, nEntries);
+  //histoTools_.ConvertToRateHisto_1D(hRateDiTau_relIso, nEntries);
 
   // Finalise efficiency histograms
   FinaliseEffHisto_(hEffSingleTau_all  , nEvtsWithMaxHTaus);
@@ -1178,14 +1207,14 @@ void TkEG::Loop()
   FinaliseEffHisto_(hEffSingleTau_I, nEvtsWithMaxHTaus);
   FinaliseEffHisto_(hEffSingleTau_F, nEvtsWithMaxHTaus);
 
-  FinaliseEffHisto_(hEffSingleTau_relIso  , nEvtsWithMaxHTaus);
+  //FinaliseEffHisto_(hEffSingleTau_relIso  , nEvtsWithMaxHTaus);
 
   FinaliseEffHisto_(hRateDiTau_all  , nEvtsWithMaxHTaus);
   FinaliseEffHisto_(hRateDiTau_C, nEvtsWithMaxHTaus);
   FinaliseEffHisto_(hRateDiTau_I, nEvtsWithMaxHTaus);
   FinaliseEffHisto_(hRateDiTau_F, nEvtsWithMaxHTaus);
 
-  FinaliseEffHisto_(hRateDiTau_relIso  , nEvtsWithMaxHTaus);
+  //FinaliseEffHisto_(hRateDiTau_relIso  , nEvtsWithMaxHTaus);
 
   ////////////////////////////////////////////////
   // Write the histograms to the file
@@ -1324,11 +1353,17 @@ void TkEG::BookHistos_(void)
   // Pt of leading charged decay product  (leading pt>10GeV) Vs dRmax with  other neutral products
   histoTools_.BookHisto_2D(h_genTau_neutralDaugh_PtLead_dRmax, "genTau_neutralDaugh_PtLead_dRmax", ";p_{T} (charged^{ldg}) (GeV); #DeltaR_{max} (charged^{ldg}, neutral)", 100, 0.0, 100.0, 50, 0.0, 0.5);
 
+  // Et of pi0 (1 prong decay, 1 pi0 cases)
+  histoTools_.BookHisto_1D(h_Pion0_Et, "Pion0_Et", ";E_{T} (GeV); Particles / bin", 100, +0.0, +100.0);
+
   // Et of the photons from pi0 (1 prong decay, 1 pi0 cases)
   histoTools_.BookHisto_1D(h_Photons_Et, "Photons_Et", ";E_{T} (GeV); Particles / bin", 100, +0.0, +100.0);
 
   // dR of the two photons from pi0 (1 prong decay, 1 pi0 cases)
   histoTools_.BookHisto_1D(h_Photons_dR  , "Photons_dR"  , ";#Delta R; Entries / bin",   200,  0.0,   +2.0);
+
+  // Et of pi0 Vs dR of the two photons from pi0 (1 prong decay, 1 pi0 cases)
+  histoTools_.BookHisto_2D(h_Pion0Et_Vs_PhotonsDR, "Pion0Et_Vs_PhotonsDR", ";E_{T} (#pi^{0})  (GeV); #DeltaR (photon_{1}, photon_{2})", 100, 0.0, 100.0, 100, 0.0, 1.0);
 
   // Matching od EGs and Gen-Photons
   histoTools_.BookHisto_1D(h_Photons_EGs_Matching, "Photons_EGs_Matching", "Entries / bin", 4, 0, 4);
@@ -1457,8 +1492,20 @@ void TkEG::BookHistos_(void)
   // DR of lead trk and EGs (before the correction of EG's eta
   histoTools_.BookHisto_1D(h_leadTrk_EG_dR_beforecorrection, "leadTrk_EG_dR_beforecorrection", ";#DeltaR(trk_{ldg}, EG); entries / bin",   60,  0.0,   +6.0);
 
+  // DPhi of lead trk and EGs                                                                      
+  histoTools_.BookHisto_1D(h_leadTrk_EG_dPhi, "leadTrk_EG_dPhi", ";#Delta#phi(trk_{ldg}, EG); entries / bin",  21,  -3.15,  +3.15);
+
+  // DEta of lead trk and EGs
+  histoTools_.BookHisto_1D(h_leadTrk_EG_dEta, "leadTrk_EG_dEta", ";#Delta#eta(trk_{ldg}, EG); entries / bin",  100,  -10.0,  10.0);
+
   // minimum DR of lead trk and EGs
   histoTools_.BookHisto_1D(h_leadTrk_EG_dRmin, "leadTrk_EG_dRmin", ";#DeltaR_{min}(trk_{ldg}, EG); entries / bin",   60,  0.0,   +6.0);
+
+  // minimum DPhi of lead trk and EGs
+  histoTools_.BookHisto_1D(h_leadTrk_EG_dPhiMin, "leadTrk_EG_dPhiMin", ";|#Delta#phi_{min}(trk_{ldg}, EG)|; entries / bin",  16,  0,  +3.2);
+
+  // minimum DEta of lead trk and EGs
+  histoTools_.BookHisto_1D(h_leadTrk_EG_dEtaMin, "leadTrk_EG_dEtaMin", ";|#Delta#eta_{min}(trk_{ldg}, EG)|; entries / bin",   50,  0.0,  10.0);
 
   // Clustered EGs counters
   histoTools_.BookHisto_1D(h_clustEGs_allEGs, "clustEGs_allEGs", ";N_{EGs} (all) ; entries / bin", 16, -0.5, +15.5);
@@ -1638,8 +1685,10 @@ void TkEG::WriteHistos_(void)
   h_genTau_chargedDaugh_PtLead_dRmax->Write();
   h_genTau_neutralDaugh_PtLead_dRmax->Write();
 
+  h_Pion0_Et->Write();
   h_Photons_Et->Write();
   h_Photons_dR->Write();
+  h_Pion0Et_Vs_PhotonsDR->Write();
   h_Photons_EGs_Matching->Write();
 
   h_trk_NStubs_all->Write();
@@ -1694,7 +1743,11 @@ void TkEG::WriteHistos_(void)
 
   h_leadTrk_EG_dR->Write();
   h_leadTrk_EG_dR_beforecorrection->Write();
+  h_leadTrk_EG_dPhi->Write();
+  h_leadTrk_EG_dEta->Write();
   h_leadTrk_EG_dRmin->Write();
+  h_leadTrk_EG_dPhiMin->Write();
+  h_leadTrk_EG_dEtaMin->Write();
 
   h_EGClusters_MultiplicityPerCluster->Write();
   h_EGClusters_Et->Write();

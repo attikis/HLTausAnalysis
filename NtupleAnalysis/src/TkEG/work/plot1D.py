@@ -260,7 +260,7 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0, "xmax": 10.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "leadtrk_eg_drmin" in h.lower():
-        kwargs["opts"]   = {"xmin": 0, "xmax": 5.0, "ymin": _yMin, "ymax" : 0.22, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": 0, "xmax": 5.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "leadtrks_pt" in h.lower():
         _yLabel = "Arbitrary Units / %.0f "

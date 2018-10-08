@@ -103,14 +103,7 @@ Double_t AuxTools::DeltaPhi(const Double_t phi1,
 {
   // See: https://cmssdt.cern.ch/SDT/doxygen/CMSSW_4_4_2/doc/html/d1/d92/DataFormats_2Math_2interface_2deltaPhi_8h_source.html
   Double_t result = phi1 - phi2;
-  /*
-  if(result > 100) {
-    result = PI;
-  }
-  if(result < -100) {
-    result = -PI;
-  }
-  */
+
   while (result > PI) result -= 2*PI;
   while (result <= -PI) result += 2*PI; 
 
