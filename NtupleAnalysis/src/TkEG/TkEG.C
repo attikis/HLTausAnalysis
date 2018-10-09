@@ -1885,7 +1885,7 @@ void TkEG::FillSingleTau_(vector<L1TkEGParticle> L1TkEGs,
   if( L1TkEGs.size() < 1 ) return;
   
   // Fill rate
-  double ldgEt = L1TkEGs.at(0).GetTrackBasedPt();
+  double ldgEt = L1TkEGs.at(0).GetTotalEt();
 
   // Inclusive or Eta slice in Central/Intermedieate/Forward Tracker region?
   if ( abs(L1TkEGs.at(0).GetLeadingTrack().getEta()) < minEta) return;
@@ -1901,7 +1901,7 @@ void TkEG::FillSingleTau_(vector<L1TkEGParticle> L1TkEGs,
   if(!bFoundAllTaus_) return;
 
   // Fill efficiency
-  double ldgEt_mcMatched = L1TkEGs_mcMatched.at(0).GetTrackBasedPt();
+  double ldgEt_mcMatched = L1TkEGs_mcMatched.at(0).GetTotalEt();
   FillEfficiency_(hEfficiency, ldgEt_mcMatched);
 
   return;
@@ -1922,7 +1922,7 @@ void TkEG::FillDiTau_(vector<L1TkEGParticle> L1TkEGs,
 
   // Fill rate
   L1TkEGParticle L1TkEG = L1TkEGs.at(1);
-  double subLdgEt = L1TkEG.GetTrackBasedPt();
+  double subLdgEt = L1TkEG.GetTotalEt();
   
   // Inclusive or Eta slice in Central/Intermedieate/Forward Tracker region?
   if ( abs(L1TkEGs.at(0).GetLeadingTrack().getEta()) < minEta) return;
@@ -1940,7 +1940,7 @@ void TkEG::FillDiTau_(vector<L1TkEGParticle> L1TkEGs,
   if(!bFoundAllTaus_) return;
 
   // Fill efficiency
-  double subLdgEt_mcMatched = L1TkEGs_mcMatched.at(1).GetTrackBasedPt();
+  double subLdgEt_mcMatched = L1TkEGs_mcMatched.at(1).GetTotalEt();
   FillEfficiency_(hEfficiency, subLdgEt_mcMatched);
 
   return;
@@ -1964,8 +1964,8 @@ void TkEG::FillDiTau_(vector<L1TkEGParticle> L1TkEGs1,
   vector<L1TkEGParticle> L1TkEGs2_mcMatched = GetMcMatchedL1TkEGs(L1TkEGs2);
 
   // Fill rate 
-  double ldgEt1 = L1TkEGs1.at(0).GetTrackBasedPt();
-  double ldgEt2 = L1TkEGs2.at(0).GetTrackBasedPt();
+  double ldgEt1 = L1TkEGs1.at(0).GetTotalEt();
+  double ldgEt2 = L1TkEGs2.at(0).GetTotalEt();
 
   // Ensure that different calo objects are used
   unsigned int index1 = L1TkEGs1.at(0).GetLeadingTrack().index();
@@ -1986,8 +1986,8 @@ void TkEG::FillDiTau_(vector<L1TkEGParticle> L1TkEGs1,
   if (L1TkEGs2_mcMatched.size() < 1) return;
 
   // Get MC-matched Et
-  double ldgEt1_mcMatched = L1TkEGs1_mcMatched.at(0).GetTrackBasedPt();
-  double ldgEt2_mcMatched = L1TkEGs2_mcMatched.at(0).GetTrackBasedPt();
+  double ldgEt1_mcMatched = L1TkEGs1_mcMatched.at(0).GetTotalEt();
+  double ldgEt2_mcMatched = L1TkEGs2_mcMatched.at(0).GetTotalEt();
 
   
   // Ensure that different calo objects are used
@@ -2071,7 +2071,7 @@ void TkEG::FillTurnOn_Numerator_(vector<L1TkEGParticle> L1TkEGs,
       
       matched_particles++;
       // Skip if trigger object has Pt < minPt
-      if (tau->GetTrackBasedPt() < minPt) continue;
+      if (tau->GetTotalEt() < minPt) continue;
       passed_cut++;      
             
       // Fill the turn-on

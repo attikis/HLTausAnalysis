@@ -38,6 +38,7 @@ class L1TkEGParticle{
 
   double GetTrackBasedEt();
   double GetEGBasedEt(); 
+  double GetTotalEt();
   double GetGenTauEt();  
   
  private:
