@@ -363,19 +363,19 @@ regionM = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kAzure, ma
 regionH = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta+2, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
                          StyleLine(lineColor=ROOT.kMagenta+2, lineStyle=ROOT.kSolid, lineWidth=3), 
                          StyleFill(fillColor=ROOT.kMagenta+2, fillStyle=1001)])
-caloStyle1   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
+tauStyle1   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
                               StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
                               StyleFill(fillColor=ROOT.kBlack, fillStyle=0)]) #3001
-caloStyle2   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+tauStyle2   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
                               StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kSolid, lineWidth=3), 
                               StyleFill(fillColor=ROOT.kRed, fillStyle=0)])
-caloStyle3   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kAzure, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+tauStyle3   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kAzure, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
                               StyleLine(lineColor=ROOT.kAzure, lineStyle=ROOT.kSolid, lineWidth=3), 
                               StyleFill(fillColor=ROOT.kAzure, fillStyle=0)])
-caloStyle4   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kGreen+2, markerSizes=None, markerStyle=ROOT.kFullSquare),
-                              StyleLine(lineColor=ROOT.kGreen+2, lineStyle=ROOT.kSolid, lineWidth=3), 
-                              StyleFill(fillColor=ROOT.kGreen+2, fillStyle=0)])
-caloStyle5   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kTeal+2, markerSizes=None, markerStyle=ROOT.kFullSquare),
+tauStyle4   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kOrange-3, markerSizes=None, markerStyle=ROOT.kFullSquare),
+                              StyleLine(lineColor=ROOT.kOrange-3, lineStyle=ROOT.kSolid, lineWidth=3), 
+                              StyleFill(fillColor=ROOT.kOrange-3, fillStyle=0)])
+tauStyle5   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kTeal+2, markerSizes=None, markerStyle=ROOT.kFullSquare),
                               StyleLine(lineColor=ROOT.kTeal+2, lineStyle=ROOT.kSolid, lineWidth=3), 
                               StyleFill(fillColor=ROOT.kTeal+2, fillStyle=0)])
 caloTkStyle  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
@@ -530,23 +530,23 @@ def getTauAlgoStyle(algo):
 
 def getCaloStyle(i):
     if i==0:
-        return caloStyle1
+        return tauStyle1
     elif i==1:
-        return caloStyle2
+        return tauStyle2
     elif i==2:
-        return caloStyle3
+        return tauStyle3
     elif i==3:
-        return caloStyle4
+        return tauStyle4
     elif i==4:
-        return caloStyle5
+        return tauStyle5
     else:
         styles[index]
 
 def getCaloStyleAlt(i):
     if i==0:
-        return caloStyle1
+        return tauStyle1
     elif i==1:
-        return caloStyle2
+        return tauStyle2
     else:
         styles[index]
 

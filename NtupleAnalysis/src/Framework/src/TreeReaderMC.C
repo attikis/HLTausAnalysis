@@ -250,8 +250,8 @@ void TreeReaderMC::SetGenParticleMomsAndDads(GenParticle &p)
 
 //============================================================================
 vector<GenParticle> TreeReaderMC::GetHadronicGenTaus(vector<GenParticle> GenTaus,
-						       double visEt,
-						       double visEta)
+						     double visEt,
+						     double visEta)
 //============================================================================
 {
   // Sanity check

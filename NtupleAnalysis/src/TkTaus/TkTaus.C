@@ -38,21 +38,22 @@ void TkTaus::InitVars_()
   // Matching tracks
   seedTk_Collection  =  "TTTracks"; // "TTTracks"
   seedTk_nFitParams  =   4;         // 4
-  seedTk_minPt       =   5.00;      // ?
+  seedTk_minPt       =  10.00;      //   5.0
   seedTk_minEta      =   0.0;       //   0.0
   seedTk_maxEta      =  999.9;      // 999.9
-  seedTk_maxChiSq    =  100.0;      // 100
-  seedTk_minStubs    =    4;        //   4
+  seedTk_maxChiSq    =   25.0;      // 100
+  seedTk_minStubs    =    5;        //   4
   seedTk_caloDeltaR  =    0.1;      // 0.1
 
   // Signal cone tracks
   sigConeTks_Collection  = seedTk_Collection;
   sigConeTks_nFitParams  = seedTk_nFitParams;
-  sigConeTks_minPt       =   2.0; //   2.0
+  sigConeTks_minPt       =   5.0; //   2.0
   sigConeTks_minEta      =   0.0; //   0.0
   sigConeTks_maxEta      = 999.9; // 999.9
-  sigConeTks_maxChiSq    = 100.0; // 100.0
-  sigConeTks_minStubs    =   4;   //   4
+  sigConeTks_maxChiSq    =  25.0; // 100.0
+  sigConeTks_minStubs    =   5;   //   4
+  sigConeTks_dPOCAz      =   0.8;  // 0.8 (A. Ryd)
 
   // Isolation cone tracks
   isoConeTks_Collection  = seedTk_Collection;
@@ -66,15 +67,15 @@ void TkTaus::InitVars_()
   // Signal cone parameters
   sigCone_Constant        = +0.00; // 0.0
   sigCone_dRMin           = +0.00; // WARNING! If > 0 the matching Track will NOT be added in sigCone_TTTracks
-  sigCone_dRMax           = +0.15; // 0.15
-  sigCone_cutoffDeltaR    = +0.15; // 0.15
+  sigCone_dRMax           = +0.12; // 0.15
+  sigCone_cutoffDeltaR    = +0.12; // 0.15
   sigCone_maxTkInvMass    = +1.77; // ?
   sigCone_maxTkDeltaPOCAz = +0.20; // ?
 
   // Isolation cone
   isoCone_Constant = +3.50;         // 3.50 GeV
   isoCone_VtxIsoWP = +0.50;         // 1.0 cm
-  isoCone_RelIsoWP = +0.20;         // N/A
+  isoCone_RelIsoWP = +0.50;         // 0.2
   isoCone_dRMin    = sigCone_dRMax; // 0.4
   isoCone_dRMax    = +0.40;         // 0.3
   diTau_deltaPOCAz = +1.00;         // 1.0 cm
@@ -394,7 +395,7 @@ void TkTaus::Loop()
 	if (0) GenParticles = GetGenParticles(false); // time-consuming
 	GenTaus             = GetGenParticles(15, true);
 	GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
-	GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 2.4);
+	GenTausTrigger      = GetHadronicGenTaus(GenTaus, 10.0, 2.4); // NEW
       }
 
     if (DEBUG)
@@ -435,6 +436,7 @@ void TkTaus::Loop()
     vector<L1TkTauParticle> L1TkTaus_Tk;
     vector<L1TkTauParticle> L1TkTaus_VtxIso;    
     vector<L1TkTauParticle> L1TkTaus_RelIso;
+    vector<L1TkTauParticle> L1TkTaus_Iso;
 
     // Ensure that all taus are found
     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
@@ -450,7 +452,7 @@ void TkTaus::Loop()
 	vector<unsigned short> chargedPionsIndices;
 	vector<GenParticle>    chargedPions;
 
-	//if (tau->HasMatchingGenParticle()) 
+	// Get the charged pions
 	GetHadronicTauChargedPions(tau->index(), chargedPionsIndices);
 
 	// Ask for 3-prong or 5-prong decay
@@ -478,25 +480,26 @@ void TkTaus::Loop()
 		
 	      }// For-loop: All charged pions
 	    
+	    // For-loop: All charged pions (3pr or 5pr)
 	    for (vector<GenParticle>::iterator chPion = chargedPions.begin(); chPion != chargedPions.end(); chPion++)
 	      {
 		if (chPion->index() == ldgPionIndx) continue;
 		double pions_dR = auxTools_.DeltaR(ldgPion.eta(), ldgPion.phi(), chPion->eta(), chPion->phi() );
-
+		
 		if ( pions_dR > pions_dRMax) pions_dRMax = pions_dR;
 	      }
 	    
 	    // Fill histo
 	    h_GenP_VisET_dRMaxLdgPion -> Fill(pions_dRMax, tau->p4vis().Et());
 	    h_GenP_PtLdg_dRMaxLdgPion -> Fill(pions_dRMax, ldgPionPt);
-
+	    
 	  }// Ask for 3-prong or 5-prong decay
 
       }
 
 
     // ======================================================================================
-    // For-loop: ?
+    // For-loop: Seed Tracks
     // ======================================================================================
     for (size_t i = 0; i < seedTracks.size(); i++)
       {
@@ -516,7 +519,7 @@ void TkTaus::Loop()
 	if (0) L1TkTauCandidate.PrintProperties(false, false, true, false);
 
 	//  Get signal-cone tracks
-	GetSigConeTracks(L1TkTauCandidate, sigTTTracks);
+	GetSigConeTracks(L1TkTauCandidate, sigTTTracks, sigConeTks_dPOCAz);
 
 	//  Get isolation-annulus tracks
 	GetIsoConeTracks(L1TkTauCandidate, isoTTTracks);
@@ -525,7 +528,7 @@ void TkTaus::Loop()
 	GetIsolationValues(L1TkTauCandidate);
 
 	// Get the matching gen-particle
-	GetMatchingGenParticle(L1TkTauCandidate, GenTausTrigger); //GenTausHadronic
+	GetMatchingGenParticle(L1TkTauCandidate, GenTausTrigger);
 
 	// Print information on L1TkTauCandidate ??
 	if (0) L1TkTauCandidate.PrintProperties(false, false, true, true);
@@ -543,9 +546,56 @@ void TkTaus::Loop()
 	// +Tk
 	if (L1TkTau->HasMatchingTk() )
 	  {
+	    
+
+	    // For-loop: All tracks
+	    // for (vector<TTTrack>::iterator tk = TTTracks.begin(); tk != TTTracks.end(); tk++) 
+
+	    bool bIsLdgTrack = true;
+	    vector<TTTrack> sigTks = L1TkTau->GetSigConeTTTracks();
+	    // For-loop: All signal tracks
+	    for (vector<TTTrack>::iterator tk = sigTks.begin(); tk != sigTks.end(); tk++)
+	      {
+		double eta_seed = L1TkTau->GetMatchingTk().getEta(); // matchingTk = seeTk
+		double phi_seed = L1TkTau->GetMatchingTk().getPhi();
+		double eta_tk   = tk->getEta();
+		double phi_tk   = tk->getPhi();
+		double deltaPt  = L1TkTau->GetMatchingTk().getPt() - tk->getPt(); 
+
+		// Skip identical tracks
+		if ( (eta_seed == eta_tk) && (phi_seed == phi_tk) )
+		  {
+		    if (0) std::cout << "SAME TRACK! Continue ..." << std::endl;
+		    continue;
+		  }
+
+		// // Calculate dR
+		// double dR = auxTools_.DeltaR(eta_seed, phi_seed, eta_tk, phi_tk);
+
+		// // Consider only tracks within dR <= 0.3
+		// if (dR > 0.3) continue;
+		
+		// Compare pT of seed track with all tracks within dR = 0 (NEW)
+		if (deltaPt < 0) 
+		  {
+		    if (0) std::cout << "Seed track not the leading track! Reject candidate! " << std::endl;
+		    bIsLdgTrack = false;
+		    break;
+		  }
+	      }
+
+	    // No higher pT track within dR < 0.3
+	    if (!bIsLdgTrack) continue;
+
 	    L1TkTaus_Tk.push_back(*L1TkTau);
-	    if (L1TkTau->GetVtxIsolation() > isoCone_VtxIsoWP) L1TkTaus_VtxIso.push_back(*L1TkTau); // +VtxIso
-	    if (L1TkTau->GetRelIsolation() < isoCone_RelIsoWP) L1TkTaus_RelIso.push_back(*L1TkTau); // +RelIso
+	    bool bPassVtxIso = (L1TkTau->GetVtxIsolation() > isoCone_VtxIsoWP);
+	    bool bPassRelIso = (L1TkTau->GetRelIsolation() < isoCone_RelIsoWP);
+	    bool bPassIso    = bPassVtxIso * bPassRelIso;
+	    
+	    // Fill containers with TkTaus
+	    if (bPassVtxIso) L1TkTaus_VtxIso.push_back(*L1TkTau);
+	    if (bPassRelIso) L1TkTaus_RelIso.push_back(*L1TkTau);
+	    if (bPassIso)    L1TkTaus_Iso.push_back(*L1TkTau);
 	  }
       }// L1TkTauCandidates
 
@@ -554,14 +604,16 @@ void TkTaus::Loop()
 	PrintL1TkTauParticleCollection(L1TkTaus_Tk);
 	PrintL1TkTauParticleCollection(L1TkTaus_VtxIso);
 	PrintL1TkTauParticleCollection(L1TkTaus_RelIso);
+	PrintL1TkTauParticleCollection(L1TkTaus_Iso);
       }
-    
-      
+          
     ////////////////////////////////////////////////
     /// TkTaus
     ////////////////////////////////////////////////
     vector<L1TkTauParticle> myL1TkTaus = L1TkTaus_Tk;
     hL1TkTau_Multiplicity ->Fill( myL1TkTaus.size() );
+
+    // For-loop: TkTaus
     for (vector<L1TkTauParticle>::iterator tau = myL1TkTaus.begin(); tau != myL1TkTaus.end(); tau++)
       {
 	if (DEBUG) tau->PrintProperties(true, true, true, true);
@@ -575,11 +627,7 @@ void TkTaus::Loop()
 	if (!tau->HasMatchingGenParticle() && (isMinBias == false) ) continue;
 	
 	// Get matching gen particle
-	GenParticle p = tau->GetMatchingGenParticle(); //fixme: more plots from MC info
-      
-	// Apply isolation? 
-	// if (tau->GetVtxIsolation() <= isoCone_VtxIsoWP) continue;
-	// if (tau->GetRelIsolation() >= isoCone_RelIsoWP) continue;
+	GenParticle p = tau->GetMatchingGenParticle(); //fixme: separate to inclusive, 1pr, and 3pr 
       
 	// Seed Track Variables
 	TTTrack matchTk   = tau->GetMatchingTk();
@@ -699,7 +747,7 @@ void TkTaus::Loop()
 	if (!tau->HasMatchingGenParticle() && (isMinBias == false) ) continue;
 	
 	// Get matching gen particle
-	GenParticle p = tau->GetMatchingGenParticle(); //fixme: more plots from MC info
+	GenParticle p = tau->GetMatchingGenParticle();  //fixme: separate to inclusive, 1pr, and 3pr
       
 	// Resolution
 	hL1TkIsoTau_ResolutionEt ->Fill( (tau->GetSigConeTTTracksP4().Et()-p.p4vis().Et() )/p.p4vis().Et()  );
@@ -837,6 +885,7 @@ void TkTaus::Loop()
     FillTurnOn_Numerator_(L1TkTaus_Tk     , 25.0, hTk_TurnOn25    );
     FillTurnOn_Numerator_(L1TkTaus_VtxIso , 25.0, hVtxIso_TurnOn25);
     FillTurnOn_Numerator_(L1TkTaus_RelIso , 25.0, hRelIso_TurnOn25);
+    FillTurnOn_Numerator_(L1TkTaus_Iso    , 25.0, hIso_TurnOn25);
 
     FillTurnOn_Numerator_(L1TkTaus_Tk     , 50.0, hTk_TurnOn50    );
     FillTurnOn_Numerator_(L1TkTaus_VtxIso , 50.0, hVtxIso_TurnOn50);
@@ -844,10 +893,12 @@ void TkTaus::Loop()
     FillTurnOn_Numerator_(L1TkTaus_Tk     , 65.0, hTk_TurnOn_SingleTau50KHz    );
     FillTurnOn_Numerator_(L1TkTaus_VtxIso , 50.0, hVtxIso_TurnOn_SingleTau50KHz);    
     FillTurnOn_Numerator_(L1TkTaus_RelIso , 50.0, hRelIso_TurnOn_SingleTau50KHz);
+    FillTurnOn_Numerator_(L1TkTaus_Iso    , 50.0, hIso_TurnOn_SingleTau50KHz);
 
     FillTurnOn_Numerator_(L1TkTaus_Tk     , 40.0, hTk_TurnOn_DiTau50KHz    );
     FillTurnOn_Numerator_(L1TkTaus_VtxIso , 25.0, hVtxIso_TurnOn_DiTau50KHz);
     FillTurnOn_Numerator_(L1TkTaus_RelIso , 25.0, hRelIso_TurnOn_DiTau50KHz);
+    FillTurnOn_Numerator_(L1TkTaus_Iso    , 25.0, hIso_TurnOn_DiTau50KHz);
     
     ////////////////////////////////////////////////
     // SingleTau
@@ -867,18 +918,25 @@ void TkTaus::Loop()
     FillSingleTau_(L1TkTaus_RelIso, hRelIso_Rate_I, hRelIso_Eff_I, 1.0, 1.6);
     FillSingleTau_(L1TkTaus_RelIso, hRelIso_Rate_F, hRelIso_Eff_F, 1.6, 3.0); // 2.5 is max
 
+    FillSingleTau_(L1TkTaus_Iso, hIso_Rate  , hIso_Eff);
+    FillSingleTau_(L1TkTaus_Iso, hIso_Rate_C, hIso_Eff_C, 0.0, 1.0);
+    FillSingleTau_(L1TkTaus_Iso, hIso_Rate_I, hIso_Eff_I, 1.0, 1.6);
+    FillSingleTau_(L1TkTaus_Iso, hIso_Rate_F, hIso_Eff_F, 1.6, 3.0); // 2.5 is max
+
     ////////////////////////////////////////////////
     // DiTau
     ////////////////////////////////////////////////
-    FillDiTau_(L1TkTaus_Tk  , L1TkTaus_VtxIso, hDiTau_Rate_Tk_VtxIso  , hDiTau_Eff_Tk_VtxIso   );
-    FillDiTau_(L1TkTaus_Tk  , L1TkTaus_RelIso, hDiTau_Rate_Tk_RelIso  , hDiTau_Eff_Tk_RelIso   );
+    FillDiTau_(L1TkTaus_Tk  , L1TkTaus_VtxIso, hDiTau_Rate_Tk_VtxIso, hDiTau_Eff_Tk_VtxIso   );
+    FillDiTau_(L1TkTaus_Tk  , L1TkTaus_RelIso, hDiTau_Rate_Tk_RelIso, hDiTau_Eff_Tk_RelIso   );
+    FillDiTau_(L1TkTaus_Tk  , L1TkTaus_Iso   , hDiTau_Rate_Tk_Iso   , hDiTau_Eff_Tk_Iso      );
 
     ////////////////////////////////////////////////
     // WARNING: Erases L1TkTaus from vector!
     ////////////////////////////////////////////////
     ApplyDiTauZMatching(seedTk_Collection, L1TkTaus_Tk);
     ApplyDiTauZMatching(seedTk_Collection, L1TkTaus_VtxIso); 
-    ApplyDiTauZMatching(seedTk_Collection, L1TkTaus_RelIso); //fixme. correct?
+    ApplyDiTauZMatching(seedTk_Collection, L1TkTaus_RelIso);
+    ApplyDiTauZMatching(seedTk_Collection, L1TkTaus_Iso);
 
     FillDiTau_(L1TkTaus_Tk, hDiTau_Rate_Tk  , hDiTau_Eff_Tk);
     FillDiTau_(L1TkTaus_Tk, hDiTau_Rate_Tk_C, hDiTau_Eff_Tk_C, 0.0, 1.0);
@@ -894,6 +952,11 @@ void TkTaus::Loop()
     FillDiTau_(L1TkTaus_RelIso, hDiTau_Rate_RelIso_C, hDiTau_Eff_RelIso_C, 0.0, 1.0);
     FillDiTau_(L1TkTaus_RelIso, hDiTau_Rate_RelIso_I, hDiTau_Eff_RelIso_I, 1.0, 1.6);
     FillDiTau_(L1TkTaus_RelIso, hDiTau_Rate_RelIso_F, hDiTau_Eff_RelIso_F, 1.6, 3.0);
+
+    FillDiTau_(L1TkTaus_Iso, hDiTau_Rate_Iso  , hDiTau_Eff_Iso);
+    FillDiTau_(L1TkTaus_Iso, hDiTau_Rate_Iso_C, hDiTau_Eff_Iso_C, 0.0, 1.0);
+    FillDiTau_(L1TkTaus_Iso, hDiTau_Rate_Iso_I, hDiTau_Eff_Iso_I, 1.0, 1.6);
+    FillDiTau_(L1TkTaus_Iso, hDiTau_Rate_Iso_F, hDiTau_Eff_Iso_F, 1.6, 3.0);
 
     // Progress bar
     if (!DEBUG) auxTools_.ProgressBar(jentry, nEntries, 100, 100);
@@ -1369,6 +1432,7 @@ void TkTaus::WriteHistos_(void)
   hL1TkTau_SeedTk_Pt->Write();
   hL1TkTau_SeedTk_Eta->Write();
   hL1TkTau_SeedTk_NStubs->Write();
+  hL1TkTau_SeedTk_POCAz->Write();
   hL1TkTau_SeedTk_ChiSquared->Write();
   hL1TkTau_SeedTk_RedChiSquared->Write();
   hL1TkTau_SeedTk_IsGenuine->Write();
@@ -1417,6 +1481,7 @@ void TkTaus::WriteHistos_(void)
   hL1TkIsoTau_SeedTk_Pt->Write();
   hL1TkIsoTau_SeedTk_Eta->Write();
   hL1TkIsoTau_SeedTk_NStubs->Write();
+  hL1TkIsoTau_SeedTk_POCAz->Write();
   hL1TkIsoTau_SeedTk_ChiSquared->Write();
   hL1TkIsoTau_SeedTk_RedChiSquared->Write();
   hL1TkIsoTau_SeedTk_IsGenuine->Write();
@@ -1444,6 +1509,7 @@ void TkTaus::WriteHistos_(void)
   hL1TkIsoTau_JetWidth->Write();
   hL1TkIsoTau_SigTksEt->Write();
   hL1TkIsoTau_SigTksEta->Write();
+  hL1TkIsoTau_NSigTks->Write();
   hL1TkIsoTau_NIsoTks->Write();
   hL1TkIsoTau_IsoTksEt->Write();
   hL1TkIsoTau_IsoTksEta->Write();
@@ -1603,7 +1669,7 @@ bool TkTaus::IsWithinEtaRegion(string etaRegion,
 
 //============================================================================
 void TkTaus::FinaliseEffHisto_(TH1D *histo, 
-				       const int nEvtsTotal)
+			       const int nEvtsTotal)
 //============================================================================
 {
 
@@ -1627,7 +1693,7 @@ void TkTaus::FinaliseEffHisto_(TH1D *histo,
 
 //============================================================================
 void TkTaus::FinaliseEffHisto_(TH2D *histo, 
-				       const int nEvtsTotal)
+			       const int nEvtsTotal)
 //============================================================================
 {
 
@@ -1712,11 +1778,13 @@ void TkTaus::FillSingleTau_(vector<L1TkTauParticle> L1TkTaus,
   if( L1TkTaus.size() < 1 ) return;
   
   // Fill rate
-  double ldgEt = L1TkTaus.at(0).GetCaloTau().et(); //fixme
+  TLorentzVector sigTks_p4 = L1TkTaus.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
+  double ldgEt  = sigTks_p4.Et();  
+  double ldgEta = sigTks_p4.Eta();
   
   // Inclusive or Eta slice in Central/Intermedieate/Forward Tracker region?
-  if ( abs(L1TkTaus.at(0).GetCaloTau().eta()) < minEta) return; // fixme
-  if ( abs(L1TkTaus.at(0).GetCaloTau().eta()) > maxEta) return; // fixme
+  if ( abs(ldgEta) < minEta) return;
+  if ( abs(ldgEta) > maxEta) return;
     
   FillRate_(hRate, ldgEt);
   
@@ -1728,7 +1796,8 @@ void TkTaus::FillSingleTau_(vector<L1TkTauParticle> L1TkTaus,
   if(!bFoundAllTaus_) return;
   
   // Fill efficiency
-  double ldgEt_mcMatched = L1TkTaus_mcMatched.at(0).GetCaloTau().et(); // fixme
+  TLorentzVector sigTks_p4_mc = L1TkTaus_mcMatched.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
+  double ldgEt_mcMatched = sigTks_p4_mc.Et();
   FillEfficiency_(hEfficiency, ldgEt_mcMatched);
 
   return;
@@ -1749,13 +1818,15 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus,
 
   // Fill rate
   L1TkTauParticle L1TkTau = L1TkTaus.at(1);
-  double subLdgEt = L1TkTau.GetCaloTau().et(); //fixme
-  
+  TLorentzVector sigTks_p4 = L1TkTaus.at(1).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
+  double subLdgEt  = sigTks_p4.Et();  
+  double subLdgEta = sigTks_p4.Eta();  
+
   // Inclusive or Eta slice in Central/Intermedieate/Forward Tracker region?
-  if ( abs(L1TkTaus.at(0).GetCaloTau().eta()) < minEta) return; //fixme
-  if ( abs(L1TkTaus.at(0).GetCaloTau().eta()) > maxEta) return;
-  if ( abs(L1TkTaus.at(1).GetCaloTau().eta()) < minEta) return;
-  if ( abs(L1TkTaus.at(1).GetCaloTau().eta()) > maxEta) return;
+  if ( abs(subLdgEta) < minEta) return;
+  if ( abs(subLdgEta) > maxEta) return;
+  if ( abs(subLdgEta) < minEta) return;
+  if ( abs(subLdgEta) > maxEta) return;
 
   FillRate_(hRate, subLdgEt);
 
@@ -1767,7 +1838,8 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus,
   if(!bFoundAllTaus_) return;
 
   // Fill efficiency
-  double subLdgEt_mcMatched = L1TkTaus_mcMatched.at(1).GetCaloTau().et(); //fixme
+  TLorentzVector sigTks_p4_mc = L1TkTaus_mcMatched.at(1).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
+  double subLdgEt_mcMatched  = sigTks_p4_mc.Et();  
   FillEfficiency_(hEfficiency, subLdgEt_mcMatched);
 
   return;
@@ -1791,16 +1863,21 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus1,
   vector<L1TkTauParticle> L1TkTaus2_mcMatched = GetMcMatchedL1TkTaus(L1TkTaus2);
 
   // Fill rate 
-  double ldgEt1 = L1TkTaus1.at(0).GetCaloTau().et(); // fixme
-  double ldgEt2 = L1TkTaus2.at(0).GetCaloTau().et();
+  TLorentzVector sigTks1_p4 = L1TkTaus1.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
+  TLorentzVector sigTks2_p4 = L1TkTaus2.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
+  double ldgEt1 = sigTks1_p4.Et();
+  double ldgEt2 = sigTks2_p4.Et();
 
   // Ensure that different calo objects are used
-  unsigned int index1 = L1TkTaus1.at(0).GetCaloTau().index(); //fixme
-  unsigned int index2 = L1TkTaus2.at(0).GetCaloTau().index();
-  if (index1==index2)
+  double eta1 = L1TkTaus1.at(0).GetMatchingTk().getEta();
+  double phi1 = L1TkTaus1.at(0).GetMatchingTk().getPhi();
+  double eta2 = L1TkTaus2.at(0).GetMatchingTk().getEta();
+  double phi2 = L1TkTaus2.at(0).GetMatchingTk().getPhi();
+  double dR = auxTools_.DeltaR(eta1, phi1, eta2, phi2);
+  if (dR < 0.4)
     {
       if (L1TkTaus2.size() < 2) return;
-      index2 = L1TkTaus2.at(1).GetCaloTau().index();
+      ldgEt2 = L1TkTaus2.at(1).GetCaloTau().et(); //fixme! better clean-up needed
     }
 
   // Make x-axis the ldgEt axis
@@ -1813,19 +1890,23 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus1,
   if (L1TkTaus2_mcMatched.size() < 1) return;
 
   // Get MC-matched Et
-  double ldgEt1_mcMatched = L1TkTaus1_mcMatched.at(0).GetCaloTau().et(); //fixme
-  double ldgEt2_mcMatched = L1TkTaus2_mcMatched.at(0).GetCaloTau().et();
+  TLorentzVector sigTks1_p4_mc = L1TkTaus1_mcMatched.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
+  TLorentzVector sigTks2_p4_mc = L1TkTaus2_mcMatched.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
+  double ldgEt1_mcMatched = sigTks1_p4_mc.Et();
+  double ldgEt2_mcMatched = sigTks2_p4_mc.Et();
 
-  
   // Ensure that different calo objects are used
-  index1 = L1TkTaus1_mcMatched.at(0).GetCaloTau().index();
-  index2 = L1TkTaus2_mcMatched.at(0).GetCaloTau().index();
-  if (index1==index2)
+  eta1 = L1TkTaus1_mcMatched.at(0).GetMatchingTk().getEta();
+  phi1 = L1TkTaus1_mcMatched.at(0).GetMatchingTk().getPhi();
+  eta2 = L1TkTaus2_mcMatched.at(0).GetMatchingTk().getEta();
+  phi2 = L1TkTaus2_mcMatched.at(0).GetMatchingTk().getPhi();
+  dR    = auxTools_.DeltaR(eta1, phi1, eta2, phi2);
+  if (dR < 0.4)
     {
       if (L1TkTaus2_mcMatched.size() < 2) return;
-      index2 = L1TkTaus2_mcMatched.at(1).GetCaloTau().index();
+      ldgEt2_mcMatched = L1TkTaus2_mcMatched.at(1).GetCaloTau().et(); //fixme! better clean-up needed
     }
-
+  
   // Check that all taus were found
   if(!bFoundAllTaus_) return;
 
@@ -1894,7 +1975,9 @@ void TkTaus::FillTurnOn_Numerator_(vector<L1TkTauParticle> L1TkTaus,
       if (!L1TkTau->HasMatchingGenParticle()) continue;	 
       
       // Skip if trigger object has eT < minEt
-      if ( L1TkTau->GetCaloTau().et() < minEt) continue; // fixme
+      TLorentzVector sigTks2_p4 = L1TkTau->GetSigConeTTTracksP4();
+      double tkTau_et = sigTks2_p4.Et();
+      if ( tkTau_et < minEt) continue;
       
       // Get MC-match
       GenParticle p = L1TkTau->GetMatchingGenParticle();
@@ -1911,11 +1994,13 @@ void TkTaus::FillTurnOn_Numerator_(vector<L1TkTauParticle> L1TkTaus,
 
 //============================================================================
 void TkTaus::GetSigConeTracks(L1TkTauParticle &L1TkTau,
-			      vector<TTTrack> TTTracks)
+			      vector<TTTrack> TTTracks,
+			      double sigConeTks_dPOCAz)
 //============================================================================
 {
   if (!L1TkTau.HasMatchingTk()) return; 
   vector<TTTrack> sigConeTks;
+  TTTrack seedTk = L1TkTau.GetMatchingTk();
   
   // For-loop: All Tracks
   for (vector<TTTrack>::iterator tk = TTTracks.begin(); tk != TTTracks.end(); tk++)
@@ -1925,11 +2010,16 @@ void TkTaus::GetSigConeTracks(L1TkTauParticle &L1TkTau,
       if( tk->index() == L1TkTau.GetMatchingTk().index() ) continue;
       
       double dR = auxTools_.DeltaR(tk->getEta(), tk->getPhi(), L1TkTau.GetMatchingTk().getEta(), L1TkTau.GetMatchingTk().getPhi());
+      
+      double dPOCAz = abs(seedTk.getZ0() - tk->getZ0());
 
       // Only consider tracks within singal cone/annulus
       if (dR < L1TkTau.GetSigConeMin()) continue;
       if (dR > L1TkTau.GetSigConeMax()) continue;
-      
+
+      // Require signal tracks come from same vertex as the seed track (NEW)
+      if (dPOCAz > sigConeTks_dPOCAz) continue;
+
       sigConeTks.push_back(*tk);
     }
 
@@ -2048,10 +2138,10 @@ void TkTaus::GetIsolationValues(L1TkTauParticle &L1TkTau)
   if ( (isoConeTks.size() < 1) )  return;
 
   // Initialise variables
-  TTTrack matchTk            = L1TkTau.GetMatchingTk();
+  TTTrack seedTk = L1TkTau.GetMatchingTk();
   double isoTks_scalarSumPt  = 0.0;
-  double deltaZ0             = 999.9;
-  double relIso              = 0.0;
+  double deltaZ0 = 999.9;
+  double relIso  = 0.0;
   
   // For-loop: All Tracks in isolation cone 
   for (size_t i = 0; i < isoConeTks.size(); i++)
@@ -2062,7 +2152,7 @@ void TkTaus::GetIsolationValues(L1TkTauParticle &L1TkTau)
       isoTks_scalarSumPt += isoConeTk.getPt();
       
       // Find the track closest in Z0
-      deltaZ0 = abs(matchTk.getZ0() - isoConeTk.getZ0());
+      deltaZ0 = abs(seedTk.getZ0() - isoConeTk.getZ0());
       if (deltaZ0 < L1TkTau.GetVtxIsolation())
 	{
 	  L1TkTau.SetVtxIsolation(deltaZ0);
@@ -2072,7 +2162,7 @@ void TkTaus::GetIsolationValues(L1TkTauParticle &L1TkTau)
     }
 
   // Calculated + Assign value of relative isolation
-  relIso = isoTks_scalarSumPt/matchTk.getPt();
+  relIso = isoTks_scalarSumPt/seedTk.getPt();
   L1TkTau.SetRelIsolation(relIso);
   
   return;
@@ -2117,16 +2207,15 @@ void TkTaus::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
 	}
     }  // For-loop: All hadronic GenTaus
       
-  // Save the matching
-  // cout << "index of match genp =" << match_GenParticle.index()<<endl;
+  // Save the matching (DataFormat/src/L1TkTauParticle.C and DataFormat/interface/L1TkTauParticle.h)
   L1TkTau.SetMatchingGenParticle(match_GenParticle);
-  L1TkTau.SetMatchingGenParticleDeltaR(match_dR);
+  if (match_dR <= mcMatching_dRMax) L1TkTau.SetMatchingGenParticleDeltaR(match_dR);
 
   // For debugging
   if (DEBUG)
     {
       L1TkTau.PrintProperties(false, true, false, false);
-      if (L1TkTau.HasMatchingGenParticle()) match_GenParticle.PrintProperties(); //iro
+      if (L1TkTau.HasMatchingGenParticle()) match_GenParticle.PrintProperties();
     }
   
   return;
