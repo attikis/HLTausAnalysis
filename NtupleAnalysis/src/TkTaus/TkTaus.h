@@ -77,15 +77,20 @@ class TkTaus : public TreeAnalyserMC{
 			     double &isoCone_dRMin,
 			     double &isoCone_dRMax);
 
+  double GetDonutRatio(L1TkTauParticle &L1TkTau, vector<TTTrack> isoTTTracks);
+
+
   double GetJetWidth(vector<TTTrack> sigTks, vector<TTTrack> isoTks,
 		     TLorentzVector sigTks_p4, TLorentzVector isoTks_p4);
 
   void GetSigConeTracks(L1TkTauParticle &L1TkTau,
 			vector<TTTrack> TTTracks,
-			double sigConeTks_dPOCAz);
+			double sigConeTks_dPOCAz,
+			double sigConeTks_invMass);
   
   void GetIsoConeTracks(L1TkTauParticle &L1TkTau,
-			vector<TTTrack> TTTracks);
+			vector<TTTrack> TTTracks,
+			double isoConeTks_dPOCAz);
     
   void GetIsolationValues(L1TkTauParticle &L1TkTau);
   
@@ -105,7 +110,6 @@ class TkTaus : public TreeAnalyserMC{
   double seedTk_maxEta;
   double seedTk_maxChiSq;
   double seedTk_minStubs;
-  double seedTk_caloDeltaR;
 
   // Signal Cone Tracks
   string sigConeTks_Collection;
@@ -116,6 +120,7 @@ class TkTaus : public TreeAnalyserMC{
   double sigConeTks_maxChiSq;
   unsigned int sigConeTks_minStubs;
   double sigConeTks_dPOCAz;
+  double sigConeTks_maxInvMass;
 
   // Isolation Cone Tracks
   string isoConeTks_Collection;
@@ -125,6 +130,7 @@ class TkTaus : public TreeAnalyserMC{
   double isoConeTks_maxEta;
   double isoConeTks_maxChiSq;
   unsigned int isoConeTks_minStubs;
+  double isoConeTks_dPOCAz;
 
   double mcMatching_dRMax;
   double pv_deltaZMax;
@@ -137,8 +143,6 @@ class TkTaus : public TreeAnalyserMC{
   double sigCone_Constant;
   double sigCone_cutoffDeltaR;
   double sigCone_dRMax;
-  double sigCone_maxTkDeltaPOCAz;
-  double sigCone_maxTkInvMass;
   double sigCone_dRMin;
   //
   double isoCone_Constant;
@@ -219,8 +223,8 @@ class TkTaus : public TreeAnalyserMC{
   bool bFoundAllTaus_;
 
   // GenParticles Histograms
-  TH2D* h_GenP_VisET_dRMaxLdgPion;
-  TH2D* h_GenP_PtLdg_dRMaxLdgPion;
+  TH2D* hGenP_VisEt_Vs_dRMaxLdgPion;
+  TH2D* hGenP_PtLdg_Vs_dRMaxLdgPion;
 
   // Counters
   TH1D* hCounters;
@@ -268,7 +272,9 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hL1TkTau_IsoTks_RedChiSquared;
 
   TH1D* hL1TkTau_Multiplicity;
+  TH1D* hL1TkTau_Multiplicity_MC;
   TH1D* hL1TkTau_JetWidth;
+  TH1D* hL1TkTau_DonutRatio;
   TH1D* hL1TkTau_NSigTks;
   TH1D* hL1TkTau_SigTksEt;
   TH1D* hL1TkTau_SigTksEta;
@@ -284,7 +290,7 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hL1TkTau_Charge;
   TH1D* hL1TkTau_RelIso;
   TH1D* hL1TkTau_VtxIso;
-  TH1D* hL1TkTau_VtxIsoAbs;
+  TH2D* hL1TkTau_VtxIso_Vs_RelIso;
   TH1D* hL1TkTau_DeltaRGenP;
 
   // L1TkIsoTaus
@@ -328,7 +334,9 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hL1TkIsoTau_IsoTks_RedChiSquared;
 
   TH1D* hL1TkIsoTau_Multiplicity;
+  TH1D* hL1TkIsoTau_Multiplicity_MC;
   TH1D* hL1TkIsoTau_JetWidth;
+  TH1D* hL1TkIsoTau_DonutRatio;
   TH1D* hL1TkIsoTau_NSigTks;
   TH1D* hL1TkIsoTau_SigTksEt;
   TH1D* hL1TkIsoTau_SigTksEta;
@@ -344,7 +352,7 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hL1TkIsoTau_Charge;
   TH1D* hL1TkIsoTau_RelIso;
   TH1D* hL1TkIsoTau_VtxIso;
-  TH1D* hL1TkIsoTau_VtxIsoAbs;
+  TH2D* hL1TkIsoTau_VtxIso_Vs_RelIso;
   TH1D* hL1TkIsoTau_DeltaRGenP;
 
   // Resolutions
@@ -471,6 +479,7 @@ class TkTaus : public TreeAnalyserMC{
   // Turn-Ons
   // TEfficiency* pEff; //fixme: convert all turn-ons
   TH1D* hMcHadronicTau_VisEt;
+
   TH1D* hCalo_TurnOn50;
   TH1D* hTk_TurnOn50;
   TH1D* hVtxIso_TurnOn50;
