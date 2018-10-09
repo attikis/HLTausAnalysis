@@ -105,16 +105,54 @@ def GetDatasetsFromDir(opts):
 def PlotHisto(datasetsMgr, h):
     dsetsMgr = datasetsMgr.deepCopy()
 
+    if "eff" in h.lower():
+        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False)
+        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False)
+        opts.normalizeToOne = False
+    elif "resolution" in h.lower():
+        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False)
+        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False)
+    elif "rate" in h.lower():
+        opts.normalizeToOne = False
+        for d in dsetsMgr.getAllDatasetNames():
+            if "SingleNeutrino" in d:
+                continue
+            else:
+                dsetsMgr.remove(d, close=False)
+    else:
+        pass
+        
+
     
     # Create the MC Plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
     kwargs = {}
+    '''
+    hList  = getHistoList(dsetsMgr, h)
+
+    if opts.normalizeToOne:
+        if 1:
+            p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[], **kwargs)
+            p.histoMgr.forEachHisto(lambda h: h.getRootHisto().Scale(1.0/h.getRootHisto().Integral()) )
+        else:
+            # p = plots.MCPlot(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
+            p = plots.PlotSameBase(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
+    else:
+        if 1:
+            p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[], **kwargs) #FIXME
+        else:
+            # p = plots.MCPlot(dsetsMgr, h, normalizeToLumi=opts.intLumi, saveFormats=[], **kwargs)
+            p = plots.PlotSameBase(dsetsMgr, h, saveFormats=[], **kwargs)
+    
+    '''
     if opts.normalizeToOne:
         #p = plots.MCPlot(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
         p = plots.PlotSameBase(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
     else:
         #p = plots.MCPlot(dsetsMgr, h, normalizeToLumi=opts.intLumi, saveFormats=[], **kwargs)
         p = plots.PlotSameBase(dsetsMgr, h, saveFormats=[], **kwargs) #def __init__(self, datasetMgr, name, normalizeToOne=False, datasetRootHistoArgs={}, **kwargs):
+
     
+
     # Set default styles (Called by default in MCPlot)
     p._setLegendStyles()
     p._setLegendLabels()
@@ -147,6 +185,15 @@ def PlotHisto(datasetsMgr, h):
     return
 
 
+def getHistoList(datasetsMgr, histoName):
+    hList = []
+    # For-loop: All dataset names
+    for d in datasetsMgr.getAllDatasetNames():
+        h = datasetsMgr.getDataset(d).getDatasetRootHisto(histoName)
+        hList.append(h)
+    return hList
+
+
 def GetHistoKwargs(h, opts):
     
     hName   = h.lower()
@@ -170,7 +217,33 @@ def GetHistoKwargs(h, opts):
         if _yMin == 0.0:
             _yMin = 1e-3
         _yMaxF = 10
-            
+
+    # Efficiency & Rate plots
+    if "eff" in hName:
+        _units  = "GeV"
+        _format = "%0.0f " + _units
+        _xLabel = "E_{T} (%s)" % (_units)
+        _cutBox = {"cutValue": 20.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = "Efficiency / %.0f " + _units
+    if "counters" in hName:
+        _units  = ""
+        _format = "%0.0f " + _units
+        _xLabel = "counters"
+        _rebinX = 1
+        #_xMax   = +10.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+    if "rate" in hName:
+        _units  = "GeV"
+        _format = "%0.0f " + _units
+        _xLabel = "E_{T} (%s)" % (_units)
+        _cutBox = {"cutValue": 20.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = "Rate (kHz) / %.0f " + _units
+        _log    = True
+        _yMin   = 1e+0
+        _xMax   = 250.0
 
 
     _kwargs = {
@@ -397,7 +470,7 @@ def main(opts):
         
         # Obsolete quantity
         #if h in skipList:
-        if "counters" in h.lower():
+        if "counter" in h.lower():
             continue
 
         histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))

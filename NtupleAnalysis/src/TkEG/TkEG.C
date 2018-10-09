@@ -232,7 +232,7 @@ void TkEG::Loop()
     GenTausHadronic.clear();
     if (cfg_AddGenP) {
       if (cfg_DEBUG) cout << "\n=== GenParticles (" << GenP_Pt.size() << ")" << endl;
-      if (!isMinBias) GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 2.4);
+      if (!isMinBias) GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
       if (cfg_DEBUG*0) PrintGenParticleCollection(GenTausHadronic);
     }
     
@@ -903,7 +903,7 @@ void TkEG::Loop()
 	// Properties of the genTau
 	hTkEG_genVisEt    -> Fill( genTau.p4vis().Et() );
 	hTkEG_DeltaRmatch -> Fill( deltaR_match );
-
+	/*
 	// Pt resolution
 	TLorentzVector p4tracks; // initialized to (0,0,0,0) 
 	for (auto tk = trackTauCandidates[i].begin(); tk != trackTauCandidates[i].end(); tk++) {
@@ -919,6 +919,9 @@ void TkEG::Loop()
 	  double ETresolution = ( ET -genTau.p4vis().Et() ) / genTau.p4vis().Et(); //marina
 	  h_EGClusters_EtResolution->Fill(ETresolution);
 	}
+	*/
+
+
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// Tk+EG algorithm representation in Gen-Level (Charged and Neutral daughters multiplicity 
 	//////////////////////////////////////////////////////////////////////////////////////////
@@ -986,7 +989,7 @@ void TkEG::Loop()
 	// For-loop: All GenTaus
 	for (vector<GenParticle>::iterator tau = GenTaus.begin(); tau != GenTaus.end(); tau++) {
 	  // Skip gen-taus outside of our eta acceptance 
-	  if (tau->eta() > 1.4) continue;
+	  if (tau->eta() > 2.4) continue;
 
 	  // Find the closest gen-tau to the leading track
 	  deltaR = auxTools_.DeltaR( trackTauCandidates[i][0].getEta(), trackTauCandidates[i][0].getPhi(), tau->eta(), tau->phi() );
@@ -1027,10 +1030,30 @@ void TkEG::Loop()
       }
       
       TauCandidates.push_back(newTauCandidate);
-     
+      
     }
+    
+    for (auto tkeg = TauCandidates.begin(); tkeg != TauCandidates.end(); tkeg++) {
+      
+      // Pt resolution
+      double pTresolution = ( tkeg->GetTotalPt()- tkeg->GetGenTauPt() ) / tkeg->GetGenTauPt();
+      h_trkClusters_PtResolution->Fill(pTresolution);
+      // FIX ME: ET resolution
+      double ETresolution = ( tkeg->GetTotalEt()- tkeg->GetGenTauEt() ) / tkeg->GetGenTauEt(); //marina
+      h_EGClusters_EtResolution->Fill(ETresolution);
+      
 
+      //cout<< tkeg->GetTotalEt()<<endl;
+      
+      //float sumET=0;
+      //for (auto clusteg = tkeg->GetEGs().begin(); clusteg != tkeg->GetEGs().end(); clusteg++){ 
+      //sumET += clusteg->getEt();
+      //}
+      //cout <<"--- "<< tkeg->GetTrackBasedPt()+sumET<<endl;
+    }
+    
     /*
+
     // Check relative isolation of tau candidates
     float relIso = -1.0;
     float ptSum;
@@ -1038,6 +1061,7 @@ void TkEG::Loop()
     TauCandidatesIsolated.clear();
     
     for (auto tkeg = TauCandidates.begin(); tkeg != TauCandidates.end(); tkeg++) {
+    
       leadingTrack = tkeg->GetLeadingTrack();
       
       // Sum Pt's inside the isolation cone
@@ -1608,42 +1632,42 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_MCmatch_dR, "MCmatch_dR", ";#DeltaR_{min}(trk_{ldg}, gen-#tau); entries / bin",   60,  0.0,   +6.0);
 
   // Turn-on histograms
-  histoTools_.BookHisto_1D(hTurnOn25_all, "TurnOn25_all", ";track cluster p_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTurnOn25_relIso, "TurnOn25_relIso", ";track cluster p_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTurnOn50_all, "TurnOn50_all", ";track cluster p_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTurnOn50_relIso, "TurnOn50_relIso", ";track cluster p_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn25_all, "TurnOn25_all", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn25_relIso, "TurnOn25_relIso", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn50_all, "TurnOn50_all", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn50_relIso, "TurnOn50_relIso", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
   
   // Single-tau rates
-  histoTools_.BookHisto_1D(hRateSingleTau_all, "Rate_SingleTau_all"    , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hRateSingleTau_C  , "Rate_SingleTau_C"  , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hRateSingleTau_I  , "Rate_SingleTau_I"  , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hRateSingleTau_F  , "Rate_SingleTau_F"  , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);  
+  histoTools_.BookHisto_1D(hRateSingleTau_all, "Rate_SingleTau_all"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hRateSingleTau_C  , "Rate_SingleTau_C"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hRateSingleTau_I  , "Rate_SingleTau_I"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hRateSingleTau_F  , "Rate_SingleTau_F"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);  
   
-  histoTools_.BookHisto_1D(hRateSingleTau_relIso  , "Rate_SingleTau_RelIso"    , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hRateSingleTau_relIso  , "Rate_SingleTau_RelIso"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
 
   // Di-tau rates
-  histoTools_.BookHisto_1D(hRateDiTau_all, "Rate_DiTau_all"    , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hRateDiTau_C  , "Rate_DiTau_C"  , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hRateDiTau_I  , "Rate_DiTau_I"  , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hRateDiTau_F  , "Rate_DiTau_F"  , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);  
+  histoTools_.BookHisto_1D(hRateDiTau_all, "Rate_DiTau_all"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hRateDiTau_C  , "Rate_DiTau_C"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hRateDiTau_I  , "Rate_DiTau_I"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hRateDiTau_F  , "Rate_DiTau_F"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);  
 
-  histoTools_.BookHisto_1D(hRateDiTau_relIso    , "Rate_DiTau_RelIso"    , ";track cluster p_{T} threshold (GeV); Rate (kHz) / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hRateDiTau_relIso    , "Rate_DiTau_RelIso"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
   
   // Single-tau efficiencies
-  histoTools_.BookHisto_1D(hEffSingleTau_all , "Eff_SingleTau_all"     , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hEffSingleTau_C   , "Eff_SingleTau_C"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hEffSingleTau_I   , "Eff_SingleTau_I"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hEffSingleTau_F   , "Eff_SingleTau_F"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_all , "Eff_SingleTau_all"     , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_C   , "Eff_SingleTau_C"   , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_I   , "Eff_SingleTau_I"   , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_F   , "Eff_SingleTau_F"   , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
 
-  histoTools_.BookHisto_1D(hEffSingleTau_relIso     , "Eff_SingleTau_RelIso"     , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_relIso     , "Eff_SingleTau_RelIso"     , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
 
   // Di-tau efficiencies
-  histoTools_.BookHisto_1D(hEffDiTau_all , "Eff_DiTau_all"     , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hEffDiTau_C   , "Eff_DiTau_C"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hEffDiTau_I   , "Eff_DiTau_I"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hEffDiTau_F   , "Eff_DiTau_F"   , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hEffDiTau_all , "Eff_DiTau_all"     , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hEffDiTau_C   , "Eff_DiTau_C"   , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hEffDiTau_I   , "Eff_DiTau_I"   , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hEffDiTau_F   , "Eff_DiTau_F"   , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
 
-  histoTools_.BookHisto_1D(hEffDiTau_relIso     , "Eff_DiTau_RelIso"     , ";track cluster p_{T} threshold (GeV); Efficiency / bin", 200, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hEffDiTau_relIso     , "Eff_DiTau_RelIso"     , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
   
   return;
 }
@@ -1754,7 +1778,7 @@ void TkEG::WriteHistos_(void)
   h_EGClusters_EtResolution->Write();
   h_EGClusters_M->Write();
 
-  h_trkClusters_relIso->Write();
+  //h_trkClusters_relIso->Write();
 
   hTkEG_matched_Et->Write();
   hTkEG_DeltaRmatch->Write();
@@ -1772,37 +1796,37 @@ void TkEG::WriteHistos_(void)
   h_nonMCmatchedCandidates_decayMode->Write();
 
   hTurnOn25_all->Write();
-  hTurnOn25_relIso->Write();
+  //hTurnOn25_relIso->Write();
   hTurnOn50_all->Write();
-  hTurnOn50_relIso->Write();
+  //hTurnOn50_relIso->Write();
 
   hRateSingleTau_all->Write(); // Inclusive = C+I+F                                                                                                                   
   hRateSingleTau_C->Write();
   hRateSingleTau_I->Write();
   hRateSingleTau_F->Write();
 
-  hRateSingleTau_relIso->Write(); // Inclusive = C+I+F                                                                                                                   
+  //hRateSingleTau_relIso->Write(); // Inclusive = C+I+F                                                                                                                   
 
   hRateDiTau_all->Write(); // Inclusive = C+I+F                                                                                                                       
   hRateDiTau_C->Write();
   hRateDiTau_I->Write();
   hRateDiTau_F->Write();
 
-  hRateDiTau_relIso->Write(); // Inclusive = C+I+F                                                                                                                       
+  //hRateDiTau_relIso->Write(); // Inclusive = C+I+F                                                                                                                       
 
   hEffSingleTau_all->Write();  // Inclusive = C+I+F                                                                                                                   
   hEffSingleTau_C->Write();
   hEffSingleTau_I->Write();
   hEffSingleTau_F->Write();
 
-  hEffSingleTau_relIso->Write();  // Inclusive = C+I+F                                                                                                                   
+  //hEffSingleTau_relIso->Write();  // Inclusive = C+I+F                                                                                                                   
 
   hEffDiTau_all->Write();  // Inclusive = C+I+F                                                                                                                       
   hEffDiTau_C->Write();
   hEffDiTau_I->Write();
   hEffDiTau_F->Write();
 
-  hEffDiTau_relIso->Write();  // Inclusive = C+I+F                                                                                                                       
+  //hEffDiTau_relIso->Write();  // Inclusive = C+I+F                                                                                                                       
   
   // Write 2-D histograms
   h_leadTrks_Phi_Eta->Write();
