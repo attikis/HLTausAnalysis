@@ -32,6 +32,7 @@ class L1TkEGParticle{
   bool HasMatchingGenParticle(void) const{return theMatching;}
   
   double GetTrackBasedPt();  
+  double GetTotalPt();
   double GetTrackInvMass();
   double GetEGInvMass();
   double GetGenTauPt();
