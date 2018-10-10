@@ -216,6 +216,7 @@ def GetHistoKwargs(h, opts):
         _cutBox = {"cutValue": 20.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
         _rebinX = 1
         _yLabel = "Efficiency / %.0f " + _units
+        _xMax   = 100.0
     if "counters" in hName:
         _units  = ""
         _format = "%0.0f " + _units
@@ -233,7 +234,7 @@ def GetHistoKwargs(h, opts):
         _yLabel = "Rate (kHz) / %.0f " + _units
         _log    = True
         _yMin   = 1e+0
-        _xMax   = 250.0
+        _xMax   = 100.0
     if "_rtau" in hName:
         _units  = ""
         _format = "%0.2f " + _units
@@ -334,7 +335,7 @@ def GetHistoKwargs(h, opts):
         _yLabel = _yNorm + " / " + _format
         _log    = False
         _xMin   = +0.0
-        _xMax   = +0.16
+        _xMax   = +0.5
     if "_chisquared" in hName:
         _units  = ""
         _format = "%0.1f " + _units
@@ -695,6 +696,15 @@ def GetHistoKwargs(h, opts):
         _rebinX = 1
         _yLabel = "Efficiency / %.0f " + _units
         _xMax   = 3.0
+        _log    = True
+    if "_donutratio" in hName:
+        _units  = ""
+        _format = "%0.2f " + _units
+        _xLabel = "#gamma"
+        _rebinX = 5
+        _yLabel = "Efficiency / " + _format
+        _xMin   = 0.0
+        _xMax   = 5.0
         _log    = True
         
     if _log:

@@ -409,7 +409,7 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
     for index, h in enumerate(p.histoMgr.getHistos()):
         hName = h.getName()
         legDict[hName] = algos[index] #styles.getCaloLegend(index)
-        p.histoMgr.forHisto(hName, styles.getCaloStyle(index))
+        p.histoMgr.forHisto(hName, styles.getTauAlgoStyle(h.getName())) #styles.getCaloStyle(index))
         p.histoMgr.setHistoDrawStyle(h.getName(), "LX") # "X" = Do not draw error bars
         p.histoMgr.setHistoLegendStyle(h.getName(), "LP")
 
