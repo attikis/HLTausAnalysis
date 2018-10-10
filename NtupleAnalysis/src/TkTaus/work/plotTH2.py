@@ -11,6 +11,9 @@ USAGE:
 
 EXAMPLES:
 ./plotTH2.py -m <mcrab> --folder ""
+./plotTH2.py -m multicrab_TkTau_v92X_SeedPt5_SigRMax0p15_IsoRMax0p35_VtxIso0p5_RelIso0p5_22h48m02s_09Oct2018 --logZ -i "TT_TuneCUETP8M2T4_14TeV_L1TnoPU" --normalizeToLumi -intLumi 1000
+./plotTH2.py -m multicrab_TkTau_v92X_SeedPt5_SigRMax0p15_IsoRMax0p35_VtxIso0p5_RelIso0p5_22h48m02s_09Oct2018 --logZ -i "TT_TuneCUETP8M2T4_14TeV_L1TnoPU" --normalizeByCrossSection
+./plotTH2.py -m multicrab_TkTau_v92X_SeedPt5_SigRMax0p15_IsoRMax0p35_VtxIso0p5_RelIso0p5_22h48m02s_09Oct2018 --logZ -i "TT_TuneCUETP8M2T4_14TeV_L1TnoPU" --normalizeToOne
 
 
 LAST USED:
@@ -75,8 +78,6 @@ def GetLumi(datasetsMgr):
     return lumi
 
 def GetDatasetsFromDir(opts):
-    Verbose("Getting datasets")
-    
     if (not opts.includeOnlyTasks and not opts.excludeTasks):
         datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
                                                         dataEra=opts.dataEra,
@@ -117,7 +118,7 @@ def main(opts):
     style.setLogX(opts.logX)
     style.setLogY(opts.logY)
     style.setLogZ(opts.logZ)
-    style.setWide(False, 0.15)
+    #style.setWide(False, 0.15)
 
     # For-loop: All opt Mode
     for opt in optModes:
@@ -164,15 +165,22 @@ def main(opts):
         # Plot Histograms
         histoList  = datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDirectoryContent(opts.folder)
         histoPaths = [os.path.join(opts.folder, h) for h in histoList]
-        histoType  = type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram())
         
         # For-loop: All histograms in chosen folder
+        counter = 0
         for i, h in enumerate(histoPaths, 1):
             histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))
             if "TH2" not in histoType:
                 continue
-            Plot2dHistograms(datasetsMgr, h)
-    
+            if "DiTau" in h:
+                continue
+
+            # For-loop: All datasets
+            for d in datasetsMgr.getAllDatasetNames():
+                counter += 1
+                Plot2dHistograms(datasetsMgr, d, h, counter)
+        print
+
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
     return
 
@@ -225,14 +233,18 @@ def GetHistoKwargs(h, opts):
         "rebinY"           : 1,
         }
 
-    ROOT.gStyle.SetNdivisions(10, "X")
-    ROOT.gStyle.SetNdivisions(10, "Y")
-    ROOT.gStyle.SetNdivisions(10, "Z")
+    if 0:
+        ROOT.gStyle.SetNdivisions(10, "X")
+        ROOT.gStyle.SetNdivisions(10, "Y")
+        ROOT.gStyle.SetNdivisions(10, "Z")
 
     if "VtxIso_Vs_RelIso" in h:
         _kwargs["xlabel"] = "vertex isolation (cm)"# / %.2f (cm)"
         _kwargs["ylabel"] = "relative isolation"# / %.2f"
-        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 5.0, "ymin": 0.0, "ymax": 5.0}
+        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 2.0, "ymin": 0.0, "ymax": 5.0}
+        if "TkIsoTau" in h:
+            _kwargs["opts"]   = {"xmin": 0.0, "xmax": 5.0, "ymin": 0.0, "ymax": 1.0}
+
         _kwargs["rebinX"] = 1
         _kwargs["rebinY"] = 1
 
@@ -282,18 +294,7 @@ def getHistos(datasetsMgr, histoName):
     h2.setName("EWK")
     return [h1, h2]
 
-def Plot2dHistograms(datasetsMgr, histoName):
-    # Get Histogram name and its kwargs
-    saveName = histoName.rsplit("/")[-1] + "_" + datasetsMgr.getAllDatasets()[0].getName().split("_")[0]
-    kwargs_  = GetHistoKwargs(saveName, opts)
-
-    # Get the reference histo and the list of histos to compare
-    datasets0 = datasetsMgr.getAllDatasets()[0].getName()
-    histoList = [getHisto(datasetsMgr, datasets0, histoName)]
-
-    ##########################################################
-    # Plot a Tgraph 
-    ##########################################################
+def getCustomTGraph(histoName):
     ymax = 200
     x    = []
     y    = []        
@@ -305,45 +306,79 @@ def Plot2dHistograms(datasetsMgr, histoName):
             x.append( 3.5/float(i) )
         else:
             x.append( 0.0/float(i) )
-            
     gr = ROOT.TGraph(len(x), array.array('d', x), array.array('d', y))
+    return gr
+
+def Plot2dHistograms(datasetsMgr, dsetName, histoName, index):
+
+    msg = "%s%s (%s)%s" % (ShellStyles.SuccessStyle(), histoName, dsetName, ShellStyles.NormalStyle() )
+    aux.PrintFlushed(msg, index==1)
+
+    # Custom Filtering of datasets 
+    dsetsMgr = datasetsMgr.deepCopy()
+    if opts.verbose:
+        dsetsMgr.PrintInfo()
+
+    # Get Histogram name and its kwargs
+    saveName = histoName.rsplit("/")[-1] + "_" + dsetName.split("_")[0] + dsetName.split("_")[-1] 
+    kwargs_  = GetHistoKwargs(saveName, opts)
+
+    for i, d in enumerate(dsetsMgr.getAllDatasetNames(), 0):
+        if d == dsetName:
+            continue
+        else:
+            # Remove dataset from manager but do NOT close the file!
+            dsetsMgr.remove(d, close=False)
+
+    # Sanity check
+    nDatasets = len(dsetsMgr.getAllDatasets())
+    if nDatasets > 1:
+        raise Exception("More than 1 datasets detected in the dataset manager! Can only support 1 dataset. Please use the -i option to choose exactly 1 dataset'")
+
+    # Get the reference histo and the list of histos to compare
+    datasets0 = dsetsMgr.getAllDatasets()[0].getName()
+    histoList = [getHisto(dsetsMgr, datasets0, histoName)]
 
     # Create the 2d plot  
+    Verbose("Creating the 2d plot", True)
     if opts.normalizeToLumi:
-        p = plots.MCPlot(datasetsMgr, histoName, normalizeToLumi=opts.intLumi, saveFormats=[])
+        p = plots.MCPlot(dsetsMgr, histoName, normalizeToLumi=opts.intLumi, saveFormats=[])
     elif opts.normalizeByCrossSection:
-        p = plots.MCPlot(datasetsMgr, histoName, normalizeByCrossSection=True, saveFormats=[], **{})
+        p = plots.MCPlot(dsetsMgr, histoName, normalizeByCrossSection=True, saveFormats=[], **{})
     elif opts.normalizeToOne:
-        p = plots.MCPlot(datasetsMgr, histoName, normalizeToOne=True, saveFormats=[], **{})
+        p = plots.MCPlot(dsetsMgr, histoName, normalizeToOne=True, saveFormats=[], **{})
     else:
         raise Exception("One of the options --normalizeToOne, --normalizeByCrossSection, --normalizeToLumi must be enabled (set to \"True\").")
 
-    # Set universal histo styles
+    Verbose("Setting universal histo styles", True)
     p.histoMgr.setHistoDrawStyleAll("COLZ")
     #p.histoMgr.setHistoLegendStyleAll("L")
 
-    # Customize histo
+    Verbose("Customising histograms", True)
     p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetTitleOffset(1.3)) #fixme
 
-    # Set default dataset style to all histos
+    Verbose("Setting plot styles to histograms", True)
     for index, h in enumerate(p.histoMgr.getHistos()):
+        #print "index = ", index
         plots._plotStyles[p.histoMgr.getHistos()[index].getDataset().getName()].apply(p.histoMgr.getHistos()[index].getRootHisto())
+    #plots._plotStyles[dsetName].apply(p.histoMgr.getHistos()[index].getRootHisto())
 
-    # Draw and save the plot
+    Verbose("Drawing the plot", True)
     plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
 
-    # Draw a a function ?
-    if "GenP" in histoName:
+    # Add fit line for shrinking cone?
+    if "GenP_VisEt_Vs" in histoName or "GenP_PtLdg_Vs" in histoName:
+        gr = getCustomTGraph(histoName)
         gr.SetLineWidth(3)
         gr.Draw("L same")
         
-    # Remove the legend
+    Verbose("Removing the legend", True)
     p.removeLegend()
 
-    # Additional text                                                                                                                                          
-    histograms.addText(0.18, 0.89, plots._legendLabels[datasets0], 17)
+    Verbose("Adding text on canvas", True)
+    histograms.addText(0.65, 0.89, plots._legendLabels[datasets0], 18)
 
-    # Save in all formats chosen by user
+    Verbose("Saving the canvas", True)
     aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, opts.url)
 
     return
