@@ -49,10 +49,10 @@ void TkTaus::InitVars_()
   sigConeTks_nFitParams  = seedTk_nFitParams;
   sigConeTks_minPt       =   2.0;  //   2.0
   sigConeTks_minEta      =   0.0;  //   0.0
-  sigConeTks_maxEta      = 999.9;  // 999.9
+  sigConeTks_maxEta      =   2.5;  // 999.9
   sigConeTks_maxChiSq    =  50.0;  //  25.0
   sigConeTks_minStubs    =   5;    //   4
-  sigConeTks_dPOCAz      =   0.8;  // 0.80 (A. Ryd)
+  sigConeTks_dPOCAz      =   0.5;  // 0.80 (A. Ryd)
   sigConeTks_maxInvMass  =   1.5;  // 1.77 (A. Ryd)
  
   // Isolation cone tracks
@@ -60,10 +60,10 @@ void TkTaus::InitVars_()
   isoConeTks_nFitParams  = seedTk_nFitParams;
   isoConeTks_minPt       =   2.0; //   2.0
   isoConeTks_minEta      =   0.0; //   0.0
-  isoConeTks_maxEta      = 999.9; // 999.9
+  isoConeTks_maxEta      =   2.5; // 999.9
   isoConeTks_maxChiSq    = 100.0; // 100.00
   isoConeTks_minStubs    =   4;   //   4
-  isoConeTks_dPOCAz      =   1.0; // 0.6 (A. Ryd) 
+  isoConeTks_dPOCAz      =   5.0; // 0.6 (A. Ryd) 
 
   // Signal cone parameters
   sigCone_Constant        = +0.00; // 0.0
@@ -72,7 +72,7 @@ void TkTaus::InitVars_()
   sigCone_cutoffDeltaR    = +0.15; // 0.15
 
   // Isolation cone
-  isoCone_Constant = +0.65;         // 3.50 GeV (for ET_vis, 0
+  isoCone_Constant = +1.0;         // 0.65 by fit on fit on ldg pT, 3.50 GeV for fit on ET_vis
   isoCone_VtxIsoWP = +0.50;         // 1.0 cm
   isoCone_RelIsoWP = +0.50;         // 0.2
   isoCone_dRMin    = sigCone_dRMax; // 0.4
@@ -1217,7 +1217,7 @@ void TkTaus::BookHistos_(void)
   const char* tDZ0  = ";#Deltaz_{0} (cm);Entries / %.2f cm";
   const char* tRIso = ";relative isolation;Entries / %.2f";
   const char* tVIso = ";min(z_{0}^{m} - z_{0}^{iso} (cm);Entries / %.2f cm";
-  const char* tIso = ";vertex isolation / %.2f cm;relativeisolation / %.2f";
+  const char* tIso  = ";vertex isolation;relative isolation";
   const char* tChi  = ";#chi^{2};Entries / %.2f";
   const char* tRChi = ";#chi^{2}_{#nu};Entries / %.2f";
   const char* tW    = ";w_{#tau};Entries / %.2f";
@@ -1251,7 +1251,7 @@ void TkTaus::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1TkTau_Charge       , "L1TkTau_Charge"       , tQ   , nN   , minN   , maxN   );
   histoTools_.BookHisto_1D(hL1TkTau_RelIso       , "L1TkTau_RelIso"       , tRIso, nRIso, minRIso, maxRIso);
   histoTools_.BookHisto_1D(hL1TkTau_VtxIso       , "L1TkTau_VtxIso"       , tVIso, nVIso, minVIso, maxVIso);
-  histoTools_.BookHisto_2D(hL1TkTau_VtxIso_Vs_RelIso, "L1TkTau_VtxIso_Vs_RelIso", tIso, nVIso, minVIso, maxVIso, nRIso, minRIso, maxRIso);
+  histoTools_.BookHisto_2D(hL1TkTau_VtxIso_Vs_RelIso, "L1TkTau_VtxIso_Vs_RelIso", tIso, 200, 0.0, 10.0, 200, 0.0, 10.0);
   histoTools_.BookHisto_1D(hL1TkTau_DeltaRGenP   , "L1TkTau_DeltaRGenP"   , tDR  , nR   , minR   , maxR   );
   histoTools_.BookHisto_1D(hL1TkTau_SigTks_Pt           , "L1TkTau_SigTks_Pt"           , tPt  ,  nPt  , minPt  , maxPt   );
   histoTools_.BookHisto_1D(hL1TkTau_SigTks_Eta          , "L1TkTau_SigTks_Eta"          , tEta ,  nEta , minEta , maxEta  );
@@ -2220,7 +2220,7 @@ void TkTaus::GetShrinkingConeSizes(double tk_pt,
 
   double signalCone_min = (sigCone_Constant)/(tk_pt);
   double signalCone_max = (isoCone_Constant)/(tk_pt);
-  if (signalCone_max > sigCone_dRCutoff) signalCone_max = sigCone_dRCutoff;
+  if (signalCone_max > sigCone_dRCutoff) signalCone_max = sigCone_dRCutoff; // fixme
   else{}
   double isoCone_min    = signalCone_max;
   double isoCone_max    = (isoCone_dRMax/1.0);
