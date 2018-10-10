@@ -649,8 +649,8 @@ void HistoTools::ConvertToOneMinusCumulativeHisto_1D(TH1D *histo)
 {
   
   // For-loop over all histogram bins
-  const int nBins = histo->GetNbinsX()+1;
-  for (int b=0; b <= nBins+1; b++){
+  const int nBins = histo->GetNbinsX();
+  for (int b=1; b <= nBins+1; b++){ //starting from bin 1 (because bin 0 is underflow)        
     
     const double value = histo->Integral(b, nBins);
     const double error = TMath::Sqrt(value);
@@ -668,14 +668,14 @@ void HistoTools::ConvertToOneMinusCumulativeHisto_2D(TH2D *histo)
   // Leadng jet on x-axis
 
   // For-loop over all histogram bins
-  const int nBinsX = histo->GetNbinsX()+1;
-  const int nBinsY = histo->GetNbinsY()+1;
+  const int nBinsX = histo->GetNbinsX();
+  const int nBinsY = histo->GetNbinsY();
   
   // For-loop: x-axis bins
-  for (int bx=0; bx <= nBinsX; bx++){
+  for (int bx=1; bx <= nBinsX; bx++){
 
     // For-loop: y-axis bins
-    for (int by=0; by <= nBinsY; by++){
+    for (int by=1; by <= nBinsY; by++){
 
       if (by > bx) break;
       const double value = histo->Integral(bx, nBinsX, by, nBinsY);
@@ -683,8 +683,7 @@ void HistoTools::ConvertToOneMinusCumulativeHisto_2D(TH2D *histo)
       histo->SetBinContent( bx, by, value );
       histo->SetBinError( bx, by, error );
 
-    } // For-loop: y-axis bins
-    
+    } // For-loop: y-axis bins    
   } // For-loop: x-axis bins
 
   return;
