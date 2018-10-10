@@ -1,17 +1,20 @@
 #!/usr/bin/env python
 '''
-Description:
+DESCRIPTION:
 Script that plots Data/MC for all histograms under a given folder (passsed as option to the script)
 Good for sanity checks for key points in the cut-flow
 
-Usage:
-./plot_Folder.py -m <pseudo_mcrab_directory> [opts]
 
-Examples:
-./plot_Folder.py -m <mcrab> --folder ""
-./plot_Folder.py -m FakeBMeasurement_GE2Medium_GE1Loose0p80_StdSelections_BDTm0p80_AllSelections_BDT0p90_RandomSort_171120_100657 --url --folder ForFakeBMeasurementEWKFakeB --nostack
+USAGE:
+./plotTH2.py -m <pseudo_mcrab_directory> [opts]
 
-Last Used:
+
+EXAMPLES:
+./plotTH2.py -m <mcrab> --folder ""
+
+
+LAST USED:
+/plotTH2.py --logZ -i "SingleNeutrino_L1TPU140" --normalizeToOne -m multicrab_TkTau_v92X_SeedPt5_SigRMax0p15_IsoRMax0p35_VtxIso0p5_RelIso0p5_22h48m02s_09Oct2018 
 
 '''
 
@@ -32,6 +35,7 @@ from ROOT import *
 
 import HLTausAnalysis.NtupleAnalysis.tools.dataset as dataset
 import HLTausAnalysis.NtupleAnalysis.tools.histograms as histograms
+import HLTausAnalysis.NtupleAnalysis.tools.aux as aux
 import HLTausAnalysis.NtupleAnalysis.tools.counter as counter
 import HLTausAnalysis.NtupleAnalysis.tools.tdrstyle as tdrstyle
 import HLTausAnalysis.NtupleAnalysis.tools.styles as styles
@@ -70,14 +74,6 @@ def GetLumi(datasetsMgr):
     Verbose("Luminosity = %s (pb)" % (lumi), True)
     return lumi
 
-def GetListOfEwkDatasets():
-    Verbose("Getting list of EWK datasets")
-    if 0: # TopSelection
-        return  ["TT", "WJetsToQQ_HT_600ToInf", "SingleTop", "DYJetsToQQHT", "TTZToQQ",  "TTWJetsToQQ", "Diboson", "TTTT"]
-    else: # TopSelectionBDT
-        return  ["TT", "noTop", "SingleTop", "ttX"]
-
-
 def GetDatasetsFromDir(opts):
     Verbose("Getting datasets")
     
@@ -105,51 +101,57 @@ def GetDatasetsFromDir(opts):
         raise Exception("This should never be reached")
     return datasets
     
+
 def main(opts):
 
-    #optModes = ["", "OptChiSqrCutValue50", "OptChiSqrCutValue100"]
     optModes = [""]
 
     if opts.optMode != None:
         optModes = [opts.optMode]
         
+    # Apply TDR style
+    style = tdrstyle.TDRStyle()
+    style.setOptStat(False)
+    style.setGridX(opts.gridX)
+    style.setGridY(opts.gridY)
+    style.setLogX(opts.logX)
+    style.setLogY(opts.logY)
+    style.setLogZ(opts.logZ)
+    style.setWide(False, 0.15)
+
     # For-loop: All opt Mode
     for opt in optModes:
         opts.optMode = opt
 
         # Setup & configure the dataset manager 
         datasetsMgr = GetDatasetsFromDir(opts)
-        datasetsMgr.updateNAllEventsToPUWeighted() #marina
-        if 0:
-            datasetsMgr.loadLuminosities() # from lumi.json
-
-        # Set/Overwrite cross-sections
-        datasetsToRemove = []
-        for d in datasetsMgr.getAllDatasets():
-            datasetsMgr.getDataset(d.getName()).setCrossSection(1.0)
+        datasetsMgr.updateNAllEventsToPUWeighted()
+        # datasetsMgr.loadLuminosities() # from lumi.json
 
         if opts.verbose:
             datasetsMgr.PrintCrossSections()
             datasetsMgr.PrintLuminosities()
+            datasetsMgr.PrintInfo()
+
+        # Merge histograms (see NtupleAnalysis/python/tools/plots.py) 
+        plots.mergeRenameReorderForDataMC(datasetsMgr) 
+
+        # Get Luminosity
+        if opts.intLumi < 0:
+            intLumi = datasetsMgr.getDataset("Data").getLuminosity()
 
         # Custom Filtering of datasets 
+        datasetsToRemove = []
         for i, d in enumerate(datasetsToRemove, 0):
             msg = "Removing dataset %s" % d
             Print(ShellStyles.WarningLabel() + msg + ShellStyles.NormalStyle(), i==0)
             datasetsMgr.remove(filter(lambda name: d in name, datasetsMgr.getAllDatasetNames()))
-        #if opts.verbose:
-            #datasetsMgr.PrintInfo()
 
-        # Merge histograms (see NtupleAnalysis/python/tools/plots.py) 
-        plots.mergeRenameReorderForDataMC(datasetsMgr) 
-        
-        # Get Luminosity
-        if 0:
-            intLumi = datasetsMgr.getDataset("Data").getLuminosity()
+        if opts.verbose:
+            datasetsMgr.PrintInfo()
 
         # Re-order datasets (different for inverted than default=baseline)
         newOrder = []
-        # For-loop: All MC datasets
         for d in datasetsMgr.getMCDatasets():
             newOrder.append(d.getName())
             
@@ -157,25 +159,21 @@ def main(opts):
         datasetsMgr.selectAndReorder(newOrder)
         
         # Print dataset information
-        #datasetsMgr.PrintInfo()
-        
-        # Apply TDR style
-        style = tdrstyle.TDRStyle()
-        #style.setOptStat(True)
-        style.setGridX(opts.gridX)
-        style.setGridY(opts.gridY)
+        datasetsMgr.PrintInfo()        
 
         # Plot Histograms
-        folder     = "" #opts.folder
-        histoList  = datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDirectoryContent(folder)
-        histoPaths = [os.path.join(folder, h) for h in histoList]
+        histoList  = datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDirectoryContent(opts.folder)
+        histoPaths = [os.path.join(opts.folder, h) for h in histoList]
         histoType  = type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram())
+        
+        # For-loop: All histograms in chosen folder
         for i, h in enumerate(histoPaths, 1):
             histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))
             if "TH2" not in histoType:
                 continue
-            PlotHistograms(datasetsMgr, h)
-
+            Plot2dHistograms(datasetsMgr, h)
+    
+    Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
     return
 
 def GetHistoKwargs(h, opts):
@@ -187,45 +185,68 @@ def GetHistoKwargs(h, opts):
         yMaxF = 10
     else:
         yMaxF = 1.0
-        
+    
+    # z-axis settings
+    zMin   =  0
+    zMax   = None
+    zLabel = "z-axis"
+    if opts.normalizeToLumi:
+        zLabel  = "Events"
+        zMin    = 1e0
+    elif opts.normalizeByCrossSection:
+        zLabel  = "#sigma (pb)"
+    elif opts.normalizeToOne:
+        zLabel  = "Arbitrary Units"
+    else:
+        zLabel = "Unknown"
+
+   # Cut lines/boxes                                                                                                                                                                                                              
+    _cutBoxX = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+    _cutBoxY = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True,
+                "mainCanvas": True, "ratioCanvas": False} # box = True not working       
+
     _kwargs = {
-        "stackMCHistograms": opts.nostack,
-        "addLuminosityText": False,
+        "stackMCHistograms": False,
+        "addMCUncertainty" : False,
+        "addLuminosityText": opts.normalizeToLumi,
         "addCmsText"       : True,
-        "cmsExtraText"     : "Phase-2 Simulation",
-        "opts"             : {"ymin": yMin, "ymaxfactor": yMaxF},
-        "opts2"            : {"ymin": 0.59, "ymax": 1.41},
+        "cmsExtraText"     : " Phase-2 Simulation",
+        "cmsTextPosition"  : "outframe",
         "log"              : logY,
         "moveLegend"       : _moveLegend,
-        "xtitlesize"       : 0.1,#xlabelSize,
-        "ytitlesize"       : 0.1,#ylabelSize,
+        "xtitlesize"       : 0.1,
+        "ytitlesize"       : 0.1,
+        "zmin"             : zMin, 
+        "zmax"             : zMax,
+        "zlabel"           : zLabel,
+        "cutBox"           : _cutBoxX,
+        "cutBoxY"          : _cutBoxY,
+        "rebinX"           : 1, 
+        "rebinY"           : 1,
         }
 
-    kwargs = copy.deepcopy(_kwargs)
-    
-    if opts.normToOne:
-        kwargs["zlabel"]= "Arbitrary Units"
-    else:
-        kwargs["zlabel"]= "Entries"
-    '''
-    if "_eta" in h.lower():
-        #_yLabel = "Arbitrary Units / %.0f "
-        units            = ""
-        kwargs["xlabel"] = "#eta" 
-        kwargs["ylabel"] = _yLabel + units
-        kwargs["cutBox"] = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-        kwargs["opts"]   = {"xmin": -2.5, "xmax": 2.5, "ymin": yMin, "ymaxfactor": yMaxF}
+    ROOT.gStyle.SetNdivisions(10, "X")
+    ROOT.gStyle.SetNdivisions(10, "Y")
+    ROOT.gStyle.SetNdivisions(10, "Z")
 
-    if "phi" in h.lower():
-        #_yLabel = "Arbitrary Units / %.0f "
-        units            = "rad"
-        kwargs["xlabel"] = "#phi (%s)" % units
-        kwargs["ylabel"] = _yLabel + units
-        kwargs["cutBox"] = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-        kwargs["opts"]   = {"xmin": -3.15, "xmax": 3.15, "ymin": yMin, "ymaxfactor": yMaxF}
-        '''
+    if "VtxIso_Vs_RelIso" in h:
+        _kwargs["xlabel"] = "vertex isolation (cm)"# / %.2f (cm)"
+        _kwargs["ylabel"] = "relative isolation"# / %.2f"
+        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 5.0, "ymin": 0.0, "ymax": 5.0}
+        _kwargs["rebinX"] = 1
+        _kwargs["rebinY"] = 1
 
-    return kwargs
+    if "VisEt_Vs_dRMax" in h:
+        _kwargs["opts"]    = {"xmin": 0.0, "xmax": 0.3, "ymin": 0.0, "ymax": 120.0}
+        _kwargs["cutBox"]  = {"cutValue":  0.17, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _kwargs["cutBoxY"] = {"cutValue": 20.00, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+
+    if "PtLdg_Vs_dRMax" in h:
+        _kwargs["opts"]    = {"xmin": 0.0, "xmax": 0.3, "ymin": 0.0, "ymax": 80.0}
+        _kwargs["cutBox"]  = {"cutValue": 0.25, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _kwargs["cutBoxY"] = {"cutValue": 5.00, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        
+    return _kwargs
     
 def GetBinwidthDecimals(binWidth):
     dec =  " %0.0f"
@@ -246,13 +267,11 @@ def GetBinwidthDecimals(binWidth):
     return dec
 
 
-
 def getHisto(datasetsMgr, datasetName, name):
 
     h1 = datasetsMgr.getDataset(datasetName).getDatasetRootHisto(name)
     h1.setName("h0" + "-" + datasetName)
     return h1
-
 
 def getHistos(datasetsMgr, histoName):
 
@@ -263,59 +282,48 @@ def getHistos(datasetsMgr, histoName):
     h2.setName("EWK")
     return [h1, h2]
 
-def PlotHistograms(datasetsMgr, histoName):
-    Verbose("Plotting Data-MC Histograms")
-
+def Plot2dHistograms(datasetsMgr, histoName):
     # Get Histogram name and its kwargs
     saveName = histoName.rsplit("/")[-1] + "_" + datasetsMgr.getAllDatasets()[0].getName().split("_")[0]
     kwargs_  = GetHistoKwargs(saveName, opts)
-    kwargs ={}
 
-    ROOT.gStyle.SetNdivisions(8, "Z")
-    ROOT.gStyle.SetNdivisions(8, "Y")
-
-    # Get the reference histo and the list of histos to compare                                                                                                
+    # Get the reference histo and the list of histos to compare
     datasets0 = datasetsMgr.getAllDatasets()[0].getName()
     histoList = [getHisto(datasetsMgr, datasets0, histoName)]
 
     ##########################################################
     # Plot a Tgraph 
+    ##########################################################
     ymax = 200
-    x=[]
-    y=[]
-    
+    x    = []
+    y    = []        
     for i in range(1, ymax):
         y.append( i )
-        x.append( 3.5/float(i))
-
+        if "PtLdg_Vs" in histoName:
+            x.append( 2.0/float(i) )
+        elif "VisEt_Vs_" in histoName:
+            x.append( 3.5/float(i) )
+        else:
+            x.append( 0.0/float(i) )
+            
     gr = ROOT.TGraph(len(x), array.array('d', x), array.array('d', y))
-    ##########################################################
 
-
-    if opts.normToOne:
-        for h in histoList:
-            h.normalizeToOne()
-    
-    p = plots.PlotBase(histoList, saveFormats=[])
+    # Create the 2d plot  
+    if opts.normalizeToLumi:
+        p = plots.MCPlot(datasetsMgr, histoName, normalizeToLumi=opts.intLumi, saveFormats=[])
+    elif opts.normalizeByCrossSection:
+        p = plots.MCPlot(datasetsMgr, histoName, normalizeByCrossSection=True, saveFormats=[], **{})
+    elif opts.normalizeToOne:
+        p = plots.MCPlot(datasetsMgr, histoName, normalizeToOne=True, saveFormats=[], **{})
+    else:
+        raise Exception("One of the options --normalizeToOne, --normalizeByCrossSection, --normalizeToLumi must be enabled (set to \"True\").")
 
     # Set universal histo styles
     p.histoMgr.setHistoDrawStyleAll("COLZ")
-    p.histoMgr.setHistoLegendStyleAll("L")
+    #p.histoMgr.setHistoLegendStyleAll("L")
 
     # Customize histo
-    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetTitle(kwargs_["zlabel"]))
-    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetTitleOffset(1.5))
-
-    # Get the x and y axis title
-    binWidthX = p.histoMgr.getHistos()[0].getRootHisto().GetXaxis().GetBinWidth(0)
-    binWidthY = p.histoMgr.getHistos()[0].getRootHisto().GetYaxis().GetBinWidth(0)
-    xlabel = p.histoMgr.getHistos()[0].getRootHisto().GetXaxis().GetTitle() + " / %s" % (GetBinwidthDecimals(binWidthX) % (binWidthX))
-    kwargs_["xlabel"] = xlabel
-    ylabel = p.histoMgr.getHistos()[0].getRootHisto().GetYaxis().GetTitle() + " / %s" % (GetBinwidthDecimals(binWidthY) % (binWidthY))
-    kwargs_["ylabel"] = ylabel
-
-    #p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMinimum(zmin))
-    #p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMaximum(zmax))
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetZaxis().SetTitleOffset(1.3)) #fixme
 
     # Set default dataset style to all histos
     for index, h in enumerate(p.histoMgr.getHistos()):
@@ -323,43 +331,21 @@ def PlotHistograms(datasetsMgr, histoName):
 
     # Draw and save the plot
     plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
-    # Draw Line(tgraph)
-    gr.SetLineWidth(3)
-    gr.Draw("L same")
-    
-    # Remove legend
+
+    # Draw a a function ?
+    if "GenP" in histoName:
+        gr.SetLineWidth(3)
+        gr.Draw("L same")
+        
+    # Remove the legend
     p.removeLegend()
 
-    # Set log-z?                                                                                                                                               
-    p.getPad().SetLogz(False)
-
-     # Additional text                                                                                                                                          
+    # Additional text                                                                                                                                          
     histograms.addText(0.18, 0.89, plots._legendLabels[datasets0], 17)
 
-    # Save the plots in custom list of saveFormats
-    SavePlot(p, saveName, os.path.join(opts.saveDir, opts.optMode, opts.folder), [".pdf"])#, ".png"] )
-    return
+    # Save in all formats chosen by user
+    aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, opts.url)
 
-
-def SavePlot(plot, plotName, saveDir, saveFormats = [".png", ".pdf"]):
-    Verbose("Saving the plot in %s formats: %s" % (len(saveFormats), ", ".join(saveFormats) ) )
-
-    # Check that path exists
-    if not os.path.exists(saveDir):
-        os.makedirs(saveDir)
-
-    # Create the name under which plot will be saved
-    saveName = os.path.join(saveDir, plotName.replace("/", "_").replace(" ", "").replace("(", "").replace(")", "") )
-    # For-loop: All save formats
-    for i, ext in enumerate(saveFormats):
-        saveNameURL = saveName + ext
-        #saveNameURL = saveNameURL.replace("/publicweb/a/aattikis/", "http://home.fnal.gov/~aattikis/")
-        saveNameURL = saveNameURL.replace("/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/", "https://cmsdoc.cern.ch/~mtoumazo/hltaus/")
-        if opts.url:
-            Print(saveNameURL, 1)
-        else:
-            Print(saveName + ext, 1)
-        plot.saveAs(saveName, formats=saveFormats)
     return
 
 
@@ -384,25 +370,25 @@ if __name__ == "__main__":
     '''
     
     # Default Settings
-    ANALYSISNAME = None #"FakeBMeasurement"
-    SEARCHMODE   = None #"80to1000"
-    DATAERA      = None #"ID2017"
-    NORMALIZETOONE = True
+    VERBOSE      = False
+    ANALYSIS     = "HLTausAnalysis"
+    SEARCHMODE   = None
+    DATAERA      = "TDR2019"
+    BATCHMODE    = True
     GRIDX        = False
     GRIDY        = False
+    LOGX         = False
+    LOGY         = False
+    LOGZ         = False
     OPTMODE      = None
-    BATCHMODE    = True
-    PRECISION    = 3
-    INTLUMI      = -1.0
-    SUBCOUNTERS  = False
-    LATEX        = False
-    URL          = True
-    NOERROR      = True
-    SAVEDIR      = "/afs/cern.ch/user/m/mtoumazo/public/html/hltaus/CaloTk/TH2D/" #os.getcwd()
-    VERBOSE      = False
+    INTLUMI      = 1000.0
+    SAVEFORMATS = [".png"] #[".C", ".png", ".pdf"]
+    URL          = False
+    SAVEDIR      = None
     FOLDER       = ""
-    RATIO        = False
-    NOSTACK      = False
+    NORM2ONE     = False
+    NORM2XSEC    = False
+    NORM2LUMI    = False
 
     # Define the available script options
     parser = OptionParser(usage="Usage: %prog [options]")
@@ -416,8 +402,8 @@ if __name__ == "__main__":
     parser.add_option("-b", "--batchMode", dest="batchMode", action="store_false", default=BATCHMODE, 
                       help="Enables batch mode (canvas creation does NOT generate a window) [default: %s]" % BATCHMODE)
 
-    parser.add_option("--analysisName", dest="analysisName", type="string", default=ANALYSISNAME,
-                      help="Override default analysisName [default: %s]" % ANALYSISNAME)
+    parser.add_option("--analysisName", dest="analysisName", type="string", default=ANALYSIS,
+                      help="Override default analysisName [default: %s]" % ANALYSIS)
 
     parser.add_option("--intLumi", dest="intLumi", type=float, default=INTLUMI,
                       help="Override the integrated lumi [default: %s]" % INTLUMI)
@@ -434,11 +420,23 @@ if __name__ == "__main__":
     parser.add_option("--gridY", dest="gridY", action="store_true", default=GRIDY, 
                       help="Enable the y-axis grid lines [default: %s]" % GRIDY)
 
+    parser.add_option("--logX", dest="logX", action="store_true", default=LOGX, 
+                      help="Set the x-axis to log scale? [default: %s]" % LOGX)
+
+    parser.add_option("--logY", dest="logY", action="store_true", default=LOGY, 
+                      help="Set the y-axis to log scale? [default: %s]" % LOGY)
+
+    parser.add_option("--logZ", dest="logZ", action="store_true", default=LOGZ, 
+                      help="Set the z-axis to log scale? [default: %s]" % LOGZ)
+
     parser.add_option("--saveDir", dest="saveDir", type="string", default=SAVEDIR, 
                       help="Directory where all pltos will be saved [default: %s]" % SAVEDIR)
 
     parser.add_option("--url", dest="url", action="store_true", default=URL, 
                       help="Don't print the actual save path the histogram is saved, but print the URL instead [default: %s]" % URL)
+
+    parser.add_option("--formats", dest="formats", default = None,
+                      help="Formats in which all plots will be saved in. Provide as list of comma-separated (NO SPACE!) formats. [default: None]")
     
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=VERBOSE, 
                       help="Enables verbose mode (for debugging purposes) [default: %s]" % VERBOSE)
@@ -452,15 +450,14 @@ if __name__ == "__main__":
     parser.add_option("--folder", dest="folder", type="string", default = FOLDER,
                       help="ROOT file folder under which all histograms to be plotted are located [default: %s]" % (FOLDER) )
 
-    parser.add_option("--ratio", dest="ratio", action="store_true", default = RATIO,
-                      help="Draw ratio canvas for Data/MC curves? [default: %s]" % (RATIO) )
-
-    parser.add_option("--nostack", dest="nostack", action="store_true", default = NOSTACK,
-                      help="Do not stack MC histograms [default: %s]" % (NOSTACK) )
-
-    parser.add_option("--normToOne", dest="normToOne", action="store_true", default = NORMALIZETOONE,
-                      help="Normalize histogram to unity [default: %s]" % (NORMALIZETOONE) )
-
+    parser.add_option("--normalizeToOne", dest="normalizeToOne", action="store_true", default=NORM2ONE,
+                      help="Normalise plot to one [default: %s]" % NORM2ONE)
+    
+    parser.add_option("--normalizeByCrossSection", dest="normalizeByCrossSection", action="store_true", default=NORM2XSEC,
+                      help="Normalise plot by cross-section [default: %s]" % NORM2XSEC)
+    
+    parser.add_option("--normalizeToLumi", dest="normalizeToLumi", action="store_true", default=NORM2LUMI,
+                      help="Normalise plot to luminosity [default: %s]" % NORM2LUMI)
 
     (opts, parseArgs) = parser.parse_args()
 
@@ -469,11 +466,23 @@ if __name__ == "__main__":
         parser.print_help()
         sys.exit(1)
 
+  # Determine path for saving plots                                                                                                                                                                                              
+    if opts.saveDir == None:
+        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="TH2")
+    else:
+        print "opts.saveDir = ", opts.saveDir
+
     if opts.mcrab == None:
         Print("Not enough arguments passed to script execution. Printing docstring & EXIT.")
         parser.print_help()
         #print __doc__
         sys.exit(1)
+
+    # Overwrite default save formats?
+    if opts.formats != None:
+        opts.saveFormats = opts.formats.split(",")
+    else:
+        opts.saveFormats = SAVEFORMATS
 
     # Sanity check
     allowedFolders = [""]
@@ -488,4 +497,4 @@ if __name__ == "__main__":
     main(opts)
 
     if not opts.batchMode:
-        raw_input("=== plot_Folder.py: Press any key to quit ROOT ...")
+        raw_input("=== plotTH2.py: Press any key to quit ROOT ...")
