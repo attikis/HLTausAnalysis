@@ -63,7 +63,7 @@ void TkTaus::InitVars_()
   isoConeTks_maxEta      =   2.5; // 999.9
   isoConeTks_maxChiSq    = 100.0; // 100.00
   isoConeTks_minStubs    =   4;   //   4
-  isoConeTks_dPOCAz      =   5.0; // 0.6 (A. Ryd) 
+  isoConeTks_dPOCAz      =  10.0; // 5.0 (0.6 from A. Ryd)
 
   // Signal cone parameters
   sigCone_Constant        = +0.00; // 0.0
@@ -72,15 +72,22 @@ void TkTaus::InitVars_()
   sigCone_cutoffDeltaR    = +0.15; // 0.15
 
   // Isolation cone
-  isoCone_Constant = +1.0;         // 0.65 by fit on fit on ldg pT, 3.50 GeV for fit on ET_vis
-  isoCone_VtxIsoWP = +0.50;         // 1.0 cm
-  isoCone_RelIsoWP = +0.50;         // 0.2
-  isoCone_dRMin    = sigCone_dRMax; // 0.4
-  isoCone_dRMax    = +0.35;         // 0.3
-  diTau_deltaPOCAz = +1.00;         // 1.0 cm
+  isoCone_Constant     = +2.0;          // 2.0 by fit on fit on ldg pT
+  isoCone_dRMin        = sigCone_dRMax; // 0.4
+  isoCone_dRMax        = +0.35;         // 0.35
+
+  // Isolation variables
+  isoCone_VtxIsoWP     = +0.50;         // 1.0 cm
+  isoCone_RelIsoWP     = +1.00;         // 0.5
+  isoCone_IsoWP        = +0.10;         // 1.0/10 = 0.1
+  isoCone_IsoVtxIsoMax = +1.0;
+  isoCone_IsoRelIsoMax = +2.5;          
+
+  // Double-tau
+  diTau_deltaPOCAz = +1.00; // cm
 
   // MC matching
-  mcMatching_dRMax  = +0.1;        // TP: 0.05
+  mcMatching_dRMax  = +0.1;
   mcMatching_unique = true;
 
   // Eta Regions
@@ -529,7 +536,8 @@ void TkTaus::Loop()
 	GetIsolationValues(L1TkTauCandidate);
 
 	// Get the matching gen-particle
-	GetMatchingGenParticle(L1TkTauCandidate, GenTausTrigger);
+	GetMatchingGenParticle(L1TkTauCandidate, GenTausTrigger); //fixme?
+	// GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic); //fixme?
 
 	// Print information on L1TkTauCandidate ??
 	if (0) L1TkTauCandidate.PrintProperties(false, false, true, true);
@@ -593,8 +601,15 @@ void TkTaus::Loop()
 	    L1TkTaus_Tk.push_back(*L1TkTau);
 	    bool bPassVtxIso = (L1TkTau->GetVtxIsolation() > isoCone_VtxIsoWP);
 	    bool bPassRelIso = (L1TkTau->GetRelIsolation() < isoCone_RelIsoWP);
-	    bool bPassIso    = bPassVtxIso * bPassRelIso;
-	    
+	    bool bPassIso    = false; // bPassVtxIso * bPassRelIso;
+	    if(L1TkTau->GetVtxIsolation() > 0.0) 
+	      {
+		bool bPassIsoVtxIso = (L1TkTau->GetVtxIsolation() < isoCone_IsoVtxIsoMax);
+		bool bPassIsoRelIso = (L1TkTau->GetRelIsolation() < isoCone_IsoRelIsoMax);
+		bool bPassIsoFunc   = (L1TkTau->GetRelIsolation() < isoCone_IsoWP/(L1TkTau->GetVtxIsolation()));
+		bPassIso = bPassIsoVtxIso * bPassIsoRelIso * bPassIsoFunc;
+	      }
+
 	    // Fill containers with TkTaus
 	    if (bPassVtxIso) L1TkTaus_VtxIso.push_back(*L1TkTau);
 	    if (bPassRelIso) L1TkTaus_RelIso.push_back(*L1TkTau);
@@ -655,6 +670,7 @@ void TkTaus::Loop()
 	double jetWidth = GetJetWidth(tau->GetSigConeTTTracks(), tau->GetIsoConeTTTracks(), sigTks_p4, isoTks_p4);
 	hL1TkTau_JetWidth     ->Fill( jetWidth );
 	hL1TkTau_DonutRatio   ->Fill( GetDonutRatio(*tau, isoTTTracks) );
+	hL1TkTau_DonutRatio_Vs_JetWidth->Fill( GetDonutRatio(*tau, isoTTTracks) , jetWidth );
 	hL1TkTau_NSigTks      ->Fill( tau->GetSigConeTTTracks().size() );
 	hL1TkTau_SigTksEt     ->Fill( tau->GetSigConeTTTracksP4().Et() );
 	hL1TkTau_SigTksEta    ->Fill( tau->GetSigConeTTTracksP4().Eta() );
@@ -816,6 +832,7 @@ void TkTaus::Loop()
 	double jetWidth = GetJetWidth(tau->GetSigConeTTTracks(), tau->GetIsoConeTTTracks(), sigTks_p4, isoTks_p4);
 	hL1TkIsoTau_JetWidth     ->Fill( jetWidth );
 	hL1TkIsoTau_DonutRatio   ->Fill( GetDonutRatio(*tau, isoTTTracks) );
+	hL1TkIsoTau_DonutRatio_Vs_JetWidth->Fill( GetDonutRatio(*tau, isoTTTracks) , jetWidth );
 	hL1TkIsoTau_NSigTks      ->Fill( tau->GetSigConeTTTracks().size() );
 	hL1TkIsoTau_SigTksEt     ->Fill( tau->GetSigConeTTTracksP4().Et() );
 	hL1TkIsoTau_SigTksEta    ->Fill( tau->GetSigConeTTTracksP4().Eta() );
@@ -1222,6 +1239,7 @@ void TkTaus::BookHistos_(void)
   const char* tRChi = ";#chi^{2}_{#nu};Entries / %.2f";
   const char* tW    = ";w_{#tau};Entries / %.2f";
   const char* tG    = ";#gamma;Entries / %.2f";
+  const char* tGW    = ";#gamma;w_{#tau}";
   // const char* tRate = ";#E_{T} (GeV);Rate (kHz) / %.0f GeV";
 
   // GenParticles Histograms
@@ -1236,6 +1254,7 @@ void TkTaus::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1TkTau_Multiplicity_MC, "L1TkTau_Multiplicity_MC", tN, nN, minN, maxN );
   histoTools_.BookHisto_1D(hL1TkTau_JetWidth     , "L1TkTau_JetWidth"     , tW   , nM   , minM   , maxM   );
   histoTools_.BookHisto_1D(hL1TkTau_DonutRatio   , "L1TkTau_DonutRatio"   , tG   , nG   , minG   , maxG   );
+  histoTools_.BookHisto_2D(hL1TkTau_DonutRatio_Vs_JetWidth, "L1TkTau_DonutRatio_Vs_JetWidth", tGW, nG, minG, maxG, nM, minM, maxM);
   histoTools_.BookHisto_1D(hL1TkTau_NSigTks      , "L1TkTau_NSigTks"      , tN   , nN   , minN   , maxN   );
   histoTools_.BookHisto_1D(hL1TkTau_SigTksEt     , "L1TkTau_SigTksEt"     , tEt  , nEt  , minEt  , maxEt  );
   histoTools_.BookHisto_1D(hL1TkTau_SigTksEta    , "L1TkTau_SigTksEta"    , tEta , nEta , minEta , maxEta );
@@ -1288,6 +1307,7 @@ void TkTaus::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1TkIsoTau_Multiplicity_MC , "L1TkIsoTau_Multiplicity_MC" , tN   , nN   , minN   , maxN   );
   histoTools_.BookHisto_1D(hL1TkIsoTau_JetWidth     , "L1TkIsoTau_JetWidth"     , tW   , nM   , minM   , maxM   );
   histoTools_.BookHisto_1D(hL1TkIsoTau_DonutRatio   , "L1TkIsoTau_DonutRatio"   , tG   , nG   , minG   , maxG   );
+  histoTools_.BookHisto_2D(hL1TkIsoTau_DonutRatio_Vs_JetWidth, "L1TkIsoTau_DonutRatio_Vs_JetWidth", tGW, nG, minG, maxG, nM, minM, maxM   );
   histoTools_.BookHisto_1D(hL1TkIsoTau_NSigTks      , "L1TkIsoTau_NSigTks"      , tN   , nN   , minN   , maxN   );
   histoTools_.BookHisto_1D(hL1TkIsoTau_SigTksEt     , "L1TkIsoTau_SigTksEt"     , tEt  , nEt  , minEt  , maxEt  );
   histoTools_.BookHisto_1D(hL1TkIsoTau_SigTksEta    , "L1TkIsoTau_SigTksEta"    , tEta , nEta , minEta , maxEta );
@@ -1501,6 +1521,7 @@ void TkTaus::WriteHistos_(void)
   hL1TkTau_Multiplicity_MC->Write();
   hL1TkTau_JetWidth->Write();
   hL1TkTau_DonutRatio->Write();
+  hL1TkTau_DonutRatio_Vs_JetWidth->Write();
   hL1TkTau_NSigTks->Write();
   hL1TkTau_SigTksEt->Write();
   hL1TkTau_SigTksEta->Write();
@@ -1553,6 +1574,7 @@ void TkTaus::WriteHistos_(void)
   hL1TkIsoTau_Multiplicity_MC->Write();
   hL1TkIsoTau_JetWidth->Write();
   hL1TkIsoTau_DonutRatio->Write();
+  hL1TkIsoTau_DonutRatio_Vs_JetWidth->Write();
   hL1TkIsoTau_SigTksEt->Write();
   hL1TkIsoTau_SigTksEta->Write();
   hL1TkIsoTau_NSigTks->Write();

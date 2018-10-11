@@ -205,6 +205,7 @@ def GetHistoKwargs(h, opts):
     _ratio = True
     _log   = False
     _yMin  = 0.0
+    _yMax  = None
     _yMaxF = 1.25 #1.2
     _xMin  = None
     _xMax  = None
@@ -217,12 +218,13 @@ def GetHistoKwargs(h, opts):
         _rebinX = 1
         _yLabel = "Efficiency / %.0f " + _units
         _xMax   = 100.0
+        _ratio  = False
     if "counters" in hName:
         _units  = ""
         _format = "%0.0f " + _units
         _xLabel = "counters"
         _rebinX = 1
-        #_xMax   = +10.0
+        _xMax   = +3.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
     if "_rate" in hName:
@@ -235,6 +237,7 @@ def GetHistoKwargs(h, opts):
         _log    = True
         _yMin   = 1e+0
         _xMax   = 100.0
+        _ratio = False
     if "_rtau" in hName:
         _units  = ""
         _format = "%0.2f " + _units
@@ -293,7 +296,7 @@ def GetHistoKwargs(h, opts):
         _yLabel = _yNorm + " / " + _format
         _log    = True
         _xMin   = +0.0
-        _xMax   = +5.0
+        _xMax   = +2.0
     if "_sigconermin" in hName:
         _units  = ""
         _format = "%0.2f " + _units
@@ -304,7 +307,6 @@ def GetHistoKwargs(h, opts):
         _log    = True
         _xMin   = +0.0
         _xMax   = +0.16
-        _log    = False
     if "_sigconermax" in hName:
         _units  = ""
         _format = "%0.2f " + _units
@@ -333,7 +335,7 @@ def GetHistoKwargs(h, opts):
         _cutBox = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
         _rebinX = 1
         _yLabel = _yNorm + " / " + _format
-        _log    = False
+        _log    = True
         _xMin   = +0.0
         _xMax   = +0.5
     if "_chisquared" in hName:
@@ -359,9 +361,13 @@ def GetHistoKwargs(h, opts):
         _units  = "cm"
         _format = "%0.2f " + _units
         _xLabel = "#Deltaz_{0} (%s)" % (_units)
-        _cutBox = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _cutBox = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         _rebinX = 4
         _yLabel = _yNorm + " / " + _format
+        if "SigTks" in hName:
+            _xMax = 2.0
+        if "IsoTks" in hName:
+            _xMax = 20.0
         _log    = True
     if "_deltar" in hName:
         _units  = ""
@@ -527,8 +533,8 @@ def GetHistoKwargs(h, opts):
         _xLabel = "z_{0} (%s)" % (_units)
         _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         _rebinX = 5
-        _xMin   = -25.0
-        _xMax   = +25.0
+        _xMin   = -20.0
+        _xMax   = +20.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
         ROOT.gStyle.SetNdivisions(6, "X")
@@ -610,7 +616,7 @@ def GetHistoKwargs(h, opts):
         _format = "%0.0f " + _units
         _xLabel = "tau candidate multiplicity"
         _rebinX = 1
-        _xMax   = +10.0
+        _xMax   = +8.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
     if "_nisotks" in hName:
@@ -634,21 +640,24 @@ def GetHistoKwargs(h, opts):
         _format = "%0.2f " + _units
         _xLabel = "relative isolation"
         _rebinX = 1
-        _xMax   = +6.0
+        _xMax   = 5.0
         _yLabel = _yNorm + " / " + _format
         _log    = True
         _cutBox = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
     if "_vtxiso" in hName:
-        _units  = "cm"
-        _format = "%0.2f " + _units
-        #_xLabel = "vertex isolation"
-        _xLabel = "min(z_{0}^{tk_{s}} - z_{0}^{tk_{i}}) (%s)" % (_units)
-        _rebinX = 1
-        _xMax   = +10.0
-        _yLabel = _yNorm + " / " + _format
-        _log    = True
-        #_cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        _cutBox = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        if "_rate" in hName:
+            pass
+        else:
+            _units  = "cm"
+            _format = "%0.2f " + _units
+            _xLabel = "vertex isolation (%s)" % (_units)
+            # _xLabel = "min(z_{0}^{tk_{s}} - z_{0}^{tk_{i}}) (%s)" % (_units)
+            _rebinX = 1
+            _xMax   = +10.0
+            _yLabel = _yNorm + " / " + _format
+            _log    = True
+            # _cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+            _cutBox = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
     if "_viset" in hName:
         _units  = "GeV"
         _format = "%0.0f " + _units
@@ -657,6 +666,8 @@ def GetHistoKwargs(h, opts):
         _xMax   = +200.0
         _yLabel = _yNorm + " / " + _format
         _log    = True
+    if "_resolution" in hName:
+        _ratio = False
     if "_resolutionet" in hName:
         _units  = ""
         _format = "%0.2f " + _units
@@ -694,7 +705,7 @@ def GetHistoKwargs(h, opts):
         _xLabel = "w_{#tau}"
         _cutBox = {"cutValue": 0.05, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
         _rebinX = 1
-        _yLabel = "Efficiency / %.0f " + _units
+        _yLabel = "Efficiency / " + _format
         _xMax   = 3.0
         _log    = True
     if "_donutratio" in hName:
@@ -704,7 +715,8 @@ def GetHistoKwargs(h, opts):
         _rebinX = 5
         _yLabel = "Efficiency / " + _format
         _xMin   = 0.0
-        _xMax   = 5.0
+        _xMax   = 8.0
+        _yMax   = 0.1
         _log    = True
         
     if _log:
@@ -714,8 +726,10 @@ def GetHistoKwargs(h, opts):
             else:
                 _yMin = 1e0
         _yMaxF = 10
-
-    _opts = {"ymin": _yMin, "ymaxfactor": _yMaxF}
+    if _yMax == None:
+        _opts = {"ymin": _yMin, "ymaxfactor": _yMaxF}
+    else:
+        _opts = {"ymin": _yMin, "ymax": _yMax}
     if _xMax != None:
         _opts["xmax"] = _xMax
     if _xMin != None:
@@ -848,11 +862,9 @@ def main(opts):
     plotCount  = 0
     skipList   = ["L1TkTau_MatchTk_d0", "L1TkTau_MatchTk_d0Abs", "L1TkTau_SigTks_d0", 
                   "L1TkTau_SigTks_d0Abs", "L1TkTau_SigTks_d0Sig", "L1TkTau_SigTks_d0SigAbs",
-                  "L1TkTau_IsoTks_d0", "L1TkTau_IsoTks_d0Abs", "L1TkTau_IsoTks_d0Sig", "L1TkTau_IsoTks_d0SigAbs",
+                  "L1TkTau_IsoTks_d0", "L1TkTau_IsoTks_d0Abs", "L1TkTau_IsoTks_d0Sig", "L1TkTau_IsoTks_d0SigAbs"]
                   #"L1TkTau_ResolutionEt_F", "L1TkTau_ResolutionEta_F", "L1TkTau_ResolutionPhi_F", 
                   #"L1TkIsoTau_ResolutionEt_F", "L1TkIsoTau_ResolutionEta_F", "L1TkIsoTau_ResolutionPhi_F", 
-                  "DiTau_Rate_Calo_F", "DiTau_Rate_Tk_F", "DiTau_Rate_VtxIso_F", "DiTau_Rate_RelIso_F",
-                  "Calo_Rate_F", "Tk_Rate_F", "VtxIso_Rate_F", "RelIso_Rate_F"]
 
     # For-loop: All histos in opts.folder
     for i, h in enumerate(histoPaths, 1):

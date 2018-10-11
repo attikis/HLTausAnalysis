@@ -148,6 +148,9 @@ class TkTaus : public TreeAnalyserMC{
   double isoCone_Constant;
   double isoCone_VtxIsoWP;
   double isoCone_RelIsoWP;
+  double isoCone_IsoWP;
+  double isoCone_IsoVtxIsoMax;
+  double isoCone_IsoRelIsoMax;
   double isoCone_dRMax;
   double isoCone_dRMin;
   //
@@ -275,6 +278,7 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hL1TkTau_Multiplicity_MC;
   TH1D* hL1TkTau_JetWidth;
   TH1D* hL1TkTau_DonutRatio;
+  TH2D* hL1TkTau_DonutRatio_Vs_JetWidth;
   TH1D* hL1TkTau_NSigTks;
   TH1D* hL1TkTau_SigTksEt;
   TH1D* hL1TkTau_SigTksEta;
@@ -337,6 +341,7 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hL1TkIsoTau_Multiplicity_MC;
   TH1D* hL1TkIsoTau_JetWidth;
   TH1D* hL1TkIsoTau_DonutRatio;
+  TH2D* hL1TkIsoTau_DonutRatio_Vs_JetWidth;
   TH1D* hL1TkIsoTau_NSigTks;
   TH1D* hL1TkIsoTau_SigTksEt;
   TH1D* hL1TkIsoTau_SigTksEta;

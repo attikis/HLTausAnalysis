@@ -17,7 +17,7 @@ EXAMPLES:
 
 
 LAST USED:
-/plotTH2.py --logZ -i "SingleNeutrino_L1TPU140" --normalizeToOne -m multicrab_TkTau_v92X_SeedPt5_SigRMax0p15_IsoRMax0p35_VtxIso0p5_RelIso0p5_22h48m02s_09Oct2018 
+/plotTH2.py -e "SingleE" --logZ --normalizeToOne -m 
 
 '''
 
@@ -174,13 +174,18 @@ def main(opts):
                 continue
             if "DiTau" in h:
                 continue
+            #if "L1TkIsoTau" in h:
+            #    continue
 
             # For-loop: All datasets
             for d in datasetsMgr.getAllDatasetNames():
-                counter += 1
+                #counter += 1
+                #if d != "SingleNeutrino_L1TPU140":
+                #    continue
+                #if "reliso" not in h.lower():
+                #    continue
                 Plot2dHistograms(datasetsMgr, d, h, counter)
-        print
-
+    print
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
     return
 
@@ -209,8 +214,8 @@ def GetHistoKwargs(h, opts):
         zLabel = "Unknown"
 
    # Cut lines/boxes                                                                                                                                                                                                              
-    _cutBoxX = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-    _cutBoxY = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True,
+    _cutBoxX = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+    _cutBoxY = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": False, "greaterThan": True,
                 "mainCanvas": True, "ratioCanvas": False} # box = True not working       
 
     _kwargs = {
@@ -241,10 +246,16 @@ def GetHistoKwargs(h, opts):
     if "VtxIso_Vs_RelIso" in h:
         _kwargs["xlabel"] = "vertex isolation (cm)"# / %.2f (cm)"
         _kwargs["ylabel"] = "relative isolation"# / %.2f"
-        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 2.0, "ymin": 0.0, "ymax": 5.0}
-        if "TkIsoTau" in h:
-            _kwargs["opts"]   = {"xmin": 0.0, "xmax": 5.0, "ymin": 0.0, "ymax": 1.0}
+        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 3.0, "ymin": 0.0, "ymax": 5.0}
+        #if "TkIsoTau" in h:
+        #    _kwargs["opts"]   = {"xmin": 0.0, "xmax": 5.0, "ymin": 0.0, "ymax": 1.0}
+        _kwargs["rebinX"] = 1
+        _kwargs["rebinY"] = 1
+        _kwargs["cutBox"]  = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _kwargs["cutBoxY"] = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
+    if "DonutRatio" in h:
+        _kwargs["opts"]   = {"xmin": 0.1, "xmax": 2.0, "ymin": 0.0, "ymax": 2.0}
         _kwargs["rebinX"] = 1
         _kwargs["rebinY"] = 1
 
@@ -254,7 +265,7 @@ def GetHistoKwargs(h, opts):
         _kwargs["cutBoxY"] = {"cutValue": 20.00, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if "PtLdg_Vs_dRMax" in h:
-        _kwargs["opts"]    = {"xmin": 0.0, "xmax": 0.3, "ymin": 0.0, "ymax": 80.0}
+        _kwargs["opts"]    = {"xmin": 0.0, "xmax": 0.3, "ymin": 0.0, "ymax": 100.0}
         _kwargs["cutBox"]  = {"cutValue": 0.25, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         _kwargs["cutBoxY"] = {"cutValue": 5.00, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         
@@ -294,19 +305,34 @@ def getHistos(datasetsMgr, histoName):
     h2.setName("EWK")
     return [h1, h2]
 
-def getCustomTGraph(histoName):
-    ymax = 200
-    x    = []
-    y    = []        
-    for i in range(1, ymax):
-        y.append( i )
-        if "PtLdg_Vs" in histoName:
-            x.append( 2.0/float(i) )
-        elif "VisEt_Vs_" in histoName:
-            x.append( 3.5/float(i) )
-        else:
-            x.append( 0.0/float(i) )
-    gr = ROOT.TGraph(len(x), array.array('d', x), array.array('d', y))
+def getCustomTGraph(histoName, constant=0.0, coeff=1.0, xmin = 0, xmax = 200, step = 1):
+
+    # Define variables
+    xList = []
+    yList = []        
+
+    # For-loop: x-y values
+    for x in range(xmin, xmax*step):
+
+        if x == 0.0:
+            continue
+
+        # Calculate x and y values
+        xVal = float(x)/float(step)
+        yVal = (constant)/(coeff*xVal)
+
+        # Debug?
+        if 0:
+            print "%.2f : %.2f" % (xVal, yVal)
+            
+        # Save values in lists (must later convert to arrays)
+        yList.append( yVal )
+        xList.append( xVal )
+        
+    if len(xList) > 0:
+        gr = ROOT.TGraph(len(xList), array.array('d', xList), array.array('d', yList))
+    else:
+        gr = ROOT.TGraph()
     return gr
 
 def Plot2dHistograms(datasetsMgr, dsetName, histoName, index):
@@ -359,24 +385,46 @@ def Plot2dHistograms(datasetsMgr, dsetName, histoName, index):
 
     Verbose("Setting plot styles to histograms", True)
     for index, h in enumerate(p.histoMgr.getHistos()):
-        #print "index = ", index
         plots._plotStyles[p.histoMgr.getHistos()[index].getDataset().getName()].apply(p.histoMgr.getHistos()[index].getRootHisto())
-    #plots._plotStyles[dsetName].apply(p.histoMgr.getHistos()[index].getRootHisto())
 
     Verbose("Drawing the plot", True)
     plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
-
+    
     # Add fit line for shrinking cone?
-    if "GenP_VisEt_Vs" in histoName or "GenP_PtLdg_Vs" in histoName:
-        gr = getCustomTGraph(histoName)
-        gr.SetLineWidth(3)
-        gr.Draw("L same")
-        
+    const= 0.0
+    coeff= 0.0
+    step = 1    
+    xmin = 0
+    xmax = 0
+    if "GenP_VisEt_Vs" in histoName:
+        const=   3.5
+        coeff=   1.0
+        step =   100    
+        xmin =   0
+        xmax =  30
+    if "GenP_PtLdg_Vs" in histoName:
+        const=   2.0
+        coeff=   1.0
+        step = 100
+        xmin =   0
+        xmax =  30
+    if "VtxIso_Vs_RelIso" in histoName:
+        const=   1.0 #iro
+        coeff=  10.0
+        step =  100
+        xmin =   0
+        xmax =   3
+    gr = getCustomTGraph(histoName, const, coeff, xmin, xmax, step)
+
+    gr.SetLineWidth(3)
+    gr.Draw("L same")
+
     Verbose("Removing the legend", True)
     p.removeLegend()
 
     Verbose("Adding text on canvas", True)
-    histograms.addText(0.65, 0.89, plots._legendLabels[datasets0], 18)
+    histograms.addText(0.22, 0.89, plots._legendLabels[datasets0], 18)
+    #histograms.addText(0.5, 0.89, plots._legendLabels[datasets0], 18)
 
     Verbose("Saving the canvas", True)
     aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, opts.url)
