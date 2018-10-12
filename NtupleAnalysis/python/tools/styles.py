@@ -511,7 +511,7 @@ def getRegionStyle(region):
 
 
 def getTauAlgoStyle(algo):
-    allowedAlgos = ["Calo", "Tk", "VtxIso", "RelIso", "TkCalo", "PFTau", "Iso"]
+    allowedAlgos = ["Calo", "Tk", "VtxIso", "RelIso", "TkCalo", "PFTau", "Iso", "all", "relIso", "vtxIso"]
     if algo not in allowedAlgos:
         raise Exception("No style available for tau algorithm \"%s\"" % (algo))
 
@@ -519,12 +519,15 @@ def getTauAlgoStyle(algo):
         return getCaloStyle(0)
     elif algo == "Tk":
         return getCaloStyle(1)
-    elif algo == "VtxIso":
+    elif algo == "VtxIso" or algo == "vtxIso":
         return getCaloStyle(2)
-    elif algo == "RelIso":
+    elif algo == "RelIso" or algo == "relIso":
         return getCaloStyle(3)
     elif algo == "Iso":
         return getCaloStyle(4)
+
+    elif algo == "all":
+        return getCaloStyle(0)
     else:
         raise Exception("This should never be reached")
 
