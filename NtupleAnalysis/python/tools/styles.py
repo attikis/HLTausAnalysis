@@ -400,8 +400,8 @@ SingleTauPU200     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT
 
 VBFnoPU  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kSpring, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
                            StyleLine(lineColor=ROOT.kSpring, lineStyle=ROOT.kSolid, lineWidth=3), StyleFill(fillColor=ROOT.kSpring, fillStyle=0)])
-VBFPU140  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kSpring+10, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
-                           StyleLine(lineColor=ROOT.kSpring+10, lineStyle=ROOT.kDotted, lineWidth=3), StyleFill(fillColor=ROOT.kSpring+10, fillStyle=0)])
+VBFPU140  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kSpring+4, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+                           StyleLine(lineColor=ROOT.kSpring+4, lineStyle=ROOT.kDotted, lineWidth=3), StyleFill(fillColor=ROOT.kSpring+9, fillStyle=0)])
 VBFPU200  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kSpring-7, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
                            StyleLine(lineColor=ROOT.kSpring-7, lineStyle=ROOT.kDashed, lineWidth=3), StyleFill(fillColor=ROOT.kSpring-7, fillStyle=0)])
 
