@@ -137,7 +137,13 @@ def PlotHisto(datasetsMgr, h):
     if opts.normalizeToOne:
         if 1:
             p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[], **kwargs)
-            p.histoMgr.forEachHisto(lambda h: h.getRootHisto().Scale(1.0/h.getRootHisto().Integral()) )
+            norm = True
+            for hist in p.histoMgr.getHistos():
+                if hist.getRootHisto().Integral() == 0:
+                    norm = False
+                    break
+            if (norm):
+                p.histoMgr.forEachHisto(lambda h: h.getRootHisto().Scale(1.0/h.getRootHisto().Integral()) )
         else:
             # p = plots.MCPlot(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
             p = plots.PlotSameBase(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
@@ -168,10 +174,11 @@ def PlotHisto(datasetsMgr, h):
         p.setLegend(histograms.createLegend(0.58, 0.86-0.04*len(dsetsMgr.getAllDatasetNames()), 0.92, 0.92))
 
     # Draw a customised plot
-    plots.drawPlot(p, h, **GetHistoKwargs(h, opts) )
+    kwargs = GetHistoKwargs(h, opts) 
+    plots.drawPlot(p, h, **kwargs)
 
     # Remove legend?
-    if 0:
+    if kwargs["removeLegend"]:
         p.removeLegend()
 
     # Save in all formats chosen by user
@@ -200,15 +207,20 @@ def GetHistoKwargs(h, opts):
     _units  = ""
     _format = "%0.0f " + _units
     _cutBox = {"cutValue": 10.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-    _leg   = {"dx": -0.5, "dy": -0.3, "dh": -0.4}
-    _leg2  = {"dx": -0.75, "dy": -0.3, "dh": -0.4}
-    _ratio = True
-    _log   = False
-    _yMin  = 0.0
-    _yMax  = None
-    _yMaxF = 1.25 #1.2
-    _xMin  = None
-    _xMax  = None
+    _cutBoxY= {"cutValue": 1.00, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+    _leg    = {"dx": -0.4, "dy": -0.3, "dh": -0.4}
+    _leg2   = {"dx": -0.75, "dy": -0.3, "dh": -0.4}
+    _ratio  = True
+    _log    = False
+    _yMin   = 0.0
+    _yMax   = None
+    _yMaxF  = 1.25 #1.2
+    _xMin   = None
+    _xMax   = None
+    _rmLeg  = False
+    
+    # Default (tdrstyle.py)
+    ROOT.gStyle.SetLabelSize(27, "XYZ")
 
     if "_eff" in hName:
         _units  = "GeV"
@@ -222,11 +234,13 @@ def GetHistoKwargs(h, opts):
     if "counters" in hName:
         _units  = ""
         _format = "%0.0f " + _units
-        _xLabel = "counters"
-        _rebinX = 1
-        _xMax   = +3.0
+        _xLabel = "" #"counters"
+        _xMax   = +12.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
+        _rmLeg  = True
+        _ratio  = False
+        ROOT.gStyle.SetLabelSize(13, "X") #"XY"
     if "_rate" in hName:
         _units  = "GeV"
         _format = "%0.0f " + _units
@@ -238,17 +252,6 @@ def GetHistoKwargs(h, opts):
         _yMin   = 1e+0
         _xMax   = 100.0
         _ratio = False
-    if "_rtau" in hName:
-        _units  = ""
-        _format = "%0.2f " + _units
-        _xLabel = "R_{#tau}"# (%s)" % (_units)
-        _cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-        _rebinX = 1
-        _yLabel = _yNorm + " / " + _format
-        # _log    = True
-        # _yMin   = 1e+0
-        _xMin   = +0.0
-        _xMax   = +1.2
     if "_chf" in hName:
         _units  = ""
         _format = "%0.1f " + _units
@@ -640,10 +643,10 @@ def GetHistoKwargs(h, opts):
         _format = "%0.2f " + _units
         _xLabel = "relative isolation"
         _rebinX = 1
-        _xMax   = 5.0
+        _xMax   = 2.5
         _yLabel = _yNorm + " / " + _format
         _log    = True
-        _cutBox = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _cutBox = {"cutValue": 0.2, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
     if "_vtxiso" in hName:
         if "_rate" in hName:
             pass
@@ -653,7 +656,7 @@ def GetHistoKwargs(h, opts):
             _xLabel = "vertex isolation (%s)" % (_units)
             # _xLabel = "min(z_{0}^{tk_{s}} - z_{0}^{tk_{i}}) (%s)" % (_units)
             _rebinX = 1
-            _xMax   = +10.0
+            _xMax   = 0.6 #10.0
             _yLabel = _yNorm + " / " + _format
             _log    = True
             # _cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
@@ -706,7 +709,7 @@ def GetHistoKwargs(h, opts):
         _cutBox = {"cutValue": 0.05, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
         _rebinX = 1
         _yLabel = "Efficiency / " + _format
-        _xMax   = 3.0
+        _xMax   = 2.0
         _log    = True
     if "_donutratio" in hName:
         _units  = ""
@@ -719,6 +722,24 @@ def GetHistoKwargs(h, opts):
         _yMax   = 0.1
         _log    = True
         
+    if "_turnon" in hName.lower():
+        _units  = "GeV"
+        _xLabel = "#tau_{h} E_{T} (%s)" % (_units)
+        _yLabel = "Efficiency / %0.0f " + _units
+        if "25" in hName:
+            _cutBox = {"cutValue": 25.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        elif "50" in hName:
+            _cutBox = {"cutValue": 50.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        else:
+            pass
+        _cutBoxY = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _log     = False
+        _opts    = {"xmin": 0.0, "xmax": 200.0, "ymin": 0.0, "ymax": 1.2}
+        _log     = False
+        _yMax    = 1.2
+        _rmLeg   = True
+        _ratio   = False
+
     if _log:
         if _yMin == 0.0:
             if opts.normalizeToOne:
@@ -726,6 +747,7 @@ def GetHistoKwargs(h, opts):
             else:
                 _yMin = 1e0
         _yMaxF = 10
+
     if _yMax == None:
         _opts = {"ymin": _yMin, "ymaxfactor": _yMaxF}
     else:
@@ -755,7 +777,11 @@ def GetHistoKwargs(h, opts):
         "opts2"            : _opts2,
         "log"              : _log,
         "cutBox"           : _cutBox,
-        "createLegend"     : None #_leg,
+        "cutBoxY"          : _cutBoxY,
+        "createLegend"     : None,
+        "xtitlesize"       : 0.1,
+        "ytitlesize"       : 0.1,
+        "removeLegend"     : _rmLeg,
         }
     return _kwargs
 
@@ -862,9 +888,10 @@ def main(opts):
     plotCount  = 0
     skipList   = ["L1TkTau_MatchTk_d0", "L1TkTau_MatchTk_d0Abs", "L1TkTau_SigTks_d0", 
                   "L1TkTau_SigTks_d0Abs", "L1TkTau_SigTks_d0Sig", "L1TkTau_SigTks_d0SigAbs",
-                  "L1TkTau_IsoTks_d0", "L1TkTau_IsoTks_d0Abs", "L1TkTau_IsoTks_d0Sig", "L1TkTau_IsoTks_d0SigAbs"]
-                  #"L1TkTau_ResolutionEt_F", "L1TkTau_ResolutionEta_F", "L1TkTau_ResolutionPhi_F", 
-                  #"L1TkIsoTau_ResolutionEt_F", "L1TkIsoTau_ResolutionEta_F", "L1TkIsoTau_ResolutionPhi_F", 
+                  "L1TkTau_IsoTks_d0", "L1TkTau_IsoTks_d0Abs", "L1TkTau_IsoTks_d0Sig", "L1TkTau_IsoTks_d0SigAbs",
+                  "L1TkIsoTau_IsoTksEt", "L1TkIsoTau_IsoTksEta", "L1TkIsoTau_IsoTks_Pt", "L1TkIsoTau_IsoTks_PtRel", 
+                  "L1TkIsoTau_IsoTks_DeltaPOCAz", "L1TkIsoTau_IsoTks_DeltaR", "L1TkIsoTau_IsoTks_ChiSquared", 
+                  "L1TkIsoTau_IsoTks_RedChiSquared", "L1TkIsoTau_IsoTksEtError"]
 
     # For-loop: All histos in opts.folder
     for i, h in enumerate(histoPaths, 1):
@@ -898,7 +925,7 @@ if __name__ == "__main__":
     GRIDX       = True
     GRIDY       = False    
     INTLUMI     = 1.0
-    NORMTOONE   = True #False
+    NORMTOONE   = False
     SAVEDIR     = None
     SAVEFORMATS = [".png"] #[".C", ".png", ".pdf"]
     VERBOSE     = False
