@@ -28,7 +28,7 @@
 #include "../DataFormat/src/L1CaloTP.C"
 
 // #include "../Plugins/src/L1TkPrimaryVertex.C"
-#include "../Plugins/src/L1PixelTrackFit.C"
+//#include "../Plugins/src/L1PixelTrackFit.C"
 
 // ROOT
 #include "TEfficiency.h"
@@ -144,15 +144,11 @@ class TkTaus : public TreeAnalyserMC{
   double sigCone_cutoffDeltaR;
   double sigCone_dRMax;
   double sigCone_dRMin;
-  //
   double isoCone_Constant;
-  double isoCone_VtxIsoWP;
-  double isoCone_RelIsoWP;
-  double isoCone_IsoWP;
-  double isoCone_IsoVtxIsoMax;
-  double isoCone_IsoRelIsoMax;
   double isoCone_dRMax;
   double isoCone_dRMin;
+  double isoCone_VtxIsoWP;
+  double isoCone_RelIsoWP;
   //
   int nMaxNumOfHTausPossible;
   int realTauMom;
@@ -364,6 +360,12 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hL1TkIsoTau_ResolutionEt;
   TH1D* hL1TkIsoTau_ResolutionEta;
   TH1D* hL1TkIsoTau_ResolutionPhi;
+  TH1D* hL1TkIsoTau_ResolutionEt_withNeutrals;
+  TH1D* hL1TkIsoTau_ResolutionEta_withNeutrals;
+  TH1D* hL1TkIsoTau_ResolutionPhi_withNeutrals;
+  TH1D* hL1TkIsoTau_ResolutionEt_noNeutrals;
+  TH1D* hL1TkIsoTau_ResolutionEta_noNeutrals;
+  TH1D* hL1TkIsoTau_ResolutionPhi_noNeutrals;
   TH1D* hL1TkIsoTau_ResolutionEt_C;
   TH1D* hL1TkIsoTau_ResolutionEta_C;
   TH1D* hL1TkIsoTau_ResolutionPhi_C;

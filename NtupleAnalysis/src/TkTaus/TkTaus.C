@@ -53,7 +53,7 @@ void TkTaus::InitVars_()
   sigConeTks_maxChiSq    =  50.0;  //  25.0
   sigConeTks_minStubs    =   5;    //   4
   sigConeTks_dPOCAz      =   0.5;  // 0.80 (A. Ryd)
-  sigConeTks_maxInvMass  =   1.5;  // 1.77 (A. Ryd)
+  sigConeTks_maxInvMass  =   1.6;  // 1.77 (A. Ryd)
  
   // Isolation cone tracks
   isoConeTks_Collection  = seedTk_Collection;
@@ -61,9 +61,9 @@ void TkTaus::InitVars_()
   isoConeTks_minPt       =   2.0; //   2.0
   isoConeTks_minEta      =   0.0; //   0.0
   isoConeTks_maxEta      =   2.5; // 999.9
-  isoConeTks_maxChiSq    = 100.0; // 100.00
+  isoConeTks_maxChiSq    =  50.0; // 100.00
   isoConeTks_minStubs    =   4;   //   4
-  isoConeTks_dPOCAz      =  10.0; // 5.0 (0.6 from A. Ryd)
+  isoConeTks_dPOCAz      =   0.5; // 0.6 from A. Ryd
 
   // Signal cone parameters
   sigCone_Constant        = +0.00; // 0.0
@@ -74,20 +74,17 @@ void TkTaus::InitVars_()
   // Isolation cone
   isoCone_Constant     = +2.0;          // 2.0 by fit on fit on ldg pT
   isoCone_dRMin        = sigCone_dRMax; // 0.4
-  isoCone_dRMax        = +0.35;         // 0.35
+  isoCone_dRMax        = +0.30;         // 0.35
 
   // Isolation variables
-  isoCone_VtxIsoWP     = +0.50;         // 1.0 cm
-  isoCone_RelIsoWP     = +1.00;         // 0.5
-  isoCone_IsoWP        = +0.10;         // 1.0/10 = 0.1
-  isoCone_IsoVtxIsoMax = +1.0;
-  isoCone_IsoRelIsoMax = +2.5;          
+  isoCone_VtxIsoWP     = +0.50;  // 0.5 cm
+  isoCone_RelIsoWP     = +0.20;  // 0.2
 
   // Double-tau
   diTau_deltaPOCAz = +1.00; // cm
 
   // MC matching
-  mcMatching_dRMax  = +0.1;
+  mcMatching_dRMax  = +0.15;
   mcMatching_unique = true;
 
   // Eta Regions
@@ -352,12 +349,20 @@ void TkTaus::Loop()
   // Initialisations
   InitVars_();
   BookHistos_();
-  Long64_t nbytes       = 0;
-  Long64_t nb           = 0;
-  int nEvtsWithMaxHTaus = 0; 
-  unsigned int nEvts    = 0;
-  unsigned int nAllEvts = fChain->GetEntries();
-  bool isMinBias        = false;  
+  Long64_t nbytes             = 0;
+  Long64_t nb                 = 0;
+  int nEvtsWithMaxHTaus       = 0; 
+  unsigned int nEvts          = 0;
+  unsigned int nEvtsSeedPt    = 0;
+  unsigned int nEvtsSeedEta   = 0;
+  unsigned int nEvtsSeedChiSq = 0;
+  unsigned int nEvtsSeedStubs = 0;
+  unsigned int nEvtsMcMatch   = 0; 
+  unsigned int nEvtsVtxIso    = 0;
+  unsigned int nEvtsRelIso    = 0;
+  unsigned int nEvtsIso       = 0;
+  unsigned int nAllEvts       = fChain->GetEntries();
+  bool isMinBias              = false;  
   
   // Determine what sample this is
   std::size_t found = mcSample.find("SingleNeutrino");
@@ -417,8 +422,20 @@ void TkTaus::Loop()
     // Track Collections
     if(DEBUG) cout << "\tGetting the Tracks and Track Particles Collections" << endl;
     vector<TrackingParticle> TPs = GetTrackingParticles(false);
-    
-    vector<TTTrack> seedTracks = GetTTTracks(seedTk_minPt, seedTk_minEta, seedTk_maxEta, seedTk_maxChiSq,
+
+    // Smart Counter
+    vector<TTTrack> tmp;    
+    tmp = GetTTTracks(seedTk_minPt, 0.0, 999.9, 999.9, 0, seedTk_nFitParams, false, false);
+    if (tmp.size() > 0) nEvtsSeedPt++;
+    tmp = GetTTTracks(seedTk_minPt, seedTk_minEta, seedTk_maxEta, 999.9, 0, seedTk_nFitParams, false, false);
+    if (tmp.size() > 0) nEvtsSeedEta++;
+    tmp = GetTTTracks(seedTk_minPt, seedTk_minEta, seedTk_maxEta, seedTk_maxChiSq, 0, seedTk_nFitParams, false, false);
+    if (tmp.size() > 0) nEvtsSeedChiSq++;
+    tmp = GetTTTracks(seedTk_minPt, seedTk_minEta, seedTk_maxEta, seedTk_maxChiSq, seedTk_minStubs, seedTk_nFitParams, false, false);
+    if (tmp.size() > 0) nEvtsSeedStubs++;
+    tmp.clear();
+
+    vector<TTTrack> seedTTTracks = GetTTTracks(seedTk_minPt, seedTk_minEta, seedTk_maxEta, seedTk_maxChiSq,
 					     seedTk_minStubs, seedTk_nFitParams, false);
     
     vector<TTTrack> sigTTTracks = GetTTTracks(sigConeTks_minPt, sigConeTks_minEta, sigConeTks_maxEta, 
@@ -428,13 +445,12 @@ void TkTaus::Loop()
     vector<TTTrack> isoTTTracks = GetTTTracks(isoConeTks_minPt , isoConeTks_minEta, isoConeTks_maxEta, 
 					      isoConeTks_maxChiSq, isoConeTks_minStubs, 
 					      isoConeTks_nFitParams, false);
-    
 
     if (0) // DEBUG
       {
 	cout << "\tPrinting all TTrack Collections" << endl;
 	PrintTrackingParticleCollection(TPs);
-	PrintTTTrackCollection(seedTracks);
+	PrintTTTrackCollection(seedTTTracks);
 	PrintTTTrackCollection(sigTTTracks);
 	PrintTTTrackCollection(isoTTTracks);
       }
@@ -507,11 +523,14 @@ void TkTaus::Loop()
 
 
     // ======================================================================================
-    // For-loop: Seed Tracks
+    // Construct the TkTau candidates from the seed tracks
     // ======================================================================================
-    for (size_t i = 0; i < seedTracks.size(); i++)
+    bool bFoundMC = false;
+
+    // For-loop: Seed tracks
+    for (size_t i = 0; i < seedTTTracks.size(); i++)
       {
-	TTTrack tk = seedTracks.at(i);
+	TTTrack tk = seedTTTracks.at(i);
 
 	// Calculate the Et-dependent signal & isolation cone sizes
 	GetShrinkingConeSizes(tk.getPt(), sigCone_Constant, isoCone_Constant, 
@@ -536,16 +555,17 @@ void TkTaus::Loop()
 	GetIsolationValues(L1TkTauCandidate);
 
 	// Get the matching gen-particle
-	GetMatchingGenParticle(L1TkTauCandidate, GenTausTrigger); //fixme?
-	// GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic); //fixme?
-
+	GetMatchingGenParticle(L1TkTauCandidate, GenTausTrigger); // GenTausHadronic
+	if ( L1TkTauCandidate.HasMatchingGenParticle() ) bFoundMC = true;
+	      
 	// Print information on L1TkTauCandidate ??
 	if (0) L1TkTauCandidate.PrintProperties(false, false, true, true);
 
 	// Save L1TkTau Candidate
 	L1TkTauCandidates.push_back(L1TkTauCandidate);
       }
-    
+	
+    if (bFoundMC) nEvtsMcMatch++;
     
     ////////////////////////////////////////////////
     /// Create Collections
@@ -582,8 +602,9 @@ void TkTaus::Loop()
 		// Calculate dR
 		double dR = auxTools_.DeltaR(eta_seed, phi_seed, eta_tk, phi_tk);
 
-		// Consider only tracks within dR <= 0.3
-		if (dR > 0.3) continue;
+		// Consider only tracks within enitre jet definition
+		if (dR > L1TkTau->GetIsoConeMax()) continue; //redundant but keep for safety
+		// if (dR > L1TkTau->GetSigConeMax()) continue;
 		
 		// Compare pT of seed track with all tracks within dR = 0 (NEW)
 		if (deltaPt < 0) 
@@ -594,28 +615,33 @@ void TkTaus::Loop()
 		  }
 	      }
 
-	    // No higher pT track within dR < 0.3
+	    // No higher pT track within the entire jet (signal & isolation cone)
 	    if (!bIsLdgTrack) continue;
-
+	    
 	    // Save the tau candidates
 	    L1TkTaus_Tk.push_back(*L1TkTau);
-	    bool bPassVtxIso = (L1TkTau->GetVtxIsolation() > isoCone_VtxIsoWP);
-	    bool bPassRelIso = (L1TkTau->GetRelIsolation() < isoCone_RelIsoWP);
-	    bool bPassIso    = false; // bPassVtxIso * bPassRelIso;
-	    if(L1TkTau->GetVtxIsolation() > 0.0) 
-	      {
-		bool bPassIsoVtxIso = (L1TkTau->GetVtxIsolation() < isoCone_IsoVtxIsoMax);
-		bool bPassIsoRelIso = (L1TkTau->GetRelIsolation() < isoCone_IsoRelIsoMax);
-		bool bPassIsoFunc   = (L1TkTau->GetRelIsolation() < isoCone_IsoWP/(L1TkTau->GetVtxIsolation()));
-		bPassIso = bPassIsoVtxIso * bPassIsoRelIso * bPassIsoFunc;
-	      }
 
+	    // Calculate isolation variables
+	    const double vtxIso = L1TkTau->GetVtxIsolation();
+	    const double relIso = L1TkTau->GetRelIsolation();
+	    bool bPassVtxIso    = (vtxIso > isoCone_VtxIsoWP); // orthogonal to RelIso
+	    bool bPassRelIso    = (relIso < isoCone_RelIsoWP); // orthogonal to VtxIso
+	    bool bPassIso       = bPassVtxIso * bPassRelIso;
+	    // if (vtxIso <= 0.5) isoFormula = 0.5-2*pow(vtxIso, 2);
+	    // else isoFormula = 0.3*pow((vtxIso-0.5), 0.15); // 0.4*pow((vtxIso-0.5), 0.15);
+	    // bPassIso = (relIso < isoFormula);
+	      
 	    // Fill containers with TkTaus
 	    if (bPassVtxIso) L1TkTaus_VtxIso.push_back(*L1TkTau);
 	    if (bPassRelIso) L1TkTaus_RelIso.push_back(*L1TkTau);
 	    if (bPassIso)    L1TkTaus_Iso.push_back(*L1TkTau);
 	  }
       }// L1TkTauCandidates
+
+    // Counters
+    if (L1TkTaus_VtxIso.size() > 0) nEvtsVtxIso++;
+    if (L1TkTaus_RelIso.size() > 0) nEvtsRelIso++;
+    if (L1TkTaus_Iso.size() > 0) nEvtsIso++;
 
     if (DEBUG)
       {
@@ -649,7 +675,7 @@ void TkTaus::Loop()
 	nMCTaus++;
 
 	// Get matching gen particle
-	GenParticle p = tau->GetMatchingGenParticle(); //fixme: separate to inclusive, 1pr, and 3pr 
+	GenParticle p = tau->GetMatchingGenParticle();
       
 	// Seed Track Variables
 	TTTrack matchTk   = tau->GetMatchingTk();
@@ -689,8 +715,11 @@ void TkTaus::Loop()
 	hL1TkTau_DeltaRGenP  ->Fill( tau->GetMatchingGenParticleDeltaR() );
 	hL1TkTau_RelIso      ->Fill( tau->GetRelIsolation() );
 	hL1TkTau_VtxIso      ->Fill( tau->GetVtxIsolation() );
+	if (  tau->GetIsoConeTTTracks().size() > 0 ) 
+	  {
 	hL1TkTau_VtxIso_Vs_RelIso->Fill( tau->GetVtxIsolation(), tau->GetRelIsolation() );
-	  
+	  }
+	
 	// SigCone TTTracks
 	int sigTks_sumCharge   = 0;
 	vector<TTTrack> sigTks = tau->GetSigConeTTTracks();
@@ -724,7 +753,7 @@ void TkTaus::Loop()
 	  }// SigCone_TTTracks
 
 	// Fill histos for other variables
-	hL1TkTau_Charge->Fill( sigTks_sumCharge); // fixme
+	hL1TkTau_Charge->Fill( sigTks_sumCharge);
 
 	// IsoCone TTTracks
 	vector<TTTrack> isoTks = tau->GetIsoConeTTTracks();	
@@ -759,7 +788,7 @@ void TkTaus::Loop()
     ////////////////////////////////////////////////
     /// L1TkIsoTau Properties 
     ////////////////////////////////////////////////
-    vector<L1TkTauParticle> myL1TkIsoTaus = L1TkTaus_Iso; //L1TkTaus_VtxIso;
+    vector<L1TkTauParticle> myL1TkIsoTaus = L1TkTaus_VtxIso; //L1TkTaus_Iso;
     unsigned int nMCIsoTaus = 0;
     hL1TkIsoTau_Multiplicity ->Fill( myL1TkIsoTaus.size() );
 
@@ -780,13 +809,26 @@ void TkTaus::Loop()
 	nMCIsoTaus++;
 
 	// Get matching gen particle
-	GenParticle p = tau->GetMatchingGenParticle();  //fixme: separate to inclusive, 1pr, and 3pr
+	GenParticle p = tau->GetMatchingGenParticle();
       
 	// Resolution
 	hL1TkIsoTau_ResolutionEt ->Fill( (tau->GetSigConeTTTracksP4().Et()-p.p4vis().Et() )/p.p4vis().Et()  );
 	hL1TkIsoTau_ResolutionEta->Fill( (tau->GetSigConeTTTracksP4().Eta()-p.p4vis().Eta())/p.p4vis().Eta() );
 	hL1TkIsoTau_ResolutionPhi->Fill( (tau->GetSigConeTTTracksP4().Phi()-p.p4vis().Phi())/p.p4vis().Phi() );
-	
+
+	// 
+	if (p.finalDaughtersNeutral().size() > 0)
+	  {
+	    hL1TkIsoTau_ResolutionEt_withNeutrals ->Fill( (tau->GetSigConeTTTracksP4().Et()-p.p4vis().Et() )/p.p4vis().Et()  );
+	    hL1TkIsoTau_ResolutionEta_withNeutrals->Fill( (tau->GetSigConeTTTracksP4().Eta()-p.p4vis().Eta())/p.p4vis().Eta() );
+	    hL1TkIsoTau_ResolutionPhi_withNeutrals->Fill( (tau->GetSigConeTTTracksP4().Phi()-p.p4vis().Phi())/p.p4vis().Phi() );
+	  }
+	else{
+	  hL1TkIsoTau_ResolutionEt_noNeutrals ->Fill( (tau->GetSigConeTTTracksP4().Et()-p.p4vis().Et() )/p.p4vis().Et()  );
+	  hL1TkIsoTau_ResolutionEta_noNeutrals->Fill( (tau->GetSigConeTTTracksP4().Eta()-p.p4vis().Eta())/p.p4vis().Eta() );
+	  hL1TkIsoTau_ResolutionPhi_noNeutrals->Fill( (tau->GetSigConeTTTracksP4().Phi()-p.p4vis().Phi())/p.p4vis().Phi() );
+	}
+
 	double tauEta =tau->GetSigConeTTTracksP4().Eta();
 
 	if ( IsWithinEtaRegion("Central", tauEta) )
@@ -851,7 +893,10 @@ void TkTaus::Loop()
 	hL1TkIsoTau_DeltaRGenP  ->Fill( tau->GetMatchingGenParticleDeltaR() );
 	hL1TkIsoTau_RelIso      ->Fill( tau->GetRelIsolation() );
 	hL1TkIsoTau_VtxIso      ->Fill( tau->GetVtxIsolation() );
-	hL1TkIsoTau_VtxIso_Vs_RelIso->Fill( tau->GetVtxIsolation(), tau->GetRelIsolation() );
+	if (  tau->GetIsoConeTTTracks().size() > 0 ) 
+	  {
+	    hL1TkIsoTau_VtxIso_Vs_RelIso->Fill( tau->GetVtxIsolation(), tau->GetRelIsolation() );
+	  }
 
 	// SigCone TTTracks
 	int sigTks_sumCharge   = 0;
@@ -913,7 +958,7 @@ void TkTaus::Loop()
 	    hL1TkIsoTau_IsoTks_RedChiSquared->Fill( isoTk->getChi2Red() );
   
 	  }// IsoCone_TTTracks
-      } // L1TkTaus_Iso
+      } // myL1TkIsoTaus
 
    // Fill MC-truth histos
     hL1TkIsoTau_Multiplicity_MC ->Fill( nMCIsoTaus );
@@ -1010,9 +1055,32 @@ void TkTaus::Loop()
   }// For-loop: Entries
 
   // Fill counters
-  hCounters->SetBinContent(1, nAllEvts);
-  hCounters->SetBinContent(2, nEvts);
-
+  hCounters->SetBinContent( 1, nAllEvts);
+  hCounters->SetBinContent( 2, nEvts);
+  hCounters->SetBinContent( 3, nEvtsSeedPt);
+  hCounters->SetBinContent( 4, nEvtsSeedEta);
+  hCounters->SetBinContent( 5, nEvtsSeedChiSq);
+  hCounters->SetBinContent( 6, nEvtsSeedStubs);
+  hCounters->SetBinContent( 7, nEvtsVtxIso);
+  hCounters->SetBinContent( 8, nEvtsRelIso);
+  hCounters->SetBinContent( 9, nEvtsIso);
+  hCounters->SetBinContent(10, 0);
+  hCounters->SetBinContent(11, nEvtsMcMatch);
+  hCounters->GetXaxis()->SetBinLabel( 1, "All Evts");
+  hCounters->GetXaxis()->SetBinLabel( 2, "Evts");
+  hCounters->GetXaxis()->SetBinLabel( 3, "Seed Pt");
+  hCounters->GetXaxis()->SetBinLabel( 4, "Seed Eta");
+  hCounters->GetXaxis()->SetBinLabel( 5, "Seed ChiSq");
+  hCounters->GetXaxis()->SetBinLabel( 6, "Seed Stubs");
+  hCounters->GetXaxis()->SetBinLabel( 7, "VtxIso");
+  hCounters->GetXaxis()->SetBinLabel( 8, "RelIso");
+  hCounters->GetXaxis()->SetBinLabel( 9, "Iso");
+  hCounters->GetXaxis()->SetBinLabel(10, "");
+  hCounters->GetXaxis()->SetBinLabel(11, "Matched");
+  if (0) std::cout << "\n" << nAllEvts << "\n " << nEvts << "\n " << nEvtsSeedPt << "\n " << nEvtsSeedEta
+		   << "\n "<< nEvtsSeedChiSq << "\n " << nEvtsSeedStubs  << "\n " << nEvtsVtxIso
+		   << "\n "<< nEvtsRelIso << "\n " << nEvtsIso << "\n " << nEvtsMcMatch << std::endl;
+  
   ////////////////////////////////////////////////
   // Convert/Finalise Histos
   ////////////////////////////////////////////////
@@ -1108,11 +1176,11 @@ void TkTaus::Loop()
   FinaliseEffHisto_( hDiTau_Eff_Tk_RelIso, nEvtsWithMaxHTaus);;
   FinaliseEffHisto_( hDiTau_Eff_Tk_Iso   , nEvtsWithMaxHTaus);;
 
-  // Turn-Ons: fixme. iro. alex
+  // Turn-Ons 
   // TEfficiency *pEff = 0;
   // pEff = new TEfficiency(*hCalo_TurnOn50_passed, *hMcHadronicTau_VisEt);
   // hCalo_TurnOn50 = (TH1D*) pEff->Clone();
-  histoTools_.DivideHistos_1D(hTk_TurnOn50     , hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hTk_TurnOn50     , hMcHadronicTau_VisEt); // fixme
   histoTools_.DivideHistos_1D(hVtxIso_TurnOn50 , hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hRelIso_TurnOn50 , hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hIso_TurnOn50    , hMcHadronicTau_VisEt);
@@ -1247,7 +1315,7 @@ void TkTaus::BookHistos_(void)
   histoTools_.BookHisto_2D(hGenP_PtLdg_Vs_dRMaxLdgPion, "GenP_PtLdg_Vs_dRMaxLdgPion", ";#DeltaR_{max}(#pi_{ldg}^{#pm},#pi^{#pm});p_{T}^{#pi_{ldg}^{#pm}}",  50,  0.0, +0.25, 100, 0.0, +200.0);
 
   // Counters
-  histoTools_.BookHisto_1D(hCounters, "Counters",  "", 2, 0.0, +2.0);
+  histoTools_.BookHisto_1D(hCounters, "Counters",  "", 15, 0.0, +15.0);
 
   // L1TkTaus
   histoTools_.BookHisto_1D(hL1TkTau_Multiplicity , "L1TkTau_Multiplicity" , tN   , nN   , minN   , maxN   );
@@ -1359,6 +1427,12 @@ void TkTaus::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1TkIsoTau_ResolutionEt , "L1TkIsoTau_ResolutionEt" , ";E_{T} (GeV);Events / %.0f GeV", 100,  -5.0,  +5.0);
   histoTools_.BookHisto_1D(hL1TkIsoTau_ResolutionEta, "L1TkIsoTau_ResolutionEta", ";#eta;Events / %.2f", 100,  -5.0,  +5.0);
   histoTools_.BookHisto_1D(hL1TkIsoTau_ResolutionPhi, "L1TkIsoTau_ResolutionPhi", ";#phi (rads);Events / %.2f rads", 100,  -10.0,  +10.0);
+  histoTools_.BookHisto_1D(hL1TkIsoTau_ResolutionEt_withNeutrals , "L1TkIsoTau_ResolutionEt_withNeutrals" , ";E_{T} (GeV);Events / %.0f GeV", 100,  -5.0,  +5.0);
+  histoTools_.BookHisto_1D(hL1TkIsoTau_ResolutionEta_withNeutrals, "L1TkIsoTau_ResolutionEta_withNeutrals", ";#eta;Events / %.2f", 100,  -5.0,  +5.0);
+  histoTools_.BookHisto_1D(hL1TkIsoTau_ResolutionPhi_withNeutrals, "L1TkIsoTau_ResolutionPhi_withNeutrals", ";#phi (rads);Events / %.2f rads", 100,  -10.0,  +10.0);
+  histoTools_.BookHisto_1D(hL1TkIsoTau_ResolutionEt_noNeutrals   , "L1TkIsoTau_ResolutionEt_noNeutrals"   , ";E_{T} (GeV);Events / %.0f GeV", 100,  -5.0,  +5.0);
+  histoTools_.BookHisto_1D(hL1TkIsoTau_ResolutionEta_noNeutrals  , "L1TkIsoTau_ResolutionEta_noNeutrals"  , ";#eta;Events / %.2f", 100,  -5.0,  +5.0);
+  histoTools_.BookHisto_1D(hL1TkIsoTau_ResolutionPhi_noNeutrals  , "L1TkIsoTau_ResolutionPhi_noNeutrals"  , ";#phi (rads);Events / %.2f rads", 100,  -10.0,  +10.0);
   histoTools_.BookHisto_1D(hL1TkIsoTau_ResolutionEt_C, "L1TkIsoTau_ResolutionEt_C" , ";E_{T} (GeV);Events / %.0f GeV", 100,  -5.0,  +5.0);
   histoTools_.BookHisto_1D(hL1TkIsoTau_ResolutionEta_C, "L1TkIsoTau_ResolutionEta_C", ";#eta;Events / %.2f", 100,  -5.0,  +5.0);
   histoTools_.BookHisto_1D(hL1TkIsoTau_ResolutionPhi_C, "L1TkIsoTau_ResolutionPhi_C", ";#phi (rads);Events / %.2f rads", 100,  -10.0,  +10.0);
@@ -1597,6 +1671,12 @@ void TkTaus::WriteHistos_(void)
   hL1TkIsoTau_ResolutionEt->Write();
   hL1TkIsoTau_ResolutionEta->Write();
   hL1TkIsoTau_ResolutionPhi->Write();
+  hL1TkIsoTau_ResolutionEt_withNeutrals->Write();
+  hL1TkIsoTau_ResolutionEta_withNeutrals->Write();
+  hL1TkIsoTau_ResolutionPhi_withNeutrals->Write();
+  hL1TkIsoTau_ResolutionEt_noNeutrals->Write();
+  hL1TkIsoTau_ResolutionEta_noNeutrals->Write();
+  hL1TkIsoTau_ResolutionPhi_noNeutrals->Write();
   hL1TkIsoTau_ResolutionEt_C->Write();
   hL1TkIsoTau_ResolutionEta_C->Write();
   hL1TkIsoTau_ResolutionPhi_C->Write();
@@ -1749,7 +1829,7 @@ void TkTaus::FinaliseEffHisto_(TH1D *histo,
   for (int i = 0; i<= nBins; i++){
     
     const int nPass = histo->GetBinContent(i);
-    auxTools_.Efficiency(nPass, nEvtsTotal, "binomial", eff, err ); //fixme: use TEfficiency?
+    auxTools_.Efficiency(nPass, nEvtsTotal, "binomial", eff, err );
 
     // Update current histo bin to true eff value and error
     histo->SetBinContent(i, eff);
@@ -1847,7 +1927,7 @@ void TkTaus::FillSingleTau_(vector<L1TkTauParticle> L1TkTaus,
   if( L1TkTaus.size() < 1 ) return;
   
   // Fill rate
-  TLorentzVector sigTks_p4 = L1TkTaus.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
+  TLorentzVector sigTks_p4 = L1TkTaus.at(0).GetSigConeTTTracksP4(); // fixme (sort with pT)?
   double ldgEt  = sigTks_p4.Et();  
   double ldgEta = sigTks_p4.Eta();
   
@@ -1865,7 +1945,7 @@ void TkTaus::FillSingleTau_(vector<L1TkTauParticle> L1TkTaus,
   if(!bFoundAllTaus_) return;
   
   // Fill efficiency
-  TLorentzVector sigTks_p4_mc = L1TkTaus_mcMatched.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
+  TLorentzVector sigTks_p4_mc = L1TkTaus_mcMatched.at(0).GetSigConeTTTracksP4(); // fixme (sort with pT)?
   double ldgEt_mcMatched = sigTks_p4_mc.Et();
   FillEfficiency_(hEfficiency, ldgEt_mcMatched);
 
@@ -1887,7 +1967,7 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus,
 
   // Fill rate
   L1TkTauParticle L1TkTau = L1TkTaus.at(1);
-  TLorentzVector sigTks_p4 = L1TkTaus.at(1).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
+  TLorentzVector sigTks_p4 = L1TkTaus.at(1).GetSigConeTTTracksP4(); // fixme (sort with pT)?
   double subLdgEt  = sigTks_p4.Et();  
   double subLdgEta = sigTks_p4.Eta();  
 
@@ -1907,7 +1987,7 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus,
   if(!bFoundAllTaus_) return;
 
   // Fill efficiency
-  TLorentzVector sigTks_p4_mc = L1TkTaus_mcMatched.at(1).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
+  TLorentzVector sigTks_p4_mc = L1TkTaus_mcMatched.at(1).GetSigConeTTTracksP4(); // fixme (sort with pT)?
   double subLdgEt_mcMatched  = sigTks_p4_mc.Et();  
   FillEfficiency_(hEfficiency, subLdgEt_mcMatched);
 
@@ -1932,8 +2012,8 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus1,
   vector<L1TkTauParticle> L1TkTaus2_mcMatched = GetMcMatchedL1TkTaus(L1TkTaus2);
 
   // Fill rate 
-  TLorentzVector sigTks1_p4 = L1TkTaus1.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
-  TLorentzVector sigTks2_p4 = L1TkTaus2.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
+  TLorentzVector sigTks1_p4 = L1TkTaus1.at(0).GetSigConeTTTracksP4(); // fixme (sort with pT)?
+  TLorentzVector sigTks2_p4 = L1TkTaus2.at(0).GetSigConeTTTracksP4(); // fixme (sort with pT)?
   double ldgEt1 = sigTks1_p4.Et();
   double ldgEt2 = sigTks2_p4.Et();
 
@@ -1959,8 +2039,8 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus1,
   if (L1TkTaus2_mcMatched.size() < 1) return;
 
   // Get MC-matched Et
-  TLorentzVector sigTks1_p4_mc = L1TkTaus1_mcMatched.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
-  TLorentzVector sigTks2_p4_mc = L1TkTaus2_mcMatched.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
+  TLorentzVector sigTks1_p4_mc = L1TkTaus1_mcMatched.at(0).GetSigConeTTTracksP4(); // fixme (sort with pT)?
+  TLorentzVector sigTks2_p4_mc = L1TkTaus2_mcMatched.at(0).GetSigConeTTTracksP4(); // fixme (sort with pT)?
   double ldgEt1_mcMatched = sigTks1_p4_mc.Et();
   double ldgEt2_mcMatched = sigTks2_p4_mc.Et();
 
