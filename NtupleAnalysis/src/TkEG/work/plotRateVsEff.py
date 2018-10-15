@@ -152,25 +152,25 @@ def main(opts):
                 dsets_signal.append(d)
 
         # ROC curve ingredients (histograms)
+                
+        effLists    = [["Eff_SingleTau_TkEG", "Eff_SingleTau_VtxIso", "Eff_SingleTau_RelIso"],
+                       ["Eff_DiTau_TkEG", "Eff_DiTau_VtxIso", "Eff_DiTau_RelIso"]]
+
+        rateLists   = [["Rate_SingleTau_TkEG", "Rate_SingleTau_VtxIso", "Rate_SingleTau_RelIso" ],
+                       ["Rate_DiTau_TkEG", "Rate_DiTau_VtxIso", "Rate_DiTau_RelIso"]]
+
+        turnOnLists = [["TurnOn25_TkEG", "TurnOn25_VtxIso", "TurnOn25_RelIso"],
+                       ["TurnOn50_TkEG", "TurnOn50_VtxIso", "TurnOn50_RelIso"]]
         '''
-        effLists    = [["Eff_SingleTau_all", "Eff_SingleTau_VtxIso", "Eff_SingleTau_RelIso"],
-                       ["Eff_DiTau_all", "Eff_DiTau_VtxIso", "Eff_DiTau_RelIso"]]
+        effLists    = [["Eff_SingleTau_TkEG", "Eff_SingleTau_RelIso"],
+                       ["Eff_DiTau_TkEG",  "Eff_DiTau_RelIso"]]
 
-        rateLists   = [["Rate_SingleTau_all", "Rate_SingleTau_VtxIso", "Rate_SingleTau_RelIso" ],
-                       ["Rate_DiTau_all", "Rate_DiTau_VtxIso", "Rate_DiTau_RelIso"]]
+        rateLists   = [["Rate_SingleTau_TkEG", "Rate_SingleTau_RelIso" ],
+                       ["Rate_DiTau_TkEG", "Rate_DiTau_RelIso"]]
 
-        turnOnLists = [["TurnOn25_all", "TurnOn25_vtxIso", "TurnOn25_relIso"],
-                       ["TurnOn50_all", "TurnOn50_vtxIso", "TurnOn50_relIso"]]
-        '''
-        effLists    = [["Eff_SingleTau_all", "Eff_SingleTau_RelIso"],
-                       ["Eff_DiTau_all",  "Eff_DiTau_RelIso"]]
-
-        rateLists   = [["Rate_SingleTau_all", "Rate_SingleTau_RelIso" ],
-                       ["Rate_DiTau_all", "Rate_DiTau_RelIso"]]
-
-        turnOnLists = [["TurnOn25_all", "TurnOn25_relIso"],
-                       ["TurnOn50_all", "TurnOn50_relIso"]]
-
+        turnOnLists = [["TurnOn25_TkEG", "TurnOn25_relIso"],
+                       ["TurnOn50_TkEG", "TurnOn50_relIso"]]
+        '''               
 
 
         # For-loop: All background histos (min bias)
@@ -222,8 +222,9 @@ def PlotRate(datasetsMgr, histoList, bkg, PU):
     kwargs   = GetHistoKwargs(saveName, opts)
     hList    = []
     legDict  = {}
-    ##algos    = ["TkEG", "TkEG (VtxIso)", "TkEG (RelIso)"]                                                                                                                
-    algos    = ["TkEG", "TkEG (RelIso)"]
+    algos    = ["TkEG", "TkEG (VtxIso)", "TkEG (RelIso)"]
+    #algos    = ["TkEG", "TkEG (RelIso)"]
+    
     # For-loop: All tau algorithms
     for i, hName in enumerate(histoList, 0):
         algo = hName.split("_")[-1]
@@ -245,7 +246,6 @@ def PlotRate(datasetsMgr, histoList, bkg, PU):
     for i, h in enumerate(p.histoMgr.getHistos(), 0):
         hName = h.getName()
         algo  = h.getName().split("_")[-1]
-
         p.histoMgr.forHisto(hName, styles.getTauAlgoStyle(algo))
         p.histoMgr.setHistoDrawStyle(hName, "HIST")
         p.histoMgr.setHistoLegendStyle(hName, "L")
@@ -277,8 +277,8 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
     kwargs   = GetHistoKwargs(saveName, opts)
     hList    = []
     legDict  = {}
-    #algos    = ["TkEG", "TkEG (VtxIso)", "TkEG (RelIso)"]                                                                                                               
-    algos    = ["TkEG", "TkEG (RelIso)"]
+    algos    = ["TkEG", "TkEG (VtxIso)", "TkEG (RelIso)"]                                                                                                               
+    #algos    = ["TkEG", "TkEG (RelIso)"]
 
     # For-loop: All tau algorithms
     count = -1
@@ -335,13 +335,13 @@ def PlotTurnOns(datasetsMgr, histoList, signal, PU):
     # Get Histogram name and its kwargs
     myRegex   = "(?:TurnOn)(.*)"
     m         = re.search(myRegex, histoList[0])
-    threshold = m.group(1)
+    threshold = m.group(1).split("_")[0]
     saveName  = "TurnOns_%sGeV_%s" % (threshold, signal)
     kwargs    = GetHistoKwargs(saveName, opts)
     hList     = []
     legDict   = {}
-    #algos     = ["TkEG", "TkEG (VtxIso)", "TkEG (RelIso)"]
-    algos     = ["TkEG", "TkEG (RelIso)"]
+    algos     = ["TkEG", "TkEG (VtxIso)", "TkEG (RelIso)"]
+    #algos     = ["TkEG", "TkEG (RelIso)"]
 
     # For-loop: All tau algorithms
     for l, hName in enumerate(histoList, 0):
@@ -405,24 +405,24 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
         if (i==0):
             g1 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
             g1.SetName("TkEG")
-        #elif (i==1):
-        #    g2 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
-        #    g2.SetName("VtxIso")
         elif (i==1):
             g2 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
-            g2.SetName("RelIso")
+            g2.SetName("VtxIso")
+        elif (i==2):
+            g3 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
+            g3.SetName("RelIso")
             
 
     # Create the Rate Vs Efficiency TGraphs
-    p = plots.ComparisonManyPlot(g1, [g2], saveFormats=[])
-    #algos = ["TkEG", "TkEG (VtxIso)", "TkEG (RelIso)"]
-    algos = ["TkEG", "TkEG (RelIso)"]
+    p = plots.ComparisonManyPlot(g1, [g2, g3], saveFormats=[])
+    algos = ["TkEG", "TkEG (VtxIso)", "TkEG (RelIso)"]
+    #algos = ["TkEG", "TkEG (RelIso)"]
 
     # Set individual styles
     for index, h in enumerate(p.histoMgr.getHistos()):
         hName = h.getName()
         legDict[hName] = algos[index] #styles.getCaloLegend(index)
-        p.histoMgr.forHisto(hName, styles.getCaloStyle(index))
+        p.histoMgr.forHisto(hName, styles.getTauAlgoStyle(hName))
         p.histoMgr.setHistoDrawStyle(h.getName(), "LX") # "X" = Do not draw error bars
         p.histoMgr.setHistoLegendStyle(h.getName(), "LP")
 
@@ -434,7 +434,7 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
 
     # Draw Error bands
     #for i, g in enumerate([g0, g1, g2, g3, g4]):
-    for i, g in enumerate([g1, g2]):
+    for i, g in enumerate([g1, g2, g3]):
         shapes, min, max = DrawErrorBand(g) 
         for shape in shapes:
             shape.SetFillColor( p.histoMgr.getHistos()[i].getRootHisto().GetFillColor())
