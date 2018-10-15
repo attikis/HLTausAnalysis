@@ -651,7 +651,8 @@ def GetHistoKwargs(h, opts):
         _kwargs["ylabel"]     = "Efficiency / %0.0f " + _units
         _kwargs["log"]        = False
         _kwargs["rebinX"]     = 1 # do NOT change
-        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 150.0, "ymin": 0.0, "ymax": 1.05, "ymaxfactor": yMaxF}
+        #_kwargs["opts"]       = {"xmin": 0.0, "xmax": 150.0, "ymin": 0.0, "ymax": 1.05, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 200.0, "ymin": 0.0, "ymax": 1.05, "ymaxfactor": yMaxF}
         _kwargs["cutBoxY"]    = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}
         _kwargs["moveLegend"] = _mvLeg4
         if "50" in h:

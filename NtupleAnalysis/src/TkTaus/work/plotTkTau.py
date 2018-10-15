@@ -331,8 +331,7 @@ def GetHistoKwargs(h, opts):
         _yLabel = _yNorm + " / " + _format
         _log    = True
         _xMin   = +0.0
-        _xMax   = +0.16
-        _log    = False
+        _xMax   = +0.50
     if "_isoconermax" in hName:
         _units  = ""
         _format = "%0.2f " + _units
@@ -585,8 +584,15 @@ def GetHistoKwargs(h, opts):
             _format = "%0.2f " + _units
             _xLabel = "p_{T}^{rel} (%s)" % (_units)
             _cutBox = {"cutValue": 2.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-            _rebinX = 10
-            _xMax   = +5.0 #+10.0
+            if "seedtk" in hName:
+                _rebinX = 1
+                _xMax   = 2.0
+            if "sigtk" in hName:
+                _rebinX = 1
+                _xMax   = 2.0
+            if "isotk" in hName:
+                _rebinX = 5
+                _xMax   = 6.0
             _yLabel = _yNorm + " / " + _format
             _log    = True
         if "_ptminuscaloet" in hName:

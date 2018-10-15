@@ -248,7 +248,7 @@ def GetHistoKwargs(h, opts):
         _kwargs["ylabel"] = "relative isolation"# / %.2f"
         #_kwargs["opts"]   = {"xmin": 0.0, "xmax": 3.2, "ymin": 0.0, "ymax": 5.0}
         #_kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.6, "ymin": 0.0, "ymax": 3.0}
-        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 5.0, "ymin": 0.0, "ymax": 5.0}
+        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 5.0, "ymin": 0.0, "ymax": 3.0}
         _kwargs["rebinX"] = 1
         _kwargs["rebinY"] = 1
         _kwargs["cutBox"]  = {"cutValue": 0.50, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
