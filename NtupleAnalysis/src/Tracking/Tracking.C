@@ -309,8 +309,8 @@ void Tracking::Loop()
   InitVars_();
   BookHistos_();
   //auxTools_.PrintPSets(fChain);
-  PrintSettings();
-  PrintPixelTrackCuts_();
+  // if (DEBUG) PrintSettings();
+  // if (DEBUG) PrintPixelTrackCuts_();
 
   Long64_t nbytes       = 0;
   Long64_t nb           = 0;
@@ -318,10 +318,10 @@ void Tracking::Loop()
   unsigned int nEvts    = 0;
 
   // Print User Settings
-  cout << "\tPrinting user settings:" << endl;
-  PrintSettings();
+  if (DEBUG) cout << "\tPrinting user settings:" << endl;
+  if (DEBUG) PrintSettings();
   
-  cout << "\tAnalyzing " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
+  if (DEBUG) cout << "\tAnalyzing " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
   // For-loop: All TTree Entries
   for (int jentry = 0; jentry < nEntries; jentry++, nEvts++)
     {
@@ -767,7 +767,7 @@ void Tracking::Loop()
   MakeEfficiencyHisto(h_eff_d0   , h_match_tp_d0   , h_tp_d0   );
  
   FinaliseHistos_();
-  PrintEfficiencies_();
+  if (DEBUG) PrintEfficiencies_();
   PrintResolutions_();
   
   ////////////////////////////////////////////////
