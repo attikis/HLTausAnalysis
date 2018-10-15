@@ -98,7 +98,9 @@ void L1TkTauParticle::SetIsolationConeSize(double deltaR_min, double deltaR_max)
 
 //============================================================================
 double L1TkTauParticle::CalculateRelIso(const double deltaZ0_max,
-					bool bStoreValue)
+					bool bStoreValue,
+					bool bInvert_deltaZ0)
+
 //============================================================================
 {
 
@@ -127,8 +129,15 @@ double L1TkTauParticle::CalculateRelIso(const double deltaZ0_max,
       // Find the track closest in Z0
       deltaZ0 = abs(matchTk.getZ0() - isoConeTk.getZ0());
 
+      // Decide on type of calculation
+      bool considerTk  = false;
+      bool considerTk_default = (deltaZ0 < deltaZ0_max);
+      bool considerTk_invert  = (deltaZ0 > deltaZ0_max);
+      if (bInvert_deltaZ0) considerTk = considerTk_invert;
+      else considerTk = considerTk_default;
+      
       // Add-up the pT of alltracks in isolation cone/annulus
-      if (deltaZ0 < deltaZ0_max) isoTks_scalarSumPt += isoConeTk.getPt();
+      if (considerTk) isoTks_scalarSumPt += isoConeTk.getPt();
     }
 
   // Calculated + Assign value of relative isolation
