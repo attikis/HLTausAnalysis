@@ -174,8 +174,8 @@ def main(opts):
                 continue
             if "DiTau" in h:
                 continue
-            #if "L1TkIsoTau" in h:
-            #    continue
+            if "L1TkIsoTau" in h:
+                continue
 
             # For-loop: All datasets
             for d in datasetsMgr.getAllDatasetNames():
@@ -429,7 +429,7 @@ def Plot2dHistograms(datasetsMgr, dsetName, histoName, index):
         xmin =   0
         xmax =   0#3
 
-    if "GenP_PtLdg_Vs" in histoName:
+    if "GenP_VisEt_Vs" in histoName or "GenP_PtLdg_Vs" in histoName:
         gr = getCustomTGraph(histoName, const, coeff, xmin, xmax, step)
         gr.SetLineWidth(3)
         gr.Draw("L same")

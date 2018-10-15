@@ -377,7 +377,21 @@ tauStyle4   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kOrang
                               StyleFill(fillColor=ROOT.kOrange-3, fillStyle=0)])
 tauStyle5   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kTeal+2, markerSizes=None, markerStyle=ROOT.kFullSquare),
                               StyleLine(lineColor=ROOT.kTeal+2, lineStyle=ROOT.kSolid, lineWidth=3), 
-                              StyleFill(fillColor=ROOT.kTeal+2, fillStyle=0)])
+                             StyleFill(fillColor=ROOT.kTeal+2, fillStyle=0)])
+
+tauStyle6   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kGray+1, markerSizes=None, markerStyle=ROOT.kFullSquare),
+                              StyleLine(lineColor=ROOT.kGray+1, lineStyle=ROOT.kSolid, lineWidth=3), 
+                              StyleFill(fillColor=ROOT.kGray+1, fillStyle=0)])
+tauStyle7   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kMagenta+2, markerSizes=None, markerStyle=ROOT.kFullSquare),
+                              StyleLine(lineColor=ROOT.kMagenta+2, lineStyle=ROOT.kSolid, lineWidth=3), 
+                              StyleFill(fillColor=ROOT.kMagenta+2, fillStyle=0)])
+tauStyle8   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kPink+1, markerSizes=None, markerStyle=ROOT.kFullSquare),
+                              StyleLine(lineColor=ROOT.kPink+1, lineStyle=ROOT.kSolid, lineWidth=3), 
+                              StyleFill(fillColor=ROOT.kPink+1, fillStyle=0)])
+tauStyle9   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kAzure-6, markerSizes=None, markerStyle=ROOT.kFullSquare),
+                              StyleLine(lineColor=ROOT.kAzure-6, lineStyle=ROOT.kSolid, lineWidth=3), 
+                              StyleFill(fillColor=ROOT.kAzure-6, fillStyle=0)])
+
 caloTkStyle  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
                               StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3), 
                               StyleFill(fillColor=ROOT.kBlack, fillStyle=3001)])
@@ -511,7 +525,8 @@ def getRegionStyle(region):
 
 
 def getTauAlgoStyle(algo):
-    allowedAlgos = ["Calo", "Tk", "VtxIso", "RelIso", "TkCalo", "PFTau", "Iso"]
+    allowedAlgos = ["Calo", "Tk", "VtxIso", "RelIso", "TkCalo", "PFTau", 
+                    "VtxIsoLoose", "VtxIsoTight", "RelIsoLoose", "RelIsoTight"]
     if algo not in allowedAlgos:
         raise Exception("No style available for tau algorithm \"%s\"" % (algo))
 
@@ -523,8 +538,14 @@ def getTauAlgoStyle(algo):
         return getCaloStyle(2)
     elif algo == "RelIso":
         return getCaloStyle(3)
-    elif algo == "Iso":
+    elif algo == "VtxIsoLoose":
         return getCaloStyle(4)
+    elif algo == "VtxIsoTight":
+        return getCaloStyle(5)
+    elif algo == "RelIsoLoose":
+        return getCaloStyle(6)
+    elif algo == "RelIsoTight":
+        return getCaloStyle(7)
     else:
         raise Exception("This should never be reached")
 
@@ -539,6 +560,14 @@ def getCaloStyle(i):
         return tauStyle4
     elif i==4:
         return tauStyle5
+    elif i==5:
+        return tauStyle6
+    elif i==6:
+        return tauStyle7
+    elif i==7:
+        return tauStyle8
+    elif i==8:
+        return tauStyle9
     else:
         styles[index]
 

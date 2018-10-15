@@ -656,7 +656,7 @@ def GetHistoKwargs(h, opts):
             _xLabel = "vertex isolation (%s)" % (_units)
             # _xLabel = "min(z_{0}^{tk_{s}} - z_{0}^{tk_{i}}) (%s)" % (_units)
             _rebinX = 1
-            _xMax   = 0.6 #10.0
+            _xMax   = 10.0
             _yLabel = _yNorm + " / " + _format
             _log    = True
             # _cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
