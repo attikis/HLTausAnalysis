@@ -4,7 +4,6 @@
 // User
 #include "../Auxiliary/interface/constants.h"
 #include "TkTaus.h"
-//#include "../Framework/interface/TreeReaderReco.h"
 
 // ROOT
 #include "TFitResult.h"
@@ -41,7 +40,7 @@ void TkTaus::InitVars_()
   seedTk_minPt       =   5.0;       //  10.0
   seedTk_minEta      =   0.0;       //   0.0
   seedTk_maxEta      =   2.5;       // 999.9
-  seedTk_maxChiSq    =  50.0;       //  25.0
+  seedTk_maxChiSq    =  50.0;       //  50.0
   seedTk_minStubs    =    5;        //   5
 
   // Signal cone tracks
@@ -50,7 +49,7 @@ void TkTaus::InitVars_()
   sigConeTks_minPt       =   2.0;  //   2.0
   sigConeTks_minEta      =   0.0;  //   0.0
   sigConeTks_maxEta      =   2.5;  // 999.9
-  sigConeTks_maxChiSq    =  50.0;  //  25.0
+  sigConeTks_maxChiSq    =  50.0;  //  50.0
   sigConeTks_minStubs    =   5;    //   4
   sigConeTks_dPOCAz      =   0.5;  // 0.80 (A. Ryd)
   sigConeTks_maxInvMass  =   1.6;  // 1.77 (A. Ryd)
@@ -62,18 +61,18 @@ void TkTaus::InitVars_()
   isoConeTks_minEta      =   0.0; //   0.0
   isoConeTks_maxEta      =   2.5; // 999.9
   isoConeTks_maxChiSq    =  50.0; // 100.00
-  isoConeTks_minStubs    =   4;   //   4
+  isoConeTks_minStubs    =   5;   //   4
 
   // Signal cone parameters
   sigCone_Constant        = +0.00; // 0.0
   sigCone_dRMin           = +0.00; // WARNING! If > 0 the matching Track will NOT be added in sigCone_TTTracks
-  sigCone_dRMax           = +0.15; // 0.15
-  sigCone_cutoffDeltaR    = +0.15; // 0.15
+  sigCone_dRMax           = +0.20; // 0.20
+  sigCone_cutoffDeltaR    = sigCone_dRMax; // ??? do i need this? (0.15)
 
   // Isolation cone
-  isoCone_Constant     = +2.0;          // 2.0 by fit on fit on ldg pT
-  isoCone_dRMin        = sigCone_dRMax; // 0.4
-  isoCone_dRMax        = +0.30;         // 0.35
+  isoCone_Constant = +2.0;          // 2.0 by fit on fit on ldg pT
+  isoCone_dRMin    = sigCone_dRMax; // 0.4
+  isoCone_dRMax    = +0.30;         // 0.30
 
   // Isolation variables
   vtxIso_WP  = +0.50;  // 0.5 cm
@@ -1000,22 +999,6 @@ void TkTaus::Loop()
     FillTurnOn_Numerator_(L1TkTaus_VtxIsoTight , 50.0, hVtxIsoTight_TurnOn50);
     FillTurnOn_Numerator_(L1TkTaus_RelIsoLoose , 50.0, hRelIsoLoose_TurnOn50);
     FillTurnOn_Numerator_(L1TkTaus_RelIsoTight , 50.0, hRelIsoTight_TurnOn50);
-
-    FillTurnOn_Numerator_(L1TkTaus_Tk     , 65.0, hTk_TurnOn_SingleTau50KHz    );
-    FillTurnOn_Numerator_(L1TkTaus_VtxIso , 50.0, hVtxIso_TurnOn_SingleTau50KHz);    
-    FillTurnOn_Numerator_(L1TkTaus_RelIso , 50.0, hRelIso_TurnOn_SingleTau50KHz);
-    FillTurnOn_Numerator_(L1TkTaus_VtxIsoLoose , 50.0, hVtxIsoLoose_TurnOn_SingleTau50KHz);    
-    FillTurnOn_Numerator_(L1TkTaus_VtxIsoTight , 50.0, hVtxIsoTight_TurnOn_SingleTau50KHz);    
-    FillTurnOn_Numerator_(L1TkTaus_RelIsoLoose , 50.0, hRelIsoLoose_TurnOn_SingleTau50KHz);    
-    FillTurnOn_Numerator_(L1TkTaus_RelIsoTight , 50.0, hRelIsoTight_TurnOn_SingleTau50KHz);    
-
-    FillTurnOn_Numerator_(L1TkTaus_Tk     , 40.0, hTk_TurnOn_DiTau50KHz    );
-    FillTurnOn_Numerator_(L1TkTaus_VtxIso , 25.0, hVtxIso_TurnOn_DiTau50KHz);
-    FillTurnOn_Numerator_(L1TkTaus_RelIso , 25.0, hRelIso_TurnOn_DiTau50KHz);
-    FillTurnOn_Numerator_(L1TkTaus_VtxIsoLoose , 25.0, hVtxIsoLoose_TurnOn_DiTau50KHz);
-    FillTurnOn_Numerator_(L1TkTaus_VtxIsoTight , 25.0, hVtxIsoTight_TurnOn_DiTau50KHz);
-    FillTurnOn_Numerator_(L1TkTaus_RelIsoLoose , 25.0, hRelIsoLoose_TurnOn_DiTau50KHz);
-    FillTurnOn_Numerator_(L1TkTaus_RelIsoTight , 25.0, hRelIsoTight_TurnOn_DiTau50KHz);
     
     ////////////////////////////////////////////////
     // SingleTau
@@ -1326,23 +1309,6 @@ void TkTaus::Loop()
   histoTools_.DivideHistos_1D(hVtxIsoTight_TurnOn25, hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hRelIsoLoose_TurnOn25, hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn25, hMcHadronicTau_VisEt);
-
-  histoTools_.DivideHistos_1D(hTk_TurnOn_SingleTau50KHz    , hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hVtxIso_TurnOn_SingleTau50KHz, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hRelIso_TurnOn_SingleTau50KHz, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hVtxIsoLoose_TurnOn_SingleTau50KHz, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hVtxIsoTight_TurnOn_SingleTau50KHz, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hRelIsoLoose_TurnOn_SingleTau50KHz, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn_SingleTau50KHz, hMcHadronicTau_VisEt);
-
-  histoTools_.DivideHistos_1D(hTk_TurnOn_DiTau50KHz    , hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hVtxIso_TurnOn_DiTau50KHz, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hRelIso_TurnOn_DiTau50KHz, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hVtxIsoLoose_TurnOn_DiTau50KHz, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hVtxIsoTight_TurnOn_DiTau50KHz, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hRelIsoLoose_TurnOn_DiTau50KHz, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn_DiTau50KHz, hMcHadronicTau_VisEt);
-
 
   ////////////////////////////////////////////////
   // Write the histograms to the file
@@ -1721,22 +1687,6 @@ void TkTaus::BookHistos_(void)
   histoTools_.BookHisto_1D(hRelIsoLoose_TurnOn25, "RelIsoLoose_TurnOn25", "", 60 , minEt , maxEt );
   histoTools_.BookHisto_1D(hRelIsoTight_TurnOn25, "RelIsoTight_TurnOn25", "", 60 , minEt , maxEt );
   
-  histoTools_.BookHisto_1D(hTk_TurnOn_SingleTau50KHz    , "Tk_TurnOn_SingleTau50KHz"    , "", 60, minEt , maxEt );
-  histoTools_.BookHisto_1D(hVtxIso_TurnOn_SingleTau50KHz, "VtxIso_TurnOn_SingleTau50KHz", "", 60, minEt , maxEt );
-  histoTools_.BookHisto_1D(hRelIso_TurnOn_SingleTau50KHz, "RelIso_TurnOn_SingleTau50KHz", "", 60, minEt , maxEt );
-  histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn_SingleTau50KHz, "VtxIsoLoose_TurnOn_SingleTau50KHz"   , "", 60, minEt , maxEt );
-  histoTools_.BookHisto_1D(hVtxIsoTight_TurnOn_SingleTau50KHz, "VtxIsoTight_TurnOn_SingleTau50KHz"   , "", 60, minEt , maxEt );
-  histoTools_.BookHisto_1D(hRelIsoLoose_TurnOn_SingleTau50KHz, "RelIsoLoose_TurnOn_SingleTau50KHz"   , "", 60, minEt , maxEt );
-  histoTools_.BookHisto_1D(hRelIsoTight_TurnOn_SingleTau50KHz, "RelIsoTight_TurnOn_SingleTau50KHz"   , "", 60, minEt , maxEt );
-
-  histoTools_.BookHisto_1D(hTk_TurnOn_DiTau50KHz    , "Tk_TurnOn_DiTau50KHz"    , "", 60, minEt , maxEt );
-  histoTools_.BookHisto_1D(hVtxIso_TurnOn_DiTau50KHz, "VtxIso_TurnOn_DiTau50KHz", "", 60, minEt , maxEt );
-  histoTools_.BookHisto_1D(hRelIso_TurnOn_DiTau50KHz, "RelIso_TurnOn_DiTau50KHz", "", 60, minEt , maxEt );
-  histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn_DiTau50KHz, "VtxIsoLoose_TurnOn_DiTau50KHz"   , "", 60, minEt , maxEt );
-  histoTools_.BookHisto_1D(hVtxIsoTight_TurnOn_DiTau50KHz, "VtxIsoTight_TurnOn_DiTau50KHz"   , "", 60, minEt , maxEt );
-  histoTools_.BookHisto_1D(hRelIsoLoose_TurnOn_DiTau50KHz, "RelIsoLoose_TurnOn_DiTau50KHz"   , "", 60, minEt , maxEt );
-  histoTools_.BookHisto_1D(hRelIsoTight_TurnOn_DiTau50KHz, "RelIsoTight_TurnOn_DiTau50KHz"   , "", 60, minEt , maxEt );
-
   // DiTau (Tk-Other)
   histoTools_.BookHisto_2D(hDiTau_Rate_Tk_VtxIso, "DiTau_Rate_Tk_VtxIso", "", nEt, minEt, maxEt, nEt, minEt, maxEt);
   histoTools_.BookHisto_2D(hDiTau_Rate_Tk_RelIso, "DiTau_Rate_Tk_RelIso", "", nEt, minEt, maxEt, nEt, minEt, maxEt);
@@ -2048,23 +1998,6 @@ void TkTaus::WriteHistos_(void)
   hRelIsoLoose_TurnOn25->Write();
   hRelIsoTight_TurnOn25->Write();
 
-  hTk_TurnOn_SingleTau50KHz->Write();
-  hVtxIso_TurnOn_SingleTau50KHz->Write();
-  hRelIso_TurnOn_SingleTau50KHz->Write();
-  hVtxIsoLoose_TurnOn_SingleTau50KHz->Write();
-  hVtxIsoTight_TurnOn_SingleTau50KHz->Write();
-  hRelIsoLoose_TurnOn_SingleTau50KHz->Write();
-  hRelIsoTight_TurnOn_SingleTau50KHz->Write();
-
-  hTk_TurnOn_DiTau50KHz->Write();
-  hVtxIso_TurnOn_DiTau50KHz->Write();
-  hRelIso_TurnOn_DiTau50KHz->Write();
-  hVtxIsoLoose_TurnOn_DiTau50KHz->Write();
-  hVtxIsoTight_TurnOn_DiTau50KHz->Write();
-  hRelIsoLoose_TurnOn_DiTau50KHz->Write();
-  hRelIsoTight_TurnOn_DiTau50KHz->Write();
-
-  // Write the outfile
   outFile->Write();
 
   return;

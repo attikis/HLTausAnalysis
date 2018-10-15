@@ -550,24 +550,6 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hRelIsoLoose_TurnOn25;
   TH1D* hRelIsoTight_TurnOn25;
 
-  TH1D* hCalo_TurnOn_SingleTau50KHz;
-  TH1D* hTk_TurnOn_SingleTau50KHz;
-  TH1D* hVtxIso_TurnOn_SingleTau50KHz;
-  TH1D* hRelIso_TurnOn_SingleTau50KHz;
-  TH1D* hVtxIsoLoose_TurnOn_SingleTau50KHz;
-  TH1D* hVtxIsoTight_TurnOn_SingleTau50KHz;
-  TH1D* hRelIsoLoose_TurnOn_SingleTau50KHz;
-  TH1D* hRelIsoTight_TurnOn_SingleTau50KHz;
-
-  TH1D* hCalo_TurnOn_DiTau50KHz;
-  TH1D* hTk_TurnOn_DiTau50KHz;
-  TH1D* hVtxIso_TurnOn_DiTau50KHz;
-  TH1D* hRelIso_TurnOn_DiTau50KHz;
-  TH1D* hVtxIsoLoose_TurnOn_DiTau50KHz;
-  TH1D* hVtxIsoTight_TurnOn_DiTau50KHz;
-  TH1D* hRelIsoLoose_TurnOn_DiTau50KHz;
-  TH1D* hRelIsoTight_TurnOn_DiTau50KHz;
-
 };
 
 #endif
