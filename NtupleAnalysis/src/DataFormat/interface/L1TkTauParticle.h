@@ -70,6 +70,8 @@ class L1TkTauParticle{
   double GetVtxIsolation(void)const { return theVtxIsolation;}
   TTTrack GetVtxIsolationTrack(void)const {return theVtxIsolationTk;}
   double GetRelIsolation(void)const { return theRelIsolation;}
+  double CalculateRelIso(const double deltaZ0_max=999.9, bool bStoreValue=false); 
+  double CalculateVtxIso(bool bStoreValue=false); 
   L1Tau GetCaloTau(void) const{ return theCaloTau;}
   TTTrack GetMatchingTk(void) const{ return theMatchingTk;}
   TTTrack GetSigConeLdgTk(void);
