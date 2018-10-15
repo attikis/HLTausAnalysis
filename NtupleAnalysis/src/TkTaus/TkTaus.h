@@ -189,7 +189,11 @@ class TkTaus : public TreeAnalyserMC{
 
   void FillTurnOn_Numerator_(vector<L1TkTauParticle> L1TkTaus,
 			     const double minEt,
-			     TH1D *hTurnOn);
+			     TH1D *hTurnOn, 
+			     TH1D *hTurnOn_1pr, 
+			     TH1D *hTurnOn_3pr, 
+			     TH1D *hTurnOn_withNeutrals, 
+			     TH1D *hTurnOn_noNeutrals);
 
   void FillSingleTau_(vector<L1TkTauParticle> L1TkTaus,
 		      TH1D *hRate,
@@ -531,24 +535,94 @@ class TkTaus : public TreeAnalyserMC{
   // Turn-Ons
   // TEfficiency* pEff; //fixme: convert all turn-ons
   TH1D* hMcHadronicTau_VisEt;
+  TH1D* hMcHadronicTau_VisEt_1pr;
+  TH1D* hMcHadronicTau_VisEt_3pr;
+  TH1D* hMcHadronicTau_VisEt_withNeutrals;
+  TH1D* hMcHadronicTau_VisEt_noNeutrals;
 
-  TH1D* hCalo_TurnOn50;
-  TH1D* hTk_TurnOn50;
-  TH1D* hVtxIso_TurnOn50;
-  TH1D* hRelIso_TurnOn50;
-  TH1D* hVtxIsoLoose_TurnOn50;
-  TH1D* hVtxIsoTight_TurnOn50;
-  TH1D* hRelIsoLoose_TurnOn50;
-  TH1D* hRelIsoTight_TurnOn50;
-
-  TH1D* hCalo_TurnOn25;
   TH1D* hTk_TurnOn25;
+  TH1D* hTk_TurnOn25_1pr;
+  TH1D* hTk_TurnOn25_3pr;
+  TH1D* hTk_TurnOn25_withNeutrals;
+  TH1D* hTk_TurnOn25_noNeutrals;
+
   TH1D* hVtxIso_TurnOn25;
+  TH1D* hVtxIso_TurnOn25_1pr;
+  TH1D* hVtxIso_TurnOn25_3pr;
+  TH1D* hVtxIso_TurnOn25_withNeutrals;
+  TH1D* hVtxIso_TurnOn25_noNeutrals;
+
   TH1D* hRelIso_TurnOn25;
+  TH1D* hRelIso_TurnOn25_1pr;
+  TH1D* hRelIso_TurnOn25_3pr;
+  TH1D* hRelIso_TurnOn25_withNeutrals;
+  TH1D* hRelIso_TurnOn25_noNeutrals;
+
   TH1D* hVtxIsoLoose_TurnOn25;
+  TH1D* hVtxIsoLoose_TurnOn25_1pr;
+  TH1D* hVtxIsoLoose_TurnOn25_3pr;
+  TH1D* hVtxIsoLoose_TurnOn25_withNeutrals;
+  TH1D* hVtxIsoLoose_TurnOn25_noNeutrals;
+
   TH1D* hVtxIsoTight_TurnOn25;
+  TH1D* hVtxIsoTight_TurnOn25_1pr;
+  TH1D* hVtxIsoTight_TurnOn25_3pr;
+  TH1D* hVtxIsoTight_TurnOn25_withNeutrals;
+  TH1D* hVtxIsoTight_TurnOn25_noNeutrals;
+
   TH1D* hRelIsoLoose_TurnOn25;
+  TH1D* hRelIsoLoose_TurnOn25_1pr;
+  TH1D* hRelIsoLoose_TurnOn25_3pr;
+  TH1D* hRelIsoLoose_TurnOn25_withNeutrals;
+  TH1D* hRelIsoLoose_TurnOn25_noNeutrals;
+
   TH1D* hRelIsoTight_TurnOn25;
+  TH1D* hRelIsoTight_TurnOn25_1pr;
+  TH1D* hRelIsoTight_TurnOn25_3pr;
+  TH1D* hRelIsoTight_TurnOn25_withNeutrals;
+  TH1D* hRelIsoTight_TurnOn25_noNeutrals;
+
+  TH1D* hTk_TurnOn50;
+  TH1D* hTk_TurnOn50_1pr;
+  TH1D* hTk_TurnOn50_3pr;
+  TH1D* hTk_TurnOn50_withNeutrals;
+  TH1D* hTk_TurnOn50_noNeutrals;
+
+  TH1D* hVtxIso_TurnOn50;
+  TH1D* hVtxIso_TurnOn50_1pr;
+  TH1D* hVtxIso_TurnOn50_3pr;
+  TH1D* hVtxIso_TurnOn50_withNeutrals;
+  TH1D* hVtxIso_TurnOn50_noNeutrals;
+
+  TH1D* hRelIso_TurnOn50;
+  TH1D* hRelIso_TurnOn50_1pr;
+  TH1D* hRelIso_TurnOn50_3pr;
+  TH1D* hRelIso_TurnOn50_withNeutrals;
+  TH1D* hRelIso_TurnOn50_noNeutrals;
+
+  TH1D* hVtxIsoLoose_TurnOn50;
+  TH1D* hVtxIsoLoose_TurnOn50_1pr;
+  TH1D* hVtxIsoLoose_TurnOn50_3pr;
+  TH1D* hVtxIsoLoose_TurnOn50_withNeutrals;
+  TH1D* hVtxIsoLoose_TurnOn50_noNeutrals;
+
+  TH1D* hVtxIsoTight_TurnOn50;
+  TH1D* hVtxIsoTight_TurnOn50_1pr;
+  TH1D* hVtxIsoTight_TurnOn50_3pr;
+  TH1D* hVtxIsoTight_TurnOn50_withNeutrals;
+  TH1D* hVtxIsoTight_TurnOn50_noNeutrals;
+
+  TH1D* hRelIsoLoose_TurnOn50;
+  TH1D* hRelIsoLoose_TurnOn50_1pr;
+  TH1D* hRelIsoLoose_TurnOn50_3pr;
+  TH1D* hRelIsoLoose_TurnOn50_withNeutrals;
+  TH1D* hRelIsoLoose_TurnOn50_noNeutrals;
+
+  TH1D* hRelIsoTight_TurnOn50;
+  TH1D* hRelIsoTight_TurnOn50_1pr;
+  TH1D* hRelIsoTight_TurnOn50_3pr;
+  TH1D* hRelIsoTight_TurnOn50_withNeutrals;
+  TH1D* hRelIsoTight_TurnOn50_noNeutrals;
 
 };
 
