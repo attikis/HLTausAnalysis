@@ -61,16 +61,16 @@ void TkTaus::InitVars_()
   isoConeTks_minEta      =   0.0; //   0.0
   isoConeTks_maxEta      =   2.5; // 999.9
   isoConeTks_maxChiSq    =  50.0; // 100.00
-  isoConeTks_minStubs    =   5;   //   4
+  isoConeTks_minStubs    =   4;   //   4
 
   // Signal cone parameters
   sigCone_Constant        = +0.00; // 0.0
   sigCone_dRMin           = +0.00; // WARNING! If > 0 the matching Track will NOT be added in sigCone_TTTracks
-  sigCone_dRMax           = +0.20; // 0.20
+  sigCone_dRMax           = +0.25; // 0.20
   sigCone_cutoffDeltaR    = sigCone_dRMax; // ??? do i need this? (0.15)
 
   // Isolation cone
-  isoCone_Constant = +2.0;          // 2.0 by fit on fit on ldg pT
+  isoCone_Constant = +2.3;          // 2.3 by fit on fit on ldg pT (Fotis)
   isoCone_dRMin    = sigCone_dRMax; // 0.4
   isoCone_dRMax    = +0.30;         // 0.30
 
@@ -558,8 +558,7 @@ void TkTaus::Loop()
 	GetIsoConeTracks(L1TkTauCandidate, isoTTTracks, 999.99);
 
 	// Calculate isolation variables
-	// GetIsolationValues(L1TkTauCandidate);
-	L1TkTauCandidate.CalculateRelIso(relIso_dZ0, true);
+	L1TkTauCandidate.CalculateRelIso(relIso_dZ0, true); // GetIsolationValues(L1TkTauCandidate);
 	L1TkTauCandidate.CalculateVtxIso(true);
 
 	// Get the matching gen-particle
@@ -728,10 +727,11 @@ void TkTaus::Loop()
 	hL1TkTau_DeltaRGenP  ->Fill( tau->GetMatchingGenParticleDeltaR() );
 	hL1TkTau_RelIso      ->Fill( tau->GetRelIsolation() );
 	hL1TkTau_VtxIso      ->Fill( tau->GetVtxIsolation() );
-	if (  tau->GetIsoConeTTTracks().size() > 0 ) 
-	  {
-	hL1TkTau_VtxIso_Vs_RelIso->Fill( tau->GetVtxIsolation(), tau->GetRelIsolation() );
-	  }
+	//if (  tau->GetIsoConeTTTracks().size() > 0 ) 
+	//{
+	// hL1TkTau_VtxIso_Vs_RelIso->Fill( tau->GetVtxIsolation(), tau->GetRelIsolation() ); // relIso shown only up to vtxIso = relIso_dZ0 => not very informative
+	hL1TkTau_VtxIso_Vs_RelIso->Fill( tau->GetVtxIsolation(), tau->CalculateRelIso(999.9, false) ); // shows entire range for relIso
+	//}
 	
 	// SigCone TTTracks
 	int sigTks_sumCharge   = 0;

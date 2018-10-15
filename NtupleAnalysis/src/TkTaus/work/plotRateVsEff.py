@@ -182,14 +182,19 @@ def main(opts):
             # For-loop: All signal histos
             for j, s in enumerate(dsets_signal, 1):
                 sPU = s.split("PU")[1]
-
+             
                 # Create rate plots (SingleTau, DiTau)
                 PlotEfficiency(datasetsMgr, effLists[0], s, sPU)
                 PlotEfficiency(datasetsMgr, effLists[1], s, sPU)
 
-                if bPU != sPU:
-                    continue
+                # Skip non-matching signal and bkg PU pairs?
+                if 0:
+                    if bPU != sPU:
+                        continue
+                    else:
+                        PU = sPU
                 else:
+                    # Allow non-matching signal and bkg PU pairs?
                     PU = sPU
 
                 # For-loop: All triggers
@@ -258,7 +263,7 @@ def PlotRate(datasetsMgr, histoList, bkg, PU):
 
     # Add additional canvas text
     histograms.addPileupText("PU=%s" % (PU) )
-    histograms.addText(0.70, 0.88, taus, 17)
+    histograms.addText(0.66, 0.86, taus, 17)
 
     # Save the plots in custom list of saveFormats
     aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, True)
@@ -317,7 +322,7 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
 
     # Add additional canvas text
     histograms.addPileupText("PU=%s" % (PU) )
-    histograms.addText(0.60, 0.88, plots._legendLabels[signal], 17)
+    histograms.addText(0.66, 0.86, plots._legendLabels[signal], 17)
 
     # Save the plots in custom list of saveFormats
     aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, True)
@@ -590,7 +595,7 @@ def DrawErrorBand(graph):
 
 def GetHistoKwargs(h, opts):
     _mvLeg1 = {"dx": -0.20, "dy": -0.45, "dh": -0.02}
-    _mvLeg2 = {"dx": -0.10, "dy": -0.45, "dh": -0.02}
+    _mvLeg2 = {"dx": -0.10, "dy": -0.07, "dh": -0.00}
     _mvLeg3 = {"dx": -0.15, "dy": -0.45, "dh": -0.02}
     _mvLeg4 = {"dx": -0.52, "dy": -0.07, "dh": -0.15}
     logY    = True
@@ -637,7 +642,7 @@ def GetHistoKwargs(h, opts):
         _kwargs["log"]        = False
         #_kwargs["opts"]       = {"xmin": 0.0, "xmax": 300.0, "ymin": 0.0, "ymax": 1.0, "ymaxfactor": yMaxF}
         _kwargs["opts"]       = {"xmin": 0.0, "xmax": 100.0, "ymin": 0.0, "ymax": 1.0, "ymaxfactor": yMaxF}
-        _kwargs["moveLegend"] = _mvLeg3
+        _kwargs["moveLegend"] = _mvLeg2 #_mvLeg3
         _kwargs["cutBoxY"]    = {"cutValue": 50, "fillColor": 16, "box": False, "line": False, "cutGreaterThan": False}
         _kwargs["cutBoxX"]    = {"cutValue": 10, "fillColor": 16, "box": True, "line": True, "cutGreaterThan": False}
     if "TurnOn" in h:
