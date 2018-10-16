@@ -363,14 +363,23 @@ class TkTaus : public TreeAnalyserMC{
 
   // Resolutions
   TH1D* hL1TkIsoTau_ResolutionEt;
-  TH1D* hL1TkIsoTau_ResolutionEta;
-  TH1D* hL1TkIsoTau_ResolutionPhi;
+  TH1D* hL1TkIsoTau_ResolutionEt_1pr;
+  TH1D* hL1TkIsoTau_ResolutionEt_3pr;
   TH1D* hL1TkIsoTau_ResolutionEt_withNeutrals;
-  TH1D* hL1TkIsoTau_ResolutionEta_withNeutrals;
-  TH1D* hL1TkIsoTau_ResolutionPhi_withNeutrals;
   TH1D* hL1TkIsoTau_ResolutionEt_noNeutrals;
+
+  TH1D* hL1TkIsoTau_ResolutionEta;
+  TH1D* hL1TkIsoTau_ResolutionEta_1pr;
+  TH1D* hL1TkIsoTau_ResolutionEta_3pr;
+  TH1D* hL1TkIsoTau_ResolutionEta_withNeutrals;
   TH1D* hL1TkIsoTau_ResolutionEta_noNeutrals;
+
+  TH1D* hL1TkIsoTau_ResolutionPhi;
+  TH1D* hL1TkIsoTau_ResolutionPhi_1pr;
+  TH1D* hL1TkIsoTau_ResolutionPhi_3pr;
+  TH1D* hL1TkIsoTau_ResolutionPhi_withNeutrals;
   TH1D* hL1TkIsoTau_ResolutionPhi_noNeutrals;
+
   TH1D* hL1TkIsoTau_ResolutionEt_C;
   TH1D* hL1TkIsoTau_ResolutionEta_C;
   TH1D* hL1TkIsoTau_ResolutionPhi_C;
