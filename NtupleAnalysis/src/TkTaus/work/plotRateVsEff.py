@@ -627,7 +627,7 @@ def GetHistoKwargs(h, opts):
     _mvLeg1 = {"dx": -0.20, "dy": -0.45, "dh": -0.02}
     _mvLeg2 = {"dx": -0.10, "dy": -0.07, "dh": -0.00}
     _mvLeg3 = {"dx": -0.15, "dy": -0.45, "dh": -0.02}
-    _mvLeg4 = {"dx": -0.52, "dy": -0.07, "dh": -0.15}
+    _mvLeg4 = {"dx": -0.52, "dy": -0.07, "dh": -0.05}
     logY    = True
     yMin    = 0.0
     if logY:

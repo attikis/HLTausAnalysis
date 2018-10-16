@@ -41,3 +41,5 @@ set PSEUDO_MCRAB_DIR = ${1}
 ./plotTkTau.py -n -e "SingleE|Charged|TT" -m $PSEUDO_MCRAB_DIR --url
 ./plotRateVsEff.py -e "SingleE" -m $PSEUDO_MCRAB_DIR --url
 ./plotTH2.py -e "SingleE" --logZ --normalizeToOne -m $PSEUDO_MCRAB_DIR --url
+./plotResolutions.py -e "SingleE" -n -m $PSEUDO_MCRAB_DIR --url
+

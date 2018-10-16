@@ -689,7 +689,7 @@ def GetHistoKwargs(h, opts):
         _units  = ""
         _format = "%0.2f " + _units
         #_xLabel = "(E_{T}^{calo} - p_{T}^{vis}) / p_{T}^{vis}"
-        _xLabel = "#deltaE_{T} / p_{T}^{vis}"
+        _xLabel = "#deltaE_{T} / E_{T}^{vis}"
         _rebinX = 1
         _xMin   = -2.0 #-5.5
         _xMax   = +2.0 #+5.5
@@ -938,7 +938,7 @@ if __name__ == "__main__":
     BATCHMODE   = True
     DATAERA     = "TDR2019"
     FOLDER      = ""
-    GRIDX       = True
+    GRIDX       = False
     GRIDY       = False    
     INTLUMI     = 1.0
     NORMTOONE   = False
