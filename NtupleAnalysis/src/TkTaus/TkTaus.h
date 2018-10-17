@@ -147,8 +147,9 @@ class TkTaus : public TreeAnalyserMC{
   double isoCone_Constant;
   double isoCone_dRMax;
   double isoCone_dRMin;
-  double isoCone_VtxIsoWP;
-  double isoCone_RelIsoWP;
+  double vtxIso_WP;
+  double relIso_WP;
+  double relIso_dZ0;
   //
   int nMaxNumOfHTausPossible;
   int realTauMom;
@@ -188,7 +189,11 @@ class TkTaus : public TreeAnalyserMC{
 
   void FillTurnOn_Numerator_(vector<L1TkTauParticle> L1TkTaus,
 			     const double minEt,
-			     TH1D *hTurnOn);
+			     TH1D *hTurnOn, 
+			     TH1D *hTurnOn_1pr, 
+			     TH1D *hTurnOn_3pr, 
+			     TH1D *hTurnOn_withNeutrals, 
+			     TH1D *hTurnOn_noNeutrals);
 
   void FillSingleTau_(vector<L1TkTauParticle> L1TkTaus,
 		      TH1D *hRate,
@@ -358,14 +363,23 @@ class TkTaus : public TreeAnalyserMC{
 
   // Resolutions
   TH1D* hL1TkIsoTau_ResolutionEt;
-  TH1D* hL1TkIsoTau_ResolutionEta;
-  TH1D* hL1TkIsoTau_ResolutionPhi;
+  TH1D* hL1TkIsoTau_ResolutionEt_1pr;
+  TH1D* hL1TkIsoTau_ResolutionEt_3pr;
   TH1D* hL1TkIsoTau_ResolutionEt_withNeutrals;
-  TH1D* hL1TkIsoTau_ResolutionEta_withNeutrals;
-  TH1D* hL1TkIsoTau_ResolutionPhi_withNeutrals;
   TH1D* hL1TkIsoTau_ResolutionEt_noNeutrals;
+
+  TH1D* hL1TkIsoTau_ResolutionEta;
+  TH1D* hL1TkIsoTau_ResolutionEta_1pr;
+  TH1D* hL1TkIsoTau_ResolutionEta_3pr;
+  TH1D* hL1TkIsoTau_ResolutionEta_withNeutrals;
   TH1D* hL1TkIsoTau_ResolutionEta_noNeutrals;
+
+  TH1D* hL1TkIsoTau_ResolutionPhi;
+  TH1D* hL1TkIsoTau_ResolutionPhi_1pr;
+  TH1D* hL1TkIsoTau_ResolutionPhi_3pr;
+  TH1D* hL1TkIsoTau_ResolutionPhi_withNeutrals;
   TH1D* hL1TkIsoTau_ResolutionPhi_noNeutrals;
+
   TH1D* hL1TkIsoTau_ResolutionEt_C;
   TH1D* hL1TkIsoTau_ResolutionEta_C;
   TH1D* hL1TkIsoTau_ResolutionPhi_C;
@@ -393,10 +407,23 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hRelIso_Rate_C;
   TH1D* hRelIso_Rate_I;
   TH1D* hRelIso_Rate_F;
-  TH1D* hIso_Rate;
-  TH1D* hIso_Rate_C;
-  TH1D* hIso_Rate_I;
-  TH1D* hIso_Rate_F;
+  TH1D* hVtxIsoLoose_Rate;
+  TH1D* hVtxIsoLoose_Rate_C;
+  TH1D* hVtxIsoLoose_Rate_I;
+  TH1D* hVtxIsoLoose_Rate_F;
+  TH1D* hVtxIsoTight_Rate;
+  TH1D* hVtxIsoTight_Rate_C;
+  TH1D* hVtxIsoTight_Rate_I;
+  TH1D* hVtxIsoTight_Rate_F;
+  TH1D* hRelIsoLoose_Rate;
+  TH1D* hRelIsoLoose_Rate_C;
+  TH1D* hRelIsoLoose_Rate_I;
+  TH1D* hRelIsoLoose_Rate_F;
+  TH1D* hRelIsoTight_Rate;
+  TH1D* hRelIsoTight_Rate_C;
+  TH1D* hRelIsoTight_Rate_I;
+  TH1D* hRelIsoTight_Rate_F;
+
   // SingleTau: Efficiencies
   TH1D* hCalo_Eff;  // Inclusive = C+I+F
   TH1D* hCalo_Eff_C;
@@ -414,10 +441,22 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hRelIso_Eff_C;
   TH1D* hRelIso_Eff_I;
   TH1D* hRelIso_Eff_F;      
-  TH1D* hIso_Eff;
-  TH1D* hIso_Eff_C;
-  TH1D* hIso_Eff_I;
-  TH1D* hIso_Eff_F;      
+  TH1D* hVtxIsoLoose_Eff;
+  TH1D* hVtxIsoLoose_Eff_C;
+  TH1D* hVtxIsoLoose_Eff_I;
+  TH1D* hVtxIsoLoose_Eff_F;      
+  TH1D* hVtxIsoTight_Eff;
+  TH1D* hVtxIsoTight_Eff_C;
+  TH1D* hVtxIsoTight_Eff_I;
+  TH1D* hVtxIsoTight_Eff_F;      
+  TH1D* hRelIsoLoose_Eff;
+  TH1D* hRelIsoLoose_Eff_C;
+  TH1D* hRelIsoLoose_Eff_I;
+  TH1D* hRelIsoLoose_Eff_F;      
+  TH1D* hRelIsoTight_Eff;
+  TH1D* hRelIsoTight_Eff_C;
+  TH1D* hRelIsoTight_Eff_I;
+  TH1D* hRelIsoTight_Eff_F;      
 
   // DiTau: Rates
   TH1D* hDiTau_Rate_Calo; // Inclusive = C+I+F
@@ -436,10 +475,22 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hDiTau_Rate_RelIso_C;
   TH1D* hDiTau_Rate_RelIso_I;
   TH1D* hDiTau_Rate_RelIso_F;
-  TH1D* hDiTau_Rate_Iso;
-  TH1D* hDiTau_Rate_Iso_C;
-  TH1D* hDiTau_Rate_Iso_I;
-  TH1D* hDiTau_Rate_Iso_F;
+  TH1D* hDiTau_Rate_VtxIsoLoose;
+  TH1D* hDiTau_Rate_VtxIsoLoose_C;
+  TH1D* hDiTau_Rate_VtxIsoLoose_I;
+  TH1D* hDiTau_Rate_VtxIsoLoose_F;
+  TH1D* hDiTau_Rate_VtxIsoTight;
+  TH1D* hDiTau_Rate_VtxIsoTight_C;
+  TH1D* hDiTau_Rate_VtxIsoTight_I;
+  TH1D* hDiTau_Rate_VtxIsoTight_F;
+  TH1D* hDiTau_Rate_RelIsoLoose;
+  TH1D* hDiTau_Rate_RelIsoLoose_C;
+  TH1D* hDiTau_Rate_RelIsoLoose_I;
+  TH1D* hDiTau_Rate_RelIsoLoose_F;
+  TH1D* hDiTau_Rate_RelIsoTight;
+  TH1D* hDiTau_Rate_RelIsoTight_C;
+  TH1D* hDiTau_Rate_RelIsoTight_I;
+  TH1D* hDiTau_Rate_RelIsoTight_F;
 
   // DiTau: Efficiencies
   TH1D* hDiTau_Eff_Calo; // Inclusive = C+I+F
@@ -458,58 +509,129 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hDiTau_Eff_RelIso_C;
   TH1D* hDiTau_Eff_RelIso_I;
   TH1D* hDiTau_Eff_RelIso_F;
-  TH1D* hDiTau_Eff_Iso;
-  TH1D* hDiTau_Eff_Iso_C;
-  TH1D* hDiTau_Eff_Iso_I;
-  TH1D* hDiTau_Eff_Iso_F;
-
-  // DiTau: (Calo-Other)
-  TH2D* hDiTau_Rate_Calo_Tk;
-  TH2D* hDiTau_Rate_Calo_VtxIso;
-  TH2D* hDiTau_Rate_Calo_RelIso;
-  TH2D* hDiTau_Rate_Calo_Iso;
-
-  TH2D* hDiTau_Eff_Calo_Tk;
-  TH2D* hDiTau_Eff_Calo_VtxIso;
-  TH2D* hDiTau_Eff_Calo_RelIso;
-  TH2D* hDiTau_Eff_Calo_Iso;
+  TH1D* hDiTau_Eff_VtxIsoLoose;
+  TH1D* hDiTau_Eff_VtxIsoLoose_C;
+  TH1D* hDiTau_Eff_VtxIsoLoose_I;
+  TH1D* hDiTau_Eff_VtxIsoLoose_F;
+  TH1D* hDiTau_Eff_VtxIsoTight;
+  TH1D* hDiTau_Eff_VtxIsoTight_C;
+  TH1D* hDiTau_Eff_VtxIsoTight_I;
+  TH1D* hDiTau_Eff_VtxIsoTight_F;
+  TH1D* hDiTau_Eff_RelIsoLoose;
+  TH1D* hDiTau_Eff_RelIsoLoose_C;
+  TH1D* hDiTau_Eff_RelIsoLoose_I;
+  TH1D* hDiTau_Eff_RelIsoLoose_F;
+  TH1D* hDiTau_Eff_RelIsoTight;
+  TH1D* hDiTau_Eff_RelIsoTight_C;
+  TH1D* hDiTau_Eff_RelIsoTight_I;
+  TH1D* hDiTau_Eff_RelIsoTight_F;
 
   // DiTau (Tk-Other)
   TH2D* hDiTau_Rate_Tk_VtxIso;
   TH2D* hDiTau_Rate_Tk_RelIso;
-  TH2D* hDiTau_Rate_Tk_Iso;
+  TH2D* hDiTau_Rate_Tk_VtxIsoLoose;
+  TH2D* hDiTau_Rate_Tk_VtxIsoTight;
+  TH2D* hDiTau_Rate_Tk_RelIsoLoose;
+  TH2D* hDiTau_Rate_Tk_RelIsoTight;
 
   TH2D* hDiTau_Eff_Tk_VtxIso;
   TH2D* hDiTau_Eff_Tk_RelIso;
-  TH2D* hDiTau_Eff_Tk_Iso;
+  TH2D* hDiTau_Eff_Tk_VtxIsoLoose;
+  TH2D* hDiTau_Eff_Tk_VtxIsoTight;
+  TH2D* hDiTau_Eff_Tk_RelIsoLoose;
+  TH2D* hDiTau_Eff_Tk_RelIsoTight;
 
   // Turn-Ons
   // TEfficiency* pEff; //fixme: convert all turn-ons
   TH1D* hMcHadronicTau_VisEt;
+  TH1D* hMcHadronicTau_VisEt_1pr;
+  TH1D* hMcHadronicTau_VisEt_3pr;
+  TH1D* hMcHadronicTau_VisEt_withNeutrals;
+  TH1D* hMcHadronicTau_VisEt_noNeutrals;
 
-  TH1D* hCalo_TurnOn50;
-  TH1D* hTk_TurnOn50;
-  TH1D* hVtxIso_TurnOn50;
-  TH1D* hRelIso_TurnOn50;
-  TH1D* hIso_TurnOn50;
-
-  TH1D* hCalo_TurnOn25;
   TH1D* hTk_TurnOn25;
+  TH1D* hTk_TurnOn25_1pr;
+  TH1D* hTk_TurnOn25_3pr;
+  TH1D* hTk_TurnOn25_withNeutrals;
+  TH1D* hTk_TurnOn25_noNeutrals;
+
   TH1D* hVtxIso_TurnOn25;
+  TH1D* hVtxIso_TurnOn25_1pr;
+  TH1D* hVtxIso_TurnOn25_3pr;
+  TH1D* hVtxIso_TurnOn25_withNeutrals;
+  TH1D* hVtxIso_TurnOn25_noNeutrals;
+
   TH1D* hRelIso_TurnOn25;
-  TH1D* hIso_TurnOn25;
+  TH1D* hRelIso_TurnOn25_1pr;
+  TH1D* hRelIso_TurnOn25_3pr;
+  TH1D* hRelIso_TurnOn25_withNeutrals;
+  TH1D* hRelIso_TurnOn25_noNeutrals;
 
-  TH1D* hCalo_TurnOn_SingleTau50KHz;
-  TH1D* hTk_TurnOn_SingleTau50KHz;
-  TH1D* hVtxIso_TurnOn_SingleTau50KHz;
-  TH1D* hRelIso_TurnOn_SingleTau50KHz;
-  TH1D* hIso_TurnOn_SingleTau50KHz;
+  TH1D* hVtxIsoLoose_TurnOn25;
+  TH1D* hVtxIsoLoose_TurnOn25_1pr;
+  TH1D* hVtxIsoLoose_TurnOn25_3pr;
+  TH1D* hVtxIsoLoose_TurnOn25_withNeutrals;
+  TH1D* hVtxIsoLoose_TurnOn25_noNeutrals;
 
-  TH1D* hCalo_TurnOn_DiTau50KHz;
-  TH1D* hTk_TurnOn_DiTau50KHz;
-  TH1D* hVtxIso_TurnOn_DiTau50KHz;
-  TH1D* hRelIso_TurnOn_DiTau50KHz;
-  TH1D* hIso_TurnOn_DiTau50KHz;
+  TH1D* hVtxIsoTight_TurnOn25;
+  TH1D* hVtxIsoTight_TurnOn25_1pr;
+  TH1D* hVtxIsoTight_TurnOn25_3pr;
+  TH1D* hVtxIsoTight_TurnOn25_withNeutrals;
+  TH1D* hVtxIsoTight_TurnOn25_noNeutrals;
+
+  TH1D* hRelIsoLoose_TurnOn25;
+  TH1D* hRelIsoLoose_TurnOn25_1pr;
+  TH1D* hRelIsoLoose_TurnOn25_3pr;
+  TH1D* hRelIsoLoose_TurnOn25_withNeutrals;
+  TH1D* hRelIsoLoose_TurnOn25_noNeutrals;
+
+  TH1D* hRelIsoTight_TurnOn25;
+  TH1D* hRelIsoTight_TurnOn25_1pr;
+  TH1D* hRelIsoTight_TurnOn25_3pr;
+  TH1D* hRelIsoTight_TurnOn25_withNeutrals;
+  TH1D* hRelIsoTight_TurnOn25_noNeutrals;
+
+  TH1D* hTk_TurnOn50;
+  TH1D* hTk_TurnOn50_1pr;
+  TH1D* hTk_TurnOn50_3pr;
+  TH1D* hTk_TurnOn50_withNeutrals;
+  TH1D* hTk_TurnOn50_noNeutrals;
+
+  TH1D* hVtxIso_TurnOn50;
+  TH1D* hVtxIso_TurnOn50_1pr;
+  TH1D* hVtxIso_TurnOn50_3pr;
+  TH1D* hVtxIso_TurnOn50_withNeutrals;
+  TH1D* hVtxIso_TurnOn50_noNeutrals;
+
+  TH1D* hRelIso_TurnOn50;
+  TH1D* hRelIso_TurnOn50_1pr;
+  TH1D* hRelIso_TurnOn50_3pr;
+  TH1D* hRelIso_TurnOn50_withNeutrals;
+  TH1D* hRelIso_TurnOn50_noNeutrals;
+
+  TH1D* hVtxIsoLoose_TurnOn50;
+  TH1D* hVtxIsoLoose_TurnOn50_1pr;
+  TH1D* hVtxIsoLoose_TurnOn50_3pr;
+  TH1D* hVtxIsoLoose_TurnOn50_withNeutrals;
+  TH1D* hVtxIsoLoose_TurnOn50_noNeutrals;
+
+  TH1D* hVtxIsoTight_TurnOn50;
+  TH1D* hVtxIsoTight_TurnOn50_1pr;
+  TH1D* hVtxIsoTight_TurnOn50_3pr;
+  TH1D* hVtxIsoTight_TurnOn50_withNeutrals;
+  TH1D* hVtxIsoTight_TurnOn50_noNeutrals;
+
+  TH1D* hRelIsoLoose_TurnOn50;
+  TH1D* hRelIsoLoose_TurnOn50_1pr;
+  TH1D* hRelIsoLoose_TurnOn50_3pr;
+  TH1D* hRelIsoLoose_TurnOn50_withNeutrals;
+  TH1D* hRelIsoLoose_TurnOn50_noNeutrals;
+
+  TH1D* hRelIsoTight_TurnOn50;
+  TH1D* hRelIsoTight_TurnOn50_1pr;
+  TH1D* hRelIsoTight_TurnOn50_3pr;
+  TH1D* hRelIsoTight_TurnOn50_withNeutrals;
+  TH1D* hRelIsoTight_TurnOn50_noNeutrals;
 
 };
 

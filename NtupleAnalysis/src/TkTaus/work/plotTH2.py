@@ -174,8 +174,8 @@ def main(opts):
                 continue
             if "DiTau" in h:
                 continue
-            #if "L1TkIsoTau" in h:
-            #    continue
+            if "L1TkIsoTau" in h:
+                continue
 
             # For-loop: All datasets
             for d in datasetsMgr.getAllDatasetNames():
@@ -247,7 +247,8 @@ def GetHistoKwargs(h, opts):
         _kwargs["xlabel"] = "vertex isolation (cm)"# / %.2f (cm)"
         _kwargs["ylabel"] = "relative isolation"# / %.2f"
         #_kwargs["opts"]   = {"xmin": 0.0, "xmax": 3.2, "ymin": 0.0, "ymax": 5.0}
-        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.6, "ymin": 0.0, "ymax": 3.0}
+        #_kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.6, "ymin": 0.0, "ymax": 3.0}
+        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 5.0, "ymin": 0.0, "ymax": 3.0}
         _kwargs["rebinX"] = 1
         _kwargs["rebinY"] = 1
         _kwargs["cutBox"]  = {"cutValue": 0.50, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
@@ -417,7 +418,7 @@ def Plot2dHistograms(datasetsMgr, dsetName, histoName, index):
         xmin =   0
         xmax =  30
     if "GenP_PtLdg_Vs" in histoName:
-        const=   2.0
+        const=   2.3#2.0
         coeff=   1.0
         step = 100
         xmin =   0
@@ -429,7 +430,7 @@ def Plot2dHistograms(datasetsMgr, dsetName, histoName, index):
         xmin =   0
         xmax =   0#3
 
-    if "GenP_PtLdg_Vs" in histoName:
+    if "GenP_VisEt_Vs" in histoName or "GenP_PtLdg_Vs" in histoName:
         gr = getCustomTGraph(histoName, const, coeff, xmin, xmax, step)
         gr.SetLineWidth(3)
         gr.Draw("L same")
