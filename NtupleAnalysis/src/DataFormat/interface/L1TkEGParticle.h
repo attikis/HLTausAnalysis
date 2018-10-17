@@ -31,7 +31,11 @@ class L1TkEGParticle{
   vector<EG> GetEGs() const{ return theEGs;}
   bool HasMatchingGenParticle(void) const{return theMatching;}
   
+  GenParticle GetMatchingGenParticle() const {return theGenTau;}
+  TLorentzVector GetTotalP4();
+  
   double GetTrackBasedPt();  
+  double GetTotalPt();
   double GetTrackInvMass();
   double GetEGInvMass();
   double GetGenTauPt();

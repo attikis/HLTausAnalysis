@@ -60,8 +60,9 @@ EG::EG(unsigned short Index,
   thezVtx        = zVtx;
   theHwQual      = HwQual;
 
-  theP4.SetPtEtaPhiM( sqrt(Et*Et-pionMass*pionMass), Eta, Phi, pionMass); // WARNING: Assumes pion mass for EG clusters 
-  
+  //theP4.SetPtEtaPhiM( sqrt(Et*Et-pionMass*pionMass), Eta, Phi, pionMass); // WARNING: Assumes pion mass for EG clusters 
+  theP4.SetPtEtaPhiM( sqrt( (Et/(sin(2*atan(exp(-Eta)))))*(Et/(sin(2*atan(exp(-Eta))))) - pionMass*pionMass )*sin(2*atan(exp(-Eta))), Eta, Phi, pionMass);
+
   if (0) PrintProperties();
 }
 

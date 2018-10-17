@@ -19,7 +19,7 @@ config.section_("General")
 config.General.requestName = rName
 config.General.workArea = dirName
 config.General.transferOutputs = True
-config.General.transferLogs = True
+config.General.transferLogs = False #jobs stuck in transferring 
 # options:
 #config.General.failureLimit
 #config.General.instance

@@ -105,16 +105,54 @@ def GetDatasetsFromDir(opts):
 def PlotHisto(datasetsMgr, h):
     dsetsMgr = datasetsMgr.deepCopy()
 
+    if "eff" in h.lower():
+        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False)
+        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False)
+        opts.normalizeToOne = False
+    elif "resolution" in h.lower():
+        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False)
+        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False)
+    elif "rate" in h.lower():
+        opts.normalizeToOne = False
+        for d in dsetsMgr.getAllDatasetNames():
+            if "SingleNeutrino" in d:
+                continue
+            else:
+                dsetsMgr.remove(d, close=False)
+    else:
+        pass
+        
+
     
     # Create the MC Plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
     kwargs = {}
+    '''
+    hList  = getHistoList(dsetsMgr, h)
+
+    if opts.normalizeToOne:
+        if 1:
+            p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[], **kwargs)
+            p.histoMgr.forEachHisto(lambda h: h.getRootHisto().Scale(1.0/h.getRootHisto().Integral()) )
+        else:
+            # p = plots.MCPlot(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
+            p = plots.PlotSameBase(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
+    else:
+        if 1:
+            p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[], **kwargs) #FIXME
+        else:
+            # p = plots.MCPlot(dsetsMgr, h, normalizeToLumi=opts.intLumi, saveFormats=[], **kwargs)
+            p = plots.PlotSameBase(dsetsMgr, h, saveFormats=[], **kwargs)
+    
+    '''
     if opts.normalizeToOne:
         #p = plots.MCPlot(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
         p = plots.PlotSameBase(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
     else:
         #p = plots.MCPlot(dsetsMgr, h, normalizeToLumi=opts.intLumi, saveFormats=[], **kwargs)
         p = plots.PlotSameBase(dsetsMgr, h, saveFormats=[], **kwargs) #def __init__(self, datasetMgr, name, normalizeToOne=False, datasetRootHistoArgs={}, **kwargs):
+
     
+
     # Set default styles (Called by default in MCPlot)
     p._setLegendStyles()
     p._setLegendLabels()
@@ -147,6 +185,15 @@ def PlotHisto(datasetsMgr, h):
     return
 
 
+def getHistoList(datasetsMgr, histoName):
+    hList = []
+    # For-loop: All dataset names
+    for d in datasetsMgr.getAllDatasetNames():
+        h = datasetsMgr.getDataset(d).getDatasetRootHisto(histoName)
+        hList.append(h)
+    return hList
+
+
 def GetHistoKwargs(h, opts):
     
     hName   = h.lower()
@@ -157,6 +204,7 @@ def GetHistoKwargs(h, opts):
     _units  = ""
     _format = "%0.0f " + _units
     _cutBox = {"cutValue": 10.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+    _cutBoxY= {"cutValue": 50.0, "fillColor": 16, "box": False, "line": False, "cutGreaterThan"   : False}
     _leg   = {"dx": -0.5, "dy": -0.3, "dh": -0.4}
     _ratio = True
     _log   = False
@@ -170,8 +218,60 @@ def GetHistoKwargs(h, opts):
         if _yMin == 0.0:
             _yMin = 1e-3
         _yMaxF = 10
-            
 
+    # Efficiency & Rate plots
+    if "eff" in hName:
+        _units  = "GeV"
+        _format = "%0.0f " + _units
+        _xLabel = "E_{T} (%s)" % (_units)
+        _cutBox = {"cutValue": 20.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _rebinX = 1
+        _yLabel = "Efficiency / %.0f " + _units
+    if "counters" in hName:
+        _units  = ""
+        _format = "%0.0f " + _units
+        _xLabel = "counters"
+        _rebinX = 1
+        #_xMax   = +10.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
+    if "rate" in hName:
+        _units  = "GeV"
+        _format = "%0.0f " + _units
+        _xLabel = "E_{T} (%s)" % (_units)
+        _cutBox = {"cutValue": 50.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        _cutBoxY= {"cutValue": 50, "fillColor": 16, "box": False, "line": True, "cutGreaterThan"   : False}
+        _rebinX = 1
+        _yLabel = "Rate (kHz) / %.0f " + _units
+        _log    = True
+        _yMin   = 1e+0
+        _xMax   = 250.0
+        
+    if "etresolution" in hName:
+        _units  = ""
+        _format = "%0.2f " + _units
+        #_xLabel = "(E_{T}^{calo} - p_{T}^{vis}) / p_{T}^{vis}"
+        _xLabel = "#deltaE_{T} / p_{T}^{vis}"
+        _rebinX = 1
+        _xMin   = -4.0 #-5.5
+        _xMax   = +4.0 #+5.5
+
+    if "etaresolution" in hName:
+        # _xLabel = "(#eta^{calo} - #eta^{vis}) / #eta^{vis}"
+        _xLabel = "#delta#eta / #eta^{vis}"
+        _xMin   = -4.0 #-5.5
+        _xMax   = +4.0 #+5.5
+        _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+
+    if "phiresolution" in hName:
+        _units  = ""
+        _format = "%0.2f " + _units
+        #_xLabel = "#phi^{calo} - #phi^{vis} / #phi^{vis}"
+        _xLabel = "#delta#phi / #phi^{vis}"
+        _rebinX = 1
+        _xMin   = -2.0 #-5.0
+        _xMax   = +2.0 #+5.0
+        _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     _kwargs = {
         #"xlabel"           : _xLabel,
@@ -190,16 +290,21 @@ def GetHistoKwargs(h, opts):
         "opts"             : {"ymin": _yMin, "ymaxfactor": _yMaxF},
         "log"              : _log,
         "cutBox"           : _cutBox,
+        "cutBoxY"          : _cutBoxY,
         "createLegend"     : None #_leg,
         }
 
     kwargs = copy.deepcopy(_kwargs)
 
+    if "nstubs" in hName:
+        kwargs["opts"]   = {"xmin": 0.0, "xmax": 10, "ymin": _yMin, "ymaxfactor": _yMaxF}
+                
+
     if "multiplicity" in h.lower():
         kwargs["opts"]   = {"xmin": -0.5, "xmax": 20, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "multiplicitypercluster" in h.lower():
-        kwargs["opts"]   = {"xmin": -0.5, "xmax": 10.5, "ymin": _yMin, "ymax" : 1.2, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": -0.5, "xmax": 6.5, "ymin": _yMin, "ymax" : 1.2, "ymaxfactor": _yMaxF}
 
     if "mcmatch_chargeddaugh_n" in h.lower():
         kwargs["xlabel"] = "Number of daughters^{+} of matched gen-#tau"
@@ -212,7 +317,7 @@ def GetHistoKwargs(h, opts):
     if "chargeddaugh_totalmass" in h.lower():
         kwargs["log"]  = True
         kwargs["opts"] = {"xmin": 0.0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
-        kwargs["cutBox"] = {"cutValue": 1.77, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        kwargs["cutBox"] = {"cutValue": 1.4, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if "neutraldaugh_totalmass" in h.lower():
         kwargs["log"]  = True
@@ -245,22 +350,47 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
 
     if "trkClusters_Pt" == h:
-        kwargs["opts"]   = {"xmin": 0, "xmax": 150.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "clustegs_eta" in h.lower():
          kwargs["opts"]   = {"xmin": -2.0, "xmax": 2.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
-    if "reliso" in h.lower():
-         kwargs["opts"]   = {"xmin": 0.0, "xmax": 2.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+    if "tkeg_reliso" in h.lower():
+         kwargs["opts"]   = {"xmin": 0.0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
+         kwargs["cutBox"] = {"cutValue": 0.10, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+         kwargs["log"]  = True
+
+    if "tkeg_vtxiso" in h.lower():
+         kwargs["opts"]   = {"xmin": 0.0, "xmax": 4.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
+         kwargs["cutBox"] = {"cutValue": 0.20, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+         kwargs["log"]  = True
+
 
     if "EGClusters_M" == h:
-        kwargs["opts"]   = {"xmin": 0, "xmax": 4.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+
+    if "EGClusters_Et" == h:
+        kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+
+    if "TkEG_ET" == h:
+        kwargs["opts"]   = {"xmin": 0, "xmax": 120.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
+        kwargs["log"]  = True
+
+
+    if "tkeg_invmass" in hName:
+        kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
+        kwargs["log"]  = True
+        kwargs["cutBox"] = {"cutValue": 1.77, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+
 
     if "leadtrks_multiplicity" in h.lower():
         kwargs["opts"]   = {"xmin": 0, "xmax": 10.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "leadtrk_eg_drmin" in h.lower():
-        kwargs["opts"]   = {"xmin": 0, "xmax": 5.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["log"]  = True
+        kwargs["opts"]   = {"xmin": 0, "xmax": 5.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
+        kwargs["cutBox"] = {"cutValue": 0.3, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+
 
     if "leadtrks_pt" in h.lower():
         _yLabel = "Arbitrary Units / %.0f "
@@ -295,10 +425,25 @@ def GetHistoKwargs(h, opts):
     if "dz0" in h.lower():
         kwargs["log"]  = True
         kwargs["opts"] = {"xmin": 0.0, "xmax": 10.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
+        kwargs["cutBox"] = {"cutValue": 0.8, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+
+    if "etresolution" in hName or "ptresolution" in hName:
+        kwargs["opts"] = {"xmin": -1.0, "xmax": 1.0, "ymin": 0.0, "ymaxfactor": _yMaxF}
+        kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+
+    if "etaresolution" in hName:
+        kwargs["opts"] = {"xmin": -0.5, "xmax": 0.5, "ymin": 0.0, "ymaxfactor": _yMaxF}
+        kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+
+    if "phiresolution" in hName:
+        kwargs["opts"] = {"xmin": -0.5, "xmax": 0.5, "ymin": 0.0, "ymaxfactor": _yMaxF}
+        kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        
+
 
     return kwargs
 
-def GetBinwidthDecimals(binWidth):                                                                                                                                        
+def GetBinwidthDecimals(binWidth):                                                                                                                                   
     dec =  " %0.0f"
     if binWidth < 1:
         dec = " %0.1f"
@@ -315,6 +460,33 @@ def GetBinwidthDecimals(binWidth):
     if binWidth < 0.000001:
         dec =  " %0.7f"
     return dec
+
+def ReorderDatasets(datasets):
+    newOrder =  datasets
+    
+    for i, d in enumerate(datasets, 0):
+        if "PU200" in d:
+            newOrder.remove(d)
+            newOrder.insert(0, d)
+            #newOrder.insert(0, newOrder.pop(i))
+    for j, d in enumerate(datasets, 0):
+        if "PU140" in d:
+            newOrder.remove(d)
+            newOrder.insert(0, d)
+    for k, d in enumerate(datasets, 0):
+        if "noPU" in d:
+            newOrder.remove(d)
+            newOrder.insert(0, d)
+    
+    mb140 = "SingleNeutrino_L1TPU140"
+    mb200 = "SingleNeutrino_L1TPU200"
+    if mb140 in datasets:
+        newOrder.remove(mb140)
+        newOrder.insert(len(newOrder), mb140)
+    if mb200 in datasets:
+        newOrder.remove(mb200)
+        newOrder.insert(len(newOrder), mb200)
+    return newOrder
 
 
 def main(opts):
@@ -366,19 +538,7 @@ def main(opts):
         intLumi = datasetsMgr.getDataset("Data").getLuminosity()
 
     # Apply new dataset order?
-    newOrder = datasetsMgr.getAllDatasetNames()
-    for i, d in  enumerate(datasetsMgr.getAllDatasetNames(), 0):
-        if "noPU" in d:
-            newOrder.insert(0, newOrder.pop(i))
-        if "PU200" in d:
-            newOrder.insert(2, newOrder.pop(i))
-        if "Neutrino" in d:
-            newOrder.insert(len(newOrder), newOrder.pop(i))
-    for i, d in  enumerate(datasetsMgr.getAllDatasetNames(), 0):
-        if "PU140" in d:
-            newOrder.insert(1, newOrder.pop(i))
-        if "Neutrino" in d:
-            newOrder.insert(len(newOrder), newOrder.pop(i))
+    newOrder = ReorderDatasets(datasetsMgr.getAllDatasetNames())
     datasetsMgr.selectAndReorder(newOrder)
 
     # Print dataset information (after merge)
@@ -397,7 +557,7 @@ def main(opts):
         
         # Obsolete quantity
         #if h in skipList:
-        if "counters" in h.lower():
+        if "counter" in h.lower():
             continue
 
         histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))
