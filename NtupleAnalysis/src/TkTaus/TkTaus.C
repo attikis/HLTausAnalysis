@@ -72,7 +72,7 @@ void TkTaus::InitVars_()
   // Isolation cone
   isoCone_Constant = +2.5;          // 2.3 by fit on fit on ldg pT (Fotis)
   isoCone_dRMin    = sigCone_dRMax; // 0.4
-  isoCone_dRMax    = +0.30;         // 0.30
+  isoCone_dRMax    = +0.25;         // 0.30
 
   // Isolation variables
   vtxIso_WP  = +0.50;  // 0.5 cm
