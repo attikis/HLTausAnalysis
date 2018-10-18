@@ -199,7 +199,8 @@ def GetHistoKwargs(h, opts):
         }
     return _kwargs
 
-def GetBinwidthDecimals(binWidth):                                                                                                                                        
+def GetBinwidthDecimals(binWidth):                                                
+
     dec =  " %0.0f"
     if binWidth < 1:
         dec = " %0.1f"
@@ -216,6 +217,34 @@ def GetBinwidthDecimals(binWidth):
     if binWidth < 0.000001:
         dec =  " %0.7f"
     return dec
+
+
+def ReorderDatasets(datasets):
+    newOrder =  datasets
+    
+    for i, d in enumerate(datasets, 0):
+        if "PU200" in d:
+            newOrder.remove(d)
+            newOrder.insert(0, d)
+            #newOrder.insert(0, newOrder.pop(i))
+    for j, d in enumerate(datasets, 0):
+        if "PU140" in d:
+            newOrder.remove(d)
+            newOrder.insert(0, d)
+    for k, d in enumerate(datasets, 0):
+        if "noPU" in d:
+            newOrder.remove(d)
+            newOrder.insert(0, d)
+    
+    mb140 = "SingleNeutrino_L1TPU140"
+    mb200 = "SingleNeutrino_L1TPU200"
+    if mb140 in datasets:
+        newOrder.remove(mb140)
+        newOrder.insert(len(newOrder), mb140)
+    if mb200 in datasets:
+        newOrder.remove(mb200)
+        newOrder.insert(len(newOrder), mb200)
+    return newOrder
 
 
 def main(opts):
@@ -265,21 +294,9 @@ def main(opts):
     # Get Luminosity
     if 0:
         intLumi = datasetsMgr.getDataset("Data").getLuminosity()
-
+        
     # Apply new dataset order?
-    newOrder = datasetsMgr.getAllDatasetNames()
-    for i, d in  enumerate(datasetsMgr.getAllDatasetNames(), 0):
-        if "noPU" in d:
-            newOrder.insert(0, newOrder.pop(i))
-        if "PU200" in d:
-            newOrder.insert(2, newOrder.pop(i))
-        if "Neutrino" in d:
-            newOrder.insert(len(newOrder), newOrder.pop(i))             
-    for i, d in  enumerate(datasetsMgr.getAllDatasetNames(), 0):
-        if "PU140" in d:
-            newOrder.insert(1, newOrder.pop(i))
-        if "Neutrino" in d:
-            newOrder.insert(len(newOrder), newOrder.pop(i))
+    newOrder = ReorderDatasets(datasetsMgr.getAllDatasetNames())
     datasetsMgr.selectAndReorder(newOrder)
 
     # Print dataset information (after merge)

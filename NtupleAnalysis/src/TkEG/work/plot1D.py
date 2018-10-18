@@ -344,10 +344,7 @@ def GetHistoKwargs(h, opts):
     if "trkClusters_M" == h:
         kwargs["log"]  = True
         kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
-
-    if "trkClusters_M_beforeCut" == h:
-        kwargs["log"]  = True
-        kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
+        kwargs["cutBox"] = {"cutValue": 1.4, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if "trkClusters_Pt" == h:
         kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
@@ -362,7 +359,7 @@ def GetHistoKwargs(h, opts):
 
     if "tkeg_vtxiso" in h.lower():
          kwargs["opts"]   = {"xmin": 0.0, "xmax": 4.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
-         kwargs["cutBox"] = {"cutValue": 0.20, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+         kwargs["cutBox"] = {"cutValue": 1.00, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
          kwargs["log"]  = True
 
 
@@ -376,6 +373,9 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0, "xmax": 120.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
         kwargs["log"]  = True
 
+    if "chf" in hName or "nhf" in hName:
+        kwargs["opts"]   = {"xmin": 0, "xmax": 1.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
+        kwargs["log"]  = True
 
     if "tkeg_invmass" in hName:
         kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
@@ -432,11 +432,11 @@ def GetHistoKwargs(h, opts):
         kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if "etaresolution" in hName:
-        kwargs["opts"] = {"xmin": -0.5, "xmax": 0.5, "ymin": 0.0, "ymaxfactor": _yMaxF}
+        kwargs["opts"] = {"xmin": -0.3, "xmax": 0.3, "ymin": 0.0, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if "phiresolution" in hName:
-        kwargs["opts"] = {"xmin": -0.5, "xmax": 0.5, "ymin": 0.0, "ymaxfactor": _yMaxF}
+        kwargs["opts"] = {"xmin": -0.3, "xmax": 0.3, "ymin": 0.0, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         
 
