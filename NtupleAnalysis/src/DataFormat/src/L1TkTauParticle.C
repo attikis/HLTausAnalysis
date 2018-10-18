@@ -96,6 +96,99 @@ void L1TkTauParticle::SetIsolationConeSize(double deltaR_min, double deltaR_max)
 
 
 
+//============================================================================
+double L1TkTauParticle::CalculateRelIso(const double deltaZ0_max,
+					bool bStoreValue,
+					bool bInvert_deltaZ0)
+
+//============================================================================
+{
+
+  // Store default values
+  // SetRelIsolation(0.0);
+  
+  // Return not Tk-Confirmed
+  if (!HasMatchingTk()) return 0.0; 
+
+  // If no tracks found in the isoalation cone return
+  vector<TTTrack> isoConeTks = GetIsoConeTTTracks();
+  if ( (isoConeTks.size() < 1) )  return 0.0;
+
+  // Initialise variables
+  TTTrack matchTk = GetMatchingTk();
+  double isoTks_scalarSumPt  = 0.0;
+  double deltaZ0 = 999.9;
+  double relIso  = 0.0;
+  
+  // For-loop: All Tracks in isolation cone 
+  for (size_t i = 0; i < isoConeTks.size(); i++)
+    {
+      TTTrack isoConeTk = isoConeTks.at(i);
+      
+      
+      // Find the track closest in Z0
+      deltaZ0 = abs(matchTk.getZ0() - isoConeTk.getZ0());
+
+      // Decide on type of calculation
+      bool considerTk  = false;
+      bool considerTk_default = (deltaZ0 < deltaZ0_max);
+      bool considerTk_invert  = (deltaZ0 > deltaZ0_max);
+      if (bInvert_deltaZ0) considerTk = considerTk_invert;
+      else considerTk = considerTk_default;
+      
+      // Add-up the pT of alltracks in isolation cone/annulus
+      if (considerTk) isoTks_scalarSumPt += isoConeTk.getPt();
+    }
+
+  // Calculated + Assign value of relative isolation
+  relIso = isoTks_scalarSumPt/matchTk.getPt();
+  if (bStoreValue) SetRelIsolation(relIso);
+  
+  return relIso;
+}
+
+
+//============================================================================
+double L1TkTauParticle::CalculateVtxIso(bool bStoreValue)
+//============================================================================
+{
+
+  // Store default values
+  double deltaZ0 = 999.9;
+  double deltaZ0_tmp = 999.9;
+  if (bStoreValue) SetVtxIsolation(deltaZ0);
+  
+  // Return not Tk-Confirmed
+  if (!HasMatchingTk()) return 999.9; 
+
+  // If no tracks found in the isoalation cone return
+  vector<TTTrack> isoConeTks = GetIsoConeTTTracks();
+  if ( (isoConeTks.size() < 1) )  return 999.9;
+
+  // Initialise variables
+  TTTrack matchTk = GetMatchingTk();
+  
+  // For-loop: All Tracks in isolation cone 
+  for (size_t i = 0; i < isoConeTks.size(); i++)
+    {
+      TTTrack isoConeTk = isoConeTks.at(i);
+      
+      // Find the track closest in Z0
+      deltaZ0_tmp = abs(matchTk.getZ0() - isoConeTk.getZ0());
+      
+      if (deltaZ0_tmp < deltaZ0)
+      	{
+	  deltaZ0 = deltaZ0_tmp;
+      	  if (bStoreValue) SetVtxIsolation(deltaZ0);
+	  if (bStoreValue) SetVtxIsolationTrack(isoConeTk);
+      	}
+    }
+
+  // Calculated + Assign value of relative isolation
+  return deltaZ0;
+}
+
+
 //****************************************************************************
 void L1TkTauParticle::SetMatchGenp(int matchGenp_Index, double matchGenp_deltaR) 
 //****************************************************************************

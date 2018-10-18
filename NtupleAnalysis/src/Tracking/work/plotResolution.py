@@ -12,9 +12,11 @@ USAGE:
 EXAMPLES:
 ./plotResolution.py -m multicrab_CaloTkSkim_v92X_20180711T1118/ --gridX --gridY --formats .png,.pdf,.C
 ./plotResolution.py -m multicrab_CaloTkSkim_v92X_20180711T1118/
+./plotResolution.py -i TT_TuneCUETP8M2T4_14TeV_L1TPU140 --url -m multicrab_Tracking_v92X_FitParams4Pt2Eta999Stubs0_14h58m32s_15Oct2018
+
 
 LAST USED:
-./plotResolution.py -m multicrab_CaloTk_v92X_17h36m07s_12Sep2018 -i TT_TuneCUETP8M2T4_14TeV_L1TPU140 --url
+./plotResolution.py -i TT_TuneCUETP8M2T4_14TeV_L1TPU140 --gridX --url -m 
 
 '''
 
@@ -167,7 +169,7 @@ def main(opts):
     # Plot Histograms
     histoList  = datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDirectoryContent(opts.folder)
     histoPaths = [os.path.join(opts.folder, h) for h in histoList]
-    skipList   = ["eff_", "counter", "match_trk", "match_tp", "tp_pt", "tp_eta"]
+    skipList   = ["eff_", "counter", "match_trk", "match_tp", "tp_pt", "tp_eta", "resVsEta_ptRel", "resVsPt_ptRel"]
     histoList  = []
     allowedReg = ["C", "I", "F", "L", "M", "H"]
 
@@ -268,14 +270,17 @@ def GetHistoKwargs(h, opts):
 
         if ("resVsPt_pt" in h):
             kwargs["ylabel"] = "p_{T} resolution / " + format
+            # kwargs["ylabel"] = "(p_{T}^{tk} - p_{T}^{tp})" + format
 
         if ("resVsPt_ptRel" in h):
             ROOT.TGaxis.SetMaxDigits(2) # force scientific scale        
             kwargs["ylabel"] = "relative p_{T} resolution / " + format
-
+            #kwargs["ylabel"] = "(p_{T}^{tk} - p_{T}^{tp}) / p_{T}^{tp} / " + format
+            
         if ("resVsPt_eta" in h):
             ROOT.TGaxis.SetMaxDigits(2) # force scientific scale
             kwargs["ylabel"] = "#eta resolution / " + format
+            #kwargs["ylabel"] = "(eta^{tk} - eta^{tp})" + format
 
         if ("resVsPt_phi" in h):
             ROOT.TGaxis.SetMaxDigits(2) # force scientific scale
@@ -326,7 +331,7 @@ def GetHistoKwargs(h, opts):
             kwargs["opts"] = {"xmin": -3.0, "xmax": 3.0, "ymin": 1e-4, "ymaxfactor": 2.0}
 
         if ("res_ptRel" in h): # = (tk_Pt - tp_Pt)/(tp_Pt)
-            kwargs["ylabel"] = "Arbitrary units / %.2f"
+            kwargs["ylabel"] = "Arbitrary units / %.3f"
             kwargs["opts"] = {"xmin": -0.2, "xmax": 0.2, "ymin": 1e-4, "ymaxfactor": 2.0}
 
         if ("res_eta" in h): # = (tk_Eta - tp_Eta)
@@ -338,7 +343,7 @@ def GetHistoKwargs(h, opts):
             kwargs["opts"]   = {"xmin": -0.02, "xmax": 0.02, "ymin": 1e-4, "ymaxfactor": 2.0}
 
         if ("res_z0" in h): # = (tk_Phi - tp_Phi)
-            kwargs["ylabel"] = "Arbitrary units / %.4f cm"
+            kwargs["ylabel"] = "Arbitrary units / %.3f cm"
             kwargs["opts"] = {"xmin": -1.0, "xmax": 1.0, "ymin": 1e-4, "ymaxfactor": 2.0}
 
         if ("res_d0" in h): # = (tk_d0 - tp_d0)
@@ -549,7 +554,7 @@ if __name__ == "__main__":
 
     # Determine path for saving plots
     if opts.saveDir == None:
-        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="", postfix="Tracking")
+        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="")
     else:
         print "opts.saveDir = ", opts.saveDir
 
