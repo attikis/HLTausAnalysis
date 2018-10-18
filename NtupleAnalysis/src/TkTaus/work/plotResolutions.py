@@ -174,14 +174,14 @@ def main(opts):
             PU = s.split("PU")[1]
             
             # By decay mode
-            #PlotHistos(datasetsMgr, resList[0], s, PU, "ResolutionEt_%s_all" % (s) )
-            #PlotHistos(datasetsMgr, resList[1], s, PU, "ResolutionEta_%s_all" % (s) )
-            #PlotHistos(datasetsMgr, resList[2], s, PU, "ResolutionPhi_%s_all" % (s) )
+            PlotHistos(datasetsMgr, resList[0], s, PU, "ResolutionEt_%s_all" % (s) )
+            PlotHistos(datasetsMgr, resList[1], s, PU, "ResolutionEta_%s_all" % (s) )
+            PlotHistos(datasetsMgr, resList[2], s, PU, "ResolutionPhi_%s_all" % (s) )
             
             # By eta region (central, intermediate, forward)
-            #PlotHistos(datasetsMgr, resList[3], s, PU, "ResolutionEt_%s_cif"  % (s) )
+            PlotHistos(datasetsMgr, resList[3], s, PU, "ResolutionEt_%s_cif"  % (s) )
             PlotHistos(datasetsMgr, resList[4], s, PU, "ResolutionEta_%s_cif" % (s) )
-            #PlotHistos(datasetsMgr, resList[5], s, PU, "ResolutionPhi_%s_cif" % (s) )
+            PlotHistos(datasetsMgr, resList[5], s, PU, "ResolutionPhi_%s_cif" % (s) )
         print
 
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
@@ -251,7 +251,7 @@ def PlotHistos(datasetsMgr, histoList, signal, PU, saveName=None):
 def GetHistoKwargs(h, opts):
     _mvLeg1 = {"dx": -0.15, "dy": -0.00, "dh": -0.0}
     _mvLeg2 = {"dx": -0.00, "dy": -0.00, "dh": -0.0}
-    logY    = True
+    logY    = False
     yMin    = 0.0
     if logY:
         yMin = 1
@@ -289,12 +289,13 @@ def GetHistoKwargs(h, opts):
         #_kwargs["moveLegend"] = _mvLeg1
     if "resolutioneta_" in h.lower():
         _kwargs["xlabel"]     = "#delta#eta / #eta^{vis}"
-        _kwargs["opts"]       = {"xmin": -3.2, "xmax": 3.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
-        #_kwargs["opts"]       = {"xmin": -1.2, "xmax": 1.2, "ymin": 0.8e-6, "ymaxfactor": yMaxF}
+        #_kwargs["opts"]       = {"xmin": -3.2, "xmax": 3.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": -0.3, "xmax": 0.3, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         _kwargs["rebinX"]     = 1
     if "resolutionphi_" in h.lower():
         _kwargs["xlabel"]     = "#delta#phi / #phi^{vis}"
-        _kwargs["opts"]       = {"xmin": -2.2, "xmax": 2.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": -0.3, "xmax": 0.3, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
+        #_kwargs["opts"]       = {"xmin": -2.2, "xmax": 2.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         _kwargs["rebinX"]     = 1
 
     if "cif" in h.lower():
