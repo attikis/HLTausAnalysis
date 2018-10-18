@@ -215,7 +215,6 @@ class TkEG : public TreeAnalyserMC{
   TH2D* h_Pion0Et_Vs_PhotonsDR;
   TH1D* h_Photons_EGs_Matching;
 
-  TH1D* h_trk_Chi2_all_4stubs;
   TH1D* h_trk_Chi2_all_5stubs;
   TH1D* h_leadTrk4stubs_MCmatched_Chi2;
   TH1D* h_trk_Chi2_all;
@@ -303,42 +302,44 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_InvMass;
   TH1D* h_TkEG_CHF;
   TH1D* h_TkEG_NHF;
+  TH1D* h_TkEG_CHF_withNeutrals;
+  TH1D* h_TkEG_NHF_withNeutrals;
 
   TH1D* h_TkEG_PtResolution;
   TH1D* h_TkEG_PtResolution_C;
   TH1D* h_TkEG_PtResolution_I;
   TH1D* h_TkEG_PtResolution_F;
-  TH1D* h_TkEG_PtResolution_NoNeuDaugh;
-  TH1D* h_TkEG_PtResolution_WhenNeuDaugh;
-  TH1D* h_TkEG_PtResolution_OneProng;
-  TH1D* h_TkEG_PtResolution_ThreeProng;
+  TH1D* h_TkEG_PtResolution_noNeutrals;
+  TH1D* h_TkEG_PtResolution_withNeutrals;
+  TH1D* h_TkEG_PtResolution_1pr;
+  TH1D* h_TkEG_PtResolution_3pr;
   
   TH1D* h_TkEG_EtResolution;
   TH1D* h_TkEG_EtResolution_C;
   TH1D* h_TkEG_EtResolution_I;
   TH1D* h_TkEG_EtResolution_F;
-  TH1D* h_TkEG_EtResolution_NoNeuDaugh;
-  TH1D* h_TkEG_EtResolution_WhenNeuDaugh;
-  TH1D* h_TkEG_EtResolution_OneProng;
-  TH1D* h_TkEG_EtResolution_ThreeProng;
+  TH1D* h_TkEG_EtResolution_noNeutrals;
+  TH1D* h_TkEG_EtResolution_withNeutrals;
+  TH1D* h_TkEG_EtResolution_1pr;
+  TH1D* h_TkEG_EtResolution_3pr;
   
   TH1D* h_TkEG_EtaResolution;
   TH1D* h_TkEG_EtaResolution_C;
   TH1D* h_TkEG_EtaResolution_I;
   TH1D* h_TkEG_EtaResolution_F;
-  TH1D* h_TkEG_EtaResolution_NoNeuDaugh;
-  TH1D* h_TkEG_EtaResolution_WhenNeuDaugh;
-  TH1D* h_TkEG_EtaResolution_OneProng;
-  TH1D* h_TkEG_EtaResolution_ThreeProng;
+  TH1D* h_TkEG_EtaResolution_noNeutrals;
+  TH1D* h_TkEG_EtaResolution_withNeutrals;
+  TH1D* h_TkEG_EtaResolution_1pr;
+  TH1D* h_TkEG_EtaResolution_3pr;
 
   TH1D* h_TkEG_PhiResolution;
   TH1D* h_TkEG_PhiResolution_C;
   TH1D* h_TkEG_PhiResolution_I;
   TH1D* h_TkEG_PhiResolution_F;
-  TH1D* h_TkEG_PhiResolution_NoNeuDaugh;
-  TH1D* h_TkEG_PhiResolution_WhenNeuDaugh;
-  TH1D* h_TkEG_PhiResolution_OneProng;
-  TH1D* h_TkEG_PhiResolution_ThreeProng;
+  TH1D* h_TkEG_PhiResolution_noNeutrals;
+  TH1D* h_TkEG_PhiResolution_withNeutrals;
+  TH1D* h_TkEG_PhiResolution_1pr;
+  TH1D* h_TkEG_PhiResolution_3pr;
 
   TH1D* h_nonMCmatched_EGenergyOverTracksPt;
   TH1D* h_nonMCmatchedCandidates_decayMode;
