@@ -42,7 +42,7 @@ void TkEG::InitVars_()
   cfg_tk_minEta      = 0.0;         // Default: 0.0
   cfg_tk_maxEta      = 2.4;        // Default: 1e6
   cfg_tk_maxChiSqRed = 1e6;         // Default: 1e6
-  cfg_tk_minStubs    =   4;         // Default: 0
+  cfg_tk_minStubs    =   5;         // Default: 0
   cfg_tk_minStubsPS  =   0;         // Default: 0
   cfg_tk_maxStubsPS  = 1e6;         // Default: 1e6
 
@@ -59,26 +59,31 @@ void TkEG::InitVars_()
   RelativeIsolation = true;
 
   // New parameters
-  minStubs_trk      = 4; 
-  maxChi2_trk       = 40.0; // GeV
-  maxChi2_trk_alt   = 20.0; // GeV
-  minPt_leadtrk     = 10.0; // GeV
+  minStubs_trk      = 5; 
+  maxChi2_trk       = 30.0; // GeV
+  minPt_leadtrk     = 5.0; // GeV
   maxEta_leadtrk    = 2.4;
   minDeltaR_leadtrk = 0.0;
-  maxDeltaR_leadtrk = 0.3;
+  maxDeltaR_leadtrk = 0.15;//0.3;
   maxDeltaZ_trk     = 0.8;  // cm
   maxInvMass_trk    = 1.4; // GeV 
   minEt_EG          = 2.0;  // GeV
   minDeltaR_EG      = 0.0;
-  maxDeltaR_EG      = 0.3;
+  maxDeltaR_EG      = 0.15;//0.3;
   maxInvMass_EG     = 1.77; // GeV
   maxDeltaR_MCmatch = 0.2;    
-  minDeltaR_iso     = 0.0;
-  maxDeltaR_iso     = 5.0;
-  maxDeltaZ_iso     = 0.8;  // cm
+  minDeltaR_iso     = 0.15;
+  maxDeltaR_iso     = 0.4;
+  maxDeltaZ_iso     = 0.6;  // cm
   useRelIso         = true;
-  maxRelIso         = 0.20; //0.15
-  
+  maxRelIso         = 0.10; //0.2
+  maxVtxIso         = 0.50;
+
+  // Eta regions
+  _eta_C             =   0.8; 
+  _eta_F             =   1.6;
+
+
   return;
 
 }
@@ -108,10 +113,18 @@ void TkEG::Loop()
   // Initialisations
   InitVars_();
   BookHistos_();
-  Long64_t nbytes       = 0;
-  Long64_t nb           = 0;
-  int nEvtsWithMaxHTaus = 0; 
-  unsigned int nEvts    = 0;
+  Long64_t nbytes              = 0;
+  Long64_t nb                  = 0;
+  int nEvtsWithMaxHTaus        = 0; 
+  unsigned int nEvts           = 0;
+  unsigned int nEvtsSeedPt     = 0;
+  unsigned int nEvtsSeedEta    = 0;
+  unsigned int nEvtsSeedChiSq  = 0;
+  unsigned int nEvtsSeedStubs  = 0;
+  unsigned int nEvtsNoHigherPt = 0;
+  unsigned int nEvtsMcMatch    = 0;
+  unsigned int nEvtsVtxIso     = 0;
+  unsigned int nEvtsRelIso     = 0;
   unsigned int nAllEvts = fChain->GetEntries();
   bool isMinBias        = false;  
   // L1PixelTrackFit f(3.8112); // Bz in Tesla (for pixel re-fitting)
@@ -129,9 +142,9 @@ void TkEG::Loop()
       std::cout << "Not a Minimum Bias sample." << std::endl;
     }
   
-  ////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////
   // Initialize Counters
-  ////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Event Counters 
   unsigned int counters_events_EGs = 0;
@@ -188,9 +201,9 @@ void TkEG::Loop()
 
 
 
-  ////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////
   // For-loop: Entries
-  ////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////
 
   for (int jentry = 0; jentry < nEntries; jentry++, nEvts++){
     
@@ -202,9 +215,9 @@ void TkEG::Loop()
     nb = fChain->GetEntry(jentry);
     nbytes += nb;
     
-    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     // Build collections
-    ////////////////////////////////////////////////       
+    ////////////////////////////////////////////////////////////////////////////////////////////////       
 
     // Tracks
     if (cfg_AddL1Tks) {
@@ -217,7 +230,6 @@ void TkEG::Loop()
     // EGs
     if (cfg_AddEGs) {
       L1EGs = GetEGs(false);
-      if (cfg_DEBUG) cout << "\n--eg getted "<< endl;
       sort( L1EGs.begin(), L1EGs.end() ); // Sort from highest Et to lowest Et (should be already done by default)
       if (cfg_DEBUG) cout << "\n=== L1EGs (" << L1EGs.size() << ")" << endl;
 //      if (cfg_DEBUG*0) PrintL1EGCollection(L1EGs);
@@ -238,7 +250,7 @@ void TkEG::Loop()
     
     // Triggred GenTaus (skip for MinBias samples)
     vector<GenParticle> GenTausTrigger;  
-    if (!isMinBias) GenTausTrigger = GetHadronicGenTaus(GenTaus, 20.0, 2.4);  
+    if (!isMinBias) GenTausTrigger = GetHadronicGenTaus(GenTaus, 20.0, 2.3);  
     
     // Ensure that all taus are found, needed by the current efficiency definition 
     // E.g. for ttbar, only events with two taus within trigger acceptance are considered for efficiency calculation)
@@ -262,11 +274,11 @@ void TkEG::Loop()
 	h_genTausAll_Phi1VsPhi2 -> Fill (GenTaus.at(0).phi(), GenTaus.at(1).phi());
       }
     }
-    if (cfg_DEBUG) cout << "\n=== All gen-taus info -end" << endl;
 
-    ////////////////////////////////////////////////
-    // TkEG algorithm
-    ////////////////////////////////////////////////    
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // INITIAL STUDIES 
+    ////////////////////////////////////////////////////////////////////////////////////////////////    
     
     // Check whether EGs exist or not when asking for a specific number of gen hadronic taus
     if (cfg_DEBUG) cout << "\n=== Count EGs multiplicity" << endl;
@@ -275,7 +287,7 @@ void TkEG::Loop()
 
     // Consider only events with at least one genuine hadronic tau (except for MinBias sample)    
     h_genTausHad_N->Fill( GenTausHadronic.size() );
-    if (GenTausHadronic.size() < 1 && !isMinBias) continue;
+    //if (GenTausHadronic.size() < 1 && !isMinBias) continue;
 
     // Ask for at least 1 genuine hadronic tau 
     if (L1EGs.size() >=1 ) counters_events_1GenTauHad_EGs++;
@@ -288,8 +300,11 @@ void TkEG::Loop()
     if (L1EGs.size() >=1 ) counters_events_2GenTauHad_EGs++;
     */
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Gen-Level Studies
+    ////////////////////////////////////////////////////////////////////////////////////////////////    
+    if (cfg_DEBUG) cout << "\n\t=== Gen-Level Studies" <<endl;
 
-    //================ Gen-Level ===================
 
     // For-loop: All hadronic gen-taus
     for (vector<GenParticle>::iterator genTau = GenTausHadronic.begin(); genTau != GenTausHadronic.end(); genTau++) {
@@ -436,19 +451,21 @@ void TkEG::Loop()
 	if (notLeading) continue;
 	counter_ldgPtCut++;
 
-	// Sum of ET of neutral products should be greater than 2 GeV
-	sumET =0;
-	for (unsigned int i = 0; i < genTau->finalDaughtersNeutral().size(); i++) sumET += genTau->finalDaughtersNeutral().at(i).et();
-	if (sumET >= 2.0) {
-	  counter_sumETcut++;
-	  // For-loop: All neutral daughters
-	  for (unsigned int i = 0; i < genTau->finalDaughtersNeutral().size(); i++) {
-	    GenParticle d_n      = genTau->finalDaughtersNeutral().at(i);
-	    
-	    // Find the maximum deltaR of the leading charged product and the other neutral products
-	    deltaRneutral = auxTools_.DeltaR(d.eta(), d.phi(), d_n.eta(), d_n.phi());
-	    if (deltaRneutral > deltaRneutral_max) deltaRneutral_max = deltaRneutral;
-	  }
+	// Each neutral product should have ET > 10GeV (most of the times it is absorbed by one EG - EG ET threshold is 10 GeV)
+	//sumET =0;
+	//for (unsigned int i = 0; i < genTau->finalDaughtersNeutral().size(); i++) sumET += genTau->finalDaughtersNeutral().at(i).et();
+	//if (sumET >= 2.0) {
+	//counter_sumETcut++;
+	// For-loop: All neutral daughters
+	for (unsigned int i = 0; i < genTau->finalDaughtersNeutral().size(); i++) {
+	  GenParticle d_n      = genTau->finalDaughtersNeutral().at(i);
+	  
+	  if (d_n.et() < 10) continue;
+
+	  // Find the maximum deltaR of the leading charged product and the other neutral products
+	  deltaRneutral = auxTools_.DeltaR(d.eta(), d.phi(), d_n.eta(), d_n.phi());
+	  if (deltaRneutral > deltaRneutral_max) deltaRneutral_max = deltaRneutral;
+	  //}
 	}
 	
 	// Fill histo if it is the leading charged product
@@ -492,13 +509,72 @@ void TkEG::Loop()
 
     }
 
-    //============= Leading-Tracks =================
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //  Tracks + EG Algorithm
+    ////////////////////////////////////////////////////////////////////////////////////////////////    
+    if (cfg_DEBUG) cout << "\n\t=== Tracks + EG Algorithm" <<endl;
+
+
+    //====================================================
+    // Smart-counter
+    //====================================================
+    vector<TTTrack> tmp, tmp1;
+    bool highPtNeighbourFound;
+	
+    // Pt Cut
+    tmp = GetTTTracks(minPt_leadtrk, 0.0, 999.9, 999.9, 0, cfg_tk_nFitParams, false, false);
+    if (tmp.size() > 0) nEvtsSeedPt++;
+    
+    // Eta cut
+    tmp = GetTTTracks(minPt_leadtrk, 0.0, maxEta_leadtrk, 999.9, 0, cfg_tk_nFitParams, false, false);
+    if (tmp.size() > 0) nEvtsSeedEta++;
+
+    // Chi^2 cut
+    tmp = GetTTTracks(minPt_leadtrk, 0.0, maxEta_leadtrk, maxChi2_trk, 0, cfg_tk_nFitParams, false, false);
+    if (tmp.size() > 0) nEvtsSeedChiSq++;
+
+    // Stubs Multiplicity cut
+    tmp = GetTTTracks(minPt_leadtrk, 0.0, maxEta_leadtrk, maxChi2_trk, minStubs_trk, cfg_tk_nFitParams, false, false);
+    if (tmp.size() > 0) nEvtsSeedStubs++;
+
+    // No higher Pt neighbour in the signal cone
+    double deltaR;
+    for (vector<TTTrack>::iterator seedTrkIter = tmp.begin(); seedTrkIter != tmp.end(); seedTrkIter++){
+      highPtNeighbourFound = false;
+      for (vector<TTTrack>::iterator trackIter = TTTracks.begin(); !highPtNeighbourFound && trackIter != TTTracks.end(); trackIter++) {
+	deltaR = auxTools_.DeltaR(seedTrkIter->getEta(), seedTrkIter->getPhi(), trackIter->getEta(), trackIter->getPhi());
+	if (deltaR > minDeltaR_leadtrk && deltaR < maxDeltaR_leadtrk && trackIter->getPt() > seedTrkIter->getPt())
+	  highPtNeighbourFound = true;
+      }
+      
+      if (!highPtNeighbourFound) {
+	tmp1.push_back(*seedTrkIter);
+      }
+    }
+    if (tmp1.size() > 0) nEvtsNoHigherPt++;
+    
+    // MC Match cut
+    bool hasGenTau = false;
+    GenParticle genTau;
+    for (vector<TTTrack>::iterator seedTrkIter = tmp1.begin(); seedTrkIter != tmp1.end(); seedTrkIter++){
+      double deltaR_match = GetMatchingGenParticle(*seedTrkIter, &genTau);
+      if (deltaR_match < maxDeltaR_MCmatch) hasGenTau = true;
+    }
+    if (hasGenTau) nEvtsMcMatch++;
+
+    tmp.clear();
+    tmp1.clear();
+    
+
+    //====================================================
+    // Leading-Tracks (tau-seeds)
+    //====================================================
+    if (cfg_DEBUG) std::cout << "\n=== Leading-Tracks (tau-seeds)" << endl;
+
 
     // Select lead tracks  
     vector<unsigned short> leadTrackIndices;
     trackTauCandidates.clear();
-    float deltaR;
-    bool highPtNeighbourFound;
     vector< TTTrack> newCandidateTracks; // temporary container
     for (vector<TTTrack>::iterator leadTrkIter = TTTracks.begin(); leadTrkIter != TTTracks.end(); leadTrkIter++) {
       counter_allTracks++;
@@ -520,18 +596,17 @@ void TkEG::Loop()
       if (leadTrkIter->getEta() > maxEta_leadtrk) continue;
       counter_passEtaCut++;
 
-      // Plot chi^2 for 4 stub and >=5 stub leading tracks
-      if (leadTrkIter->getNumOfStubs() == minStubs_trk) h_trk_Chi2_all_4stubs -> Fill (leadTrkIter->getChi2());
-      if (leadTrkIter->getNumOfStubs() > minStubs_trk) h_trk_Chi2_all_5stubs -> Fill (leadTrkIter->getChi2());
+      // Plot chi^2 for >=5 stub leading tracks
+      if (leadTrkIter->getNumOfStubs() >= minStubs_trk) h_trk_Chi2_all_5stubs -> Fill (leadTrkIter->getChi2());
 
       // Only use high quality tracks
       if (leadTrkIter->getNumOfStubs() < minStubs_trk) continue;
       if (leadTrkIter->getChi2() > maxChi2_trk) continue;
-      if ((leadTrkIter->getNumOfStubs() > minStubs_trk) && (leadTrkIter->getChi2() > maxChi2_trk_alt)) continue;
+      //if ((leadTrkIter->getNumOfStubs() > minStubs_trk) && (leadTrkIter->getChi2() > maxChi2_trk_alt)) continue;
       counter_passChi2Nstubs++;
 
 
-      if (cfg_DEBUG*0) std:: cout << "Leading track candidate " << leadTrkIter->index() << "passed cuts!" << std::endl;
+      if (cfg_DEBUG) std:: cout << "Leading track candidate " << leadTrkIter->index() << "passed cuts!" << std::endl;
       // Check that there are no close tracks (in terms of deltaR) with higher Pt
       highPtNeighbourFound = false;
       for (vector<TTTrack>::iterator trackIter = TTTracks.begin(); !highPtNeighbourFound && trackIter != TTTracks.end(); trackIter++) {
@@ -561,14 +636,17 @@ void TkEG::Loop()
     // Debug prints
     if (cfg_DEBUG) std::cout << "Lead tracks:" << std::endl;
     if (cfg_DEBUG) std::cout << trackTauCandidates.size() << " lead tracks found, here are 3 first:" << std::endl;
-//    for (std::size_t i=0; i<3 && i<trackTauCandidates.size(); i++) {
-//      if (cfg_DEBUG*0) std::cout << "leading track index = " << trackTauCandidates[i][0].index() << ", Pt = " << trackTauCandidates[i][0].getPt() << std::endl;
-//    }  
+    for (std::size_t i=0; i<3 && i<trackTauCandidates.size(); i++) {
+      if (cfg_DEBUG*0) std::cout << "leading track index = " << trackTauCandidates[i][0].index() << ", Pt = " << trackTauCandidates[i][0].getPt() << std::endl;
+    }  
 
-    if (cfg_DEBUG) std::cout << "track clustering next" << endl;
 
-    //============= Tracks Clustering =================
-    
+
+    //====================================================
+    // Tracks Clustering (around tau-seed)
+    //====================================================
+    if (cfg_DEBUG) std::cout << "\n=== Track Clustering (around tau-seed)" << endl;
+	
     // Cluster surrounding tracks with lead tracks
     TTTrack* leadTrackPtr = NULL;
     float invMass;
@@ -577,18 +655,9 @@ void TkEG::Loop()
     bool stopClustering;
     TLorentzVector p4sum; // initialized to (0,0,0,0)
     //PrintTTTrackCollection(TTTracks);
-    //TLorentzVector p4sum; //marina
     for (size_t i=0; i<trackTauCandidates.size(); i++) {
       leadTrackPtr = &(trackTauCandidates[i][0]);
 
-      // Calculate the initial multiplicity, inMass and Pt of the cluster (in case there are no more tracks in the cluster)
-      //int Ntrks = 1;
-      //invMass = leadTrackPtr->p4().M();
-      //pT =leadTrackPtr->p4().Pt();
-      //invMass = 0.0;
-      //pT = 0.0;
-
-      
       if (cfg_DEBUG) cout << "Starting to cluster lead track " << leadTrackPtr->index();
       // Loop over other tracks
       stopClustering = false;
@@ -666,7 +735,7 @@ void TkEG::Loop()
       h_trkClusters_M->Fill( invMass );
             
       //PrintTTTrackCollection(trackTauCandidates[i]);
-      counter_allTrkTauCand ++; //marina
+      counter_allTrkTauCand ++; 
       if (trackTauCandidates[i].size()==1) counter_1trk++;
       if (trackTauCandidates[i].size()==2) counter_2trk++;
       if (trackTauCandidates[i].size()==3) counter_3trk++;
@@ -674,13 +743,15 @@ void TkEG::Loop()
       if (trackTauCandidates[i].size()==5) counter_5trk++;
 
     }
-    
-    if (cfg_DEBUG) std::cout << "match EG to gentau next " << endl;
 
-    ////////////////////////////////////////////////////////////////////////////
-    // Match an EG to a Hadronic Gen-Tau independently from the track candidates 
-    ////////////////////////////////////////////////////////////////////////////
+
+    //====================================================
+    //  EGs Properties
+    //====================================================
+    if (cfg_DEBUG) std::cout << "\n=== EGs Properties" << endl;
+
     h_EGs_N -> Fill( L1EGs.size() );
+
     // For-loop: All the EGs in the event                                                                                                                               
     for (auto eg = L1EGs.begin(); eg != L1EGs.end() ; eg++) {
 
@@ -688,47 +759,14 @@ void TkEG::Loop()
       h_EGs_Eta -> Fill( eg->getEta() );
       h_EGs_Phi -> Fill( eg->getPhi() );
       
-      // Skip small-Et EGs 
-      if (eg->getEt() < minEt_EG) continue;
-      counter_allEGspassET++;
-
-      // Initialise the GenParticle (to be returned)
-      GenParticle match_GenParticle;
-      double deltaR;
-      double match_dR = 999;
-
-      // For-loop: All hadronic GenTaus
-      for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++) {
-	// If no hadronic decay products found (pi+/-, pi0, K+/-, K0, K0L), skip this tau
-	if (tau->finalDaughtersCharged().size() < 1) continue;
-	deltaR = auxTools_.DeltaR( eg->getEta(), eg->getPhi(), tau->eta(), tau->phi() );
-
-	if (deltaR < match_dR) {
-	  match_dR = deltaR;
-	  match_GenParticle = *tau;
-	}
-
-      } 
-      
-      bool EGhasGenTau = false;
-      if (match_dR < maxDeltaR_MCmatch) {
-	counter_MCmatched_EG++;
-	EGhasGenTau = true; 
-	h_EGs_MCmatched_Et -> Fill(eg->getEt());
-	// Print EG and matching gen particle properties 
-	if (cfg_DEBUG*0){
-	  eg->PrintProperties();
-	  match_GenParticle.PrintProperties();
-	  cout << "DeltaR of EG and its matching Gen-Particle = " << match_dR <<endl;
-	}
-
-      }
-    }
+    }// For-loop: All the EGs in the event
     
-    if (cfg_DEBUG) std::cout << "EG clustering stuff next" << endl;
 
-    //============= EGs Clustering =================
-        
+    //====================================================
+    //  EGs Clustering
+    //====================================================
+    if (cfg_DEBUG) std::cout << "\n=== EGs Clustering" << endl;
+
     // EGs properties (when Leading Track exist)
     if (trackTauCandidates.size() != 0) {
       
@@ -743,10 +781,11 @@ void TkEG::Loop()
 	//h_EGs_Et  -> Fill( eg->getEt() );
 	//h_EGs_Eta -> Fill( eg->getEta() );
 	//h_EGs_Phi -> Fill( eg->getPhi() );
-//	h_EGs_IEta -> Fill( eg->getIEta() );
-//	h_EGs_IPhi -> Fill( eg->getIPhi() );
+        //h_EGs_IEta -> Fill( eg->getIEta() );
+        //h_EGs_IPhi -> Fill( eg->getIPhi() );
 	
       }// For-loop: All the EGs in the event
+   
     }
         
     // Build EG clusters and create tau candidates
@@ -756,7 +795,6 @@ void TkEG::Loop()
     float deltaEta, deltaPhi;
     float deltaRmin, deltaEtaMin, deltaPhiMin;
     float deltaR_beforecorrection;
-    //deltaR = 999.0; //marina
     for (size_t i=0; i<trackTauCandidates.size(); i++) {
       //cout << "Clustering EGs around trackTauCandidates[" << i << "]" << endl;
       //h_EGs_N -> Fill( L1EGs.size() );
@@ -847,8 +885,7 @@ void TkEG::Loop()
 	  stopClustering = true;
 	}
 	
-	if (cfg_DEBUG) cout << "Invariant mass of cluster is " << invMass << " and ET is " << ET << endl; //marina
-	
+	if (cfg_DEBUG) cout << "Invariant mass of cluster is " << invMass << " and ET is " << ET << endl; 
 	
       }// For-loop: All the EGs in the event
       
@@ -878,18 +915,22 @@ void TkEG::Loop()
       // Fill the number of EGs in cluster
       h_EGClusters_MultiplicityPerCluster->Fill( EGcluster.size() );
       
+      //====================================================
+      // MC Matching of Tau Candidates
+      //====================================================
+      if (cfg_DEBUG) std::cout << "\n=== MC Matching of Tau Candidates" << endl;
+
+
       // Find the genTau matching to the lead track
-      GenParticle genTau;
       double deltaR_match = GetMatchingGenParticle(trackTauCandidates[i][0], &genTau);
       h_MCmatch_dR->Fill(deltaR_match);
 
       bool hasGenTau = false;
       if (deltaR_match < maxDeltaR_MCmatch) hasGenTau = true;
       h_leadTrk_MCmatch -> Fill (hasGenTau);
+
       if (trackTauCandidates[i][0].getNumOfStubs() == 4) h_leadTrk4stubs_MCmatch -> Fill(hasGenTau);
       if ((trackTauCandidates[i][0].getNumOfStubs() == 4) && (hasGenTau)) h_leadTrk4stubs_MCmatched_Chi2 -> Fill (trackTauCandidates[i][0].getChi2());
-
-      
       
       if (hasGenTau) {
 	//Increase counter for trackTauCandidates which have a genTau
@@ -903,28 +944,12 @@ void TkEG::Loop()
 	// Properties of the genTau
 	hTkEG_genVisEt    -> Fill( genTau.p4vis().Et() );
 	hTkEG_DeltaRmatch -> Fill( deltaR_match );
-	/*
-	// Pt resolution
-	TLorentzVector p4tracks; // initialized to (0,0,0,0) 
-	for (auto tk = trackTauCandidates[i].begin(); tk != trackTauCandidates[i].end(); tk++) {
-	  p4tracks += tk->p4();
-	}
-	double pTresolution = ( p4tracks.Pt()-genTau.p4vis().Pt() ) / genTau.p4vis().Pt();
-	h_trkClusters_PtResolution->Fill(pTresolution);
-	// FIX ME: ET resolution
-	if (EGcluster.size() >=1) {
-	  hTkEG_genVisEt_clustEG -> Fill( genTau.p4vis().Et() );
-	  hTkEG_genVisPt_clustEG -> Fill( genTau.p4vis().Pt() );
-
-	  double ETresolution = ( ET -genTau.p4vis().Et() ) / genTau.p4vis().Et(); //marina
-	  h_EGClusters_EtResolution->Fill(ETresolution);
-	}
-	*/
 
 
 	//////////////////////////////////////////////////////////////////////////////////////////
-	// Tk+EG algorithm representation in Gen-Level (Charged and Neutral daughters multiplicity 
+	// Tk+EG algorithm representation in Gen-Level (Charged and Neutral daughters multiplicity) 
 	//////////////////////////////////////////////////////////////////////////////////////////
+	if (cfg_DEBUG) std::cout << "\n=== Tk+EG algorithm representation in Gen-Level" << endl;
 
 	// Find the leading charged daughter
 	GenParticle d_ldg = genTau.finalDaughtersCharged().at(0);
@@ -1020,6 +1045,12 @@ void TkEG::Loop()
       }
 
 
+      //====================================================
+      // Build Tau Candidate
+      //====================================================
+      if (cfg_DEBUG) std::cout << "\n=== Build Tau Candidate" << endl;
+
+
       // Build a tau candidate from tracks and EGs
       L1TkEGParticle newTauCandidate(trackTauCandidates[i], EGcluster, genTau, hasGenTau);
       if (cfg_DEBUG) { //marina
@@ -1033,16 +1064,121 @@ void TkEG::Loop()
       
     }
     
+    if (TauCandidates.size() >=1){
+      h_ldgTkEG_ET -> Fill( TauCandidates.at(0).GetTotalEt());
+    }
+    
+    
+
     for (auto tkeg = TauCandidates.begin(); tkeg != TauCandidates.end(); tkeg++) {
+
+      h_TkEG_Pt      -> Fill (tkeg->GetTotalPt());
+      h_TkEG_ET      -> Fill (tkeg->GetTotalEt());
+      h_TkEG_Eta     -> Fill (tkeg->GetTotalP4().Eta());
+      h_TkEG_Phi     -> Fill (tkeg->GetTotalP4().Phi());
+      h_TkEG_InvMass -> Fill (tkeg->GetTotalP4().M());
+      h_TkEG_CHF     -> Fill (tkeg->GetTrackBasedPt() / tkeg->GetTotalP4().Pt());
+      h_TkEG_NHF     -> Fill ( (tkeg->GetTotalP4().Pt() - tkeg->GetTrackBasedPt() ) / tkeg->GetTotalP4().Pt());
       
+      if (tkeg->GetEGs().size() > 0) {
+	h_TkEG_CHF_withNeutrals     -> Fill (tkeg->GetTrackBasedPt() / tkeg->GetTotalP4().Pt());
+	h_TkEG_NHF_withNeutrals     -> Fill ( (tkeg->GetTotalP4().Pt() - tkeg->GetTrackBasedPt() ) / tkeg->GetTotalP4().Pt());
+      }
+
+      if (tkeg->HasMatchingGenParticle()){
+	
+	// Pt resolution
+	double pTresolution = ( tkeg->GetTotalPt()- tkeg->GetGenTauPt() ) / tkeg->GetGenTauPt();
+	h_TkEG_PtResolution->Fill(pTresolution);
+
+	// ET resolution
+	double ETresolution = ( tkeg->GetTotalEt()- tkeg->GetGenTauEt() ) / tkeg->GetGenTauEt();
+	h_TkEG_EtResolution->Fill(ETresolution);
+
+	// Eta Resolution
+	double EtaResolution = ( tkeg->GetTotalP4().Eta() - tkeg->GetMatchingGenParticle().eta() ) / tkeg->GetMatchingGenParticle().eta();
+        h_TkEG_EtaResolution->Fill(EtaResolution);
+
+	// Phi Resolution
+	double PhiResolution = ( tkeg->GetTotalP4().Phi() - tkeg->GetMatchingGenParticle().phi() ) / tkeg->GetMatchingGenParticle().phi();
+        h_TkEG_PhiResolution->Fill(PhiResolution);
+
+
+	// Resolution in different eta regions
+	float tkeg_eta = tkeg->GetTotalP4().Eta();
+
+	if ( IsWithinEtaRegion("Central", tkeg_eta) ) {
+	  h_TkEG_PtResolution_C  -> Fill(pTresolution);
+	  h_TkEG_EtResolution_C  -> Fill(ETresolution);
+	  h_TkEG_EtaResolution_C -> Fill(EtaResolution);
+	  h_TkEG_PhiResolution_C -> Fill(PhiResolution);
+	}
+	else if ( IsWithinEtaRegion("Intermediate", tkeg_eta) ) {
+	  h_TkEG_PtResolution_I  -> Fill(pTresolution);
+	  h_TkEG_EtResolution_I  -> Fill(ETresolution);
+	  h_TkEG_EtaResolution_I -> Fill(EtaResolution);
+	  h_TkEG_PhiResolution_I -> Fill(PhiResolution);
+	}
+	else if ( IsWithinEtaRegion("Forward", tkeg_eta) ) {
+	  h_TkEG_PtResolution_F  -> Fill(pTresolution);
+	  h_TkEG_EtResolution_F  -> Fill(ETresolution);
+	  h_TkEG_EtaResolution_F -> Fill(EtaResolution);
+	  h_TkEG_PhiResolution_F -> Fill(PhiResolution);
+	}
+
+	// Resolution in case of zero or more than one neutral products 
+	int neuDaugh_N = tkeg->GetMatchingGenParticle().finalDaughtersNeutral().size();
+	
+	if (neuDaugh_N == 0) {
+	  h_TkEG_PtResolution_noNeutrals  -> Fill(pTresolution);
+	  h_TkEG_EtResolution_noNeutrals  -> Fill(ETresolution);
+	  h_TkEG_EtaResolution_noNeutrals -> Fill(EtaResolution);
+	  h_TkEG_PhiResolution_noNeutrals -> Fill(PhiResolution);
+	}
+	else {
+	  h_TkEG_PtResolution_withNeutrals  -> Fill(pTresolution);
+	  h_TkEG_EtResolution_withNeutrals  -> Fill(ETresolution);
+	  h_TkEG_EtaResolution_withNeutrals -> Fill(EtaResolution);
+	  h_TkEG_PhiResolution_withNeutrals -> Fill(PhiResolution);
+	}
+	  
+	// Resolution for 1- and 3-prong decays
+	int chargedDaugh_N = tkeg->GetMatchingGenParticle().finalDaughtersCharged().size();
+	
+	if (chargedDaugh_N == 1) {
+	  h_TkEG_PtResolution_1pr  -> Fill(pTresolution);
+	  h_TkEG_EtResolution_1pr  -> Fill(ETresolution);
+	  h_TkEG_EtaResolution_1pr -> Fill(EtaResolution);
+	  h_TkEG_PhiResolution_1pr -> Fill(PhiResolution);
+	}
+	else if (chargedDaugh_N == 3){
+	  h_TkEG_PtResolution_3pr  -> Fill(pTresolution);
+	  h_TkEG_EtResolution_3pr  -> Fill(ETresolution);
+	  h_TkEG_EtaResolution_3pr -> Fill(EtaResolution);
+	  h_TkEG_PhiResolution_3pr -> Fill(PhiResolution);
+	}
+	
+      }
+      
+      /*
       // Pt resolution
-      double pTresolution = ( tkeg->GetTotalPt()- tkeg->GetGenTauPt() ) / tkeg->GetGenTauPt();
+      TLorentzVector p4tracks; // initialized to (0,0,0,0) 
+      for (auto tk = trackTauCandidates[i].begin(); tk != trackTauCandidates[i].end(); tk++) {
+      p4tracks += tk->p4();
+      }
+      double pTresolution = ( p4tracks.Pt()-genTau.p4vis().Pt() ) / genTau.p4vis().Pt();
       h_trkClusters_PtResolution->Fill(pTresolution);
       // FIX ME: ET resolution
-      double ETresolution = ( tkeg->GetTotalEt()- tkeg->GetGenTauEt() ) / tkeg->GetGenTauEt(); //marina
-      h_EGClusters_EtResolution->Fill(ETresolution);
+      if (EGcluster.size() >=1) {
+      hTkEG_genVisEt_clustEG -> Fill( genTau.p4vis().Et() );
+      hTkEG_genVisPt_clustEG -> Fill( genTau.p4vis().Pt() );
       
-
+      double ETresolution = ( ET -genTau.p4vis().Et() ) / genTau.p4vis().Et(); //marina
+      h_TkEG_EtResolution->Fill(ETresolution);
+      }
+      */
+      
+      
       //cout<< tkeg->GetTotalEt()<<endl;
       
       //float sumET=0;
@@ -1052,47 +1188,107 @@ void TkEG::Loop()
       //cout <<"--- "<< tkeg->GetTrackBasedPt()+sumET<<endl;
     }
     
-    /*
+
+    //====================================================
+    // Apply Isolation (Vertex, Relative)
+    //====================================================
+    if (cfg_DEBUG) std::cout << "\n=== Apply Isolation (Vertex, Relative)" << endl;
 
     // Check relative isolation of tau candidates
     float relIso = -1.0;
     float ptSum;
     TTTrack leadingTrack;
-    TauCandidatesIsolated.clear();
+    vector<TTTrack> clustTracks;
+    TauCandidatesRelIsolated.clear();
     
     for (auto tkeg = TauCandidates.begin(); tkeg != TauCandidates.end(); tkeg++) {
     
       leadingTrack = tkeg->GetLeadingTrack();
-      
+      clustTracks  = tkeg->GetTracks();
+
       // Sum Pt's inside the isolation cone
       ptSum = 0.0;
+      // For-loop: All TTTracks
       for (auto tk = TTTracks.begin(); tk != TTTracks.end(); tk++) {
+
+	// Check if the track is clustered in the tau candidate
 	bool clustered = false;
-	//for (auto clusttk = tkeg->GetTracks().begin(); clusttk != tkeg->GetTracks().end(); clusttk++){
-	//if (clusttk->index() == tk->index()) clustered = true;
-	//}
-	//if (clustered) continue;
+	
+	for (auto clusttk = clustTracks.begin(); clusttk != clustTracks.end(); clusttk++){
+	  if (clusttk->index() == tk->index()) clustered = true;
+	}
+	if (clustered) continue;	
+	
+	// Check if the track is from the same vertex and within an isolation cone of 0.5
 	if (abs (tk->getZ0() - leadingTrack.getZ0() ) > maxDeltaZ_iso) continue;
 	deltaR = auxTools_.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), tk->getEta(), tk->getPhi());
+
         if (deltaR > minDeltaR_iso && deltaR < maxDeltaR_iso)
+	  
           ptSum += tk -> getPt();
-      }
+	
+      } // For-loop: All TTTracks
+
       // Calculate relative isolation
-      relIso = ptSum / tkeg->GetTrackBasedPt();
+      relIso = ptSum / tkeg->GetTotalEt();
       // Fill relative isolation histogram
-      h_trkClusters_relIso->Fill( relIso );
-      //cout << "relIso = " << relIso << endl;
+      h_TkEG_relIso->Fill( relIso );
+
       if(relIso < maxRelIso) {
-        TauCandidatesIsolated.push_back(*tkeg);
+        TauCandidatesRelIsolated.push_back(*tkeg);
       }
     }
-    */
-       
 
-    if (cfg_DEBUG) std::cout << "fill histos " << endl;
-    ////////////////////////////////////////////////
+    // Check vertex isolation of tau candidates
+    float mindZ0 = 1000000.0;
+    float dz0;
+    TauCandidatesVtxIsolated.clear();
+
+    for (auto tkeg = TauCandidates.begin(); tkeg != TauCandidates.end(); tkeg++) {
+
+      leadingTrack = tkeg->GetLeadingTrack();
+      clustTracks  = tkeg->GetTracks();
+
+      // For-loop: All TTTracks
+      for (auto tk = TTTracks.begin(); tk != TTTracks.end(); tk++) {
+
+	// Check if the track is clustered in the tau candidate
+	bool clustered = false;
+	
+	for (auto clusttk = clustTracks.begin(); clusttk != clustTracks.end(); clusttk++){
+	  if (clusttk->index() == tk->index()) clustered = true;
+	}
+	if (clustered) continue;	
+	
+	// Check if the track is in the iso-cone
+	deltaR = auxTools_.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), tk->getEta(), tk->getPhi());
+	if (deltaR > minDeltaR_iso && deltaR < maxDeltaR_iso) {
+	  dz0 = abs (tk->getZ0() - leadingTrack.getZ0() );
+
+	  if (dz0 < mindZ0) mindZ0 = dz0;
+	  
+	}
+
+      } // For-loop: All TTTracks
+
+      // Fill relative isolation histogram
+      h_TkEG_vtxIso->Fill( mindZ0 );
+
+      if(mindZ0 > maxVtxIso) {
+        TauCandidatesVtxIsolated.push_back(*tkeg);
+      }
+    }
+    
+    if (TauCandidatesRelIsolated.size() > 0) nEvtsRelIso++;
+    if (TauCandidatesVtxIsolated.size() > 0) nEvtsVtxIso++;
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     // Fill Turn-On histograms
-    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    if (cfg_DEBUG) std::cout << "\n=== Fill Turn-On histograms" << endl;
+
     
     // Fill visible Et of hadronic taus to a histogram
     for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++) hMcHadronicTau_VisEt->Fill( tau->p4vis().Et() );
@@ -1100,35 +1296,45 @@ void TkEG::Loop()
 
 
     // Fill turn-on numerators
-    FillTurnOn_Numerator_(TauCandidates, 25.0, hTurnOn25_all);
-    //FillTurnOn_Numerator_(TauCandidatesIsolated, 25.0, hTurnOn25_relIso);
-    FillTurnOn_Numerator_(TauCandidates, 50.0, hTurnOn50_all);
-    //FillTurnOn_Numerator_(TauCandidatesIsolated, 50.0, hTurnOn50_relIso);
+    FillTurnOn_Numerator_(TauCandidates, 25.0, hTurnOn25_TkEG);
+    FillTurnOn_Numerator_(TauCandidatesRelIsolated, 25.0, hTurnOn25_relIso);
+    FillTurnOn_Numerator_(TauCandidatesVtxIsolated, 25.0, hTurnOn25_vtxIso);
+    FillTurnOn_Numerator_(TauCandidates, 50.0, hTurnOn50_TkEG);
+    FillTurnOn_Numerator_(TauCandidatesRelIsolated, 50.0, hTurnOn50_relIso);
+    FillTurnOn_Numerator_(TauCandidatesVtxIsolated, 50.0, hTurnOn50_vtxIso);
 
-    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     // Rates and efficiencies for single tau
-    ////////////////////////////////////////////////
-    FillSingleTau_(TauCandidates, hRateSingleTau_all, hEffSingleTau_all);
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    if (cfg_DEBUG) std::cout << "\n=== Rates and efficiencies for single tau" << endl;
+
+
+    FillSingleTau_(TauCandidates, hRateSingleTau_TkEG, hEffSingleTau_TkEG);
     FillSingleTau_(TauCandidates, hRateSingleTau_C, hEffSingleTau_C, 0.0, 1.0);
     FillSingleTau_(TauCandidates, hRateSingleTau_I, hEffSingleTau_I, 1.0, 1.6);
     FillSingleTau_(TauCandidates, hRateSingleTau_F, hEffSingleTau_F, 1.6, 3.0); // 2.5 is max
 
-    //FillSingleTau_(TauCandidatesIsolated, hRateSingleTau_relIso, hEffSingleTau_relIso);
+    FillSingleTau_(TauCandidatesRelIsolated, hRateSingleTau_relIso, hEffSingleTau_relIso);
+    FillSingleTau_(TauCandidatesVtxIsolated, hRateSingleTau_vtxIso, hEffSingleTau_vtxIso);
     
 
-    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     // Rates and efficiencies for ditau
-    ////////////////////////////////////////////////
-    FillDiTau_(TauCandidates, hRateDiTau_all, hEffDiTau_all);
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    if (cfg_DEBUG) std::cout << "\n=== Rates and efficiencies for ditau" << endl;
+
+
+    FillDiTau_(TauCandidates, hRateDiTau_TkEG, hEffDiTau_TkEG);
     FillDiTau_(TauCandidates, hRateDiTau_C, hEffDiTau_C, 0.0, 1.0);
     FillDiTau_(TauCandidates, hRateDiTau_I, hEffDiTau_I, 1.0, 1.6);
     FillDiTau_(TauCandidates, hRateDiTau_F, hEffDiTau_F, 1.6, 3.0); // 2.5 is max
 
-    //FillDiTau_(TauCandidatesIsolated, hRateDiTau_relIso, hEffDiTau_relIso);
+    FillDiTau_(TauCandidatesRelIsolated, hRateDiTau_relIso, hEffDiTau_relIso);
+    FillDiTau_(TauCandidatesVtxIsolated, hRateDiTau_vtxIso, hEffDiTau_vtxIso);
 
-    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     // WARNING: Erases L1TkTaus from vector!
-    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     //ApplyDiTauZMatching(matchTk_Collection, L1TkTaus_Tk);
     //FillDiTau_(L1TkTaus_Tk, hDiTau_Rate_Tk  , hDiTau_Eff_Tk);
     //FillDiTau_(L1TkTaus_Tk, hDiTau_Rate_Tk_C, hDiTau_Eff_Tk_C, 0.0, 1.0);
@@ -1141,14 +1347,25 @@ void TkEG::Loop()
   } // For-loop: Entries
 
 
-  ////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////
   // Fill counters
-  ////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+  if (cfg_DEBUG) std::cout << "\n=== Fill counters" << endl;
 
-  // Event counters 
-  h_Counters->SetBinContent(1, nAllEvts);
-  h_Counters->SetBinContent(2, nEvts);
 
+  // Event counters (smart counters)
+  h_Counters->SetBinContent( 1, nAllEvts);
+  h_Counters->SetBinContent( 2, nEvts);
+  h_Counters->SetBinContent( 3, nEvtsSeedPt);
+  h_Counters->SetBinContent( 4, nEvtsSeedEta);
+  h_Counters->SetBinContent( 5, nEvtsSeedChiSq);
+  h_Counters->SetBinContent( 6, nEvtsSeedStubs);
+  h_Counters->SetBinContent( 7, nEvtsNoHigherPt);
+  h_Counters->SetBinContent( 8, nEvtsRelIso);
+  h_Counters->SetBinContent( 9, nEvtsVtxIso);
+  h_Counters->SetBinContent(10, nEvtsMcMatch);
+  
+  // events with EGs counters
   h_Counters_events_EGs->SetBinContent(1, nAllEvts);
   h_Counters_events_EGs->SetBinContent(2, counters_events_EGs);
   h_Counters_events_EGs->SetBinContent(3, counters_events_1GenTauHad_EGs);
@@ -1200,49 +1417,59 @@ void TkEG::Loop()
   h_MCmatch_counters -> SetBinContent(6, counter_allEGspassET);
   h_MCmatch_counters -> SetBinContent(7, counter_MCmatched_EG);
 
-  ////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////
   // Convert/Finalise histograms
-  ////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+  if (cfg_DEBUG) std::cout << "\n=== Convert/Finalise histograms" << endl;
 
   // Divide turn-on numerators by the denumerator
-  histoTools_.DivideHistos_1D(hTurnOn25_all, hMcHadronicTau_VisEt);
-  //histoTools_.DivideHistos_1D(hTurnOn25_relIso, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hTurnOn50_all, hMcHadronicTau_VisEt);
-  //histoTools_.DivideHistos_1D(hTurnOn50_relIso, hMcHadronicTau_VisEt); 
+  histoTools_.DivideHistos_1D(hTurnOn25_TkEG, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hTurnOn25_relIso, hMcHadronicTau_VisEt); 
+  histoTools_.DivideHistos_1D(hTurnOn25_vtxIso, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hTurnOn50_TkEG, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hTurnOn50_relIso, hMcHadronicTau_VisEt); 
+  histoTools_.DivideHistos_1D(hTurnOn50_vtxIso, hMcHadronicTau_VisEt); 
   
   // Convert rate histograms
-  histoTools_.ConvertToRateHisto_1D(hRateSingleTau_all, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRateSingleTau_TkEG, nEntries);
+
   histoTools_.ConvertToRateHisto_1D(hRateSingleTau_C, nEntries);
   histoTools_.ConvertToRateHisto_1D(hRateSingleTau_I, nEntries);
   histoTools_.ConvertToRateHisto_1D(hRateSingleTau_F, nEntries);
 
-  //histoTools_.ConvertToRateHisto_1D(hRateSingleTau_relIso, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRateSingleTau_relIso, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRateSingleTau_vtxIso, nEntries);
 
-  histoTools_.ConvertToRateHisto_1D(hRateDiTau_all, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRateDiTau_TkEG, nEntries);
   histoTools_.ConvertToRateHisto_1D(hRateDiTau_C, nEntries);
   histoTools_.ConvertToRateHisto_1D(hRateDiTau_I, nEntries);
   histoTools_.ConvertToRateHisto_1D(hRateDiTau_F, nEntries);
 
-  //histoTools_.ConvertToRateHisto_1D(hRateDiTau_relIso, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRateDiTau_relIso, nEntries);
+  histoTools_.ConvertToRateHisto_1D(hRateDiTau_vtxIso, nEntries);
 
   // Finalise efficiency histograms
-  FinaliseEffHisto_(hEffSingleTau_all  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_(hEffSingleTau_TkEG  , nEvtsWithMaxHTaus);
   FinaliseEffHisto_(hEffSingleTau_C, nEvtsWithMaxHTaus);
   FinaliseEffHisto_(hEffSingleTau_I, nEvtsWithMaxHTaus);
   FinaliseEffHisto_(hEffSingleTau_F, nEvtsWithMaxHTaus);
 
-  //FinaliseEffHisto_(hEffSingleTau_relIso  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_(hEffSingleTau_relIso  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_(hEffSingleTau_vtxIso  , nEvtsWithMaxHTaus);
 
-  FinaliseEffHisto_(hRateDiTau_all  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_(hRateDiTau_TkEG  , nEvtsWithMaxHTaus);
   FinaliseEffHisto_(hRateDiTau_C, nEvtsWithMaxHTaus);
   FinaliseEffHisto_(hRateDiTau_I, nEvtsWithMaxHTaus);
   FinaliseEffHisto_(hRateDiTau_F, nEvtsWithMaxHTaus);
 
-  //FinaliseEffHisto_(hRateDiTau_relIso  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_(hRateDiTau_relIso  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_(hRateDiTau_vtxIso  , nEvtsWithMaxHTaus);
 
-  ////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////
   // Write the histograms to the file
-  ////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+  if (cfg_DEBUG) std::cout << "\n=== Write the histograms to the file" << endl;
+  
   WriteHistos_();
   auxTools_.StopwatchStop(5, "minutes", "Total Time");
 
@@ -1302,6 +1529,24 @@ float TkEG::CorrectedEta(float eta, float zTrack)  {
 
 }
 
+//============================================================================
+bool TkEG::IsWithinEtaRegion(string etaRegion, 
+				 double eta)
+//============================================================================
+{
+
+  bool bWithinEtaRegion = false;
+  if ( etaRegion.compare("Central") == 0 )           bWithinEtaRegion = (fabs(eta) <= _eta_C);
+  else if ( etaRegion.compare("Intermediate") == 0 ) bWithinEtaRegion = (fabs(eta) <= _eta_F && fabs(eta) > _eta_C);
+  else if ( etaRegion.compare("Forward") == 0 )      bWithinEtaRegion = (fabs(eta) > _eta_F);
+  else{
+    cout << "E R R O R ! Tracking::IsWithinEtaRegion(...) - Invalid eta region type \"" << etaRegion << "\". EXIT" << endl;
+    exit(1);
+  }
+  
+  return bWithinEtaRegion;  
+}
+
 
 
 //============================================================================
@@ -1309,7 +1554,18 @@ void TkEG::BookHistos_(void)
 //============================================================================
 {
   // Event-Type Histograms
-  histoTools_.BookHisto_1D(h_Counters, "Counters",  "", 2, 0.0, +2.0);
+  histoTools_.BookHisto_1D(h_Counters, "Counters",  "", 10, 0.0, +10.0);
+  h_Counters->GetXaxis()->SetBinLabel( 1, "All Evts");
+  h_Counters->GetXaxis()->SetBinLabel( 2, "Evts");
+  h_Counters->GetXaxis()->SetBinLabel( 3, "Seed Pt");
+  h_Counters->GetXaxis()->SetBinLabel( 4, "Seed Eta");
+  h_Counters->GetXaxis()->SetBinLabel( 5, "Seed ChiSq");
+  h_Counters->GetXaxis()->SetBinLabel( 6, "Seed Stubs");
+  h_Counters->GetXaxis()->SetBinLabel( 7, "Seed - No higher p_{T} neighbours");
+  h_Counters->GetXaxis()->SetBinLabel( 8, "RelIso");
+  h_Counters->GetXaxis()->SetBinLabel( 9, "VtxIso");
+  h_Counters->GetXaxis()->SetBinLabel(10, "Matched");
+
 
   histoTools_.BookHisto_1D(h_Counters_events_EGs, "Counters_events_EGs", ";;Entries", 4, 0, 4);
   h_Counters_events_EGs->GetXaxis()->SetBinLabel(1, "All events");
@@ -1399,11 +1655,8 @@ void TkEG::BookHistos_(void)
   // Number of stubs of all tracks
   histoTools_.BookHisto_1D(h_trk_NStubs_all, "trk_NStubs_all", ";N_{stubs} (all tracks); Events / bin", 16, -0.5, 15.5);
 
-  // Chi Squared of the tracks (4 stubs)
-  histoTools_.BookHisto_1D(h_trk_Chi2_all_4stubs, "trk_Chi2_all_4stubs", ";#chi^{2} (4-stubs tracks); Events / bin", 100, 0.0, 100.0);
-
   // Chi Squared of the tracks (>=5 stubs)
-  histoTools_.BookHisto_1D(h_trk_Chi2_all_5stubs, "trk_Chi2_all_5stubs", ";#chi^{2} (5-stubs tracks); Events / bin", 100, 0.0, 100.0);
+  histoTools_.BookHisto_1D(h_trk_Chi2_all_5stubs, "trk_Chi2_all_5stubs", ";#chi^{2} ( #ge 5-stubs tracks); Events / bin", 100, 0.0, 100.0);
 
   //Chi Squared of the leading tracks when it has 4 stubs and it is MC matched
   histoTools_.BookHisto_1D(h_leadTrk4stubs_MCmatched_Chi2, "leadTrk4stubs_MCmatched_Chi2", ";#chi^{2} (4-stubs, MC matched ldg track); Events / bin", 100, 0.0, 100.0);
@@ -1477,8 +1730,6 @@ void TkEG::BookHistos_(void)
   // Pt of track clusters
   histoTools_.BookHisto_1D(h_trkClusters_Pt, "trkClusters_Pt", ";p_{T} (GeV);Clusters / bin", 150, +0.0, +300.0);
 
-  // Pt resolution of track clusters
-  histoTools_.BookHisto_1D(h_trkClusters_PtResolution, "trkClusters_PtResolution", ";p_{T} resolution (GeV);Clusters / bin", 50, -5.0, +5.0);
   
   // Invariant mass of track clusters (before cut)
   // histoTools_.BookHisto_1D(h_trkClusters_M_beforeCut, "trkClusters_M_beforeCut", ";Invariant mass;Clusters / bin", 40, 0.0, +4.0);
@@ -1572,17 +1823,21 @@ void TkEG::BookHistos_(void)
   // Et of EG clusters
   histoTools_.BookHisto_1D(h_EGClusters_Et, "EGClusters_Et", ";Et (GeV);Clusters / bin", 30, +0.0, +150.0);
 
-  // Et resolution of EG clusters
-  histoTools_.BookHisto_1D(h_EGClusters_EtResolution, "EGClusters_EtResolution", ";Et resolution (GeV);Clusters / bin", 50, -5.0, +5.0);
   
   // Invariant mass of EG clusters
   histoTools_.BookHisto_1D(h_EGClusters_M, "EGClusters_M", ";Invariant mass (GeV);Clusters / bin", 40, +0.0, +4.0);
 
   // Track-based relative isolation of tau candidates
-  histoTools_.BookHisto_1D(h_trkClusters_relIso, "trkClusters_relIso", ";Relative isolation;Clusters / bin", 100, 0.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_relIso, "TkEG_relIso", ";Relative isolation;Clusters / bin", 100, 0.0, +5.0);
+
+    // Track-based relative isolation of tau candidates
+  histoTools_.BookHisto_1D(h_TkEG_vtxIso, "TkEG_vtxIso", ";Vertex isolation;Clusters / bin", 100, 0.0, +5.0);
   
   // Et of the tkeg when it has a matched genTau
   histoTools_.BookHisto_1D(hTkEG_matched_Et, "TkEG_matched_Et", ";E_{T} (GeV); TkEGs / bin", 40, 0.0,  +200.0);
+
+  
+  histoTools_.BookHisto_1D(h_ldgTkEG_ET, "TkEG_ldgET", ";E_{T} (GeV); TkEGs / bin", 300, 0.0,  +300.0); 
 
   // DeltaR in MC matching of the lead track of tau candidates
   histoTools_.BookHisto_1D(hTkEG_DeltaRmatch  , "TkEG_DeltaRmatch"  , ";#Delta R;Particles / bin",   100,  0.0,   +1.0);
@@ -1599,6 +1854,58 @@ void TkEG::BookHistos_(void)
   // Visible Et of all generator taus
   histoTools_.BookHisto_1D(hMcHadronicTau_VisEt, "hMcHadronicTau_VisEt", ";VisEt (GeV);Particles / bin", 40, 0.0,  +200.0);
 
+  // Properties of tau candidate 
+  histoTools_.BookHisto_1D(h_TkEG_Pt, "TkEG_Pt", ";p_{T} (GeV);Entries / bin", 300, +0.0, +300.0);
+  histoTools_.BookHisto_1D(h_TkEG_ET, "TkEG_ET", ";E_{T} (GeV);Entries / bin", 300, +0.0, +300.0);
+  histoTools_.BookHisto_1D(h_TkEG_Eta, "TkEG_Eta", ";#eta;Entries / bin", 60, -3.0, +3.0);
+  histoTools_.BookHisto_1D(h_TkEG_Phi, "TkEG_Phi", ";#phi (rads); Entries / bin", 21,  -3.15,  +3.15);
+  histoTools_.BookHisto_1D(h_TkEG_InvMass, "TkEG_InvMass", ";Mass (GeV); Entries / bin", 40, 0.0, +4.0);
+  histoTools_.BookHisto_1D(h_TkEG_CHF, "TkEG_CHF", ";CHF; Entries / bin", 200,  0.0,   +2.0);
+  histoTools_.BookHisto_1D(h_TkEG_NHF, "TkEG_NHF", ";NHF; Entries / bin", 200,  0.0,   +2.0);
+  histoTools_.BookHisto_1D(h_TkEG_CHF_withNeutrals, "TkEG_CHF_withNeutrals", ";CHF; Entries / bin", 200,  0.0,   +2.0);
+  histoTools_.BookHisto_1D(h_TkEG_NHF_withNeutrals, "TkEG_NHF_withNeutrals", ";NHF; Entries / bin", 200,  0.0,   +2.0);
+
+
+  // Pt resolution of TkEG candidate
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution, "TkEG_PtResolution", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_C, "TkEG_PtResolution_C", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_I, "TkEG_PtResolution_I", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_F, "TkEG_PtResolution_F", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_noNeutrals, "TkEG_PtResolution_noNeutrals", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_withNeutrals, "TkEG_PtResolution_withNeutrals", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_1pr, "TkEG_PtResolution_1pr", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_3pr, "TkEG_PtResolution_3pr", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  
+  // Et resolution of TkEG candidate
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution, "TkEG_EtResolution", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_C, "TkEG_EtResolution_C", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_I, "TkEG_EtResolution_I", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_F, "TkEG_EtResolution_F", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_noNeutrals, "TkEG_EtResolution_noNeutrals", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals, "TkEG_EtResolution_withNeutrals", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_1pr, "TkEG_EtResolution_1pr", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_3pr, "TkEG_EtResolution_3pr", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+
+  // Eta resolution of TkEG candidate
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution, "TkEG_EtaResolution", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_C, "TkEG_EtaResolution_C", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_I, "TkEG_EtaResolution_I", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_F, "TkEG_EtaResolution_F", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_noNeutrals, "TkEG_EtaResolution_noNeutrals", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_withNeutrals, "TkEG_EtaResolution_withNeutrals", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_1pr, "TkEG_EtaResolution_1pr", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_3pr, "TkEG_EtaResolution_3pr", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  
+  // Phi resolution of TkEG candidate
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution, "TkEG_PhiResolution", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_C, "TkEG_PhiResolution_C", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_I, "TkEG_PhiResolution_I", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_F, "TkEG_PhiResolution_F", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_noNeutrals, "TkEG_PhiResolution_noNeutrals", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_withNeutrals, "TkEG_PhiResolution_withNeutrals", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_1pr, "TkEG_PhiResolution_1pr", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_3pr, "TkEG_PhiResolution_3pr", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  
   // MC match counters 
   histoTools_.BookHisto_1D(h_MCmatch_counters, "MCmatch_counters", ";;Events", 7, 0, 7);
   h_MCmatch_counters->GetXaxis()->SetBinLabel(1, "All TrkTau Candidates");
@@ -1632,42 +1939,49 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_MCmatch_dR, "MCmatch_dR", ";#DeltaR_{min}(trk_{ldg}, gen-#tau); entries / bin",   60,  0.0,   +6.0);
 
   // Turn-on histograms
-  histoTools_.BookHisto_1D(hTurnOn25_all, "TurnOn25_all", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTurnOn25_relIso, "TurnOn25_relIso", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTurnOn50_all, "TurnOn50_all", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTurnOn50_relIso, "TurnOn50_relIso", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn25_TkEG, "TurnOn25_TkEG", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn25_relIso, "TurnOn25_RelIso", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn25_vtxIso, "TurnOn25_VtxIso", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
+
+  histoTools_.BookHisto_1D(hTurnOn50_TkEG, "TurnOn50_TkEG", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn50_relIso, "TurnOn50_RelIso", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTurnOn50_vtxIso, "TurnOn50_VtxIso", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
   
   // Single-tau rates
-  histoTools_.BookHisto_1D(hRateSingleTau_all, "Rate_SingleTau_all"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
-  histoTools_.BookHisto_1D(hRateSingleTau_C  , "Rate_SingleTau_C"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
-  histoTools_.BookHisto_1D(hRateSingleTau_I  , "Rate_SingleTau_I"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
-  histoTools_.BookHisto_1D(hRateSingleTau_F  , "Rate_SingleTau_F"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);  
+  histoTools_.BookHisto_1D(hRateSingleTau_TkEG, "Rate_SingleTau_TkEG"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hRateSingleTau_C  , "Rate_SingleTau_C"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hRateSingleTau_I  , "Rate_SingleTau_I"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hRateSingleTau_F  , "Rate_SingleTau_F"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);  
   
-  histoTools_.BookHisto_1D(hRateSingleTau_relIso  , "Rate_SingleTau_RelIso"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hRateSingleTau_relIso  , "Rate_SingleTau_RelIso"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hRateSingleTau_vtxIso  , "Rate_SingleTau_VtxIso"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
 
   // Di-tau rates
-  histoTools_.BookHisto_1D(hRateDiTau_all, "Rate_DiTau_all"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
-  histoTools_.BookHisto_1D(hRateDiTau_C  , "Rate_DiTau_C"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
-  histoTools_.BookHisto_1D(hRateDiTau_I  , "Rate_DiTau_I"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
-  histoTools_.BookHisto_1D(hRateDiTau_F  , "Rate_DiTau_F"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);  
+  histoTools_.BookHisto_1D(hRateDiTau_TkEG, "Rate_DiTau_TkEG"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hRateDiTau_C  , "Rate_DiTau_C"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hRateDiTau_I  , "Rate_DiTau_I"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hRateDiTau_F  , "Rate_DiTau_F"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);  
 
-  histoTools_.BookHisto_1D(hRateDiTau_relIso    , "Rate_DiTau_RelIso"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 300, 0.0, +300.0);
-  
+  histoTools_.BookHisto_1D(hRateDiTau_relIso    , "Rate_DiTau_RelIso"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0); 
+  histoTools_.BookHisto_1D(hRateDiTau_vtxIso    , "Rate_DiTau_VtxIso"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
+ 
   // Single-tau efficiencies
-  histoTools_.BookHisto_1D(hEffSingleTau_all , "Eff_SingleTau_all"     , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
-  histoTools_.BookHisto_1D(hEffSingleTau_C   , "Eff_SingleTau_C"   , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
-  histoTools_.BookHisto_1D(hEffSingleTau_I   , "Eff_SingleTau_I"   , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
-  histoTools_.BookHisto_1D(hEffSingleTau_F   , "Eff_SingleTau_F"   , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_TkEG , "Eff_SingleTau_TkEG"     , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_C   , "Eff_SingleTau_C"   , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_I   , "Eff_SingleTau_I"   , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_F   , "Eff_SingleTau_F"   , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
 
-  histoTools_.BookHisto_1D(hEffSingleTau_relIso     , "Eff_SingleTau_RelIso"     , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_relIso     , "Eff_SingleTau_RelIso"     , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hEffSingleTau_vtxIso     , "Eff_SingleTau_VtxIso"     , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
 
   // Di-tau efficiencies
-  histoTools_.BookHisto_1D(hEffDiTau_all , "Eff_DiTau_all"     , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
-  histoTools_.BookHisto_1D(hEffDiTau_C   , "Eff_DiTau_C"   , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
-  histoTools_.BookHisto_1D(hEffDiTau_I   , "Eff_DiTau_I"   , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
-  histoTools_.BookHisto_1D(hEffDiTau_F   , "Eff_DiTau_F"   , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hEffDiTau_TkEG , "Eff_DiTau_TkEG"     , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hEffDiTau_C   , "Eff_DiTau_C"   , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hEffDiTau_I   , "Eff_DiTau_I"   , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hEffDiTau_F   , "Eff_DiTau_F"   , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
 
-  histoTools_.BookHisto_1D(hEffDiTau_relIso     , "Eff_DiTau_RelIso"     , ";E_{T} threshold (GeV); Efficiency / bin", 300, 0.0, +300.0);
+  histoTools_.BookHisto_1D(hEffDiTau_relIso     , "Eff_DiTau_RelIso"     , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hEffDiTau_vtxIso     , "Eff_DiTau_VtxIso"     , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
   
   return;
 }
@@ -1716,7 +2030,6 @@ void TkEG::WriteHistos_(void)
   h_Photons_EGs_Matching->Write();
 
   h_trk_NStubs_all->Write();
-  h_trk_Chi2_all_4stubs->Write();
   h_trk_Chi2_all_5stubs->Write();
   h_leadTrk4stubs_MCmatched_Chi2->Write();
   h_trk_Chi2_all->Write();
@@ -1741,7 +2054,6 @@ void TkEG::WriteHistos_(void)
   h_MCmatch_chargedDaugh_N->Write();
   h_MCmatch_neutralDaugh_N->Write();
   h_trkClusters_Pt->Write();
-  h_trkClusters_PtResolution->Write();
   h_trkClusters_M->Write();
   //h_trkClusters_M_beforeCut->Write();
 
@@ -1775,17 +2087,65 @@ void TkEG::WriteHistos_(void)
 
   h_EGClusters_MultiplicityPerCluster->Write();
   h_EGClusters_Et->Write();
-  h_EGClusters_EtResolution->Write();
   h_EGClusters_M->Write();
 
-  //h_trkClusters_relIso->Write();
+  h_TkEG_relIso->Write();
+  h_TkEG_vtxIso->Write();
+
+  h_TkEG_Pt->Write();
+  h_TkEG_ET->Write();
+  h_TkEG_Eta->Write();
+  h_TkEG_Phi->Write();
+  h_TkEG_InvMass->Write();
+  h_TkEG_CHF->Write();
+  h_TkEG_NHF->Write();
+  h_TkEG_CHF_withNeutrals->Write();
+  h_TkEG_NHF_withNeutrals->Write();
+  
+  h_TkEG_PtResolution->Write();
+  h_TkEG_PtResolution_C->Write();
+  h_TkEG_PtResolution_I->Write();
+  h_TkEG_PtResolution_F->Write();
+  h_TkEG_PtResolution_noNeutrals->Write();
+  h_TkEG_PtResolution_withNeutrals->Write();
+  h_TkEG_PtResolution_1pr->Write();
+  h_TkEG_PtResolution_3pr->Write();
+  
+  h_TkEG_EtResolution->Write();
+  h_TkEG_EtResolution_C->Write();
+  h_TkEG_EtResolution_I->Write();
+  h_TkEG_EtResolution_F->Write();
+  h_TkEG_EtResolution_noNeutrals->Write();
+  h_TkEG_EtResolution_withNeutrals->Write();
+  h_TkEG_EtResolution_1pr->Write();
+  h_TkEG_EtResolution_3pr->Write();
+  
+  h_TkEG_EtaResolution->Write();
+  h_TkEG_EtaResolution_C->Write();
+  h_TkEG_EtaResolution_I->Write();
+  h_TkEG_EtaResolution_F->Write();
+  h_TkEG_EtaResolution_noNeutrals->Write();
+  h_TkEG_EtaResolution_withNeutrals->Write();
+  h_TkEG_EtaResolution_1pr->Write();
+  h_TkEG_EtaResolution_3pr->Write();
+
+  h_TkEG_PhiResolution->Write();
+  h_TkEG_PhiResolution_C->Write();
+  h_TkEG_PhiResolution_I->Write();
+  h_TkEG_PhiResolution_F->Write();
+  h_TkEG_PhiResolution_noNeutrals->Write();
+  h_TkEG_PhiResolution_withNeutrals->Write();
+  h_TkEG_PhiResolution_1pr->Write();
+  h_TkEG_PhiResolution_3pr->Write();
 
   hTkEG_matched_Et->Write();
+  h_ldgTkEG_ET->Write();
   hTkEG_DeltaRmatch->Write();
   hTkEG_genVisEt->Write();
   hTkEG_genVisEt_clustEG->Write();
   hTkEG_genVisPt_clustEG->Write();
   hMcHadronicTau_VisEt->Write();
+
   
   h_MCmatch_counters->Write(); 
   h_MCmatch_dR->Write(); 
@@ -1795,38 +2155,44 @@ void TkEG::WriteHistos_(void)
   h_nonMCmatched_EGenergyOverTracksPt->Write();
   h_nonMCmatchedCandidates_decayMode->Write();
 
-  hTurnOn25_all->Write();
-  //hTurnOn25_relIso->Write();
-  hTurnOn50_all->Write();
-  //hTurnOn50_relIso->Write();
+  hTurnOn25_TkEG->Write();
+  hTurnOn25_relIso->Write();
+  hTurnOn25_vtxIso->Write();
+  hTurnOn50_TkEG->Write();
+  hTurnOn50_relIso->Write();
+  hTurnOn50_vtxIso->Write();
 
-  hRateSingleTau_all->Write(); // Inclusive = C+I+F                                                                                                                   
+  hRateSingleTau_TkEG->Write(); // Inclusive = C+I+F                                                                                                                   
   hRateSingleTau_C->Write();
   hRateSingleTau_I->Write();
   hRateSingleTau_F->Write();
 
-  //hRateSingleTau_relIso->Write(); // Inclusive = C+I+F                                                                                                                   
+  hRateSingleTau_relIso->Write(); // Inclusive = C+I+F                                                                                                                   
+  hRateSingleTau_vtxIso->Write(); // Inclusive = C+I+F                                                                                                                   
 
-  hRateDiTau_all->Write(); // Inclusive = C+I+F                                                                                                                       
+  hRateDiTau_TkEG->Write(); // Inclusive = C+I+F                                                                                                                       
   hRateDiTau_C->Write();
   hRateDiTau_I->Write();
   hRateDiTau_F->Write();
 
-  //hRateDiTau_relIso->Write(); // Inclusive = C+I+F                                                                                                                       
+  hRateDiTau_relIso->Write(); // Inclusive = C+I+F                                                                                                                       
+  hRateDiTau_vtxIso->Write(); // Inclusive = C+I+F                                                                                                                       
 
-  hEffSingleTau_all->Write();  // Inclusive = C+I+F                                                                                                                   
+  hEffSingleTau_TkEG->Write();  // Inclusive = C+I+F                                                                                                                   
   hEffSingleTau_C->Write();
   hEffSingleTau_I->Write();
   hEffSingleTau_F->Write();
 
-  //hEffSingleTau_relIso->Write();  // Inclusive = C+I+F                                                                                                                   
+  hEffSingleTau_relIso->Write();  // Inclusive = C+I+F                                                                                                                   
+  hEffSingleTau_vtxIso->Write();  // Inclusive = C+I+F                                                                                                                   
 
-  hEffDiTau_all->Write();  // Inclusive = C+I+F                                                                                                                       
+  hEffDiTau_TkEG->Write();  // Inclusive = C+I+F                                                                                                                       
   hEffDiTau_C->Write();
   hEffDiTau_I->Write();
   hEffDiTau_F->Write();
 
-  //hEffDiTau_relIso->Write();  // Inclusive = C+I+F                                                                                                                       
+  hEffDiTau_relIso->Write();  // Inclusive = C+I+F                                                                                                                       
+  hEffDiTau_vtxIso->Write();  // Inclusive = C+I+F                                                                                                                       
   
   // Write 2-D histograms
   h_leadTrks_Phi_Eta->Write();
@@ -2119,7 +2485,7 @@ void TkEG::FinaliseEffHisto_(TH1D *histo,
   double eff, err;
 
   // For-loop: Histogram bins
-  for (int i = 0; i<= nBins; i++){
+  for (int i = 1; i<= nBins; i++){
     
     const int nPass = histo->GetBinContent(i);
     auxTools_.Efficiency(nPass, nEvtsTotal, "binomial", eff, err ); //fixme: use TEfficiency?

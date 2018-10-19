@@ -87,7 +87,8 @@ class TkEG : public TreeAnalyserMC{
   float DeltaPhi(float phi1, float phi2);
   float deltaR(float eta1, float eta2, float phi1, float phi2);
   float CorrectedEta(float eta, float zTrack);
-  vector<L1TkEGParticle> GetMcMatchedL1TkEGs(vector<L1TkEGParticle> L1TkEGs);
+  bool IsWithinEtaRegion(string etaRegion, double eta);
+    vector<L1TkEGParticle> GetMcMatchedL1TkEGs(vector<L1TkEGParticle> L1TkEGs);
   double GetMatchingGenParticle(TTTrack track, GenParticle *genParticlePtr);
   void FillTurnOn_Numerator_(vector<L1TkEGParticle> L1TkEGs, const double minEt, TH1D *hTurnOn);
 
@@ -162,12 +163,18 @@ class TkEG : public TreeAnalyserMC{
   float maxDeltaZ_iso;   
   float useRelIso;  
   float maxRelIso;  
+  float maxVtxIso;
+
+  // Eta regions
+  double _eta_C;
+  double _eta_F;
   
   vector<TTTrack> TTTracks;
   vector<EG> L1EGs;
   vector< vector <TTTrack> > trackTauCandidates;
   vector<L1TkEGParticle> TauCandidates;
-  vector<L1TkEGParticle> TauCandidatesIsolated;
+  vector<L1TkEGParticle> TauCandidatesRelIsolated;
+  vector<L1TkEGParticle> TauCandidatesVtxIsolated;
   vector<GenParticle> GenTausHadronic;
   vector<GenParticle> GenTausTrigger;
 
@@ -208,7 +215,6 @@ class TkEG : public TreeAnalyserMC{
   TH2D* h_Pion0Et_Vs_PhotonsDR;
   TH1D* h_Photons_EGs_Matching;
 
-  TH1D* h_trk_Chi2_all_4stubs;
   TH1D* h_trk_Chi2_all_5stubs;
   TH1D* h_leadTrk4stubs_MCmatched_Chi2;
   TH1D* h_trk_Chi2_all;
@@ -240,7 +246,6 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_MCmatch_chargedDaugh_N;
   TH1D* h_MCmatch_neutralDaugh_N;
   TH1D* h_trkClusters_Pt;
-  TH1D* h_trkClusters_PtResolution;
   TH1D* h_trkClusters_M;
   //TH1D* h_trkClusters_M_beforeCut;
 
@@ -277,17 +282,64 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_clustEGs_counter;
   TH1D* h_EGClusters_MultiplicityPerCluster;
   TH1D* h_EGClusters_Et;
-  TH1D* h_EGClusters_EtResolution;
   TH1D* h_EGClusters_M;
 
-  TH1D* h_trkClusters_relIso;
+  TH1D* h_TkEG_relIso;
+  TH1D* h_TkEG_vtxIso;
 
   TH1D* hTkEG_matched_Et;
+  TH1D* h_ldgTkEG_ET;
   TH1D* hTkEG_DeltaRmatch;
   TH1D* hTkEG_genVisEt;
   TH1D* hTkEG_genVisEt_clustEG;
   TH1D* hTkEG_genVisPt_clustEG;
   TH1D* hMcHadronicTau_VisEt;
+
+  TH1D* h_TkEG_Pt;
+  TH1D* h_TkEG_ET;
+  TH1D* h_TkEG_Eta;
+  TH1D* h_TkEG_Phi;
+  TH1D* h_TkEG_InvMass;
+  TH1D* h_TkEG_CHF;
+  TH1D* h_TkEG_NHF;
+  TH1D* h_TkEG_CHF_withNeutrals;
+  TH1D* h_TkEG_NHF_withNeutrals;
+
+  TH1D* h_TkEG_PtResolution;
+  TH1D* h_TkEG_PtResolution_C;
+  TH1D* h_TkEG_PtResolution_I;
+  TH1D* h_TkEG_PtResolution_F;
+  TH1D* h_TkEG_PtResolution_noNeutrals;
+  TH1D* h_TkEG_PtResolution_withNeutrals;
+  TH1D* h_TkEG_PtResolution_1pr;
+  TH1D* h_TkEG_PtResolution_3pr;
+  
+  TH1D* h_TkEG_EtResolution;
+  TH1D* h_TkEG_EtResolution_C;
+  TH1D* h_TkEG_EtResolution_I;
+  TH1D* h_TkEG_EtResolution_F;
+  TH1D* h_TkEG_EtResolution_noNeutrals;
+  TH1D* h_TkEG_EtResolution_withNeutrals;
+  TH1D* h_TkEG_EtResolution_1pr;
+  TH1D* h_TkEG_EtResolution_3pr;
+  
+  TH1D* h_TkEG_EtaResolution;
+  TH1D* h_TkEG_EtaResolution_C;
+  TH1D* h_TkEG_EtaResolution_I;
+  TH1D* h_TkEG_EtaResolution_F;
+  TH1D* h_TkEG_EtaResolution_noNeutrals;
+  TH1D* h_TkEG_EtaResolution_withNeutrals;
+  TH1D* h_TkEG_EtaResolution_1pr;
+  TH1D* h_TkEG_EtaResolution_3pr;
+
+  TH1D* h_TkEG_PhiResolution;
+  TH1D* h_TkEG_PhiResolution_C;
+  TH1D* h_TkEG_PhiResolution_I;
+  TH1D* h_TkEG_PhiResolution_F;
+  TH1D* h_TkEG_PhiResolution_noNeutrals;
+  TH1D* h_TkEG_PhiResolution_withNeutrals;
+  TH1D* h_TkEG_PhiResolution_1pr;
+  TH1D* h_TkEG_PhiResolution_3pr;
 
   TH1D* h_nonMCmatched_EGenergyOverTracksPt;
   TH1D* h_nonMCmatchedCandidates_decayMode;
@@ -297,38 +349,44 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_leadTrk_MCmatch;
   TH1D* h_leadTrk4stubs_MCmatch;
 
-  TH1D* hTurnOn25_all;
+  TH1D* hTurnOn25_TkEG;
   TH1D* hTurnOn25_relIso;
-  TH1D* hTurnOn50_all;
+  TH1D* hTurnOn25_vtxIso;
+  TH1D* hTurnOn50_TkEG;
   TH1D* hTurnOn50_relIso;
+  TH1D* hTurnOn50_vtxIso;
   
-  TH1D* hRateSingleTau_all; // Inclusive = C+I+F
+  TH1D* hRateSingleTau_TkEG; // Inclusive = C+I+F
   TH1D* hRateSingleTau_C;
   TH1D* hRateSingleTau_I;
   TH1D* hRateSingleTau_F;
 
   TH1D* hRateSingleTau_relIso; // Inclusive = C+I+F
+  TH1D* hRateSingleTau_vtxIso; // Inclusive = C+I+F
 
-  TH1D* hRateDiTau_all; // Inclusive = C+I+F
+  TH1D* hRateDiTau_TkEG; // Inclusive = C+I+F
   TH1D* hRateDiTau_C;
   TH1D* hRateDiTau_I;
   TH1D* hRateDiTau_F;
 
   TH1D* hRateDiTau_relIso; // Inclusive = C+I+F
+  TH1D* hRateDiTau_vtxIso; // Inclusive = C+I+F
 
-  TH1D* hEffSingleTau_all;  // Inclusive = C+I+F
+  TH1D* hEffSingleTau_TkEG;  // Inclusive = C+I+F
   TH1D* hEffSingleTau_C;
   TH1D* hEffSingleTau_I;
   TH1D* hEffSingleTau_F;
 
   TH1D* hEffSingleTau_relIso;  // Inclusive = C+I+F
+  TH1D* hEffSingleTau_vtxIso;  // Inclusive = C+I+F
 
-  TH1D* hEffDiTau_all;  // Inclusive = C+I+F
+  TH1D* hEffDiTau_TkEG;  // Inclusive = C+I+F
   TH1D* hEffDiTau_C;
   TH1D* hEffDiTau_I;
   TH1D* hEffDiTau_F;
 
   TH1D* hEffDiTau_relIso;  // Inclusive = C+I+F
+  TH1D* hEffDiTau_vtxIso;  // Inclusive = C+I+F
   
 };
 

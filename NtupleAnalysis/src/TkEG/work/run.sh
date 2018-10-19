@@ -44,9 +44,9 @@ fi
 
 # if [ -z "$3" ]
 #   then
-#     echo "=== OUTPUTDIR argument not found. Using default value of multicrab_CaloTkSkim_v92X_<time>"
+#     echo "=== OUTPUTDIR argument not found. Using default value of multicrab_TkEGTausSkim_v92X_<time>"
 #     STIME=`date '+%Hh%Mm%Ss_%d%h%Y'`
-#     OUTPUTDIR="multicrab_CaloTkSkim_v92X_${STIME}"
+#     OUTPUTDIR="multicrab_TkEGTausSkim_v92X_${STIME}"
 # else
 #     STIME=`date '+%Hh%Mm%Ss_%d%h%Y'`
 #     OUTPUTDIR="${3}_${STIME}"
