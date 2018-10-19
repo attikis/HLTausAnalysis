@@ -402,15 +402,15 @@ pfTauStyle   = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlue
                                    StyleLine(lineColor=ROOT.kBlue, lineStyle=ROOT.kSolid, lineWidth=4), 
                                    StyleFill(fillColor=ROOT.kBlue, fillStyle=3001)])
 
-SingleTauNoPU     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kOrange, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
-                                   StyleLine(lineColor=ROOT.kOrange, lineStyle=ROOT.kSolid, lineWidth=4), 
-                                   StyleFill(fillColor=ROOT.kOrange, fillStyle=0)])#3001)])
-SingleTauPU140     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kOrange-1, markerSizes=None, markerStyle=ROOT.kFullCircle),
-                                   StyleLine(lineColor=ROOT.kOrange-1, lineStyle=ROOT.kDotted, lineWidth=4), 
-                                   StyleFill(fillColor=ROOT.kOrange-1, fillStyle=0)])#3001)])
-SingleTauPU200     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kOrange+10, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
-                                   StyleLine(lineColor=ROOT.kOrange+10, lineStyle=ROOT.kDashed, lineWidth=4), 
-                                   StyleFill(fillColor=ROOT.kOrange+10, fillStyle=0)])#3001)])
+SingleTauNoPU     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
+                                   StyleLine(lineColor=ROOT.kMagenta, lineStyle=ROOT.kSolid, lineWidth=4), 
+                                   StyleFill(fillColor=ROOT.kMagenta, fillStyle=0)])#3001)])
+SingleTauPU140     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta-1, markerSizes=None, markerStyle=ROOT.kFullCircle),
+                                   StyleLine(lineColor=ROOT.kMagenta-1, lineStyle=ROOT.kDotted, lineWidth=4), 
+                                   StyleFill(fillColor=ROOT.kMagenta-1, fillStyle=0)])#3001)])
+SingleTauPU200     = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kMagenta+10, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                                   StyleLine(lineColor=ROOT.kMagenta+10, lineStyle=ROOT.kDashed, lineWidth=4), 
+                                   StyleFill(fillColor=ROOT.kMagenta+10, fillStyle=0)])#3001)])
 
 VBFnoPU  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kSpring, markerSizes=None, markerStyle=ROOT.kFullTriangleDown),
                            StyleLine(lineColor=ROOT.kSpring, lineStyle=ROOT.kSolid, lineWidth=4), StyleFill(fillColor=ROOT.kSpring, fillStyle=0)])
