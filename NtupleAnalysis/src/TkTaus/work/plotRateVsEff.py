@@ -729,7 +729,7 @@ if __name__ == "__main__":
     PRECISION    = 3
     RATIO        = False
     SAVEDIR      = None
-    SAVEFORMATS = [".png"] #[".C", ".png", ".pdf"]
+    SAVEFORMATS = [".C", ".png", ".pdf"]
     SEARCHMODE   = None
     URL          = False
     VERBOSE      = False

@@ -285,18 +285,22 @@ def GetHistoKwargs(h, opts):
 
     if "resolutionet_" in h.lower():
         _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
-        _kwargs["opts"]       = {"xmin": -1.2, "xmax": 1.5, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
+        #_kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": -0.2, "xmax": 0.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         #_kwargs["moveLegend"] = _mvLeg1
+        ROOT.gStyle.SetNdivisions(8, "X")
     if "resolutioneta_" in h.lower():
         _kwargs["xlabel"]     = "#delta#eta / #eta^{vis}"
-        #_kwargs["opts"]       = {"xmin": -3.2, "xmax": 3.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
-        _kwargs["opts"]       = {"xmin": -0.3, "xmax": 0.3, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
+        #_kwargs["opts"]       = {"xmin": -0.3, "xmax": 0.3, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": -0.10, "xmax": 0.10, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         _kwargs["rebinX"]     = 1
+        ROOT.gStyle.SetNdivisions(8, "X")
     if "resolutionphi_" in h.lower():
         _kwargs["xlabel"]     = "#delta#phi / #phi^{vis}"
-        _kwargs["opts"]       = {"xmin": -0.3, "xmax": 0.3, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         #_kwargs["opts"]       = {"xmin": -2.2, "xmax": 2.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": -0.10, "xmax": 0.10, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         _kwargs["rebinX"]     = 1
+        ROOT.gStyle.SetNdivisions(8, "X")
 
     if "cif" in h.lower():
         _kwargs["moveLegend"] = _mvLeg1
@@ -342,7 +346,7 @@ if __name__ == "__main__":
     PRECISION    = 3
     RATIO        = False
     SAVEDIR      = None
-    SAVEFORMATS = [".png"] #[".C", ".png", ".pdf"]
+    SAVEFORMATS = [".C", ".png", ".pdf"]
     SEARCHMODE   = None
     URL          = False
     VERBOSE      = False
@@ -417,7 +421,7 @@ if __name__ == "__main__":
 
     # Determine path for saving plots
     if opts.saveDir == None:
-        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="ROC")
+        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="Resolution")
     else:
         print "opts.saveDir = ", opts.saveDir
 

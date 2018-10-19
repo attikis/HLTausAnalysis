@@ -916,6 +916,14 @@ def main(opts):
         if h in skipList:
             continue
 
+        # Skip resolution plots (now done by dedicated script)
+        if "resolution" in h.lower():
+            continue
+
+        # Skp turn-on plots (now done by dedicated script)
+        if "turnon" in h.lower():
+            continue
+
         histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))
         if "TH1" not in histoType:
             continue
@@ -943,7 +951,7 @@ if __name__ == "__main__":
     INTLUMI     = 1.0
     NORMTOONE   = False
     SAVEDIR     = None
-    SAVEFORMATS = [".png"] #[".C", ".png", ".pdf"]
+    SAVEFORMATS = [".C", ".png", ".pdf"]
     VERBOSE     = False
 
     parser = OptionParser(usage="Usage: %prog [options]" , add_help_option=False,conflict_handler="resolve")
