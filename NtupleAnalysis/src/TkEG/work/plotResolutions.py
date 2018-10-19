@@ -161,11 +161,11 @@ def main(opts):
         # ROC curve ingredients (histograms)
         resList = [
             ["TkEG_EtResolution" , "TkEG_EtResolution_1pr" , "TkEG_EtResolution_3pr" , "TkEG_EtResolution_withNeutrals" , "TkEG_EtResolution_noNeutrals" ], 
-            ["TkEG_EtResolution", "TkEG_EtResolution_1pr", "TkEG_EtResolution_3pr", "TkEG_EtResolution_withNeutrals", "TkEG_EtResolution_noNeutrals"], 
-            ["TkEG_EtaResolution", "TkEG_EtaResolution_1pr", "TkEG_EtaResolution_3pr", "TkEG_EtaResolution_withNeutrals", "TkEG_EtaResolution_noNeutrals"],
+            ["TkEG_EtaResolution", "TkEG_EtaResolution_1pr", "TkEG_EtaResolution_3pr", "TkEG_EtaResolution_withNeutrals", "TkEG_EtaResolution_noNeutrals"], 
+            ["TkEG_PhiResolution", "TkEG_PhiResolution_1pr", "TkEG_PhiResolution_3pr", "TkEG_PhiResolution_withNeutrals", "TkEG_PhiResolution_noNeutrals"],
             ["TkEG_EtResolution" , "TkEG_EtResolution_C"   , "TkEG_EtResolution_I"   , "TkEG_EtResolution_F" ],
-            ["TkEG_EtResolution", "TkEG_EtResolution_C"  , "TkEG_EtResolution_I"  , "TkEG_EtResolution_F"],
             ["TkEG_EtaResolution", "TkEG_EtaResolution_C"  , "TkEG_EtaResolution_I"  , "TkEG_EtaResolution_F"],
+            ["TkEG_PhiResolution", "TkEG_PhiResolution_C"  , "TkEG_PhiResolution_I"  , "TkEG_PhiResolution_F"],
             ]
                        
     
@@ -342,7 +342,7 @@ if __name__ == "__main__":
     PRECISION    = 3
     RATIO        = False
     SAVEDIR      = None
-    SAVEFORMATS = [".png"] #[".C", ".png", ".pdf"]
+    SAVEFORMATS = [".pdf"] #[".C", ".png", ".pdf"]
     SEARCHMODE   = None
     URL          = False
     VERBOSE      = False
@@ -417,7 +417,7 @@ if __name__ == "__main__":
 
     # Determine path for saving plots
     if opts.saveDir == None:
-        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="Resolutions")
+        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/TkEG/", postfix="Resolutions")
     else:
         print "opts.saveDir = ", opts.saveDir
 
