@@ -236,16 +236,6 @@ def GetHistoKwargs(h, opts):
         _yLabel = "Efficiency / %.0f " + _units
         _xMax   = 100.0
         _ratio  = False
-    if "counters" in hName:
-        _units  = ""
-        _format = "%0.0f " + _units
-        _xLabel = "" #"counters"
-        _xMax   = +12.0
-        _yLabel = _yNorm + " / " + _format
-        _log    = False
-        _rmLeg  = True
-        _ratio  = False
-
         ROOT.gStyle.SetLabelSize(13, "X") #"XY"
     if "_rate" in hName:
         _units  = "GeV"
@@ -301,7 +291,7 @@ def GetHistoKwargs(h, opts):
         _format = "%0.1f " + _units
         _xLabel = "m (%s)" % (_units)
         _cutBox = {"cutValue": 1.776, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        _rebinX = 2
+        _rebinX = 1
         _yLabel = _yNorm + " / " + _format
         _log    = True
         _xMin   = +0.0
@@ -943,9 +933,9 @@ def main(opts):
         if "turnon" in h.lower():
             continue
 
-        # Skip (tmp)
-        #if "vtxiso" not in h.lower():
-        #    continue
+        # Skip Counters (now done by dedicated script)
+        if "counters" in h.lower():
+            continue
 
         histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))
         if "TH1" not in histoType:
