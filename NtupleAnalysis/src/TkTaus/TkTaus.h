@@ -288,7 +288,6 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hL1TkTau_IsoTksEt;
   TH1D* hL1TkTau_IsoTksEta;
   TH1D* hL1TkTau_InvMass;
-  TH1D* hL1TkTau_InvMassIncl;
   TH1D* hL1TkTau_SigConeRMin;
   TH1D* hL1TkTau_SigConeRMax;
   TH1D* hL1TkTau_IsoConeRMin;
@@ -351,7 +350,6 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hL1TkIsoTau_IsoTksEt;
   TH1D* hL1TkIsoTau_IsoTksEta;
   TH1D* hL1TkIsoTau_InvMass;
-  TH1D* hL1TkIsoTau_InvMassIncl;
   TH1D* hL1TkIsoTau_SigConeRMin;
   TH1D* hL1TkIsoTau_SigConeRMax;
   TH1D* hL1TkIsoTau_IsoConeRMin;
