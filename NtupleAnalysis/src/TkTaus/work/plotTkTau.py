@@ -679,6 +679,7 @@ def GetHistoKwargs(h, opts):
             _yLabel = _yNorm + " / " + _format
             _log    = True
             _cutBox = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+            #_cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
     if "_viset" in hName:
         _units  = "GeV"
         _format = "%0.0f " + _units
@@ -938,9 +939,13 @@ def main(opts):
         if "resolution" in h.lower():
             continue
 
-        # Skp turn-on plots (now done by dedicated script)
+        # Skip turn-on plots (now done by dedicated script)
         if "turnon" in h.lower():
             continue
+
+        # Skip (tmp)
+        #if "vtxiso" not in h.lower():
+        #    continue
 
         histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))
         if "TH1" not in histoType:

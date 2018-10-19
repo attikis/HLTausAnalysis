@@ -51,7 +51,7 @@ void TkTaus::InitVars_()
   sigConeTks_maxEta      =   2.5;  // 999.9
   sigConeTks_maxChiSq    =  50.0;  //  50.0
   sigConeTks_minStubs    =   5;    //   4
-  sigConeTks_dPOCAz      =   0.5;  // 0.80 (A. Ryd)
+  sigConeTks_dPOCAz      =   1.0;  // 0.80 (A. Ryd)
   sigConeTks_maxInvMass  =   1.6;  // 1.77 (A. Ryd)
  
   // Isolation cone tracks
@@ -72,7 +72,7 @@ void TkTaus::InitVars_()
   // Isolation cone
   isoCone_Constant = +2.5;          // 2.3 by fit on fit on ldg pT (Fotis)
   isoCone_dRMin    = sigCone_dRMax; // 0.4
-  isoCone_dRMax    = +0.25;         // 0.30
+  isoCone_dRMax    = +0.30;         // 0.30
   isoCone_useCone  = false; // instead of annulus
 
   // Isolation variables
