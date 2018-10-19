@@ -166,6 +166,10 @@ def PlotHisto(datasetsMgr, h):
             p.histoMgr.setHistoLegendStyle(d, "F")
         else:
             p.histoMgr.setHistoLegendStyle(d, "L")
+            p.histoMgr.setHistoDrawStyle(d, "HIST9")
+
+            #p.histoMgr.setHistoLegendStyle(d, "P") #"L"
+            #p.histoMgr.setHistoDrawStyle(d, "AP")
 
     # Create legend
     if 0:
@@ -218,7 +222,7 @@ def GetHistoKwargs(h, opts):
     _xMin   = None
     _xMax   = None
     _rmLeg  = False
-    _mvLeg  = {"dx": -0.08, "dy": -0.00, "dh": -0.0}
+    _mvLeg  = {"dx": -0.14, "dy": -0.00, "dh": -0.0}
 
     # Default (tdrstyle.py)
     ROOT.gStyle.SetLabelSize(27, "XYZ")
@@ -779,10 +783,10 @@ def GetHistoKwargs(h, opts):
         "ylabel"           : _yLabel,
         "rebinX"           : _rebinX,
         "rebinY"           : _rebinY,
-        "ratioYlabel"      : "1/Ratio ", #"Ratio "
+        "ratioYlabel"      : "Ratio ", #"1/Ratio "
         "ratio"            : _ratio, # only plots.ComparisonManyPlot(). Eitherwise comment out
         "stackMCHistograms": False,
-        "ratioInvert"      : True,
+        "ratioInvert"      : False, #True,
         "addMCUncertainty" : True,
         "addLuminosityText": False,
         "addCmsText"       : True,
@@ -835,6 +839,14 @@ def ReorderDatasets(datasets):
         if "noPU" in d:
             newOrder.remove(d)
             newOrder.insert(0, d)
+
+    # Use tau guns for ratio reference => put very first
+    if "SingleTau_L1TPU200" in datasets:
+        newOrder.remove("SingleTau_L1TPU200")
+        newOrder.insert(0,"SingleTau_L1TPU200")
+    if "SingleTau_L1TPU140" in datasets:
+        newOrder.remove("SingleTau_L1TPU140")
+        newOrder.insert(0,"SingleTau_L1TPU140")
     
     mb140 = "SingleNeutrino_L1TPU140"
     mb200 = "SingleNeutrino_L1TPU200"
@@ -844,8 +856,14 @@ def ReorderDatasets(datasets):
     if mb200 in datasets:
         newOrder.remove(mb200)
         newOrder.insert(len(newOrder), mb200)
-    return newOrder
 
+#    if mb140 in datasets and mb200 in datasets:
+#        newOrder.remove(mb140)
+#        newOrder.insert(-1, mb140)
+#        newOrder.remove(mb200)
+#        newOrder.insert(-1, mb200)
+
+    return newOrder
 
 def main(opts):
     
@@ -930,6 +948,7 @@ def main(opts):
         
         aux.PrintFlushed(h, plotCount==0)
         plotCount += 1
+        
         PlotHisto(datasetsMgr, h)
 
     print
