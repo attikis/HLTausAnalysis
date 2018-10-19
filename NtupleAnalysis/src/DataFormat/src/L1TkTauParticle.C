@@ -99,7 +99,8 @@ void L1TkTauParticle::SetIsolationConeSize(double deltaR_min, double deltaR_max)
 //============================================================================
 double L1TkTauParticle::CalculateRelIso(const double deltaZ0_max,
 					bool bStoreValue,
-					bool bInvert_deltaZ0)
+					bool bInvert_deltaZ0,
+					bool bUseIsoCone)
 
 //============================================================================
 {
@@ -111,8 +112,14 @@ double L1TkTauParticle::CalculateRelIso(const double deltaZ0_max,
   if (!HasMatchingTk()) return 0.0; 
 
   // If no tracks found in the isoalation cone return
-  vector<TTTrack> isoConeTks = GetIsoConeTTTracks();
-  if ( (isoConeTks.size() < 1) )  return 0.0;
+  vector<TTTrack> isoTks; // = GetIsoConeTTTracks();
+  if (bUseIsoCone) isoTks = GetIsoConeTTTracks();
+  else isoTks = GetIsoAnnulusTTTracks();
+  // std::cout << "GetIsoConeTTTracks(); = " << GetIsoConeTTTracks().size() << std::endl;
+  // std::cout << "GetIsoAnnulusTTTracks(); = " << GetIsoAnnulusTTTracks().size() << std::endl;
+  // std::cout << "isoTks.size() = " << isoTks.size() << std::endl;
+
+  if ( (isoTks.size() < 1) )  return 0.0;
 
   // Initialise variables
   TTTrack matchTk = GetMatchingTk();
@@ -121,9 +128,9 @@ double L1TkTauParticle::CalculateRelIso(const double deltaZ0_max,
   double relIso  = 0.0;
   
   // For-loop: All Tracks in isolation cone 
-  for (size_t i = 0; i < isoConeTks.size(); i++)
+  for (size_t i = 0; i < isoTks.size(); i++)
     {
-      TTTrack isoConeTk = isoConeTks.at(i);
+      TTTrack isoConeTk = isoTks.at(i);
       
       
       // Find the track closest in Z0
@@ -149,7 +156,8 @@ double L1TkTauParticle::CalculateRelIso(const double deltaZ0_max,
 
 
 //============================================================================
-double L1TkTauParticle::CalculateVtxIso(bool bStoreValue)
+double L1TkTauParticle::CalculateVtxIso(bool bStoreValue,
+					bool bUseIsoCone)
 //============================================================================
 {
 
@@ -162,16 +170,20 @@ double L1TkTauParticle::CalculateVtxIso(bool bStoreValue)
   if (!HasMatchingTk()) return 999.9; 
 
   // If no tracks found in the isoalation cone return
-  vector<TTTrack> isoConeTks = GetIsoConeTTTracks();
-  if ( (isoConeTks.size() < 1) )  return 999.9;
+  vector<TTTrack> isoTks; // = GetIsoConeTTTracks();
+  if (bUseIsoCone) isoTks = GetIsoConeTTTracks();
+  else isoTks = GetIsoAnnulusTTTracks();
+
+  // Return large value if no isolation track exists
+  if ( (isoTks.size() < 1) )  return 999.9;
 
   // Initialise variables
   TTTrack matchTk = GetMatchingTk();
   
   // For-loop: All Tracks in isolation cone 
-  for (size_t i = 0; i < isoConeTks.size(); i++)
+  for (size_t i = 0; i < isoTks.size(); i++)
     {
-      TTTrack isoConeTk = isoConeTks.at(i);
+      TTTrack isoConeTk = isoTks.at(i);
       
       // Find the track closest in Z0
       deltaZ0_tmp = abs(matchTk.getZ0() - isoConeTk.getZ0());
@@ -259,6 +271,30 @@ TTTrack L1TkTauParticle::GetIsoConeLdgTk(void)
 
   // Temporarily set the leading track
   vector<TTTrack> theTracks = GetIsoConeTTTracks();
+  TTTrack ldgTk = theTracks.at(0);
+  
+  // For-loop: All Tracks
+  for (size_t i = 0; i < theTracks.size(); i++)
+    {
+
+      TTTrack tk = theTracks.at(i);
+      ldgTk = tk;
+
+      // Find new leading track
+      if (tk.getPt() > ldgTk.getPt() ) ldgTk = tk;
+      
+    }
+  
+  return ldgTk;  
+}
+
+//****************************************************************************
+TTTrack L1TkTauParticle::GetIsoAnnulusLdgTk(void)
+//****************************************************************************
+{
+
+  // Temporarily set the leading track
+  vector<TTTrack> theTracks = GetIsoAnnulusTTTracks();
   TTTrack ldgTk = theTracks.at(0);
   
   // For-loop: All Tracks
@@ -436,6 +472,25 @@ void L1TkTauParticle::SetIsoConeTTTracksP4_(void)
   return;
 }
 
+//****************************************************************************
+void L1TkTauParticle::SetIsoAnnulusTTTracksP4_(void)
+//****************************************************************************
+{
+
+  // Variables
+  vector<TTTrack> TTTracks = GetIsoAnnulusTTTracks();
+  TLorentzVector isoTks_p4(0, 0, 0, 0);
+  for (vector<TTTrack>::iterator t = TTTracks.begin(); t != TTTracks.end(); t++)
+    {
+      TLorentzVector p4;
+      p4.SetPtEtaPhiM(t->getPt(), t->getEta(), t->getPhi(), pionMass); // assume track is a pion (most likely true!)
+      isoTks_p4 += p4;
+    }
+
+  theIsoAnnulusTTTracksP4 = isoTks_p4;
+  return;
+}
+
 
 //****************************************************************************
 TLorentzVector L1TkTauParticle::GetSigConeTTTracksP4(void)
@@ -453,6 +508,15 @@ TLorentzVector L1TkTauParticle::GetIsoConeTTTracksP4(void)
 
   SetIsoConeTTTracksP4_();
   return theIsoConeTTTracksP4;
+}
+
+//****************************************************************************
+TLorentzVector L1TkTauParticle::GetIsoAnnulusTTTracksP4(void)
+//****************************************************************************
+{
+
+  SetIsoAnnulusTTTracksP4_();
+  return theIsoAnnulusTTTracksP4;
 }
 
 #endif

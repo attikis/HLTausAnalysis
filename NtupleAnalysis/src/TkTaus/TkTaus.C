@@ -73,6 +73,7 @@ void TkTaus::InitVars_()
   isoCone_Constant = +2.5;          // 2.3 by fit on fit on ldg pT (Fotis)
   isoCone_dRMin    = sigCone_dRMax; // 0.4
   isoCone_dRMax    = +0.25;         // 0.30
+  isoCone_useCone  = false; // instead of annulus
 
   // Isolation variables
   vtxIso_WP  = +0.50;  // 0.5 cm
@@ -83,7 +84,7 @@ void TkTaus::InitVars_()
   diTau_deltaPOCAz = +1.00; // cm
 
   // MC matching
-  mcMatching_dRMax  = +0.15;
+  mcMatching_dRMax  = +0.10; // if too big get problem with turn-on curves (numerator>denominator)
   mcMatching_unique = true;
 
   // Eta Regions
@@ -558,8 +559,8 @@ void TkTaus::Loop()
 	GetIsoConeTracks(L1TkTauCandidate, isoTTTracks, 999.99);
 
 	// Calculate isolation variables
-	L1TkTauCandidate.CalculateRelIso(relIso_dZ0, true); // GetIsolationValues(L1TkTauCandidate);
-	L1TkTauCandidate.CalculateVtxIso(true);
+	L1TkTauCandidate.CalculateRelIso(relIso_dZ0, true, false, isoCone_useCone);
+	L1TkTauCandidate.CalculateVtxIso(true, isoCone_useCone);
 
 	// Get the matching gen-particle
 	GetMatchingGenParticle(L1TkTauCandidate, GenTausTrigger); // GenTausHadronic
@@ -998,7 +999,7 @@ void TkTaus::Loop()
     ////////////////////////////////////////////////
     for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++)
       {
-	hMcHadronicTau_VisEt->Fill( tau->p4vis().Et() );
+	hMcHadronicTau_VisEt->Fill( tau->p4vis().Et() ); // turn-on fill
 	
 	if (tau->finalDaughtersNeutral().size() > 0)
 	  {
@@ -2599,7 +2600,7 @@ void TkTaus::FillTurnOn_Numerator_(vector<L1TkTauParticle> L1TkTaus,
       GenParticle p = L1TkTau->GetMatchingGenParticle();
       
       // Fill the turn-on
-      hTurnOn->Fill( p.p4vis().Et() );
+      hTurnOn->Fill( p.p4vis().Et() ); // turn-on fill: warning if MC matchind dR is too lose this can have more entries than denominator
 
 	
       if (p.finalDaughtersNeutral().size() > 0)
@@ -2683,33 +2684,78 @@ void TkTaus::GetSigConeTracks(L1TkTauParticle &L1TkTau,
 
 //============================================================================
 void TkTaus::GetIsoConeTracks(L1TkTauParticle &L1TkTau,
-			      vector<TTTrack> TTTracks,
+			      vector<TTTrack> isoTks,
 			      double isoConeTks_dPOCAz)
 //============================================================================
 {
   if (!L1TkTau.HasMatchingTk()) return; 
+  vector<TTTrack> isoConeTks_tmp;
   vector<TTTrack> isoConeTks;
+  vector<TTTrack> isoAnnulusTks;
+  vector<TTTrack> sigConeTks = L1TkTau.GetSigConeTTTracks();
   TTTrack seedTk = L1TkTau.GetMatchingTk();
 
   // For-loop: All Tracks
-  for (vector<TTTrack>::iterator tk = TTTracks.begin(); tk != TTTracks.end(); tk++)
+  for (vector<TTTrack>::iterator tk = isoTks.begin(); tk != isoTks.end(); tk++)
     {
       double dR = auxTools_.DeltaR(tk->getEta(), tk->getPhi(), L1TkTau.GetMatchingTk().getEta(), L1TkTau.GetMatchingTk().getPhi());
       double dPOCAz = abs(seedTk.getZ0() - tk->getZ0());
 
       // Only consider tracks within singal cone
-      if (dR < L1TkTau.GetIsoConeMin()) continue;
-      if (dR > L1TkTau.GetIsoConeMax()) continue;
+      bool bInSigCone    = (dR < L1TkTau.GetIsoConeMin());
+      bool bInIsoCone    = (dR < L1TkTau.GetIsoConeMax());
+      bool bInIsoAnnulus = bInIsoCone*(!bInSigCone); 
 
       // Require isolation tracks come from same vertex as the seed track (NEW)
       if (dPOCAz > isoConeTks_dPOCAz) continue;
-      
+            
       // Save the track as an isolation-cone track
-      isoConeTks.push_back(*tk);
+      if (bInIsoCone) isoConeTks_tmp.push_back(*tk);
+      if (bInIsoAnnulus) isoAnnulusTks.push_back(*tk);
     }
   
-  L1TkTau.SetIsoConeTracks(isoConeTks);
+  // For-loop: All tracks in isolation cone
+  for (vector<TTTrack>::iterator iTk = isoConeTks_tmp.begin(); iTk != isoConeTks_tmp.end(); iTk++)
+    {
+      bool bSaveTk = true;
 
+      // For-loop: All tracks in signal cone
+      for (vector<TTTrack>::iterator sTk = sigConeTks.begin(); sTk != sigConeTks.end(); sTk++)
+	{
+      
+	  double dPt = abs(sTk->getPt() - iTk->getPt());
+	  double dR  = auxTools_.DeltaR(sTk->getEta(), sTk->getPhi(), iTk->getEta(), iTk->getPhi());
+	  double dZ  = abs(sTk->getZ0() - iTk->getZ0());
+	  
+	  // Isolation tracks matches a signal cone track that was clustered
+	  if ((dPt == 0.0) && (dR == 0.0) && (dZ == 0.0) )
+	    {
+	      bSaveTk = false;
+	      break;
+	    }
+	}
+      // Now only add isolation tracks which are not signal clustered tracks
+      if (bSaveTk) isoConeTks.push_back(*iTk);
+    }
+
+  if (0)
+    {
+      std::cout << "\nsigConeTks.size() = " << sigConeTks.size() << std::endl;
+      std::cout << "isoAnnulusTks.size() = " << isoAnnulusTks.size() << std::endl;
+      std::cout << "isoConeTks.size() = " << isoConeTks.size() << std::endl;
+    }
+
+  // Sanity check
+  if (isoConeTks.size() < isoAnnulusTks.size())
+    {
+      cout << "=== TkTaus::GetIsoConeTracks() - Unexpected number of tracks in isolation cone. Cannot be less than those in isolation annulus! EXIT" << endl;
+      exit(1);
+    }
+
+  // Save the tracks
+  L1TkTau.SetIsoConeTracks(isoConeTks);
+  L1TkTau.SetIsoAnnulusTracks(isoAnnulusTks);
+  
   return;
 }
 
@@ -2876,12 +2922,6 @@ void TkTaus::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
 //============================================================================
 {
 
-  //
-  // Description: (to do)
-  // Match the L1TkTau with a genParticle. At the moment try to match a genParticle (tau)
-  // final decay products (pions, Kaons) with the matching track. If a match is found
-  // the assign the tau (not the pion) to the L1TkTau as the matching genParticle.
-  //
   // Sanity check
   if (hadGenTaus.size() < 1 ) return;
 
