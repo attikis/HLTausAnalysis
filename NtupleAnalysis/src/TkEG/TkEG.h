@@ -72,10 +72,8 @@ class TkEG : public TreeAnalyserMC{
   double cfg_tk_minPt;
   double cfg_tk_minEta;
   double cfg_tk_maxEta;
-  double cfg_tk_maxChiSqRed;
+  double cfg_tk_maxChiSq;
   double cfg_tk_minStubs;
-  double cfg_tk_minStubsPS;
-  double cfg_tk_maxStubsPS;
   bool cfg_DEBUG;  
     
  private:
@@ -90,7 +88,14 @@ class TkEG : public TreeAnalyserMC{
   bool IsWithinEtaRegion(string etaRegion, double eta);
     vector<L1TkEGParticle> GetMcMatchedL1TkEGs(vector<L1TkEGParticle> L1TkEGs);
   double GetMatchingGenParticle(TTTrack track, GenParticle *genParticlePtr);
-  void FillTurnOn_Numerator_(vector<L1TkEGParticle> L1TkEGs, const double minEt, TH1D *hTurnOn);
+
+  void FillTurnOn_Numerator_(vector<L1TkEGParticle> L1TkEGs,
+			     const double minEt,
+			     TH1D *hTurnOn, 
+			     TH1D *hTurnOn_1pr, 
+			     TH1D *hTurnOn_3pr, 
+			     TH1D *hTurnOn_withNeutrals, 
+			     TH1D *hTurnOn_noNeutrals);
 
   void FillSingleTau_(vector<L1TkEGParticle> L1TkEGs,
 		      TH1D *hRate,
@@ -293,7 +298,6 @@ class TkEG : public TreeAnalyserMC{
   TH1D* hTkEG_genVisEt;
   TH1D* hTkEG_genVisEt_clustEG;
   TH1D* hTkEG_genVisPt_clustEG;
-  TH1D* hMcHadronicTau_VisEt;
 
   TH1D* h_TkEG_Pt;
   TH1D* h_TkEG_ET;
@@ -313,6 +317,11 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_PtResolution_withNeutrals;
   TH1D* h_TkEG_PtResolution_1pr;
   TH1D* h_TkEG_PtResolution_3pr;
+
+  TH1D* h_TkEG_PtResolution_noNeutrals_F;
+  TH1D* h_TkEG_PtResolution_withNeutrals_F;
+  TH1D* h_TkEG_PtResolution_1pr_F;
+  TH1D* h_TkEG_PtResolution_3pr_F;
   
   TH1D* h_TkEG_EtResolution;
   TH1D* h_TkEG_EtResolution_C;
@@ -322,6 +331,11 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_EtResolution_withNeutrals;
   TH1D* h_TkEG_EtResolution_1pr;
   TH1D* h_TkEG_EtResolution_3pr;
+
+  TH1D* h_TkEG_EtResolution_noNeutrals_F;
+  TH1D* h_TkEG_EtResolution_withNeutrals_F;
+  TH1D* h_TkEG_EtResolution_1pr_F;
+  TH1D* h_TkEG_EtResolution_3pr_F;
   
   TH1D* h_TkEG_EtaResolution;
   TH1D* h_TkEG_EtaResolution_C;
@@ -332,6 +346,12 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_EtaResolution_1pr;
   TH1D* h_TkEG_EtaResolution_3pr;
 
+  TH1D* h_TkEG_EtaResolution_noNeutrals_F;
+  TH1D* h_TkEG_EtaResolution_withNeutrals_F;
+  TH1D* h_TkEG_EtaResolution_1pr_F;
+  TH1D* h_TkEG_EtaResolution_3pr_F;
+
+
   TH1D* h_TkEG_PhiResolution;
   TH1D* h_TkEG_PhiResolution_C;
   TH1D* h_TkEG_PhiResolution_I;
@@ -341,6 +361,11 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_PhiResolution_1pr;
   TH1D* h_TkEG_PhiResolution_3pr;
 
+  TH1D* h_TkEG_PhiResolution_noNeutrals_F;
+  TH1D* h_TkEG_PhiResolution_withNeutrals_F;
+  TH1D* h_TkEG_PhiResolution_1pr_F;
+  TH1D* h_TkEG_PhiResolution_3pr_F;
+
   TH1D* h_nonMCmatched_EGenergyOverTracksPt;
   TH1D* h_nonMCmatchedCandidates_decayMode;
 
@@ -349,12 +374,48 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_leadTrk_MCmatch;
   TH1D* h_leadTrk4stubs_MCmatch;
 
-  TH1D* hTurnOn25_TkEG;
-  TH1D* hTurnOn25_relIso;
-  TH1D* hTurnOn25_vtxIso;
-  TH1D* hTurnOn50_TkEG;
-  TH1D* hTurnOn50_relIso;
-  TH1D* hTurnOn50_vtxIso;
+  // Turn-Ons
+  TH1D* hMcHadronicTau_VisEt;
+  TH1D* hMcHadronicTau_VisEt_1pr;
+  TH1D* hMcHadronicTau_VisEt_3pr;
+  TH1D* hMcHadronicTau_VisEt_withNeutrals;
+  TH1D* hMcHadronicTau_VisEt_noNeutrals;
+
+  TH1D* hTkEG_TurnOn25;
+  TH1D* hTkEG_TurnOn25_1pr;
+  TH1D* hTkEG_TurnOn25_3pr;
+  TH1D* hTkEG_TurnOn25_withNeutrals;
+  TH1D* hTkEG_TurnOn25_noNeutrals;
+
+  TH1D* hRelIso_TurnOn25;
+  TH1D* hRelIso_TurnOn25_1pr;
+  TH1D* hRelIso_TurnOn25_3pr;
+  TH1D* hRelIso_TurnOn25_withNeutrals;
+  TH1D* hRelIso_TurnOn25_noNeutrals;
+
+  TH1D* hVtxIso_TurnOn25;
+  TH1D* hVtxIso_TurnOn25_1pr;
+  TH1D* hVtxIso_TurnOn25_3pr;
+  TH1D* hVtxIso_TurnOn25_withNeutrals;
+  TH1D* hVtxIso_TurnOn25_noNeutrals;
+
+  TH1D* hTkEG_TurnOn50;
+  TH1D* hTkEG_TurnOn50_1pr;
+  TH1D* hTkEG_TurnOn50_3pr;
+  TH1D* hTkEG_TurnOn50_withNeutrals;
+  TH1D* hTkEG_TurnOn50_noNeutrals;
+
+  TH1D* hRelIso_TurnOn50;
+  TH1D* hRelIso_TurnOn50_1pr;
+  TH1D* hRelIso_TurnOn50_3pr;
+  TH1D* hRelIso_TurnOn50_withNeutrals;
+  TH1D* hRelIso_TurnOn50_noNeutrals;
+
+  TH1D* hVtxIso_TurnOn50;
+  TH1D* hVtxIso_TurnOn50_1pr;
+  TH1D* hVtxIso_TurnOn50_3pr;
+  TH1D* hVtxIso_TurnOn50_withNeutrals;
+  TH1D* hVtxIso_TurnOn50_noNeutrals;
   
   TH1D* hRateSingleTau_TkEG; // Inclusive = C+I+F
   TH1D* hRateSingleTau_C;
