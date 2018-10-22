@@ -231,6 +231,8 @@ def PlotHistos(datasetsMgr, histoList, signal, PU, saveName=None):
     for i, h in enumerate(p.histoMgr.getHistos(), 0):
         hName = h.getName()
         p.histoMgr.forHisto(hName, styles.getCaloStyle(i))
+        #p.histoMgr.setHistoDrawStyle(hName, "HIST")
+        #p.histoMgr.setHistoLegendStyle(hName, "L")
         p.histoMgr.setHistoDrawStyle(hName, "AP")
         p.histoMgr.setHistoLegendStyle(hName, "P")
     
@@ -286,7 +288,7 @@ def GetHistoKwargs(h, opts):
     if "resolutionet_" in h.lower():
         _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
         #_kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
-        _kwargs["opts"]       = {"xmin": -0.2, "xmax": 0.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": -0.20, "xmax": 0.20, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         #_kwargs["moveLegend"] = _mvLeg1
         ROOT.gStyle.SetNdivisions(8, "X")
     if "resolutioneta_" in h.lower():

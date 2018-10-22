@@ -37,9 +37,18 @@ endif
 set INITIAL = `echo $USER | cut -c1-1`
 set PSEUDO_MCRAB_DIR = ${1}
 
-#./plotTkTau.py -n -e "SingleE|Charged|TT|GluGlu" -m $PSEUDO_MCRAB_DIR --url
-./plotTkTau.py -n -e "SingleE|Charged|TT" -m $PSEUDO_MCRAB_DIR --url
+#"SingleNeutrino_L1TPU140|SingleNeutrino_L1TPU200|SingleTau_L1TnoPU|SingleTau_L1TPU200|TT_TuneCUETP8M2T4_14TeV_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TPU200|ChargedHiggs200_14TeV_L1TnoPU|ChargedHiggs200_14TeV_L1TPU140"
+#"ChargedHiggs200_14TeV_L1TPU200|ChargedHiggs500_14TeV_L1TnoPU|ChargedHiggs500_14TeV_L1TPU140|ChargedHiggs500_14TeV_L1TPU200|ChargedHiggs1000_14TeV_L1TnoPU|ChargedHiggs1000_14TeV_L1TPU140|ChargedHiggs1000_14TeV_L1TPU200"
+#"GluGluHToTauTau_14TeV_L1TPU140|GluGluHToTauTau_14TeV_L1TPU200"
+
+./plotCounters.py -i 'SingleTau_L1TnoPU|SingleNeutrino_L1TPU200|Glu' -n -m $PSEUDO_MCRAB_DIR --url
+./plotTkTau.py -n -i "SingleNeutrino|GluGluHToTauTau_14TeV_L1TPU200|SingleTau_L1TPU200" -m $PSEUDO_MCRAB_DIR --url
 ./plotRateVsEff.py -e "SingleE" -m $PSEUDO_MCRAB_DIR --url
 ./plotTH2.py -e "SingleE" --logZ --normalizeToOne -m $PSEUDO_MCRAB_DIR --url
-./plotResolutions.py -e "SingleE" -n -m $PSEUDO_MCRAB_DIR --url
+./plotResolutions.py -i "ChargedHiggs200" -n -m $PSEUDO_MCRAB_DIR --url
+
+#./plotTkTau.py -n -e "SingleE|Charged|TT" -m $PSEUDO_MCRAB_DIR --url
+#./plotRateVsEff.py -e "SingleE" -m $PSEUDO_MCRAB_DIR --url
+#./plotTH2.py -e "SingleE" --logZ --normalizeToOne -m $PSEUDO_MCRAB_DIR --url
+#./plotResolutions.py -e "SingleE" -n -m $PSEUDO_MCRAB_DIR --url
 

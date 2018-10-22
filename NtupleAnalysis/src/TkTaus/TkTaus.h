@@ -89,9 +89,9 @@ class TkTaus : public TreeAnalyserMC{
 			double sigConeTks_invMass);
   
   void GetIsoConeTracks(L1TkTauParticle &L1TkTau,
-			vector<TTTrack> TTTracks,
+			vector<TTTrack> isoTTTracks,
 			double isoConeTks_dPOCAz);
-    
+
   void GetIsolationValues(L1TkTauParticle &L1TkTau);
   
   void GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
@@ -147,6 +147,7 @@ class TkTaus : public TreeAnalyserMC{
   double isoCone_Constant;
   double isoCone_dRMax;
   double isoCone_dRMin;
+  bool   isoCone_useCone; //instead of annulus
   double vtxIso_WP;
   double relIso_WP;
   double relIso_dZ0;
@@ -287,7 +288,6 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hL1TkTau_IsoTksEt;
   TH1D* hL1TkTau_IsoTksEta;
   TH1D* hL1TkTau_InvMass;
-  TH1D* hL1TkTau_InvMassIncl;
   TH1D* hL1TkTau_SigConeRMin;
   TH1D* hL1TkTau_SigConeRMax;
   TH1D* hL1TkTau_IsoConeRMin;
@@ -350,7 +350,6 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hL1TkIsoTau_IsoTksEt;
   TH1D* hL1TkIsoTau_IsoTksEta;
   TH1D* hL1TkIsoTau_InvMass;
-  TH1D* hL1TkIsoTau_InvMassIncl;
   TH1D* hL1TkIsoTau_SigConeRMin;
   TH1D* hL1TkIsoTau_SigConeRMax;
   TH1D* hL1TkIsoTau_IsoConeRMin;

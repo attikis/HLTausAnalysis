@@ -166,6 +166,10 @@ def PlotHisto(datasetsMgr, h):
             p.histoMgr.setHistoLegendStyle(d, "F")
         else:
             p.histoMgr.setHistoLegendStyle(d, "L")
+            p.histoMgr.setHistoDrawStyle(d, "HIST9")
+
+            #p.histoMgr.setHistoLegendStyle(d, "P") #"L"
+            #p.histoMgr.setHistoDrawStyle(d, "AP")
 
     # Create legend
     if 0:
@@ -218,7 +222,7 @@ def GetHistoKwargs(h, opts):
     _xMin   = None
     _xMax   = None
     _rmLeg  = False
-    _mvLeg  = {"dx": -0.08, "dy": -0.00, "dh": -0.0}
+    _mvLeg  = {"dx": -0.14, "dy": -0.00, "dh": -0.0}
 
     # Default (tdrstyle.py)
     ROOT.gStyle.SetLabelSize(27, "XYZ")
@@ -232,16 +236,6 @@ def GetHistoKwargs(h, opts):
         _yLabel = "Efficiency / %.0f " + _units
         _xMax   = 100.0
         _ratio  = False
-    if "counters" in hName:
-        _units  = ""
-        _format = "%0.0f " + _units
-        _xLabel = "" #"counters"
-        _xMax   = +12.0
-        _yLabel = _yNorm + " / " + _format
-        _log    = False
-        _rmLeg  = True
-        _ratio  = False
-
         ROOT.gStyle.SetLabelSize(13, "X") #"XY"
     if "_rate" in hName:
         _units  = "GeV"
@@ -297,7 +291,7 @@ def GetHistoKwargs(h, opts):
         _format = "%0.1f " + _units
         _xLabel = "m (%s)" % (_units)
         _cutBox = {"cutValue": 1.776, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        _rebinX = 2
+        _rebinX = 1
         _yLabel = _yNorm + " / " + _format
         _log    = True
         _xMin   = +0.0
@@ -675,6 +669,7 @@ def GetHistoKwargs(h, opts):
             _yLabel = _yNorm + " / " + _format
             _log    = True
             _cutBox = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+            #_cutBox = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
     if "_viset" in hName:
         _units  = "GeV"
         _format = "%0.0f " + _units
@@ -779,10 +774,10 @@ def GetHistoKwargs(h, opts):
         "ylabel"           : _yLabel,
         "rebinX"           : _rebinX,
         "rebinY"           : _rebinY,
-        "ratioYlabel"      : "1/Ratio ", #"Ratio "
+        "ratioYlabel"      : "Ratio ", #"1/Ratio "
         "ratio"            : _ratio, # only plots.ComparisonManyPlot(). Eitherwise comment out
         "stackMCHistograms": False,
-        "ratioInvert"      : True,
+        "ratioInvert"      : False, #True,
         "addMCUncertainty" : True,
         "addLuminosityText": False,
         "addCmsText"       : True,
@@ -835,6 +830,14 @@ def ReorderDatasets(datasets):
         if "noPU" in d:
             newOrder.remove(d)
             newOrder.insert(0, d)
+
+    # Use tau guns for ratio reference => put very first
+    if "SingleTau_L1TPU200" in datasets:
+        newOrder.remove("SingleTau_L1TPU200")
+        newOrder.insert(0,"SingleTau_L1TPU200")
+    if "SingleTau_L1TPU140" in datasets:
+        newOrder.remove("SingleTau_L1TPU140")
+        newOrder.insert(0,"SingleTau_L1TPU140")
     
     mb140 = "SingleNeutrino_L1TPU140"
     mb200 = "SingleNeutrino_L1TPU200"
@@ -844,8 +847,14 @@ def ReorderDatasets(datasets):
     if mb200 in datasets:
         newOrder.remove(mb200)
         newOrder.insert(len(newOrder), mb200)
-    return newOrder
 
+#    if mb140 in datasets and mb200 in datasets:
+#        newOrder.remove(mb140)
+#        newOrder.insert(-1, mb140)
+#        newOrder.remove(mb200)
+#        newOrder.insert(-1, mb200)
+
+    return newOrder
 
 def main(opts):
     
@@ -920,8 +929,12 @@ def main(opts):
         if "resolution" in h.lower():
             continue
 
-        # Skp turn-on plots (now done by dedicated script)
+        # Skip turn-on plots (now done by dedicated script)
         if "turnon" in h.lower():
+            continue
+
+        # Skip Counters (now done by dedicated script)
+        if "counters" in h.lower():
             continue
 
         histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))
@@ -930,6 +943,7 @@ def main(opts):
         
         aux.PrintFlushed(h, plotCount==0)
         plotCount += 1
+        
         PlotHisto(datasetsMgr, h)
 
     print
