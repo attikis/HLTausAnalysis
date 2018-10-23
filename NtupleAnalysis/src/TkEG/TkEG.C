@@ -1885,7 +1885,7 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_EGClusters_MultiplicityPerCluster, "EGClusters_MultiplicityPerCluster", ";Number of EGs in cluster;Clusters / bin", 16, -0.5, +15.5);
 
   // Et of EG clusters
-  histoTools_.BookHisto_1D(h_EGClusters_Et, "EGClusters_Et", ";Et (GeV);Clusters / bin", 75, +0.0, +150.0);
+  histoTools_.BookHisto_1D(h_EGClusters_Et, "EGClusters_Et", ";Et (GeV);Clusters / bin", 150, +0.0, +150.0);
 
   
   // Invariant mass of EG clusters
@@ -2407,12 +2407,12 @@ double TkEG::GetMatchingGenParticle(TTTrack track, GenParticle *genParticlePtr)
   // Returns the match dR.
 
   // Sanity check
-  // if (GenTausHadronic.size() < 1 ) return; // FIXME: move outside this function
+  if (GenTausHadronic.size() < 1 ) return 999.9; // FIXME: move outside this function
 
   // Initialise the GenParticle (to be returned)
   GenParticle match_GenParticle;
   double deltaR;
-  double match_dR = 999;
+  double match_dR = 9999.9;
   
   // For-loop: All hadronic GenTaus
   for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++) {
@@ -2420,7 +2420,7 @@ double TkEG::GetMatchingGenParticle(TTTrack track, GenParticle *genParticlePtr)
       // If no hadronic decay products found (pi+/-, pi0, K+/-, K0, K0L), skip this tau
       if (tau->finalDaughtersCharged().size() < 1) continue;
       deltaR = auxTools_.DeltaR( track.getEta(), track.getPhi(), tau->eta(), tau->phi() );
-      //if (deltaR > maxDeltaR_MCmatch) continue;
+      if (deltaR > maxDeltaR_MCmatch) continue;
       if (deltaR < match_dR) {
         match_dR = deltaR;
         *genParticlePtr = *tau;
