@@ -16,7 +16,7 @@ EXAMPLES:
 
 
 LAST USED:
-./plotResolution.py -i TT_TuneCUETP8M2T4_14TeV_L1TPU140 --gridX --url -m 
+./plotResolution.py -i TT_TuneCUETP8M2T4_14TeV_L1TnoPU --gridX --url -m 
 
 '''
 

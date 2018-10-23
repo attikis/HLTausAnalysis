@@ -70,18 +70,21 @@ class L1TkTauParticle{
   double GetVtxIsolation(void)const { return theVtxIsolation;}
   TTTrack GetVtxIsolationTrack(void)const {return theVtxIsolationTk;}
   double GetRelIsolation(void)const { return theRelIsolation;}
-  double CalculateRelIso(const double deltaZ0_max=999.9, bool bStoreValue=false, bool bInvert_deltaZ0=false); 
-  double CalculateVtxIso(bool bStoreValue=false); 
+  double CalculateRelIso(const double deltaZ0_max=999.9, bool bStoreValue=false, bool bInvert_deltaZ0=false, bool bUseIsoCone=false);
+  double CalculateVtxIso(bool bStoreValue=false, bool bUseIsoCone=false);
   L1Tau GetCaloTau(void) const{ return theCaloTau;}
   TTTrack GetMatchingTk(void) const{ return theMatchingTk;}
   TTTrack GetSigConeLdgTk(void);
   TTTrack GetIsoConeLdgTk(void);
+  TTTrack GetIsoAnnulusLdgTk(void);
   bool HasMatchingTk(void) const{return theMatchingTk.getPt() > 1.0;} 
   double GetMatchingTkDeltaR(void) const{ return theMatchingTk_dR;}  
   vector<TTTrack> GetSigConeTTTracks(void) const { return theSigConeTTTracks;}
   TLorentzVector GetSigConeTTTracksP4(void);
   TLorentzVector GetIsoConeTTTracksP4(void);
+  TLorentzVector GetIsoAnnulusTTTracksP4(void);
   vector<TTTrack> GetIsoConeTTTracks(void) const { return theIsoConeTTTracks;}
+  vector<TTTrack> GetIsoAnnulusTTTracks(void) const { return theIsoAnnulusTTTracks;}
   vector<TTPixelTrack> GetSigConeTTPixelTracks(void) const { return theIsoConeTTPixelTracks;}
   vector<TTPixelTrack> GetIsoConeTTPixelTracks(void) const { return theSigConeTTPixelTracks;}
   GenParticle GetMatchingGenParticle(void) const { return theMatchingGenParticle;}
@@ -104,6 +107,7 @@ class L1TkTauParticle{
   void SetSigConeTracks(vector<TTTrack> sigConeTks){theSigConeTTTracks = sigConeTks;}
   void SetSigConeTracks(vector<TTPixelTrack> sigConeTks){theIsoConeTTPixelTracks = sigConeTks;}
   void SetIsoConeTracks(vector<TTTrack> isoConeTks){theIsoConeTTTracks = isoConeTks;}
+  void SetIsoAnnulusTracks(vector<TTTrack> isoAnnulusTks){theIsoAnnulusTTTracks = isoAnnulusTks;}
   void SetIsoConeTracks(vector<TTPixelTrack> isoConeTks){theSigConeTTPixelTracks = isoConeTks;}
   void SetMatchingGenParticle(GenParticle genP){ theMatchingGenParticle = genP;}
   void SetMatchingGenParticleDeltaR(double dR){ theMatchingGenParticle_dR = dR;}
@@ -148,8 +152,10 @@ class L1TkTauParticle{
   vector<TTPixelTrack> theSigConeTTPixelTracks;
   TLorentzVector theSigConeTTTracksP4;
   vector<TTTrack> theIsoConeTTTracks;
+  vector<TTTrack> theIsoAnnulusTTTracks;
   vector<TTPixelTrack> theIsoConeTTPixelTracks;
   TLorentzVector theIsoConeTTTracksP4;
+  TLorentzVector theIsoAnnulusTTTracksP4;
   double theVtxIsolation;
   double theRelIsolation;
   TTTrack theVtxIsolationTk;
@@ -161,6 +167,7 @@ class L1TkTauParticle{
   AuxTools auxTools;
   void SetSigConeTTTracksP4_(void);
   void SetIsoConeTTTracksP4_(void);
+  void SetIsoAnnulusTTTracksP4_(void);
 
   
 };

@@ -471,14 +471,15 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
     plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
 
     # Draw Error bands
+    if opts.errorBands:
     #for i, g in enumerate([g0, g1, g2, g3, g4]):
-    for i, g in enumerate([g1, g2, g3]):
-        shapes, min, max = DrawErrorBand(g) 
-        for shape in shapes:
-            shape.SetFillColor( p.histoMgr.getHistos()[i].getRootHisto().GetFillColor())
-            shape.SetFillStyle(3002)
-            shape.Draw("f same")
-        ROOT.gPad.RedrawAxis()
+        for i, g in enumerate([g1, g2, g3]):
+            shapes, min, max = DrawErrorBand(g) 
+            for shape in shapes:
+                shape.SetFillColor( p.histoMgr.getHistos()[i].getRootHisto().GetFillColor())
+                shape.SetFillStyle(3002)
+                shape.Draw("f same")
+            ROOT.gPad.RedrawAxis()
 
     histograms.addPileupText("PU=%s" % (PU) )
     histograms.addText(0.55, 0.48, plots._legendLabels[signal], 18)
@@ -723,6 +724,7 @@ if __name__ == "__main__":
     BATCHMODE    = True
     DATAERA      = "TDR2019" #"ID2017" #"TDR2019"
     FOLDER       = ""
+    EBANDS       = False
     GRIDX        = False
     GRIDY        = False
     OPTMODE      = None
@@ -754,6 +756,9 @@ if __name__ == "__main__":
 
     parser.add_option("--dataEra", dest="dataEra", type="string", default=DATAERA, 
                       help="Override default dataEra [default: %s]" % DATAERA)
+
+    parser.add_option("--errorBands", dest="errorBands", action="store_true", default=EBANDS, 
+                      help="Enable error bands for ROC curves [default: %s]" % EBANDS)
 
     parser.add_option("--gridX", dest="gridX", action="store_true", default=GRIDX, 
                       help="Enable the x-axis grid lines [default: %s]" % GRIDX)
