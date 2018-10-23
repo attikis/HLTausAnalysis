@@ -352,28 +352,29 @@ def GetHistoKwargs(h, opts):
         kwargs["cutBox"] = {"cutValue": 1.4, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if "trkClusters_Pt" == h:
-        kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": 0, "xmax": 50.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
+        kwargs["log"]  = True
+
 
     if "clustegs_eta" in h.lower():
          kwargs["opts"]   = {"xmin": -2.0, "xmax": 2.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "tkeg_reliso" in h.lower():
-         kwargs["opts"]   = {"xmin": 0.0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
+         kwargs["opts"]   = {"xmin": 0.0, "xmax": 1.2, "ymin": 0.001, "ymaxfactor": _yMaxF}
          kwargs["cutBox"] = {"cutValue": 0.10, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
          kwargs["log"]  = True
 
     if "tkeg_vtxiso" in h.lower():
-         kwargs["opts"]   = {"xmin": 0.0, "xmax": 4.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
+         kwargs["opts"]   = {"xmin": 0.0, "xmax": 4.0, "ymin": 0.0001, "ymaxfactor": _yMaxF}
          kwargs["cutBox"] = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
          kwargs["log"]  = True
-
 
     if "EGClusters_M" == h:
         kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "EGClusters_Et" == h:
-        kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-
+        kwargs["opts"]   = {"xmin": 0, "xmax": 80.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        
     if "TkEG_ET" == h:
         kwargs["opts"]   = {"xmin": 0, "xmax": 120.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
         kwargs["log"]  = True
@@ -403,8 +404,8 @@ def GetHistoKwargs(h, opts):
         kwargs["xlabel"] = "p_{T} (%s)" % units
         kwargs["ylabel"] = _yLabel + units
         kwargs["cutBox"] = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-        kwargs["opts"]   = {"xmin": 0, "xmax": 80.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
-        #kwargs["log"]    = True                                                                                                                                         
+        kwargs["opts"]   = {"xmin": 0, "xmax": 50.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
+        kwargs["log"]    = True                                                                                                                                         
     
     if "clusttrks_pt" in h.lower():
         _yLabel = "Arbitrary Units / %.0f "
