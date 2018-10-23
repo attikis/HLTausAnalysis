@@ -346,6 +346,11 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 1.4, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
+    if "trkClusters_M_beforeCut" == h:
+        kwargs["log"]  = True
+        kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
+        kwargs["cutBox"] = {"cutValue": 1.4, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+
     if "trkClusters_Pt" == h:
         kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
@@ -582,8 +587,8 @@ if __name__ == "__main__":
     BATCHMODE   = True
     DATAERA     = "TDR2019"
     FOLDER      = ""
-    GRIDX       = True
-    GRIDY       = True    
+    GRIDX       = False
+    GRIDY       = False   
     INTLUMI     = 1.0
     NORMTOONE   = True
     SAVEDIR     = None

@@ -456,14 +456,13 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
     plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
 
     # Draw Error bands
-    #for i, g in enumerate([g0, g1, g2, g3, g4]):
-    for i, g in enumerate([g1, g2, g3]):
-        shapes, min, max = DrawErrorBand(g) 
-        for shape in shapes:
-            shape.SetFillColor( p.histoMgr.getHistos()[i].getRootHisto().GetFillColor())
-            shape.SetFillStyle(3002)
-            shape.Draw("f same")
-        ROOT.gPad.RedrawAxis()
+    #for i, g in enumerate([g1, g2, g3]):
+    #    shapes, min, max = DrawErrorBand(g) 
+    #    for shape in shapes:
+    #        shape.SetFillColor( p.histoMgr.getHistos()[i].getRootHisto().GetFillColor())
+    #        shape.SetFillStyle(3002)
+    #        shape.Draw("f same")
+    #    ROOT.gPad.RedrawAxis()
 
     histograms.addPileupText("PU=%s" % (PU) )
     histograms.addText(0.60, 0.38, plots._legendLabels[signal], 17)
