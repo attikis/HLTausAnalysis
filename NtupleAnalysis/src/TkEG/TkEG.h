@@ -74,7 +74,7 @@ class TkEG : public TreeAnalyserMC{
   double cfg_tk_maxEta;
   double cfg_tk_maxChiSq;
   double cfg_tk_minStubs;
-  bool cfg_DEBUG;  
+  bool DEBUG;  
     
  private:
   // Private function declarations
@@ -156,6 +156,7 @@ class TkEG : public TreeAnalyserMC{
   float maxEta_leadtrk;   
   float minDeltaR_leadtrk; 
   float maxDeltaR_leadtrk; 
+  float maxDeltaR_const;
   float maxDeltaZ_trk; 
   float maxInvMass_trk;  
   float minEt_EG;     
@@ -252,7 +253,7 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_MCmatch_neutralDaugh_N;
   TH1D* h_trkClusters_Pt;
   TH1D* h_trkClusters_M;
-  //TH1D* h_trkClusters_M_beforeCut;
+  TH1D* h_trkClusters_M_beforeCut;
 
   TH1D* h_EGs_N;
   TH1D* h_EGs_N_OneHadTau;
@@ -308,6 +309,7 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_NHF;
   TH1D* h_TkEG_CHF_withNeutrals;
   TH1D* h_TkEG_NHF_withNeutrals;
+  TH1D* h_TkEG_isoCone_InvMass;
 
   TH1D* h_TkEG_PtResolution;
   TH1D* h_TkEG_PtResolution_C;

@@ -24,12 +24,13 @@ void TkEG::InitObjects(void)
 void TkEG::InitVars_()
 //============================================================================
 {
+  DEBUG = false;
 
+  // Dataset-related
   datasets_  = datasets_.GetDataset(mcSample);
   nMaxNumOfHTausPossible = datasets_.nMcTaus_;
   
-  cfg_DEBUG = false;
-  if (cfg_DEBUG) std::cout << "=== TkEG::InitVars_()" << std::endl;
+  if (DEBUG) std::cout << "=== TkEG::InitVars_()" << std::endl;
   
   cfg_AddL1Tks   = true;
   cfg_AddEGs     = true;
@@ -40,7 +41,7 @@ void TkEG::InitVars_()
   cfg_tk_nFitParams  = 4;           // Default: 4
   cfg_tk_minPt       = 2.00;        // Default: 2.0
   cfg_tk_minEta      = 0.0;         // Default: 0.0
-  cfg_tk_maxEta      = 2.4;        // Default: 1e6
+  cfg_tk_maxEta      = 2.5;        // Default: 1e6
   cfg_tk_maxChiSq    = 50.0;         // Default: 1e6
   cfg_tk_minStubs    =   5;         // Default: 0
 
@@ -48,26 +49,27 @@ void TkEG::InitVars_()
   minStubs_trk      = 5; 
   maxChi2_trk       = 50.0; // GeV
   minPt_leadtrk     = 5.0; // GeV
-  maxEta_leadtrk    = 2.4;
+  maxEta_leadtrk    = 2.5;
   minDeltaR_leadtrk = 0.0;
-  maxDeltaR_leadtrk = 0.15;//0.3;
-  maxDeltaZ_trk     = 0.8;  // cm
-  maxInvMass_trk    = 1.4; // GeV 
+  maxDeltaR_leadtrk = 0.25;//0.3;
+  maxDeltaR_const   = 2.0;
+  maxDeltaZ_trk     = 1.0;  // cm
+  maxInvMass_trk    = 1.5; // GeV 
   minEt_EG          = 2.0;  // GeV
   minDeltaR_EG      = 0.0;
-  maxDeltaR_EG      = 0.15;//0.3;
+  maxDeltaR_EG      = 0.25;//0.3;
   maxInvMass_EG     = 1.77; // GeV
-  maxDeltaR_MCmatch = 0.2;    
-  minDeltaR_iso     = 0.15;
+  maxDeltaR_MCmatch = 0.1;    
+  //minDeltaR_iso     = 0.15;
   maxDeltaR_iso     = 0.3;
   maxDeltaZ_iso     = 0.6;  // cm
   useRelIso         = true;
-  maxRelIso         = 0.10; //0.2
+  maxRelIso         = 0.20; //0.2
   maxVtxIso         = 0.50;
 
   // Eta regions
-  _eta_C             =   0.8; 
-  _eta_F             =   1.6;
+  _eta_C = 0.8; 
+  _eta_F = 1.6;
 
 
   return;
@@ -114,7 +116,7 @@ void TkEG::Loop()
   bool isMinBias        = false;  
   // L1PixelTrackFit f(3.8112); // Bz in Tesla (for pixel re-fitting)
   
-  if (cfg_DEBUG)  cout << "=== TkEG:\n\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
+  if (DEBUG)  cout << "=== TkEG:\n\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
   
   // Determine what sample this is
   std::size_t found = mcSample.find("SingleNeutrino");
@@ -122,11 +124,11 @@ void TkEG::Loop()
   if ((found!=std::string::npos) || (found_electron!=std::string::npos))
     {
       isMinBias = true;
-      if (cfg_DEBUG) std::cout << "Minimum Bias sample" << std::endl;
+      if (DEBUG) std::cout << "Minimum Bias sample" << std::endl;
     }
   else
     {
-      if (cfg_DEBUG) std::cout << "Not a Minimum Bias sample." << std::endl;
+      if (DEBUG) std::cout << "Not a Minimum Bias sample." << std::endl;
     }
   
   ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -194,7 +196,7 @@ void TkEG::Loop()
 
   for (int jentry = 0; jentry < nEntries; jentry++, nEvts++){
     
-    if (cfg_DEBUG) cout << "\t------------ Entry = " << jentry << endl;
+    if (DEBUG) cout << "\t------------ Entry = " << jentry << endl;
     
     // Init variables
     Long64_t ientry = LoadTree(jentry);
@@ -210,29 +212,29 @@ void TkEG::Loop()
     if (cfg_AddL1Tks) {
       TTTracks = GetTTTracks(cfg_tk_minPt, cfg_tk_minEta, cfg_tk_maxEta, cfg_tk_maxChiSq, cfg_tk_minStubs, cfg_tk_nFitParams, false);
       sort( TTTracks.begin(), TTTracks.end() ); // Sort from highest Pt to lowest (not done by default)
-      if (cfg_DEBUG*0) cout << "\n=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
-      if (cfg_DEBUG*0) PrintTTTrackCollection(TTTracks);
+      if (DEBUG*0) cout << "\n=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
+      if (DEBUG*0) PrintTTTrackCollection(TTTracks);
     }    
     
     // EGs
     if (cfg_AddEGs) {
       L1EGs = GetEGs(false);
       sort( L1EGs.begin(), L1EGs.end() ); // Sort from highest Et to lowest Et (should be already done by default)
-      if (cfg_DEBUG) cout << "\n=== L1EGs (" << L1EGs.size() << ")" << endl;
-//      if (cfg_DEBUG*0) PrintL1EGCollection(L1EGs);
+      if (DEBUG) cout << "\n=== L1EGs (" << L1EGs.size() << ")" << endl;
+//      if (DEBUG*0) PrintL1EGCollection(L1EGs);
     }
 
     // GenParticles (skip for MinBias samples as no real taus exist)
     vector<GenParticle> GenTaus;
     if (!isMinBias) GenTaus = GetGenParticles(15, true);
-    if (cfg_DEBUG*0) PrintGenParticleCollection(GenTaus);
+    if (DEBUG*0) PrintGenParticleCollection(GenTaus);
     
     // Hadronic GenTaus (skip for MinBias samples)
     GenTausHadronic.clear();
     if (cfg_AddGenP) {
-      if (cfg_DEBUG) cout << "\n=== GenParticles (" << GenP_Pt.size() << ")" << endl;
+      if (DEBUG) cout << "\n=== GenParticles (" << GenP_Pt.size() << ")" << endl;
       if (!isMinBias) GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
-      if (cfg_DEBUG*0) PrintGenParticleCollection(GenTausHadronic);
+      if (DEBUG*0) PrintGenParticleCollection(GenTausHadronic);
     }
     
     // Triggred GenTaus (skip for MinBias samples)
@@ -246,7 +248,7 @@ void TkEG::Loop()
 
 
     // Fill histos with genTau info
-    if (cfg_DEBUG) cout << "\n=== All gen-taus info " << endl;
+    if (DEBUG) cout << "\n=== All gen-taus info " << endl;
 
     if (!isMinBias){
       h_genTausAll_N->Fill(GenTaus.size());
@@ -268,7 +270,7 @@ void TkEG::Loop()
     ////////////////////////////////////////////////////////////////////////////////////////////////    
     
     // Check whether EGs exist or not when asking for a specific number of gen hadronic taus
-    if (cfg_DEBUG) cout << "\n=== Count EGs multiplicity" << endl;
+    if (DEBUG) cout << "\n=== Count EGs multiplicity" << endl;
     // Without asking for genuine hadronic taus 
     if (L1EGs.size() >=1 ) counters_events_EGs++;
 
@@ -290,7 +292,7 @@ void TkEG::Loop()
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Gen-Level Studies
     ////////////////////////////////////////////////////////////////////////////////////////////////    
-    if (cfg_DEBUG) cout << "\n\t=== Gen-Level Studies" <<endl;
+    if (DEBUG) cout << "\n\t=== Gen-Level Studies" <<endl;
 
 
     // For-loop: All hadronic gen-taus
@@ -461,7 +463,7 @@ void TkEG::Loop()
 	if (!notLeading) h_genTau_neutralDaugh_PtLead_dRmax -> Fill (d.pt(), deltaRneutral_max);
       }                
            
-      if (cfg_DEBUG) genTau -> PrintFinalDaughtersCharged();
+      if (DEBUG) genTau -> PrintFinalDaughtersCharged();
 
       // Fill the invariant mass and Pt of all charged products
       float chargedPt = p4sum.Pt();
@@ -480,7 +482,7 @@ void TkEG::Loop()
 	neutralET += d.et();
       }                           
 
-      if (cfg_DEBUG) genTau -> PrintFinalDaughtersNeutral();
+      if (DEBUG) genTau -> PrintFinalDaughtersNeutral();
       
       // Fill the invariant mass and ET of all neutral products (if exist)
       if (genTau->finalDaughtersNeutral().size()!=0){
@@ -499,7 +501,7 @@ void TkEG::Loop()
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //  Tracks + EG Algorithm
     ////////////////////////////////////////////////////////////////////////////////////////////////    
-    if (cfg_DEBUG) cout << "\n\t=== Tracks + EG Algorithm" <<endl;
+    if (DEBUG) cout << "\n\t=== Tracks + EG Algorithm" <<endl;
 
 
     //====================================================
@@ -556,7 +558,7 @@ void TkEG::Loop()
     //====================================================
     // Leading-Tracks (tau-seeds)
     //====================================================
-    if (cfg_DEBUG) std::cout << "\n=== Leading-Tracks (tau-seeds)" << endl;
+    if (DEBUG) std::cout << "\n=== Leading-Tracks (tau-seeds)" << endl;
 
 
     // Select lead tracks  
@@ -565,7 +567,7 @@ void TkEG::Loop()
     vector< TTTrack> newCandidateTracks; // temporary container
     for (vector<TTTrack>::iterator leadTrkIter = TTTracks.begin(); leadTrkIter != TTTracks.end(); leadTrkIter++) {
       counter_allTracks++;
-      if (cfg_DEBUG*0) std:: cout << "Considering leading track candidate " << leadTrkIter->index() << std::endl;
+      if (DEBUG*0) std:: cout << "Considering leading track candidate " << leadTrkIter->index() << std::endl;
       
       // Plot quality quantities for all the TTTracks 
       h_trk_NStubs_all       -> Fill (leadTrkIter->getNumOfStubs());
@@ -589,16 +591,16 @@ void TkEG::Loop()
       counter_passChi2Nstubs++;
 
 
-      if (cfg_DEBUG) std:: cout << "Leading track candidate " << leadTrkIter->index() << "passed cuts!" << std::endl;
+      if (DEBUG) std:: cout << "Leading track candidate " << leadTrkIter->index() << "passed cuts!" << std::endl;
       // Check that there are no close tracks (in terms of deltaR) with higher Pt
       highPtNeighbourFound = false;
       for (vector<TTTrack>::iterator trackIter = TTTracks.begin(); !highPtNeighbourFound && trackIter != TTTracks.end(); trackIter++) {
-         if (cfg_DEBUG*0) std::cout << "Considering neighbour track " << trackIter->index() << std::endl;
+         if (DEBUG*0) std::cout << "Considering neighbour track " << trackIter->index() << std::endl;
          deltaR = auxTools_.DeltaR(leadTrkIter->getEta(), leadTrkIter->getPhi(), trackIter->getEta(), trackIter->getPhi());
-         if (cfg_DEBUG*0) std::cout << "DeltaR = " << deltaR << std::endl;
+         if (DEBUG*0) std::cout << "DeltaR = " << deltaR << std::endl;
          if (deltaR > minDeltaR_leadtrk && deltaR < maxDeltaR_leadtrk && trackIter->getPt() > leadTrkIter->getPt())
            highPtNeighbourFound = true;
-           if (cfg_DEBUG*0) std::cout << "High-pT neighbour found, leading track cadidate " << leadTrkIter->index() << " discarded" << std::endl;
+           if (DEBUG*0) std::cout << "High-pT neighbour found, leading track cadidate " << leadTrkIter->index() << " discarded" << std::endl;
       }
       // If not, save the lead track to trackTauCandidates vector
       if (!highPtNeighbourFound) {
@@ -617,10 +619,10 @@ void TkEG::Loop()
     // Fill number of lead tracks (in this event) to a histogram
     h_leadTrks_Multiplicity->Fill( trackTauCandidates.size() );
     // Debug prints
-    if (cfg_DEBUG) std::cout << "Lead tracks:" << std::endl;
-    if (cfg_DEBUG) std::cout << trackTauCandidates.size() << " lead tracks found, here are 3 first:" << std::endl;
+    if (DEBUG) std::cout << "Lead tracks:" << std::endl;
+    if (DEBUG) std::cout << trackTauCandidates.size() << " lead tracks found, here are 3 first:" << std::endl;
     for (std::size_t i=0; i<3 && i<trackTauCandidates.size(); i++) {
-      if (cfg_DEBUG*0) std::cout << "leading track index = " << trackTauCandidates[i][0].index() << ", Pt = " << trackTauCandidates[i][0].getPt() << std::endl;
+      if (DEBUG*0) std::cout << "leading track index = " << trackTauCandidates[i][0].index() << ", Pt = " << trackTauCandidates[i][0].getPt() << std::endl;
     }  
 
 
@@ -628,27 +630,36 @@ void TkEG::Loop()
     //====================================================
     // Tracks Clustering (around tau-seed)
     //====================================================
-    if (cfg_DEBUG) std::cout << "\n=== Track Clustering (around tau-seed)" << endl;
-	
+    if (DEBUG) std::cout << "\n=== Track Clustering (around tau-seed)" << endl;
+    
     // Cluster surrounding tracks with lead tracks
     TTTrack* leadTrackPtr = NULL;
-    float invMass;
-    float pT;
+    float invMass, pT, maxDeltaR;
     int Ntrks;
     bool stopClustering;
-    TLorentzVector p4sum; // initialized to (0,0,0,0)
-    //PrintTTTrackCollection(TTTracks);
+        
     for (size_t i=0; i<trackTauCandidates.size(); i++) {
+      
+      // Initialize the p4sum for each tau candidate
+      TLorentzVector p4sum; // initialized to (0,0,0,0)
+
       leadTrackPtr = &(trackTauCandidates[i][0]);
+      p4sum += leadTrackPtr->p4();
+      
+      // Shrinking cone size
+      maxDeltaR = maxDeltaR_const/leadTrackPtr->getPt();
+      if (maxDeltaR > maxDeltaR_leadtrk) maxDeltaR = maxDeltaR_leadtrk;
 
-      if (cfg_DEBUG) cout << "Starting to cluster lead track " << leadTrackPtr->index();
+      if (DEBUG) cout << "Starting to cluster lead track " << leadTrackPtr->index();
       // Loop over other tracks
-      stopClustering = false;
+      //stopClustering = false;
 
-      for (vector<TTTrack>::iterator trackIter = TTTracks.begin(); ( !stopClustering && (trackIter != TTTracks.end()) ); trackIter++) {
+      for (vector<TTTrack>::iterator trackIter = TTTracks.begin(); trackIter != TTTracks.end(); trackIter++) {
+
+	// General cut on chi^2 
+	if (trackIter->getChi2() > 100.0) continue;
 
 	trkcounter_allTracks += 1;
-
 	// Do not double-counts the lead track
 	if (trackIter->index() == leadTrackPtr->index()) continue;
 	trkcounter_allNonLeading += 1;
@@ -660,76 +671,86 @@ void TkEG::Loop()
 	trkcounter_passZ += 1;
 	deltaR = auxTools_.DeltaR(leadTrackPtr->getEta(), leadTrackPtr->getPhi(), trackIter->getEta(), trackIter->getPhi());
 
-	if (deltaR > maxDeltaR_leadtrk) continue;
+	if (deltaR > maxDeltaR) continue;
 	trkcounter_passDRmax += 1;
 	if (deltaR < minDeltaR_leadtrk) continue;
 	trkcounter_passDRmin += 1;
 
 	// Calculate invariant mass and pT of already clustered tracks
+	//p4sum.SetPtEtaPhiM(0., 0., 0., 0.);
+	//for(size_t j=0; j < trackTauCandidates[i].size(); j++){
+	//p4sum += trackTauCandidates[i][j].p4();
+	//}
+	//invMass = p4sum.M();
+	//pT = p4sum.Pt();
+
+	// Add the p4 of the new track
+	p4sum += trackIter->p4();
+	trackTauCandidates[i].push_back(*trackIter);
+	//trkcounter_passInvMass += 1;
+	
+	/*
+	// Fill histos for clustered tracks
+	h_clustTrks_Pt->Fill( trackIter->getPt() );
+	h_clustTrks_Eta->Fill( trackIter->getEta() );
+	h_clustTrks_Phi->Fill( trackIter->getPhi() );
+	h_clustTrks_Phi_Eta->Fill( trackIter->getPhi(),trackIter->getEta() );
+	
+
+	// Remove clustered track from TTTrack's collction so that it will not be used for another tau candidate
+	trackIter = TTTracks.erase(trackIter);
+	trackIter--; //WARNING!
+	} 
+	else {
+	// Stop clustering
+	stopClustering = true;
+	}
+	*/
+      }
+      
+      h_trkClusters_M_beforeCut->Fill(p4sum.M());
+
+      // Cluster the track if the total invariant mass is below the maximum  
+      if (p4sum.M() > maxInvMass_trk) {
+
+	trackTauCandidates.erase(trackTauCandidates.begin()+i);
+	i--;
+      }
+
+      else {
+
+	// Calculate final multiplicity, pt and invariant mass of the track clusters
+	Ntrks = trackTauCandidates[i].size();
 	p4sum.SetPtEtaPhiM(0., 0., 0., 0.);
 	for(size_t j=0; j < trackTauCandidates[i].size(); j++){
 	  p4sum += trackTauCandidates[i][j].p4();
 	}
 	invMass = p4sum.M();
 	pT = p4sum.Pt();
-
-	// Add the p4 of the new track
-	p4sum += trackIter->p4();
-
-	// Cluster the track if the total invariant mass is below the maximum  
-	if (p4sum.M() < maxInvMass_trk) {
-	  trackTauCandidates[i].push_back(*trackIter);
-	  trkcounter_passInvMass += 1;
-
-	  // Fill histos for clustered tracks
-	  h_clustTrks_Pt->Fill( trackIter->getPt() );
-	  h_clustTrks_Eta->Fill( trackIter->getEta() );
-	  h_clustTrks_Phi->Fill( trackIter->getPhi() );
-	  h_clustTrks_Phi_Eta->Fill( trackIter->getPhi(),trackIter->getEta() );
-
-	  // Remove clustered track from TTTrack's collction so that it will not be used for another tau candidate
-	  trackIter = TTTracks.erase(trackIter);
-	  trackIter--; //WARNING!
-	} 
-	else {
-	  // Stop clustering
-	  stopClustering = true;
-	}
+	
+	if (DEBUG) cout << "After clustering trackTauCandidates[" << i << "] with leadTrack " << leadTrackPtr->index() << ", it has " 
+			    << trackTauCandidates[i].size() << " tracks and a mass of " << invMass << endl;
+	
+	// Fill histos with Track Clusters info
+	h_trkClusters_MultiplicityPerCluster->Fill( Ntrks );
+	h_trkClusters_Pt->Fill( pT );
+	h_trkClusters_M->Fill( invMass );
+	
+	//PrintTTTrackCollection(trackTauCandidates[i]);
+	counter_allTrkTauCand ++; 
+	if (trackTauCandidates[i].size()==1) counter_1trk++;
+	if (trackTauCandidates[i].size()==2) counter_2trk++;
+	if (trackTauCandidates[i].size()==3) counter_3trk++;
+	if (trackTauCandidates[i].size()==4) counter_4trk++;
+	if (trackTauCandidates[i].size()==5) counter_5trk++;
+	
       }
-
-      //h_trkClusters_M_beforeCut->Fill(p4sum.M());
-      // Calculate final multiplicity, pt and invariant mass of the track clusters
-      Ntrks = trackTauCandidates[i].size();
-      p4sum.SetPtEtaPhiM(0., 0., 0., 0.);
-      for(size_t j=0; j < trackTauCandidates[i].size(); j++){
-	p4sum += trackTauCandidates[i][j].p4();
-      }
-      invMass = p4sum.M();
-      pT = p4sum.Pt();
-
-      if (cfg_DEBUG) cout << "After clustering trackTauCandidates[" << i << "] with leadTrack " << leadTrackPtr->index() << ", it has " 
-			  << trackTauCandidates[i].size() << " tracks and a mass of " << invMass << endl;
-
-      // Fill histos with Track Clusters info
-      h_trkClusters_MultiplicityPerCluster->Fill( Ntrks );
-      h_trkClusters_Pt->Fill( pT );
-      h_trkClusters_M->Fill( invMass );
-            
-      //PrintTTTrackCollection(trackTauCandidates[i]);
-      counter_allTrkTauCand ++; 
-      if (trackTauCandidates[i].size()==1) counter_1trk++;
-      if (trackTauCandidates[i].size()==2) counter_2trk++;
-      if (trackTauCandidates[i].size()==3) counter_3trk++;
-      if (trackTauCandidates[i].size()==4) counter_4trk++;
-      if (trackTauCandidates[i].size()==5) counter_5trk++;
-
     }
-
 
     //====================================================
     //  EGs Properties
     //====================================================
-    if (cfg_DEBUG) std::cout << "\n=== EGs Properties" << endl;
+    if (DEBUG) std::cout << "\n=== EGs Properties" << endl;
 
     h_EGs_N -> Fill( L1EGs.size() );
 
@@ -746,29 +767,9 @@ void TkEG::Loop()
     //====================================================
     //  EGs Clustering
     //====================================================
-    if (cfg_DEBUG) std::cout << "\n=== EGs Clustering" << endl;
+    if (DEBUG) std::cout << "\n=== EGs Clustering" << endl;
 
-    // EGs properties (when Leading Track exist)
-    if (trackTauCandidates.size() != 0) {
-      
-      // Fill histo with number of EGs in each event
-      //h_EGs_N -> Fill( L1EGs.size() );
-      //if (GenTausHadronic.size() == 1) h_EGs_N_OneHadTau -> Fill(L1EGs.size());
-      
-      // For-loop: All the EGs in the event
-      for (auto eg = L1EGs.begin(); eg != L1EGs.end() ; eg++) {
-	
-	// Fill histos with EGs properties 
-	//h_EGs_Et  -> Fill( eg->getEt() );
-	//h_EGs_Eta -> Fill( eg->getEta() );
-	//h_EGs_Phi -> Fill( eg->getPhi() );
-        //h_EGs_IEta -> Fill( eg->getIEta() );
-        //h_EGs_IPhi -> Fill( eg->getIPhi() );
-	
-      }// For-loop: All the EGs in the event
-   
-    }
-        
+
     // Build EG clusters and create tau candidates
     vector<EG> EGcluster;
     TauCandidates.clear();
@@ -784,6 +785,11 @@ void TkEG::Loop()
       EGcluster.clear();
       leadTrackPtr = &(trackTauCandidates[i][0]);
       stopClustering = false;
+
+      // Shrinking cone size
+      maxDeltaR = maxDeltaR_const/leadTrackPtr->getPt();
+      if (maxDeltaR > maxDeltaR_leadtrk) maxDeltaR = maxDeltaR_leadtrk;
+      
       TLorentzVector p4sum; // initialized to (0,0,0,0)  //marina
       // EG clustering counters
       unsigned int counter_allEG = 0;
@@ -830,10 +836,10 @@ void TkEG::Loop()
 	if (deltaR < deltaRmin) deltaRmin=deltaR;
 	if (abs(deltaPhi) < abs(deltaPhiMin)) deltaPhiMin = deltaPhi;
 	if (abs(deltaEta) < abs(deltaEtaMin)) deltaEtaMin = deltaEta;
-
+       
 	// Aply dR cuts
 	// Skip if EG is not within the signal cone 
-	if (deltaR > maxDeltaR_EG) continue;
+	if (deltaR > maxDeltaR) continue;
 	counter_passDRmax++;
 	if (deltaR < minDeltaR_EG) continue;
 	counter_passDRmin++;
@@ -866,7 +872,7 @@ void TkEG::Loop()
 	  stopClustering = true;
 	}
 	
-	if (cfg_DEBUG) cout << "Invariant mass of cluster is " << invMass << " and ET is " << ET << endl; 
+	if (DEBUG) cout << "Invariant mass of cluster is " << invMass << " and ET is " << ET << endl; 
 	
       }// For-loop: All the EGs in the event
       
@@ -899,7 +905,7 @@ void TkEG::Loop()
       //====================================================
       // MC Matching of Tau Candidates
       //====================================================
-      if (cfg_DEBUG) std::cout << "\n=== MC Matching of Tau Candidates" << endl;
+      if (DEBUG) std::cout << "\n=== MC Matching of Tau Candidates" << endl;
 
 
       // Find the genTau matching to the lead track
@@ -930,7 +936,7 @@ void TkEG::Loop()
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// Tk+EG algorithm representation in Gen-Level (Charged and Neutral daughters multiplicity) 
 	//////////////////////////////////////////////////////////////////////////////////////////
-	if (cfg_DEBUG) std::cout << "\n=== Tk+EG algorithm representation in Gen-Level" << endl;
+	if (DEBUG) std::cout << "\n=== Tk+EG algorithm representation in Gen-Level" << endl;
 
 	// Find the leading charged daughter
 	GenParticle d_ldg = genTau.finalDaughtersCharged().at(0);
@@ -1029,12 +1035,12 @@ void TkEG::Loop()
       //====================================================
       // Build Tau Candidate
       //====================================================
-      if (cfg_DEBUG) std::cout << "\n=== Build Tau Candidate" << endl;
+      if (DEBUG) std::cout << "\n=== Build Tau Candidate" << endl;
 
 
       // Build a tau candidate from tracks and EGs
       L1TkEGParticle newTauCandidate(trackTauCandidates[i], EGcluster, genTau, hasGenTau);
-      if (cfg_DEBUG) { //marina
+      if (DEBUG) { //marina
 	cout << "Constructed a new tau candidate with a track invariant mass of " << newTauCandidate.GetTrackInvMass() 
 	     << ", an EG invariant mass of " << newTauCandidate.GetEGInvMass();
 	if (hasGenTau) cout  << " and a generator tau with visible pT " << newTauCandidate.GetGenTauPt() << endl;
@@ -1050,7 +1056,7 @@ void TkEG::Loop()
     }
     
     
-
+    // Tau Candidates Properties & Resolution
     for (auto tkeg = TauCandidates.begin(); tkeg != TauCandidates.end(); tkeg++) {
 
       h_TkEG_Pt      -> Fill (tkeg->GetTotalPt());
@@ -1168,43 +1174,17 @@ void TkEG::Loop()
 	}	
       }
       
-      /*
-      // Pt resolution
-      TLorentzVector p4tracks; // initialized to (0,0,0,0) 
-      for (auto tk = trackTauCandidates[i].begin(); tk != trackTauCandidates[i].end(); tk++) {
-      p4tracks += tk->p4();
-      }
-      double pTresolution = ( p4tracks.Pt()-genTau.p4vis().Pt() ) / genTau.p4vis().Pt();
-      h_trkClusters_PtResolution->Fill(pTresolution);
-      // FIX ME: ET resolution
-      if (EGcluster.size() >=1) {
-      hTkEG_genVisEt_clustEG -> Fill( genTau.p4vis().Et() );
-      hTkEG_genVisPt_clustEG -> Fill( genTau.p4vis().Pt() );
-      
-      double ETresolution = ( ET -genTau.p4vis().Et() ) / genTau.p4vis().Et(); //marina
-      h_TkEG_EtResolution->Fill(ETresolution);
-      }
-      */
-      
-      
-      //cout<< tkeg->GetTotalEt()<<endl;
-      
-      //float sumET=0;
-      //for (auto clusteg = tkeg->GetEGs().begin(); clusteg != tkeg->GetEGs().end(); clusteg++){ 
-      //sumET += clusteg->getEt();
-      //}
-      //cout <<"--- "<< tkeg->GetTrackBasedPt()+sumET<<endl;
     }
     
 
     //====================================================
     // Apply Isolation (Vertex, Relative)
     //====================================================
-    if (cfg_DEBUG) std::cout << "\n=== Apply Isolation (Vertex, Relative)" << endl;
+    if (DEBUG) std::cout << "\n=== Apply Isolation (Vertex, Relative)" << endl;
 
     // Check relative isolation of tau candidates
     float relIso = -1.0;
-    float ptSum;
+    float ptSum, minDeltaR_iso;
     TTTrack leadingTrack;
     vector<TTTrack> clustTracks;
     TauCandidatesRelIsolated.clear();
@@ -1213,7 +1193,12 @@ void TkEG::Loop()
     
       leadingTrack = tkeg->GetLeadingTrack();
       clustTracks  = tkeg->GetTracks();
-
+      
+      // Shrinking cone size
+      maxDeltaR = maxDeltaR_const/leadingTrack.getPt();
+      if (maxDeltaR > maxDeltaR_leadtrk) maxDeltaR = maxDeltaR_leadtrk;
+      minDeltaR_iso = maxDeltaR;
+      
       // Sum Pt's inside the isolation cone
       ptSum = 0.0;
       // For-loop: All TTTracks
@@ -1230,6 +1215,7 @@ void TkEG::Loop()
 	// Check if the track is from the same vertex and within an isolation cone of 0.5
 	if (abs (tk->getZ0() - leadingTrack.getZ0() ) > maxDeltaZ_iso) continue;
 	deltaR = auxTools_.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), tk->getEta(), tk->getPhi());
+
 
         if (deltaR > minDeltaR_iso && deltaR < maxDeltaR_iso)
 	  
@@ -1248,7 +1234,7 @@ void TkEG::Loop()
     }
 
     // Check vertex isolation of tau candidates
-    float mindZ0 = 1000000.0;
+    float mindZ0;
     float dz0;
     TauCandidatesVtxIsolated.clear();
 
@@ -1256,7 +1242,14 @@ void TkEG::Loop()
 
       leadingTrack = tkeg->GetLeadingTrack();
       clustTracks  = tkeg->GetTracks();
-
+      mindZ0 = 1000000.0;
+      TLorentzVector p4sum;
+	
+      // Shrinking cone size
+      maxDeltaR = maxDeltaR_const/leadingTrack.getPt();
+      if (maxDeltaR > maxDeltaR_leadtrk) maxDeltaR = maxDeltaR_leadtrk;
+      minDeltaR_iso = maxDeltaR;
+      
       // For-loop: All TTTracks
       for (auto tk = TTTracks.begin(); tk != TTTracks.end(); tk++) {
 
@@ -1267,12 +1260,16 @@ void TkEG::Loop()
 	  if (clusttk->index() == tk->index()) clustered = true;
 	}
 	if (clustered) continue;	
-	
+
 	// Check if the track is in the iso-cone
 	deltaR = auxTools_.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), tk->getEta(), tk->getPhi());
 	if (deltaR > minDeltaR_iso && deltaR < maxDeltaR_iso) {
+	  
+	  // Calclulate total p4 of isolation annulus tracks
+	  p4sum += tk->p4();
+	  
+	  // Calculate mindz0
 	  dz0 = abs (tk->getZ0() - leadingTrack.getZ0() );
-
 	  if (dz0 < mindZ0) mindZ0 = dz0;
 	  
 	}
@@ -1280,7 +1277,8 @@ void TkEG::Loop()
       } // For-loop: All TTTracks
 
       // Fill relative isolation histogram
-      h_TkEG_vtxIso->Fill( mindZ0 );
+      h_TkEG_vtxIso       -> Fill( mindZ0 );
+      h_TkEG_isoCone_InvMass -> Fill( p4sum.M() );
 
       if(mindZ0 > maxVtxIso) {
         TauCandidatesVtxIsolated.push_back(*tkeg);
@@ -1295,7 +1293,7 @@ void TkEG::Loop()
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Fill Turn-On histograms
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    if (cfg_DEBUG) std::cout << "\n=== Fill Turn-On histograms" << endl;
+    if (DEBUG) std::cout << "\n=== Fill Turn-On histograms" << endl;
 
 
     for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++)
@@ -1331,7 +1329,7 @@ void TkEG::Loop()
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Rates and efficiencies for single tau
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    if (cfg_DEBUG) std::cout << "\n=== Rates and efficiencies for single tau" << endl;
+    if (DEBUG) std::cout << "\n=== Rates and efficiencies for single tau" << endl;
 
 
     FillSingleTau_(TauCandidates, hRateSingleTau_TkEG, hEffSingleTau_TkEG);
@@ -1346,7 +1344,7 @@ void TkEG::Loop()
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Rates and efficiencies for ditau
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    if (cfg_DEBUG) std::cout << "\n=== Rates and efficiencies for ditau" << endl;
+    if (DEBUG) std::cout << "\n=== Rates and efficiencies for ditau" << endl;
 
 
     FillDiTau_(TauCandidates, hRateDiTau_TkEG, hEffDiTau_TkEG);
@@ -1367,7 +1365,7 @@ void TkEG::Loop()
     //FillDiTau_(L1TkTaus_Tk, hDiTau_Rate_Tk_F, hDiTau_Eff_Tk_F, 1.6, 3.0); 
     
     // Progress bar
-    if (!cfg_DEBUG) auxTools_.ProgressBar(jentry, nEntries, 100, 100);
+    if (!DEBUG) auxTools_.ProgressBar(jentry, nEntries, 100, 100);
    
   } // For-loop: Entries
 
@@ -1375,7 +1373,7 @@ void TkEG::Loop()
   ////////////////////////////////////////////////////////////////////////////////////////////////
   // Fill counters
   ////////////////////////////////////////////////////////////////////////////////////////////////
-  if (cfg_DEBUG) std::cout << "\n=== Fill counters" << endl;
+  if (DEBUG) std::cout << "\n=== Fill counters" << endl;
 
 
   // Event counters (smart counters)
@@ -1445,7 +1443,7 @@ void TkEG::Loop()
   ////////////////////////////////////////////////////////////////////////////////////////////////
   // Convert/Finalise histograms
   ////////////////////////////////////////////////////////////////////////////////////////////////
-  if (cfg_DEBUG) std::cout << "\n=== Convert/Finalise histograms" << endl;
+  if (DEBUG) std::cout << "\n=== Convert/Finalise histograms" << endl;
 
   // Divide turn-on numerators by the denumerator
   histoTools_.DivideHistos_1D(hTkEG_TurnOn25, hMcHadronicTau_VisEt);
@@ -1525,7 +1523,7 @@ void TkEG::Loop()
   ////////////////////////////////////////////////////////////////////////////////////////////////
   // Write the histograms to the file
   ////////////////////////////////////////////////////////////////////////////////////////////////
-  if (cfg_DEBUG) std::cout << "\n=== Write the histograms to the file" << endl;
+  if (DEBUG) std::cout << "\n=== Write the histograms to the file" << endl;
   
   WriteHistos_();
   auxTools_.StopwatchStop(5, "minutes", "Total Time");
@@ -1618,7 +1616,7 @@ void TkEG::BookHistos_(void)
 
 
   // Event-Type Histograms
-  histoTools_.BookHisto_1D(h_Counters, "Counters",  "", 10, 0.0, +9.0);
+  histoTools_.BookHisto_1D(h_Counters, "Counters",  "", 9, 0.0, +9.0);
   h_Counters->GetXaxis()->SetBinLabel( 1, "All Evts");
   h_Counters->GetXaxis()->SetBinLabel( 2, "Evts");
   h_Counters->GetXaxis()->SetBinLabel( 3, "Seed Pt");
@@ -1794,9 +1792,8 @@ void TkEG::BookHistos_(void)
   // Pt of track clusters
   histoTools_.BookHisto_1D(h_trkClusters_Pt, "trkClusters_Pt", ";p_{T} (GeV);Clusters / bin", 150, +0.0, +300.0);
 
-  
   // Invariant mass of track clusters (before cut)
-  // histoTools_.BookHisto_1D(h_trkClusters_M_beforeCut, "trkClusters_M_beforeCut", ";Invariant mass;Clusters / bin", 40, 0.0, +4.0);
+  histoTools_.BookHisto_1D(h_trkClusters_M_beforeCut, "trkClusters_M_beforeCut", ";Invariant mass;Clusters / bin", 40, 0.0, +4.0);
 
   // Invariant mass of track clusters
   histoTools_.BookHisto_1D(h_trkClusters_M, "trkClusters_M", ";Invariant mass;Clusters / bin", 40, 0.0, +4.0);
@@ -1894,7 +1891,7 @@ void TkEG::BookHistos_(void)
   // Track-based relative isolation of tau candidates
   histoTools_.BookHisto_1D(h_TkEG_relIso, "TkEG_relIso", ";Relative isolation;Clusters / bin", 100, 0.0, +5.0);
 
-    // Track-based relative isolation of tau candidates
+  // Track-based relative isolation of tau candidates
   histoTools_.BookHisto_1D(h_TkEG_vtxIso, "TkEG_vtxIso", ";Vertex isolation;Clusters / bin", 100, 0.0, +5.0);
   
   // Et of the tkeg when it has a matched genTau
@@ -1925,7 +1922,7 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_TkEG_NHF, "TkEG_NHF", ";NHF; Entries / bin", 200,  0.0,   +2.0);
   histoTools_.BookHisto_1D(h_TkEG_CHF_withNeutrals, "TkEG_CHF_withNeutrals", ";CHF; Entries / bin", 200,  0.0,   +2.0);
   histoTools_.BookHisto_1D(h_TkEG_NHF_withNeutrals, "TkEG_NHF_withNeutrals", ";NHF; Entries / bin", 200,  0.0,   +2.0);
-
+  histoTools_.BookHisto_1D(h_TkEG_isoCone_InvMass, "TkEG_isoCone_InvMass", ";Invariant mass (iso-cone); Entries / bin", 40, +0.0, +4.0);
 
   // Pt resolution of TkEG candidate
   histoTools_.BookHisto_1D(h_TkEG_PtResolution, "TkEG_PtResolution", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
@@ -2174,7 +2171,7 @@ void TkEG::WriteHistos_(void)
   h_MCmatch_neutralDaugh_N->Write();
   h_trkClusters_Pt->Write();
   h_trkClusters_M->Write();
-  //h_trkClusters_M_beforeCut->Write();
+  h_trkClusters_M_beforeCut->Write();
 
   h_clustEGs_Et->Write();
   h_clustEGs_Eta->Write();
@@ -2220,6 +2217,7 @@ void TkEG::WriteHistos_(void)
   h_TkEG_NHF->Write();
   h_TkEG_CHF_withNeutrals->Write();
   h_TkEG_NHF_withNeutrals->Write();
+  h_TkEG_isoCone_InvMass->Write();
   
   h_TkEG_PtResolution->Write();
   h_TkEG_PtResolution_C->Write();
