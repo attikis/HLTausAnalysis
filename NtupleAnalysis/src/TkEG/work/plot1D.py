@@ -359,7 +359,7 @@ def GetHistoKwargs(h, opts):
 
     if "tkeg_vtxiso" in h.lower():
          kwargs["opts"]   = {"xmin": 0.0, "xmax": 4.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
-         kwargs["cutBox"] = {"cutValue": 1.00, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+         kwargs["cutBox"] = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
          kwargs["log"]  = True
 
 
