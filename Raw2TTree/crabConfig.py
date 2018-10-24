@@ -19,7 +19,7 @@ config.section_("General")
 config.General.requestName = rName
 config.General.workArea = dirName
 config.General.transferOutputs = True
-config.General.transferLogs = False #jobs stuck in transferring 
+config.General.transferLogs = True #False #jobs stuck in transferring 
 # options:
 #config.General.failureLimit
 #config.General.instance
@@ -61,13 +61,13 @@ config.Data.inputDataset = dataset
 config.Data.inputDBS = 'global' #'phys03'
 config.Data.splitting = 'FileBased'
 #config.Data.totalUnits  = 10
-config.Data.unitsPerJob = 5
+config.Data.unitsPerJob = 1
 config.Data.publication = False
 config.Data.outLFNDirBase = '/store/user/%s/CRAB3_TransferData' % (getUsernameFromSiteDB())
 
 # testing:
 # config.Data.totalUnits    = 100000
-# config.Data.unitsPerJob   = 10000 
+#config.Data.unitsPerJob   = 10000 
 # options:
 # config.Data.allowNonValidInputDatase
 # config.Data.outputPrimaryDataset
