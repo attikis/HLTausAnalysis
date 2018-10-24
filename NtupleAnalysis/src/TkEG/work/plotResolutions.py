@@ -169,6 +169,13 @@ def main(opts):
             ["TkEG_EtResolution_F", "TkEG_EtResolution_1pr_F", "TkEG_EtResolution_3pr_F", "TkEG_EtResolution_withNeutrals_F", "TkEG_EtResolution_noNeutrals_F"],
             ["TkEG_EtaResolution_F", "TkEG_EtaResolution_1pr_F", "TkEG_EtaResolution_3pr_F", "TkEG_EtaResolution_withNeutrals_F", "TkEG_EtaResolution_noNeutrals_F"],
             ["TkEG_PhiResolution_F", "TkEG_PhiResolution_1pr_F", "TkEG_PhiResolution_3pr_F", "TkEG_PhiResolution_withNeutrals_F", "TkEG_PhiResolution_noNeutrals_F"],
+            ["TkEG_EtResolution_F", "TkEG_EtResolution_1pr_F_withEGs", "TkEG_EtResolution_3pr_F_withEGs", "TkEG_EtResolution_withNeutrals_F_withEGs", "TkEG_EtResolution_noNeutrals_F_withEGs"],
+            ["TkEG_EtaResolution_F", "TkEG_EtaResolution_1pr_F_withEGs", "TkEG_EtaResolution_3pr_F_withEGs", "TkEG_EtaResolution_withNeutrals_F_withEGs", "TkEG_EtaResolution_noNeutrals_F_withEGs"],
+            ["TkEG_PhiResolution_F", "TkEG_PhiResolution_1pr_F_withEGs", "TkEG_PhiResolution_3pr_F_withEGs", "TkEG_PhiResolution_withNeutrals_F_withEGs", "TkEG_PhiResolution_noNeutrals_F_withEGs"],
+            ["TkEG_EtResolution_F", "TkEG_EtResolution_1pr_F_noEGs", "TkEG_EtResolution_3pr_F_noEGs", "TkEG_EtResolution_withNeutrals_F_noEGs", "TkEG_EtResolution_noNeutrals_F_noEGs"],
+            ["TkEG_EtaResolution_F", "TkEG_EtaResolution_1pr_F_noEGs", "TkEG_EtaResolution_3pr_F_noEGs", "TkEG_EtaResolution_withNeutrals_F_noEGs", "TkEG_EtaResolution_noNeutrals_F_noEGs"],
+            ["TkEG_PhiResolution_F", "TkEG_PhiResolution_1pr_F_noEGs", "TkEG_PhiResolution_3pr_F_noEGs", "TkEG_PhiResolution_withNeutrals_F_noEGs", "TkEG_PhiResolution_noNeutrals_F_noEGs"],
+
             ]
                        
     
@@ -189,6 +196,14 @@ def main(opts):
             PlotHistos(datasetsMgr, resList[6], s, PU, "ResolutionEt_%s_all_F" % (s) )
             PlotHistos(datasetsMgr, resList[7], s, PU, "ResolutionEta_%s_all_F" % (s) )
             PlotHistos(datasetsMgr, resList[8], s, PU, "ResolutionPhi_%s_all_F" % (s) )
+
+            PlotHistos(datasetsMgr, resList[9] , s, PU, "ResolutionEt_%s_all_F_withEGs" % (s) )
+            PlotHistos(datasetsMgr, resList[10], s, PU, "ResolutionEta_%s_all_F_withEGs" % (s) )
+            PlotHistos(datasetsMgr, resList[11], s, PU, "ResolutionPhi_%s_all_F_withEGs" % (s) )
+            
+            PlotHistos(datasetsMgr, resList[12], s, PU, "ResolutionEt_%s_all_F_noEGs" % (s) )
+            PlotHistos(datasetsMgr, resList[13], s, PU, "ResolutionEta_%s_all_F_noEGs" % (s) )
+            PlotHistos(datasetsMgr, resList[14], s, PU, "ResolutionPhi_%s_all_F_noEGs" % (s) )
 
         print
 
@@ -263,7 +278,7 @@ def GetHistoKwargs(h, opts):
     _mvLeg2 = {"dx": -0.00, "dy": -0.00, "dh": -0.0}
     _mvLeg3 = {"dx": -0.05, "dy": -0.00, "dh": -0.0}
 
-    logY    = False
+    logY    = True
     yMin    = 0.0
     if logY:
         yMin = 1

@@ -104,6 +104,14 @@ def GetDatasetsFromDir(opts):
     return datasets
     
 
+def getAlgos():
+    '''
+    https://root.cern.ch/doc/master/classTAttText.html
+    '''
+    #return ["TkTaus", "TkTaus (RelIso)", "TkTaus (VtxIso)", "TkTaus (VtxIso-L)", "TkTaus (VtxIso-T)", "TkTaus (RelIso-L)", "TkTaus (RelIso-T)"]
+    return ["TkEGs", "TkEGs #font[72]{RelIso}", "TkEGs #font[72]{VtxIso}", "TkEGs #font[72]{VtxIso-L}", "TkEGs #font[72]{VtxIso-T}", "TkEGs #font[72]{RelIso-L}", "TkEGs #font[72]{RelIso-T}"]
+
+
 def main(opts):
     
     # Apply TDR style
@@ -152,11 +160,11 @@ def main(opts):
                 dsets_signal.append(d)
 
         # ROC curve ingredients (histograms)
-                
-        effLists    = [["Eff_SingleTau_TkEG", "Eff_SingleTau_VtxIso", "Eff_SingleTau_RelIso"],
+        effLists    = [["TkEG_Eff", "RelIso_Eff", "VtxIso_Eff", "VtxIsoLoose_Eff", "VtxIsoTight_Eff", "RelIsoLoose_Eff", "RelIsoTight_Eff"], 
                        ["Eff_DiTau_TkEG", "Eff_DiTau_VtxIso", "Eff_DiTau_RelIso"]]
-
-        rateLists   = [["Rate_SingleTau_TkEG", "Rate_SingleTau_VtxIso", "Rate_SingleTau_RelIso" ],
+        
+        
+        rateLists   = [["TkEG_Rate", "RelIso_Rate", "VtxIso_Rate", "VtxIsoLoose_Rate", "VtxIsoTight_Rate", "RelIsoLoose_Rate", "RelIsoTight_Rate"], 
                        ["Rate_DiTau_TkEG", "Rate_DiTau_VtxIso", "Rate_DiTau_RelIso"]]
 
         turnOnLists = [["TkEG_TurnOn25", "RelIso_TurnOn25", "VtxIso_TurnOn25"],# "VtxIsoLoose_TurnOn25", "VtxIsoTight_TurnOn25", "RelIsoLoose_TurnOn25", "RelIsoTight_TurnOn25"], 
@@ -240,16 +248,22 @@ def PlotRate(datasetsMgr, histoList, bkg, PU):
     kwargs   = GetHistoKwargs(saveName, opts)
     hList    = []
     legDict  = {}
-    algos    = ["TkEG", "TkEG (VtxIso)", "TkEG (RelIso)"]
-    #algos    = ["TkEG", "TkEG (RelIso)"]
+    algos    = getAlgos()
     
     # For-loop: All tau algorithms
     for i, hName in enumerate(histoList, 0):
-        algo = hName.split("_")[-1]
-        tau  = hName.split("_")[1]
-        if  tau == "DiTau":
-            taus = "DiTau"
-            algo = hName.split("_")[-1]
+        algo = hName.split("_")[0]
+        
+        #if algo == "DiTau":
+        #    taus = "DiTau"
+        #    algo = hName.split("_")[-1]
+        if "ditau" in hName.lower():
+            return
+        #algo = hName.split("_")[-1]
+        #tau  = hName.split("_")[1]
+        #if  tau == "DiTau":
+        #    taus = "DiTau"
+        #    algo = hName.split("_")[-1]
         
         aux.PrintFlushed("Plotting rate (%s-%s)" % (algo, taus), False)
         h = datasetsMgr.getDataset(bkg).getDatasetRootHisto(hName).getHistogram()
@@ -263,7 +277,7 @@ def PlotRate(datasetsMgr, histoList, bkg, PU):
     # Set legend labels
     for i, h in enumerate(p.histoMgr.getHistos(), 0):
         hName = h.getName()
-        algo  = h.getName().split("_")[-1]
+        algo  = h.getName().split("_")[0]
         p.histoMgr.forHisto(hName, styles.getTauAlgoStyle(algo))
         p.histoMgr.setHistoDrawStyle(hName, "HIST")
         p.histoMgr.setHistoLegendStyle(hName, "L")
@@ -295,23 +309,21 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
     kwargs   = GetHistoKwargs(saveName, opts)
     hList    = []
     legDict  = {}
-    algos    = ["TkEG", "TkEG (VtxIso)", "TkEG (RelIso)"]                                                                                                               
-    #algos    = ["TkEG", "TkEG (RelIso)"]
+    algos    = getAlgos()
 
     # For-loop: All tau algorithms
     count = -1
     for i, hName in enumerate(histoList, 0):
-        algo = hName.split("_")[-1]
-        tau  = hName.split("_")[1]
-        if tau == "DiTau":
-
-            if "TT_" in signal or "GluGlu"  or "SingleTau" in signal:
-                pass
-            else:
-                return
-
-            taus = "DiTau"
-            algo = hName.split("_")[-1]
+        algo = hName.split("_")[0]
+        if "ditau" in hName.lower():
+            return
+        #if algo == "DiTau":
+        #    if "TT_" in signal or "GluGlu" in signal:
+        #        pass
+        #    else:
+        #        return
+        #    taus = "DiTau"
+        #    algo = hName.split("_")[-1]
         count+=1  
         aux.PrintFlushed("Plotting efficiency (%s-%s-%s)" % (algo, taus, signal), False) #count==0)
         h = datasetsMgr.getDataset(signal).getDatasetRootHisto(hName).getHistogram()
@@ -325,7 +337,7 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
     # Set legend labels
     for h in p.histoMgr.getHistos():
         hName = h.getName()
-        algo  = h.getName().split("_")[-1]
+        algo  = h.getName().split("_")[0]
         p.histoMgr.forHisto(hName, styles.getTauAlgoStyle(algo))
         p.histoMgr.setHistoDrawStyle(hName, "HIST")
         p.histoMgr.setHistoLegendStyle(hName, "L")
@@ -340,7 +352,7 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
     # Add additional canvas text
     histograms.addPileupText("PU=%s" % (PU) )
     # histograms.addText(0.75, 0.88, taus, 17)
-    histograms.addText(0.60, 0.88, plots._legendLabels[signal], 17)
+    histograms.addText(0.66, 0.86, plots._legendLabels[signal], 17)
 
     # Save the plots in custom list of saveFormats
     aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, True)
@@ -359,8 +371,8 @@ def PlotTurnOns(datasetsMgr, histoList, signal, PU, saveName=None):
     kwargs    = GetHistoKwargs(saveName, opts)
     hList     = []
     legDict   = {}
-    algos     = ["TkEG", "TkEG (VtxIso)", "TkEG (RelIso)"]
-    #algos     = ["TkEG", "TkEG (RelIso)"]
+    algos     = getAlgos()
+
     if "_all"  in saveName:
         algos = ["Inclusive", "1-prong", "3-prong", "#geq 1 #pi^{0}'s", "0 #pi^{0}'s"]
 
@@ -415,11 +427,12 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
 
     # Get Histogram name and its kwargs
     if "ditau" in effHistoList[0].lower():
-        if "TT_" in signal or "GluGlu" or "SingleTau" in signal:
-            pass
-        else:
-            return
-        saveName = "RateVsEff_DiTau_%s_PU%s" % (signal.split("_")[0], PU)
+        return
+        #if "TT_" in signal or "GluGlu" in signal:
+        #    pass
+        #else:
+        #    return
+        #saveName = "RateVsEff_DiTau_%s_PU%s" % (signal.split("_")[0], PU)
     else:
         saveName = "RateVsEff_SingleTau_%s_PU%s" % (signal.split("_")[0], PU)
     kwargs_  = GetHistoKwargs(saveName, opts)
@@ -434,12 +447,23 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
         elif (i==2):
             g3 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
             g3.SetName("RelIso")
-            
+        elif (i==3):
+            g4 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
+            g4.SetName("VtxIsoLoose")
+        elif (i==4):
+            g5 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
+            g5.SetName("VtxIsoTight")
+        elif (i==5):
+            g6 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
+            g6.SetName("RelIsoLoose")
+        elif (i==6):
+            g7 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
+            g7.SetName("RelIsoTight")
+
 
     # Create the Rate Vs Efficiency TGraphs
-    p = plots.ComparisonManyPlot(g1, [g2, g3], saveFormats=[])
-    algos = ["TkEG", "TkEG (VtxIso)", "TkEG (RelIso)"]
-    #algos = ["TkEG", "TkEG (RelIso)"]
+    p = plots.ComparisonManyPlot(g1, [g2, g3, g4, g5, g6, g7], saveFormats=[])
+    algos = getAlgos()
 
     # Set individual styles
     for index, h in enumerate(p.histoMgr.getHistos()):
@@ -456,16 +480,17 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
     plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
 
     # Draw Error bands
-    #for i, g in enumerate([g1, g2, g3]):
-    #    shapes, min, max = DrawErrorBand(g) 
-    #    for shape in shapes:
-    #        shape.SetFillColor( p.histoMgr.getHistos()[i].getRootHisto().GetFillColor())
-    #        shape.SetFillStyle(3002)
-    #        shape.Draw("f same")
-    #    ROOT.gPad.RedrawAxis()
+    if opts.errorBands:
+        for i, g in enumerate([g1, g2, g3]):
+            shapes, min, max = DrawErrorBand(g) 
+            for shape in shapes:
+                shape.SetFillColor( p.histoMgr.getHistos()[i].getRootHisto().GetFillColor())
+                shape.SetFillStyle(3002)
+                shape.Draw("f same")
+            ROOT.gPad.RedrawAxis()
 
     histograms.addPileupText("PU=%s" % (PU) )
-    histograms.addText(0.60, 0.38, plots._legendLabels[signal], 17)
+    histograms.addText(0.55, 0.48, plots._legendLabels[signal], 17)
 
     # Save the plots in custom list of saveFormats
     aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, True)
@@ -608,10 +633,10 @@ def DrawErrorBand(graph):
     return shapes, min, max 
 
 def GetHistoKwargs(h, opts):
-    _mvLeg1 = {"dx": -0.20, "dy": -0.55, "dh": -0.15}
-    _mvLeg2 = {"dx": -0.10, "dy": -0.05, "dh": -0.15}
-    _mvLeg3 = {"dx": -0.15, "dy": -0.05, "dh": -0.15}
-    _mvLeg4 = {"dx": -0.15, "dy": -0.55, "dh": -0.15}
+    _mvLeg1 = {"dx": -0.20, "dy": -0.45, "dh": -0.02}
+    _mvLeg2 = {"dx": -0.10, "dy": -0.07, "dh": -0.00}
+    _mvLeg3 = {"dx": -0.15, "dy": -0.45, "dh": -0.02}
+    _mvLeg4 = {"dx": -0.52, "dy": -0.07, "dh": -0.05}
     logY    = True
     yMin    = 0.0
     if logY:
@@ -712,6 +737,7 @@ if __name__ == "__main__":
     BATCHMODE    = True
     DATAERA      = "TDR2019" #"ID2017" #"TDR2019"
     FOLDER       = ""
+    EBANDS       = False
     GRIDX        = True
     GRIDY        = True
     OPTMODE      = None
@@ -743,6 +769,9 @@ if __name__ == "__main__":
 
     parser.add_option("--dataEra", dest="dataEra", type="string", default=DATAERA, 
                       help="Override default dataEra [default: %s]" % DATAERA)
+
+    parser.add_option("--errorBands", dest="errorBands", action="store_true", default=EBANDS, 
+                      help="Enable error bands for ROC curves [default: %s]" % EBANDS)
 
     parser.add_option("--gridX", dest="gridX", action="store_true", default=GRIDX, 
                       help="Enable the x-axis grid lines [default: %s]" % GRIDX)
