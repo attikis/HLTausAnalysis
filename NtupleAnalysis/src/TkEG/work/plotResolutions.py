@@ -166,15 +166,31 @@ def main(opts):
             ["TkEG_EtResolution" , "TkEG_EtResolution_C"   , "TkEG_EtResolution_I"   , "TkEG_EtResolution_F" ],
             ["TkEG_EtaResolution", "TkEG_EtaResolution_C"  , "TkEG_EtaResolution_I"  , "TkEG_EtaResolution_F"],
             ["TkEG_PhiResolution", "TkEG_PhiResolution_C"  , "TkEG_PhiResolution_I"  , "TkEG_PhiResolution_F"],
+
             ["TkEG_EtResolution_F", "TkEG_EtResolution_1pr_F", "TkEG_EtResolution_3pr_F", "TkEG_EtResolution_withNeutrals_F", "TkEG_EtResolution_noNeutrals_F"],
             ["TkEG_EtaResolution_F", "TkEG_EtaResolution_1pr_F", "TkEG_EtaResolution_3pr_F", "TkEG_EtaResolution_withNeutrals_F", "TkEG_EtaResolution_noNeutrals_F"],
             ["TkEG_PhiResolution_F", "TkEG_PhiResolution_1pr_F", "TkEG_PhiResolution_3pr_F", "TkEG_PhiResolution_withNeutrals_F", "TkEG_PhiResolution_noNeutrals_F"],
-            ["TkEG_EtResolution_F", "TkEG_EtResolution_1pr_F_withEGs", "TkEG_EtResolution_3pr_F_withEGs", "TkEG_EtResolution_withNeutrals_F_withEGs", "TkEG_EtResolution_noNeutrals_F_withEGs"],
-            ["TkEG_EtaResolution_F", "TkEG_EtaResolution_1pr_F_withEGs", "TkEG_EtaResolution_3pr_F_withEGs", "TkEG_EtaResolution_withNeutrals_F_withEGs", "TkEG_EtaResolution_noNeutrals_F_withEGs"],
-            ["TkEG_PhiResolution_F", "TkEG_PhiResolution_1pr_F_withEGs", "TkEG_PhiResolution_3pr_F_withEGs", "TkEG_PhiResolution_withNeutrals_F_withEGs", "TkEG_PhiResolution_noNeutrals_F_withEGs"],
-            ["TkEG_EtResolution_F", "TkEG_EtResolution_1pr_F_noEGs", "TkEG_EtResolution_3pr_F_noEGs", "TkEG_EtResolution_withNeutrals_F_noEGs", "TkEG_EtResolution_noNeutrals_F_noEGs"],
-            ["TkEG_EtaResolution_F", "TkEG_EtaResolution_1pr_F_noEGs", "TkEG_EtaResolution_3pr_F_noEGs", "TkEG_EtaResolution_withNeutrals_F_noEGs", "TkEG_EtaResolution_noNeutrals_F_noEGs"],
-            ["TkEG_PhiResolution_F", "TkEG_PhiResolution_1pr_F_noEGs", "TkEG_PhiResolution_3pr_F_noEGs", "TkEG_PhiResolution_withNeutrals_F_noEGs", "TkEG_PhiResolution_noNeutrals_F_noEGs"],
+
+            ["TkEG_EtResolution_F_withEGs", "TkEG_EtResolution_1pr_F_withEGs", "TkEG_EtResolution_3pr_F_withEGs", "TkEG_EtResolution_withNeutrals_F_withEGs", "TkEG_EtResolution_noNeutrals_F_withEGs"],
+            ["TkEG_EtaResolution_F_withEGs", "TkEG_EtaResolution_1pr_F_withEGs", "TkEG_EtaResolution_3pr_F_withEGs", "TkEG_EtaResolution_withNeutrals_F_withEGs", "TkEG_EtaResolution_noNeutrals_F_withEGs"],
+            ["TkEG_PhiResolution_F_withEGs", "TkEG_PhiResolution_1pr_F_withEGs", "TkEG_PhiResolution_3pr_F_withEGs", "TkEG_PhiResolution_withNeutrals_F_withEGs", "TkEG_PhiResolution_noNeutrals_F_withEGs"],
+            ["TkEG_EtResolution_F_noEGs", "TkEG_EtResolution_1pr_F_noEGs", "TkEG_EtResolution_3pr_F_noEGs", "TkEG_EtResolution_withNeutrals_F_noEGs", "TkEG_EtResolution_noNeutrals_F_noEGs"],
+            ["TkEG_EtaResolution_F_noEGs", "TkEG_EtaResolution_1pr_F_noEGs", "TkEG_EtaResolution_3pr_F_noEGs", "TkEG_EtaResolution_withNeutrals_F_noEGs", "TkEG_EtaResolution_noNeutrals_F_noEGs"],
+            ["TkEG_PhiResolution_F_noEGs", "TkEG_PhiResolution_1pr_F_noEGs", "TkEG_PhiResolution_3pr_F_noEGs", "TkEG_PhiResolution_withNeutrals_F_noEGs", "TkEG_PhiResolution_noNeutrals_F_noEGs"],
+
+            ["TkEG_EtResolution_F_withEGs_posEta", "TkEG_EtResolution_1pr_F_withEGs_posEta", "TkEG_EtResolution_3pr_F_withEGs_posEta", "TkEG_EtResolution_withNeutrals_F_withEGs_posEta", "TkEG_EtResolution_noNeutrals_F_withEGs_posEta"],
+            ["TkEG_EtaResolution_F_withEGs_posEta", "TkEG_EtaResolution_1pr_F_withEGs_posEta", "TkEG_EtaResolution_3pr_F_withEGs_posEta", "TkEG_EtaResolution_withNeutrals_F_withEGs_posEta", "TkEG_EtaResolution_noNeutrals_F_withEGs_posEta"],
+            ["TkEG_PhiResolution_F_withEGs_posEta", "TkEG_PhiResolution_1pr_F_withEGs_posEta", "TkEG_PhiResolution_3pr_F_withEGs_posEta", "TkEG_PhiResolution_withNeutrals_F_withEGs_posEta", "TkEG_PhiResolution_noNeutrals_F_withEGs_posEta"],
+            ["TkEG_EtResolution_F_noEGs_posEta", "TkEG_EtResolution_1pr_F_noEGs_posEta", "TkEG_EtResolution_3pr_F_noEGs_posEta", "TkEG_EtResolution_withNeutrals_F_noEGs_posEta", "TkEG_EtResolution_noNeutrals_F_noEGs_posEta"],
+            ["TkEG_EtaResolution_F_noEGs_posEta", "TkEG_EtaResolution_1pr_F_noEGs_posEta", "TkEG_EtaResolution_3pr_F_noEGs_posEta", "TkEG_EtaResolution_withNeutrals_F_noEGs_posEta", "TkEG_EtaResolution_noNeutrals_F_noEGs_posEta"],
+            ["TkEG_PhiResolution_F_noEGs_posEta", "TkEG_PhiResolution_1pr_F_noEGs_posEta", "TkEG_PhiResolution_3pr_F_noEGs_posEta", "TkEG_PhiResolution_withNeutrals_F_noEGs_posEta", "TkEG_PhiResolution_noNeutrals_F_noEGs_posEta"],
+
+            ["TkEG_EtResolution_F_withEGs_negEta", "TkEG_EtResolution_1pr_F_withEGs_negEta", "TkEG_EtResolution_3pr_F_withEGs_negEta", "TkEG_EtResolution_withNeutrals_F_withEGs_negEta", "TkEG_EtResolution_noNeutrals_F_withEGs_negEta"],
+            ["TkEG_EtaResolution_F_withEGs_negEta", "TkEG_EtaResolution_1pr_F_withEGs_negEta", "TkEG_EtaResolution_3pr_F_withEGs_negEta", "TkEG_EtaResolution_withNeutrals_F_withEGs_negEta", "TkEG_EtaResolution_noNeutrals_F_withEGs_negEta"],
+            ["TkEG_PhiResolution_F_withEGs_negEta", "TkEG_PhiResolution_1pr_F_withEGs_negEta", "TkEG_PhiResolution_3pr_F_withEGs_negEta", "TkEG_PhiResolution_withNeutrals_F_withEGs_negEta", "TkEG_PhiResolution_noNeutrals_F_withEGs_negEta"],
+            ["TkEG_EtResolution_F_noEGs_negEta", "TkEG_EtResolution_1pr_F_noEGs_negEta", "TkEG_EtResolution_3pr_F_noEGs_negEta", "TkEG_EtResolution_withNeutrals_F_noEGs_negEta", "TkEG_EtResolution_noNeutrals_F_noEGs_negEta"],
+            ["TkEG_EtaResolution_F_noEGs_negEta", "TkEG_EtaResolution_1pr_F_noEGs_negEta", "TkEG_EtaResolution_3pr_F_noEGs_negEta", "TkEG_EtaResolution_withNeutrals_F_noEGs_negEta", "TkEG_EtaResolution_noNeutrals_F_noEGs_negEta"],
+            ["TkEG_PhiResolution_F_noEGs_negEta", "TkEG_PhiResolution_1pr_F_noEGs_negEta", "TkEG_PhiResolution_3pr_F_noEGs_negEta", "TkEG_PhiResolution_withNeutrals_F_noEGs_negEta", "TkEG_PhiResolution_noNeutrals_F_noEGs_negEta"],
 
             ]
                        
@@ -204,6 +220,22 @@ def main(opts):
             PlotHistos(datasetsMgr, resList[12], s, PU, "ResolutionEt_%s_all_F_noEGs" % (s) )
             PlotHistos(datasetsMgr, resList[13], s, PU, "ResolutionEta_%s_all_F_noEGs" % (s) )
             PlotHistos(datasetsMgr, resList[14], s, PU, "ResolutionPhi_%s_all_F_noEGs" % (s) )
+
+            PlotHistos(datasetsMgr, resList[15], s, PU, "ResolutionEt_%s_all_F_withEGs_posEta" % (s) )
+            PlotHistos(datasetsMgr, resList[16], s, PU, "ResolutionEta_%s_all_F_withEGs_posEta" % (s) )
+            PlotHistos(datasetsMgr, resList[17], s, PU, "ResolutionPhi_%s_all_F_withEGs_posEta" % (s) )
+            
+            PlotHistos(datasetsMgr, resList[18], s, PU, "ResolutionEt_%s_all_F_noEGs_posEta" % (s) )
+            PlotHistos(datasetsMgr, resList[19], s, PU, "ResolutionEta_%s_all_F_noEGs_posEta" % (s) )
+            PlotHistos(datasetsMgr, resList[20], s, PU, "ResolutionPhi_%s_all_F_noEGs_posEta" % (s) )
+
+            PlotHistos(datasetsMgr, resList[21], s, PU, "ResolutionEt_%s_all_F_withEGs_negEta" % (s) )
+            PlotHistos(datasetsMgr, resList[22], s, PU, "ResolutionEta_%s_all_F_withEGs_negEta" % (s) )
+            PlotHistos(datasetsMgr, resList[23], s, PU, "ResolutionPhi_%s_all_F_withEGs_negEta" % (s) )
+            
+            PlotHistos(datasetsMgr, resList[24], s, PU, "ResolutionEt_%s_all_F_noEGs_negEta" % (s) )
+            PlotHistos(datasetsMgr, resList[25], s, PU, "ResolutionEta_%s_all_F_noEGs_negEta" % (s) )
+            PlotHistos(datasetsMgr, resList[26], s, PU, "ResolutionPhi_%s_all_F_noEGs_negEta" % (s) )
 
         print
 
@@ -278,7 +310,7 @@ def GetHistoKwargs(h, opts):
     _mvLeg2 = {"dx": -0.00, "dy": -0.00, "dh": -0.0}
     _mvLeg3 = {"dx": -0.05, "dy": -0.00, "dh": -0.0}
 
-    logY    = True
+    logY    = False
     yMin    = 0.0
     if logY:
         yMin = 1

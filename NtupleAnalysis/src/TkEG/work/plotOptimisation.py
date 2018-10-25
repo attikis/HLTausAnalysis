@@ -21,6 +21,7 @@ import math
 import copy
 import os
 import re
+import array
 from optparse import OptionParser
 
 import ROOT
@@ -171,16 +172,18 @@ def main(opts):
             histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))
             if "TH1" not in histoType:
                 continue
-            if "trkClusters_relIso" == h:
+            if "TkEG_vtxIso"==h or "leadTrks_Pt"== h:
                 GetCumulativePlot(datasetsMgr, h)
+                GetSignificancePlot(datasetsMgr, h)
             
+                
 
     return
 
 def GetCumulativePlot(datasetsMgr, histoName):
 
     # Define cut direction
-    cutDirection= "<" 
+    cutDirection= ">" 
 
     Verbose("Calculating the cut-efficiency (%s) for histo with name %s" % (cutDirection, histoName) )
 
@@ -203,9 +206,9 @@ def GetCumulativePlot(datasetsMgr, histoName):
     
         # Set the x-y axis titles
         binWidth = h.GetXaxis().GetBinWidth(0)
-        # kwargs_["xlabel"] = h.GetXaxis().GetTitle()
-        kwargs_["xlabel"] = "Relative Isolation"
-        kwargs_["ylabel"] = "Efficiency / RelIso Value (%s) / %s" % (cutDirection, GetBinwidthDecimals(binWidth) % (binWidth) )
+        kwargs_["xlabel"] = h.GetXaxis().GetTitle()
+        #kwargs_["xlabel"] = "Relative Isolation"
+        kwargs_["ylabel"] = "Efficiency / Value (%s) / %s" % (cutDirection, GetBinwidthDecimals(binWidth) % (binWidth) )
     
         # If empty return                                                                                  
         if h.GetEntries() == 0:
@@ -240,24 +243,186 @@ def GetCumulativePlot(datasetsMgr, histoName):
         
         histosCumul.append(eventsNo)
 
+
+    histoName = histoName +"_Cumulative"
     PlotHistograms(datasetsMgr,histoName,histosCumul, **kwargs_)
 
     return
 
-def GetOptimizationPlot(signal_dataset, background_dataset, histoName, **kwargs):
+
+def GetSignificancePlot(datasetsMgr, histoName):
+
+    # Define cut direction
+    cutDirection= ">" 
+    histosSignif = []
+
+    Verbose("Calculating the cut-efficiency (%s) for histo with name %s" % (cutDirection, histoName) )
+
+    # Declare variables & options                                                                      
+    first  = True
+    isData = False
+    Signal_Cumul = []
+
+    kwargs_  = GetHistoKwargs(histoName, opts)
+
+    # Get the ROOT histogram                                                                           
+    for d in datasetsMgr.getAllDatasetNames():
+        rootHisto = datasetsMgr.getDataset(d).getDatasetRootHisto(histoName)
+
+        # Normalise the histogram                                                                          
+        rootHisto.normalizeToOne()
+
+        # Get a clone of the wrapped histogram normalized as requested.                                   
+        h = rootHisto.getHistogram()
+    
+        # Set the x-y axis titles
+        binWidth = h.GetXaxis().GetBinWidth(0)
+        kwargs_["xlabel"] = h.GetXaxis().GetTitle()
+        #kwargs_["xlabel"] = "Relative Isolation"
+        kwargs_["ylabel"] = "Efficiency / Value (%s) / %s" % (cutDirection, GetBinwidthDecimals(binWidth) % (binWidth) )
+    
+        # If empty return                                                                                  
+        if h.GetEntries() == 0:
+            return
+
+        # Create the eventsNo histogram                                                                    
+        eventsNo   = h.Clone(d)
+
+        # Reset and Edit the eventsNo histogram                                                            
+        eventsNo.Reset()
+
+        # Calculate the instances passing a given cut (all bins)                                           
+        nBinsX = h.GetNbinsX()+1
+        for iBin in range(1, nBinsX):
+            
+            nTotal = h.Integral(0, nBinsX)
+            
+            if cutDirection == ">":
+                nPass  = h.Integral(iBin, nBinsX)
+            elif cutDirection == "<":
+                nPass  = nTotal - h.Integral(iBin+1, nBinsX)
+            else:
+                raise Exception("Invalid cut direction  \"%s\". Please choose either \">\" or \"<\"" % (cutDirection))
+
+            # Sanity check                                                                                 
+            if nPass < 0:
+                nPass = 0
+
+            # Fill the eventNo histogram                                                                   
+            eventsNo.SetBinContent(iBin, nPass)
+            eventsNo.SetBinError(iBin, math.sqrt(nPass)/10)
+        
+        if "SingleNeutrino" in d:
+            Background_Cumul = eventsNo
+            datasetsMgr.remove(d)
+        else:
+            Signal_Cumul.append(eventsNo)
+
+    for index, sig in enumerate(Signal_Cumul):
+        x_signal     = []                                                                                 
+        y_signal     = []                                                                                 
+        x_background = []                                                                                 
+        y_background = []                                                                                 
+        
+        # Clone the Cumulative plots for Signal and Bkg                                                   
+        h_signal     = sig.Clone()                                                               
+        h_background = Background_Cumul.Clone()                                                           
+                                                                                                      
+        # Get the binNo of the Cumulative plots for Signal and Bkg                                         
+        n_signal = h_signal.GetNbinsX()                                                                   
+        n_background = h_background.GetNbinsX()                                                           
+                                                                                                      
+        # Get the bin-width of the plots                                                                  
+        binWidth = h_signal.GetBinWidth(0)                                                                
+                                                                                                      
+        # Sanity Check                                                                                    
+        if (n_signal != n_background):                                                                    
+            print "Warning: Number of Bins of signal and background are different!"                      
+
+
+        # Get the x-y values of the Cumulative Histogram                                                  
+        for i in range(1, n_signal+1):                                                                    
+                                                                                                      
+            # Signal (x,y) Values                                                                         
+            x_signal.append(h_signal.GetBinLowEdge(i)+0.5*h_signal.GetBinWidth(i))                        
+            y_signal.append(h_signal.GetBinContent(i))                                                    
+            
+            # Background (x,y) values and errors                                                          
+            x_background.append(h_background.GetBinLowEdge(i)+0.5*h_background.GetBinWidth(i))            
+            y_background.append(h_background.GetBinContent(i))                                            
+
+        # Create the (x-y) list to append the significance value for each x value                         
+        x = []                                                                                            
+        y = []                                                                                            
+                
+        '''
+        # Create variables for Maximum Significance                                                       
+        maxSignX = 0                                                                                      
+        maxSignY = 0                                                                                      
+        '''
+        print "="*100
+        # Calculate the Significance of the Signal                                                        
+        for i in range(0, n_signal):                                                                      
+            if ((float(y_background[i]) <= 0 ) or (float(y_signal[i]) <= 0)):                             
+                significance = 0                                                                          
+            else:
+                significance = float(y_signal[i])/math.sqrt(float(y_background[i])+ float(y_signal[i]))
+                #significance = float(y_signal[i])/math.sqrt(float(y_background[i]))
+                #significance = float(y_signal[i]) / float(y_background[i])                                
+                #print i, y_signal[i], y_background[i], significance
+            '''
+            elif (kwargs.get("significanceDef") == "S1"):                                                 
+                significance = float(y_signal[i])/math.sqrt(float(y_background[i]))                       
+            elif (kwargs.get("significanceDef") == "S2"):                                                 
+                significance = float(y_signal[i]) / float(y_background[i])                                
+            '''
+            x.append(x_signal[i])
+            y.append(significance)
+
+        # Create the Significance Plot         
+        tGraph = ROOT.TGraph(n_signal, array.array("d", x), array.array("d", y))                          
+        # tGraph = ROOT.TGraph(n_signal, x, y)                          
+                                                                                                         
+        # Customize y-axis title                                                                          
+        ytitle = "S/ #sqrt{B} "                                                                       
+        '''
+        if (kwargs.get("significanceDef") == "S1"):                                                       
+        ytitle = "S/ #sqrt{B} "                                                                       
+        elif (kwargs.get("significanceDef") == "S2"):                                                     
+        ytitle = "S/B"                                
+        '''
+        
+        # Customize the Significance Plot                                                                 
+        #styleDict[signal_dataset.getName()].apply(tGraph)                                                 
+        tGraph.SetName(datasetsMgr.getAllDatasetNames()[index])                                                          
+    #tGraph.GetYaxis().SetTitle("\mathcal{S} =(S/sqrt(S+B))")                                         
+    #tGraph.GetYaxis().SetTitle( ytitle +" (%s) / %s" % (cutDirection, GetBinwidthDecimals(binWidth) % (binWidth) ))                      
+        #tGraph.GetYaxis().SetTitle( ytitle +" (%s) / %s" % (cutDirection, GetBinwidthDecimals(binWidth) % (binWidth) ))                                        
+    #tGraph.GetYaxis().SetTitle( ytitle +" (%s) / %s" % (cutDirection,binWidth))                      
+        #tGraph.GetXaxis().SetTitle(h_signal.GetXaxis().GetTitle())                                        
+        optGraph = histograms.HistoGraph(tGraph, datasetsMgr.getAllDatasetNames()[index], "")
+        histosSignif.append(optGraph)
+        
+    
+    histoName = histoName +"_Significance"
+    PlotHistograms(datasetsMgr,histoName,histosSignif, **kwargs_)
+
+    return
+
+
+def GetOptimizationPlot(datasetsMgr, histoName):
 
     #print "--plotAux.py: ploting Optimization for histogram", histoName                               
 
     # Get the options                                                                                  
-    drawStyle    = kwargs.get("drawStyle")
-    legStyle     = kwargs.get("legStyle")
-    legName      = plots._legendLabels[signal_dataset.getName()]
-    cutDirection = kwargs.get("cutDirection")
-
-    # Get the Cumulative Plots for Signal and Background                                               
-    Signal_Cumul     = GetCumulativePlot(signal_dataset, histoName, **kwargs)
-    Background_Cumul = GetCumulativePlot(background_dataset, histoName, **kwargs)
+    #cutDirection = kwargs.get("cutDirection")
     
+    
+    # Get the Cumulative Plots for Signal and Background                                               
+    Signal_Cumul     = GetCumulativePlot(signal_datasets, histoName, **kwargs)
+    Background_Cumul = GetCumulativePlot(background_dataset, histoName, **kwargs)
+
+
     ######
         # Create lists to append the x-y values of the Cumulative Histogram                               
     x_signal     = []                                                                                 
@@ -345,7 +510,7 @@ def GetHistoKwargs(h, opts):
         
     _kwargs = {
         "ylabel"           : _yLabel,
-        "rebinX"           : 1,
+        "rebinX"           : None,
         "rebinY"           : None,
         "ratioYlabel"      : "Ratio",
         "ratio"            : opts.ratio,
@@ -366,8 +531,8 @@ def GetHistoKwargs(h, opts):
 
     kwargs = copy.deepcopy(_kwargs)
 
-    if "reliso" in h.lower():
-        kwargs["opts"] = {"xmin": 0.0, "xmax": 2.0, "ymin": yMin, "ymaxfactor": yMaxF}
+    if "leadtrks_pt" in h.lower():
+        kwargs["opts"] = {"xmin": 0.0, "xmax": 80.0, "ymin": yMin, "ymaxfactor": yMaxF}
     
 
     return kwargs
@@ -405,7 +570,7 @@ def PlotHistograms(datasetsMgr, histoName, histos, **kwargs_):
     Verbose("Plotting Histograms")
 
     # Set the saveName
-    saveName = histoName +"_Cumulative"
+    saveName = histoName# +"_Cumulative"
     legendDict = {} 
 
     # Create & draw the plot                                                                   
