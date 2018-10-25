@@ -312,11 +312,17 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_Eta;
   TH1D* h_TkEG_Phi;
   TH1D* h_TkEG_InvMass;
+  TH1D* h_TkEG_NEGs;
+  TH1D* h_TkEG_NTks;
+  TH1D* h_TkEG_NEGs_C;
+  TH1D* h_TkEG_NEGs_I;
+  TH1D* h_TkEG_NEGs_F;
   TH1D* h_TkEG_CHF;
   TH1D* h_TkEG_NHF;
   TH1D* h_TkEG_CHF_withNeutrals;
   TH1D* h_TkEG_NHF_withNeutrals;
-  TH1D* h_TkEG_isoCone_InvMass;
+  TH1D* h_TkEG_isoTracks_InvMass;
+  TH1D* h_TkEG_isoTracks_Multiplicity;
 
   TH1D* h_TkEG_PtResolution;
   TH1D* h_TkEG_PtResolution_C;
@@ -326,6 +332,13 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_PtResolution_withNeutrals;
   TH1D* h_TkEG_PtResolution_1pr;
   TH1D* h_TkEG_PtResolution_3pr;
+
+  TH1D* h_TkEG_PtResolution_F_withEGs;
+  TH1D* h_TkEG_PtResolution_F_withEGs_posEta;
+  TH1D* h_TkEG_PtResolution_F_withEGs_negEta;
+  TH1D* h_TkEG_PtResolution_F_noEGs;
+  TH1D* h_TkEG_PtResolution_F_noEGs_posEta;
+  TH1D* h_TkEG_PtResolution_F_noEGs_negEta;
 
   TH1D* h_TkEG_PtResolution_noNeutrals_F;
   TH1D* h_TkEG_PtResolution_withNeutrals_F;
@@ -340,7 +353,27 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_PtResolution_withNeutrals_F_noEGs;
   TH1D* h_TkEG_PtResolution_1pr_F_noEGs;
   TH1D* h_TkEG_PtResolution_3pr_F_noEGs;
-  
+
+  // eta > 0
+  TH1D* h_TkEG_PtResolution_noNeutrals_F_withEGs_posEta;
+  TH1D* h_TkEG_PtResolution_withNeutrals_F_withEGs_posEta;
+  TH1D* h_TkEG_PtResolution_1pr_F_withEGs_posEta;
+  TH1D* h_TkEG_PtResolution_3pr_F_withEGs_posEta;
+  TH1D* h_TkEG_PtResolution_noNeutrals_F_noEGs_posEta;
+  TH1D* h_TkEG_PtResolution_withNeutrals_F_noEGs_posEta;
+  TH1D* h_TkEG_PtResolution_1pr_F_noEGs_posEta;
+  TH1D* h_TkEG_PtResolution_3pr_F_noEGs_posEta;
+
+  // eta < 0
+  TH1D* h_TkEG_PtResolution_noNeutrals_F_withEGs_negEta;
+  TH1D* h_TkEG_PtResolution_withNeutrals_F_withEGs_negEta;
+  TH1D* h_TkEG_PtResolution_1pr_F_withEGs_negEta;
+  TH1D* h_TkEG_PtResolution_3pr_F_withEGs_negEta;
+  TH1D* h_TkEG_PtResolution_noNeutrals_F_noEGs_negEta;
+  TH1D* h_TkEG_PtResolution_withNeutrals_F_noEGs_negEta;
+  TH1D* h_TkEG_PtResolution_1pr_F_noEGs_negEta;
+  TH1D* h_TkEG_PtResolution_3pr_F_noEGs_negEta;
+
   TH1D* h_TkEG_EtResolution;
   TH1D* h_TkEG_EtResolution_C;
   TH1D* h_TkEG_EtResolution_I;
@@ -349,6 +382,13 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_EtResolution_withNeutrals;
   TH1D* h_TkEG_EtResolution_1pr;
   TH1D* h_TkEG_EtResolution_3pr;
+
+  TH1D* h_TkEG_EtResolution_F_withEGs;
+  TH1D* h_TkEG_EtResolution_F_withEGs_posEta;
+  TH1D* h_TkEG_EtResolution_F_withEGs_negEta;
+  TH1D* h_TkEG_EtResolution_F_noEGs;
+  TH1D* h_TkEG_EtResolution_F_noEGs_posEta;
+  TH1D* h_TkEG_EtResolution_F_noEGs_negEta;
 
   TH1D* h_TkEG_EtResolution_noNeutrals_F;
   TH1D* h_TkEG_EtResolution_withNeutrals_F;
@@ -363,6 +403,26 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_EtResolution_withNeutrals_F_noEGs;
   TH1D* h_TkEG_EtResolution_1pr_F_noEGs;
   TH1D* h_TkEG_EtResolution_3pr_F_noEGs;
+
+  // eta > 0
+  TH1D* h_TkEG_EtResolution_noNeutrals_F_withEGs_posEta;
+  TH1D* h_TkEG_EtResolution_withNeutrals_F_withEGs_posEta;
+  TH1D* h_TkEG_EtResolution_1pr_F_withEGs_posEta;
+  TH1D* h_TkEG_EtResolution_3pr_F_withEGs_posEta;
+  TH1D* h_TkEG_EtResolution_noNeutrals_F_noEGs_posEta;
+  TH1D* h_TkEG_EtResolution_withNeutrals_F_noEGs_posEta;
+  TH1D* h_TkEG_EtResolution_1pr_F_noEGs_posEta;
+  TH1D* h_TkEG_EtResolution_3pr_F_noEGs_posEta;
+
+  // eta < 0
+  TH1D* h_TkEG_EtResolution_noNeutrals_F_withEGs_negEta;
+  TH1D* h_TkEG_EtResolution_withNeutrals_F_withEGs_negEta;
+  TH1D* h_TkEG_EtResolution_1pr_F_withEGs_negEta;
+  TH1D* h_TkEG_EtResolution_3pr_F_withEGs_negEta;
+  TH1D* h_TkEG_EtResolution_noNeutrals_F_noEGs_negEta;
+  TH1D* h_TkEG_EtResolution_withNeutrals_F_noEGs_negEta;
+  TH1D* h_TkEG_EtResolution_1pr_F_noEGs_negEta;
+  TH1D* h_TkEG_EtResolution_3pr_F_noEGs_negEta;
   
   TH1D* h_TkEG_EtaResolution;
   TH1D* h_TkEG_EtaResolution_C;
@@ -372,6 +432,13 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_EtaResolution_withNeutrals;
   TH1D* h_TkEG_EtaResolution_1pr;
   TH1D* h_TkEG_EtaResolution_3pr;
+
+  TH1D* h_TkEG_EtaResolution_F_withEGs;
+  TH1D* h_TkEG_EtaResolution_F_withEGs_posEta;
+  TH1D* h_TkEG_EtaResolution_F_withEGs_negEta;
+  TH1D* h_TkEG_EtaResolution_F_noEGs;
+  TH1D* h_TkEG_EtaResolution_F_noEGs_posEta;
+  TH1D* h_TkEG_EtaResolution_F_noEGs_negEta;
 
   TH1D* h_TkEG_EtaResolution_noNeutrals_F;
   TH1D* h_TkEG_EtaResolution_withNeutrals_F;
@@ -387,6 +454,26 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_EtaResolution_1pr_F_noEGs;
   TH1D* h_TkEG_EtaResolution_3pr_F_noEGs;
 
+  // eta > 0
+  TH1D* h_TkEG_EtaResolution_noNeutrals_F_withEGs_posEta;
+  TH1D* h_TkEG_EtaResolution_withNeutrals_F_withEGs_posEta;
+  TH1D* h_TkEG_EtaResolution_1pr_F_withEGs_posEta;
+  TH1D* h_TkEG_EtaResolution_3pr_F_withEGs_posEta;
+  TH1D* h_TkEG_EtaResolution_noNeutrals_F_noEGs_posEta;
+  TH1D* h_TkEG_EtaResolution_withNeutrals_F_noEGs_posEta;
+  TH1D* h_TkEG_EtaResolution_1pr_F_noEGs_posEta;
+  TH1D* h_TkEG_EtaResolution_3pr_F_noEGs_posEta;
+
+  // eta < 0
+  TH1D* h_TkEG_EtaResolution_noNeutrals_F_withEGs_negEta;
+  TH1D* h_TkEG_EtaResolution_withNeutrals_F_withEGs_negEta;
+  TH1D* h_TkEG_EtaResolution_1pr_F_withEGs_negEta;
+  TH1D* h_TkEG_EtaResolution_3pr_F_withEGs_negEta;
+  TH1D* h_TkEG_EtaResolution_noNeutrals_F_noEGs_negEta;
+  TH1D* h_TkEG_EtaResolution_withNeutrals_F_noEGs_negEta;
+  TH1D* h_TkEG_EtaResolution_1pr_F_noEGs_negEta;
+  TH1D* h_TkEG_EtaResolution_3pr_F_noEGs_negEta;
+
   TH1D* h_TkEG_PhiResolution;
   TH1D* h_TkEG_PhiResolution_C;
   TH1D* h_TkEG_PhiResolution_I;
@@ -395,6 +482,13 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_PhiResolution_withNeutrals;
   TH1D* h_TkEG_PhiResolution_1pr;
   TH1D* h_TkEG_PhiResolution_3pr;
+
+  TH1D* h_TkEG_PhiResolution_F_withEGs;
+  TH1D* h_TkEG_PhiResolution_F_withEGs_posEta;
+  TH1D* h_TkEG_PhiResolution_F_withEGs_negEta;
+  TH1D* h_TkEG_PhiResolution_F_noEGs;
+  TH1D* h_TkEG_PhiResolution_F_noEGs_posEta;
+  TH1D* h_TkEG_PhiResolution_F_noEGs_negEta;
 
   TH1D* h_TkEG_PhiResolution_noNeutrals_F;
   TH1D* h_TkEG_PhiResolution_withNeutrals_F;
@@ -409,6 +503,34 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_PhiResolution_withNeutrals_F_noEGs;
   TH1D* h_TkEG_PhiResolution_1pr_F_noEGs;
   TH1D* h_TkEG_PhiResolution_3pr_F_noEGs;
+
+  // eta > 0
+  TH1D* h_TkEG_PhiResolution_noNeutrals_F_withEGs_posEta;
+  TH1D* h_TkEG_PhiResolution_withNeutrals_F_withEGs_posEta;
+  TH1D* h_TkEG_PhiResolution_1pr_F_withEGs_posEta;
+  TH1D* h_TkEG_PhiResolution_3pr_F_withEGs_posEta;
+  TH1D* h_TkEG_PhiResolution_noNeutrals_F_noEGs_posEta;
+  TH1D* h_TkEG_PhiResolution_withNeutrals_F_noEGs_posEta;
+  TH1D* h_TkEG_PhiResolution_1pr_F_noEGs_posEta;
+  TH1D* h_TkEG_PhiResolution_3pr_F_noEGs_posEta;
+
+  // eta < 0
+  TH1D* h_TkEG_PhiResolution_noNeutrals_F_withEGs_negEta;
+  TH1D* h_TkEG_PhiResolution_withNeutrals_F_withEGs_negEta;
+  TH1D* h_TkEG_PhiResolution_1pr_F_withEGs_negEta;
+  TH1D* h_TkEG_PhiResolution_3pr_F_withEGs_negEta;
+  TH1D* h_TkEG_PhiResolution_noNeutrals_F_noEGs_negEta;
+  TH1D* h_TkEG_PhiResolution_withNeutrals_F_noEGs_negEta;
+  TH1D* h_TkEG_PhiResolution_1pr_F_noEGs_negEta;
+  TH1D* h_TkEG_PhiResolution_3pr_F_noEGs_negEta;
+
+  // Bad Et resolution candidates 
+  TH1D* h_BadEtResolCand_InvMass;
+  TH1D* h_BadEtResolCand_RelIso;
+  TH1D* h_BadEtResolCand_VtxIso;
+  TH1D* h_BadEtResolCand_CHF;
+  TH1D* h_BadEtResolCand_IsoTracks_N;
+  TH1D* h_BadEtResolCand_dR_EG_Seed;
 
   TH1D* h_nonMCmatched_EGenergyOverTracksPt;
   TH1D* h_nonMCmatchedCandidates_decayMode;
