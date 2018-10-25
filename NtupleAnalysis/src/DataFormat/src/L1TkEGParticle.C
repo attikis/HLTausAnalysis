@@ -27,6 +27,23 @@ L1TkEGParticle::L1TkEGParticle(vector<TTTrack> tracks, vector<EG> EGs,
   theMatching = matching;
 }
 
+//****************************************************************************
+L1TkEGParticle::L1TkEGParticle(double vtxIso,
+			       double relIso, 
+			       double CHF, 
+			       double NHF, 
+			       int isoTracks_N)
+  
+//****************************************************************************
+{
+  SetVtxIso(vtxIso);
+  SetRelIso(relIso);
+  SetCHF(CHF);
+  SetNHF(NHF);
+  SetIsoTracksN(isoTracks_N);
+}
+
+
 
 //****************************************************************************
 void L1TkEGParticle::InitVars_(void)

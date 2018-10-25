@@ -24,12 +24,13 @@ void TkEG::InitObjects(void)
 void TkEG::InitVars_()
 //============================================================================
 {
+  DEBUG = false;
 
+  // Dataset-related
   datasets_  = datasets_.GetDataset(mcSample);
   nMaxNumOfHTausPossible = datasets_.nMcTaus_;
   
-  cfg_DEBUG = false;
-  if (cfg_DEBUG) std::cout << "=== TkEG::InitVars_()" << std::endl;
+  if (DEBUG) std::cout << "=== TkEG::InitVars_()" << std::endl;
   
   cfg_AddL1Tks   = true;
   cfg_AddEGs     = true;
@@ -40,48 +41,37 @@ void TkEG::InitVars_()
   cfg_tk_nFitParams  = 4;           // Default: 4
   cfg_tk_minPt       = 2.00;        // Default: 2.0
   cfg_tk_minEta      = 0.0;         // Default: 0.0
-  cfg_tk_maxEta      = 2.4;        // Default: 1e6
-  cfg_tk_maxChiSqRed = 1e6;         // Default: 1e6
+  cfg_tk_maxEta      = 2.5;        // Default: 1e6
+  cfg_tk_maxChiSq    = 50.0;         // Default: 1e6
   cfg_tk_minStubs    =   5;         // Default: 0
-  cfg_tk_minStubsPS  =   0;         // Default: 0
-  cfg_tk_maxStubsPS  = 1e6;         // Default: 1e6
 
   // TkEG algorithm parameters
-  ETmin = 5.0; // min ET in GeV of L1EG objects
-  ZMAX = 10.0; // |z_track| < ZMAX in cm
-  CHI2MAX = 200;		
-  DRmin=0.1;
-  DRmax=0.3;
-  minPt_leading_track = 10.0;
-  PrimaryVtxConstrain = false; // use the primary vertex
-  DeltaZMax = 1.0; // | z_track - z_primaryvtx | < DeltaZMax in cm. 
-  IsoCut=0.15; 
-  RelativeIsolation = true;
-
-  // New parameters
   minStubs_trk      = 5; 
-  maxChi2_trk       = 30.0; // GeV
+  maxChi2_trk       = 50.0; // GeV
   minPt_leadtrk     = 5.0; // GeV
-  maxEta_leadtrk    = 2.4;
+  maxEta_leadtrk    = 2.5;
   minDeltaR_leadtrk = 0.0;
   maxDeltaR_leadtrk = 0.15;//0.3;
+  maxDeltaR_const   = 2.0;
   maxDeltaZ_trk     = 0.8;  // cm
   maxInvMass_trk    = 1.4; // GeV 
   minEt_EG          = 2.0;  // GeV
   minDeltaR_EG      = 0.0;
   maxDeltaR_EG      = 0.15;//0.3;
   maxInvMass_EG     = 1.77; // GeV
-  maxDeltaR_MCmatch = 0.2;    
-  minDeltaR_iso     = 0.15;
-  maxDeltaR_iso     = 0.4;
+  maxDeltaR_MCmatch = 0.1;    
+
+  
+  //minDeltaR_iso     = 0.15;
+  maxDeltaR_iso     = 0.3;
   maxDeltaZ_iso     = 0.6;  // cm
   useRelIso         = true;
-  maxRelIso         = 0.10; //0.2
-  maxVtxIso         = 0.50;
+  relIso_WP         = 0.10; //0.2
+  vtxIso_WP         = 0.50;
 
   // Eta regions
-  _eta_C             =   0.8; 
-  _eta_F             =   1.6;
+  _eta_C = 0.8; 
+  _eta_F = 1.6;
 
 
   return;
@@ -109,7 +99,6 @@ void TkEG::Loop()
   if (fChain == 0) return;
   const Long64_t nEntries = (MaxEvents == -1) ? fChain->GetEntries() : min((int)fChain->GetEntries(), MaxEvents);
   
-  cout << "=== TkEG:\n\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
   // Initialisations
   InitVars_();
   BookHistos_();
@@ -125,9 +114,16 @@ void TkEG::Loop()
   unsigned int nEvtsMcMatch    = 0;
   unsigned int nEvtsVtxIso     = 0;
   unsigned int nEvtsRelIso     = 0;
+  unsigned int nEvtsVtxIsoLoose= 0;
+  unsigned int nEvtsVtxIsoTight= 0;
+  unsigned int nEvtsRelIsoLoose= 0;
+  unsigned int nEvtsRelIsoTight= 0;
+  unsigned int nEvtsIso        = 0;
   unsigned int nAllEvts = fChain->GetEntries();
   bool isMinBias        = false;  
   // L1PixelTrackFit f(3.8112); // Bz in Tesla (for pixel re-fitting)
+  
+  if (DEBUG)  cout << "=== TkEG:\n\tAnalyzing: " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
   
   // Determine what sample this is
   std::size_t found = mcSample.find("SingleNeutrino");
@@ -135,11 +131,11 @@ void TkEG::Loop()
   if ((found!=std::string::npos) || (found_electron!=std::string::npos))
     {
       isMinBias = true;
-      std::cout << "Minimum Bias sample" << std::endl;
+      if (DEBUG) std::cout << "Minimum Bias sample" << std::endl;
     }
   else
     {
-      std::cout << "Not a Minimum Bias sample." << std::endl;
+      if (DEBUG) std::cout << "Not a Minimum Bias sample." << std::endl;
     }
   
   ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,7 +203,7 @@ void TkEG::Loop()
 
   for (int jentry = 0; jentry < nEntries; jentry++, nEvts++){
     
-    if (cfg_DEBUG) cout << "\t------------ Entry = " << jentry << endl;
+    if (DEBUG) cout << "\t------------ Entry = " << jentry << endl;
     
     // Init variables
     Long64_t ientry = LoadTree(jentry);
@@ -221,31 +217,31 @@ void TkEG::Loop()
 
     // Tracks
     if (cfg_AddL1Tks) {
-      TTTracks = GetTTTracks(cfg_tk_minPt, cfg_tk_minEta, cfg_tk_maxEta, cfg_tk_maxChiSqRed, cfg_tk_minStubs, cfg_tk_nFitParams, false);
+      TTTracks = GetTTTracks(cfg_tk_minPt, cfg_tk_minEta, cfg_tk_maxEta, cfg_tk_maxChiSq, cfg_tk_minStubs, cfg_tk_nFitParams, false);
       sort( TTTracks.begin(), TTTracks.end() ); // Sort from highest Pt to lowest (not done by default)
-      if (cfg_DEBUG*0) cout << "\n=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
-      if (cfg_DEBUG*0) PrintTTTrackCollection(TTTracks);
+      if (DEBUG*0) cout << "\n=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
+      if (DEBUG*0) PrintTTTrackCollection(TTTracks);
     }    
     
     // EGs
     if (cfg_AddEGs) {
       L1EGs = GetEGs(false);
       sort( L1EGs.begin(), L1EGs.end() ); // Sort from highest Et to lowest Et (should be already done by default)
-      if (cfg_DEBUG) cout << "\n=== L1EGs (" << L1EGs.size() << ")" << endl;
-//      if (cfg_DEBUG*0) PrintL1EGCollection(L1EGs);
+      if (DEBUG) cout << "\n=== L1EGs (" << L1EGs.size() << ")" << endl;
+//      if (DEBUG*0) PrintL1EGCollection(L1EGs);
     }
 
     // GenParticles (skip for MinBias samples as no real taus exist)
     vector<GenParticle> GenTaus;
     if (!isMinBias) GenTaus = GetGenParticles(15, true);
-    if (cfg_DEBUG*0) PrintGenParticleCollection(GenTaus);
+    if (DEBUG*0) PrintGenParticleCollection(GenTaus);
     
     // Hadronic GenTaus (skip for MinBias samples)
     GenTausHadronic.clear();
     if (cfg_AddGenP) {
-      if (cfg_DEBUG) cout << "\n=== GenParticles (" << GenP_Pt.size() << ")" << endl;
+      if (DEBUG) cout << "\n=== GenParticles (" << GenP_Pt.size() << ")" << endl;
       if (!isMinBias) GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 999.9);
-      if (cfg_DEBUG*0) PrintGenParticleCollection(GenTausHadronic);
+      if (DEBUG*0) PrintGenParticleCollection(GenTausHadronic);
     }
     
     // Triggred GenTaus (skip for MinBias samples)
@@ -259,7 +255,7 @@ void TkEG::Loop()
 
 
     // Fill histos with genTau info
-    if (cfg_DEBUG) cout << "\n=== All gen-taus info " << endl;
+    if (DEBUG) cout << "\n=== All gen-taus info " << endl;
 
     if (!isMinBias){
       h_genTausAll_N->Fill(GenTaus.size());
@@ -281,7 +277,7 @@ void TkEG::Loop()
     ////////////////////////////////////////////////////////////////////////////////////////////////    
     
     // Check whether EGs exist or not when asking for a specific number of gen hadronic taus
-    if (cfg_DEBUG) cout << "\n=== Count EGs multiplicity" << endl;
+    if (DEBUG) cout << "\n=== Count EGs multiplicity" << endl;
     // Without asking for genuine hadronic taus 
     if (L1EGs.size() >=1 ) counters_events_EGs++;
 
@@ -303,7 +299,7 @@ void TkEG::Loop()
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Gen-Level Studies
     ////////////////////////////////////////////////////////////////////////////////////////////////    
-    if (cfg_DEBUG) cout << "\n\t=== Gen-Level Studies" <<endl;
+    if (DEBUG) cout << "\n\t=== Gen-Level Studies" <<endl;
 
 
     // For-loop: All hadronic gen-taus
@@ -474,7 +470,7 @@ void TkEG::Loop()
 	if (!notLeading) h_genTau_neutralDaugh_PtLead_dRmax -> Fill (d.pt(), deltaRneutral_max);
       }                
            
-      if (cfg_DEBUG) genTau -> PrintFinalDaughtersCharged();
+      if (DEBUG) genTau -> PrintFinalDaughtersCharged();
 
       // Fill the invariant mass and Pt of all charged products
       float chargedPt = p4sum.Pt();
@@ -493,7 +489,7 @@ void TkEG::Loop()
 	neutralET += d.et();
       }                           
 
-      if (cfg_DEBUG) genTau -> PrintFinalDaughtersNeutral();
+      if (DEBUG) genTau -> PrintFinalDaughtersNeutral();
       
       // Fill the invariant mass and ET of all neutral products (if exist)
       if (genTau->finalDaughtersNeutral().size()!=0){
@@ -512,7 +508,7 @@ void TkEG::Loop()
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //  Tracks + EG Algorithm
     ////////////////////////////////////////////////////////////////////////////////////////////////    
-    if (cfg_DEBUG) cout << "\n\t=== Tracks + EG Algorithm" <<endl;
+    if (DEBUG) cout << "\n\t=== Tracks + EG Algorithm" <<endl;
 
 
     //====================================================
@@ -538,9 +534,14 @@ void TkEG::Loop()
     if (tmp.size() > 0) nEvtsSeedStubs++;
 
     // No higher Pt neighbour in the signal cone
-    double deltaR;
+    double deltaR, maxDeltaR;
     for (vector<TTTrack>::iterator seedTrkIter = tmp.begin(); seedTrkIter != tmp.end(); seedTrkIter++){
       highPtNeighbourFound = false;
+
+      // Shrinking cone size
+      // maxDeltaR = maxDeltaR_const/seedTrkIter->getPt();
+      // if (maxDeltaR > maxDeltaR_leadtrk) maxDeltaR = maxDeltaR_leadtrk;
+      
       for (vector<TTTrack>::iterator trackIter = TTTracks.begin(); !highPtNeighbourFound && trackIter != TTTracks.end(); trackIter++) {
 	deltaR = auxTools_.DeltaR(seedTrkIter->getEta(), seedTrkIter->getPhi(), trackIter->getEta(), trackIter->getPhi());
 	if (deltaR > minDeltaR_leadtrk && deltaR < maxDeltaR_leadtrk && trackIter->getPt() > seedTrkIter->getPt())
@@ -569,7 +570,7 @@ void TkEG::Loop()
     //====================================================
     // Leading-Tracks (tau-seeds)
     //====================================================
-    if (cfg_DEBUG) std::cout << "\n=== Leading-Tracks (tau-seeds)" << endl;
+    if (DEBUG) std::cout << "\n=== Leading-Tracks (tau-seeds)" << endl;
 
 
     // Select lead tracks  
@@ -578,12 +579,8 @@ void TkEG::Loop()
     vector< TTTrack> newCandidateTracks; // temporary container
     for (vector<TTTrack>::iterator leadTrkIter = TTTracks.begin(); leadTrkIter != TTTracks.end(); leadTrkIter++) {
       counter_allTracks++;
-      if (cfg_DEBUG*0) std:: cout << "Considering leading track candidate " << leadTrkIter->index() << std::endl;
+      if (DEBUG*0) std:: cout << "Considering leading track candidate " << leadTrkIter->index() << std::endl;
       
-      // General cut on chi^2 
-      if (leadTrkIter->getChi2() > 100.0) continue;
-      counter_passChi2100++;
-
       // Plot quality quantities for all the TTTracks 
       h_trk_NStubs_all       -> Fill (leadTrkIter->getNumOfStubs());
       h_trk_Chi2_all         -> Fill (leadTrkIter->getChi2());
@@ -605,17 +602,20 @@ void TkEG::Loop()
       //if ((leadTrkIter->getNumOfStubs() > minStubs_trk) && (leadTrkIter->getChi2() > maxChi2_trk_alt)) continue;
       counter_passChi2Nstubs++;
 
+      // Shrinking cone size
+      // maxDeltaR = maxDeltaR_const/leadTrkIter->getPt();
+      // if (maxDeltaR > maxDeltaR_leadtrk) maxDeltaR = maxDeltaR_leadtrk;
 
-      if (cfg_DEBUG) std:: cout << "Leading track candidate " << leadTrkIter->index() << "passed cuts!" << std::endl;
+      if (DEBUG) std:: cout << "Leading track candidate " << leadTrkIter->index() << "passed cuts!" << std::endl;
       // Check that there are no close tracks (in terms of deltaR) with higher Pt
       highPtNeighbourFound = false;
       for (vector<TTTrack>::iterator trackIter = TTTracks.begin(); !highPtNeighbourFound && trackIter != TTTracks.end(); trackIter++) {
-         if (cfg_DEBUG*0) std::cout << "Considering neighbour track " << trackIter->index() << std::endl;
+         if (DEBUG*0) std::cout << "Considering neighbour track " << trackIter->index() << std::endl;
          deltaR = auxTools_.DeltaR(leadTrkIter->getEta(), leadTrkIter->getPhi(), trackIter->getEta(), trackIter->getPhi());
-         if (cfg_DEBUG*0) std::cout << "DeltaR = " << deltaR << std::endl;
+         if (DEBUG*0) std::cout << "DeltaR = " << deltaR << std::endl;
          if (deltaR > minDeltaR_leadtrk && deltaR < maxDeltaR_leadtrk && trackIter->getPt() > leadTrkIter->getPt())
            highPtNeighbourFound = true;
-           if (cfg_DEBUG*0) std::cout << "High-pT neighbour found, leading track cadidate " << leadTrkIter->index() << " discarded" << std::endl;
+           if (DEBUG*0) std::cout << "High-pT neighbour found, leading track cadidate " << leadTrkIter->index() << " discarded" << std::endl;
       }
       // If not, save the lead track to trackTauCandidates vector
       if (!highPtNeighbourFound) {
@@ -634,10 +634,10 @@ void TkEG::Loop()
     // Fill number of lead tracks (in this event) to a histogram
     h_leadTrks_Multiplicity->Fill( trackTauCandidates.size() );
     // Debug prints
-    if (cfg_DEBUG) std::cout << "Lead tracks:" << std::endl;
-    if (cfg_DEBUG) std::cout << trackTauCandidates.size() << " lead tracks found, here are 3 first:" << std::endl;
+    if (DEBUG) std::cout << "Lead tracks:" << std::endl;
+    if (DEBUG) std::cout << trackTauCandidates.size() << " lead tracks found, here are 3 first:" << std::endl;
     for (std::size_t i=0; i<3 && i<trackTauCandidates.size(); i++) {
-      if (cfg_DEBUG*0) std::cout << "leading track index = " << trackTauCandidates[i][0].index() << ", Pt = " << trackTauCandidates[i][0].getPt() << std::endl;
+      if (DEBUG*0) std::cout << "leading track index = " << trackTauCandidates[i][0].index() << ", Pt = " << trackTauCandidates[i][0].getPt() << std::endl;
     }  
 
 
@@ -645,27 +645,33 @@ void TkEG::Loop()
     //====================================================
     // Tracks Clustering (around tau-seed)
     //====================================================
-    if (cfg_DEBUG) std::cout << "\n=== Track Clustering (around tau-seed)" << endl;
-	
+    if (DEBUG) std::cout << "\n=== Track Clustering (around tau-seed)" << endl;
+    
     // Cluster surrounding tracks with lead tracks
     TTTrack* leadTrackPtr = NULL;
-    float invMass;
-    float pT;
+    float invMass, pT;
     int Ntrks;
     bool stopClustering;
-    TLorentzVector p4sum; // initialized to (0,0,0,0)
-    //PrintTTTrackCollection(TTTracks);
+        
     for (size_t i=0; i<trackTauCandidates.size(); i++) {
+      
+      // Initialize the p4sum for each tau candidate
+      TLorentzVector p4sum; // initialized to (0,0,0,0)
+
       leadTrackPtr = &(trackTauCandidates[i][0]);
+      p4sum += leadTrackPtr->p4();
+      
+      // Shrinking cone size
+      maxDeltaR = maxDeltaR_const/leadTrackPtr->getPt();
+      if (maxDeltaR > maxDeltaR_leadtrk) maxDeltaR = maxDeltaR_leadtrk;
 
-      if (cfg_DEBUG) cout << "Starting to cluster lead track " << leadTrackPtr->index();
+      h_SigCone_DeltaR -> Fill (maxDeltaR);
+
+      if (DEBUG) cout << "Starting to cluster lead track " << leadTrackPtr->index();
       // Loop over other tracks
-      stopClustering = false;
+      //stopClustering = false;
 
-      for (vector<TTTrack>::iterator trackIter = TTTracks.begin(); ( !stopClustering && (trackIter != TTTracks.end()) ); trackIter++) {
-	//cout<<TTTracks.size()<<endl;
-	// General cut on chi^2 
-	if (trackIter->getChi2() > 100.0) continue;
+      for (vector<TTTrack>::iterator trackIter = TTTracks.begin(); trackIter != TTTracks.end(); trackIter++) {
 
 	trkcounter_allTracks += 1;
 	// Do not double-counts the lead track
@@ -679,76 +685,86 @@ void TkEG::Loop()
 	trkcounter_passZ += 1;
 	deltaR = auxTools_.DeltaR(leadTrackPtr->getEta(), leadTrackPtr->getPhi(), trackIter->getEta(), trackIter->getPhi());
 
-	if (deltaR > maxDeltaR_leadtrk) continue;
+	if (deltaR > maxDeltaR) continue;
 	trkcounter_passDRmax += 1;
 	if (deltaR < minDeltaR_leadtrk) continue;
 	trkcounter_passDRmin += 1;
 
 	// Calculate invariant mass and pT of already clustered tracks
+	//p4sum.SetPtEtaPhiM(0., 0., 0., 0.);
+	//for(size_t j=0; j < trackTauCandidates[i].size(); j++){
+	//p4sum += trackTauCandidates[i][j].p4();
+	//}
+	//invMass = p4sum.M();
+	//pT = p4sum.Pt();
+
+	// Add the p4 of the new track
+	p4sum += trackIter->p4();
+	trackTauCandidates[i].push_back(*trackIter);
+	//trkcounter_passInvMass += 1;
+	
+	/*
+	// Fill histos for clustered tracks
+	h_clustTrks_Pt->Fill( trackIter->getPt() );
+	h_clustTrks_Eta->Fill( trackIter->getEta() );
+	h_clustTrks_Phi->Fill( trackIter->getPhi() );
+	h_clustTrks_Phi_Eta->Fill( trackIter->getPhi(),trackIter->getEta() );
+	
+
+	// Remove clustered track from TTTrack's collction so that it will not be used for another tau candidate
+	trackIter = TTTracks.erase(trackIter);
+	trackIter--; //WARNING!
+	} 
+	else {
+	// Stop clustering
+	stopClustering = true;
+	}
+	*/
+      }
+      
+      h_trkClusters_M_beforeCut->Fill(p4sum.M());
+
+      // Cluster the track if the total invariant mass is below the maximum  
+      if (p4sum.M() > maxInvMass_trk) {
+
+	trackTauCandidates.erase(trackTauCandidates.begin()+i);
+	i--;
+      }
+
+      else {
+
+	// Calculate final multiplicity, pt and invariant mass of the track clusters
+	Ntrks = trackTauCandidates[i].size();
 	p4sum.SetPtEtaPhiM(0., 0., 0., 0.);
 	for(size_t j=0; j < trackTauCandidates[i].size(); j++){
 	  p4sum += trackTauCandidates[i][j].p4();
 	}
 	invMass = p4sum.M();
 	pT = p4sum.Pt();
-
-	// Add the p4 of the new track
-	p4sum += trackIter->p4();
-
-	// Cluster the track if the total invariant mass is below the maximum  
-	if (p4sum.M() < maxInvMass_trk) {
-	  trackTauCandidates[i].push_back(*trackIter);
-	  trkcounter_passInvMass += 1;
-
-	  // Fill histos for clustered tracks
-	  h_clustTrks_Pt->Fill( trackIter->getPt() );
-	  h_clustTrks_Eta->Fill( trackIter->getEta() );
-	  h_clustTrks_Phi->Fill( trackIter->getPhi() );
-	  h_clustTrks_Phi_Eta->Fill( trackIter->getPhi(),trackIter->getEta() );
-
-	  // Remove clustered track from TTTrack's collction so that it will not be used for another tau candidate
-	  trackIter = TTTracks.erase(trackIter);
-	  trackIter--; //WARNING!
-	} 
-	else {
-	  // Stop clustering
-	  stopClustering = true;
-	}
+	
+	if (DEBUG) cout << "After clustering trackTauCandidates[" << i << "] with leadTrack " << leadTrackPtr->index() << ", it has " 
+			    << trackTauCandidates[i].size() << " tracks and a mass of " << invMass << endl;
+	
+	// Fill histos with Track Clusters info
+	h_trkClusters_MultiplicityPerCluster->Fill( Ntrks );
+	h_trkClusters_Pt->Fill( pT );
+	h_trkClusters_M->Fill( invMass );
+	
+	//PrintTTTrackCollection(trackTauCandidates[i]);
+	counter_allTrkTauCand ++; 
+	if (trackTauCandidates[i].size()==1) counter_1trk++;
+	if (trackTauCandidates[i].size()==2) counter_2trk++;
+	if (trackTauCandidates[i].size()==3) counter_3trk++;
+	if (trackTauCandidates[i].size()==4) counter_4trk++;
+	if (trackTauCandidates[i].size()==5) counter_5trk++;
+	
       }
-
-      //h_trkClusters_M_beforeCut->Fill(p4sum.M());
-      // Calculate final multiplicity, pt and invariant mass of the track clusters
-      Ntrks = trackTauCandidates[i].size();
-      p4sum.SetPtEtaPhiM(0., 0., 0., 0.);
-      for(size_t j=0; j < trackTauCandidates[i].size(); j++){
-	p4sum += trackTauCandidates[i][j].p4();
-      }
-      invMass = p4sum.M();
-      pT = p4sum.Pt();
-
-      if (cfg_DEBUG) cout << "After clustering trackTauCandidates[" << i << "] with leadTrack " << leadTrackPtr->index() << ", it has " 
-			  << trackTauCandidates[i].size() << " tracks and a mass of " << invMass << endl;
-
-      // Fill histos with Track Clusters info
-      h_trkClusters_MultiplicityPerCluster->Fill( Ntrks );
-      h_trkClusters_Pt->Fill( pT );
-      h_trkClusters_M->Fill( invMass );
-            
-      //PrintTTTrackCollection(trackTauCandidates[i]);
-      counter_allTrkTauCand ++; 
-      if (trackTauCandidates[i].size()==1) counter_1trk++;
-      if (trackTauCandidates[i].size()==2) counter_2trk++;
-      if (trackTauCandidates[i].size()==3) counter_3trk++;
-      if (trackTauCandidates[i].size()==4) counter_4trk++;
-      if (trackTauCandidates[i].size()==5) counter_5trk++;
-
     }
-
 
     //====================================================
     //  EGs Properties
     //====================================================
-    if (cfg_DEBUG) std::cout << "\n=== EGs Properties" << endl;
+    if (DEBUG) std::cout << "\n=== EGs Properties" << endl;
 
     h_EGs_N -> Fill( L1EGs.size() );
 
@@ -765,32 +781,12 @@ void TkEG::Loop()
     //====================================================
     //  EGs Clustering
     //====================================================
-    if (cfg_DEBUG) std::cout << "\n=== EGs Clustering" << endl;
+    if (DEBUG) std::cout << "\n=== EGs Clustering" << endl;
 
-    // EGs properties (when Leading Track exist)
-    if (trackTauCandidates.size() != 0) {
-      
-      // Fill histo with number of EGs in each event
-      //h_EGs_N -> Fill( L1EGs.size() );
-      //if (GenTausHadronic.size() == 1) h_EGs_N_OneHadTau -> Fill(L1EGs.size());
-      
-      // For-loop: All the EGs in the event
-      for (auto eg = L1EGs.begin(); eg != L1EGs.end() ; eg++) {
-	
-	// Fill histos with EGs properties 
-	//h_EGs_Et  -> Fill( eg->getEt() );
-	//h_EGs_Eta -> Fill( eg->getEta() );
-	//h_EGs_Phi -> Fill( eg->getPhi() );
-        //h_EGs_IEta -> Fill( eg->getIEta() );
-        //h_EGs_IPhi -> Fill( eg->getIPhi() );
-	
-      }// For-loop: All the EGs in the event
-   
-    }
-        
+
     // Build EG clusters and create tau candidates
     vector<EG> EGcluster;
-    TauCandidates.clear();
+    L1TkEGTauCandidates.clear();
     double ET;
     float deltaEta, deltaPhi;
     float deltaRmin, deltaEtaMin, deltaPhiMin;
@@ -803,6 +799,11 @@ void TkEG::Loop()
       EGcluster.clear();
       leadTrackPtr = &(trackTauCandidates[i][0]);
       stopClustering = false;
+
+      // Shrinking cone size
+      maxDeltaR = maxDeltaR_const/leadTrackPtr->getPt();
+      if (maxDeltaR > maxDeltaR_EG) maxDeltaR = maxDeltaR_leadtrk;
+      
       TLorentzVector p4sum; // initialized to (0,0,0,0)  //marina
       // EG clustering counters
       unsigned int counter_allEG = 0;
@@ -849,10 +850,10 @@ void TkEG::Loop()
 	if (deltaR < deltaRmin) deltaRmin=deltaR;
 	if (abs(deltaPhi) < abs(deltaPhiMin)) deltaPhiMin = deltaPhi;
 	if (abs(deltaEta) < abs(deltaEtaMin)) deltaEtaMin = deltaEta;
-
+       
 	// Aply dR cuts
 	// Skip if EG is not within the signal cone 
-	if (deltaR > maxDeltaR_EG) continue;
+	if (deltaR > maxDeltaR) continue;
 	counter_passDRmax++;
 	if (deltaR < minDeltaR_EG) continue;
 	counter_passDRmin++;
@@ -885,7 +886,7 @@ void TkEG::Loop()
 	  stopClustering = true;
 	}
 	
-	if (cfg_DEBUG) cout << "Invariant mass of cluster is " << invMass << " and ET is " << ET << endl; 
+	if (DEBUG) cout << "Invariant mass of cluster is " << invMass << " and ET is " << ET << endl; 
 	
       }// For-loop: All the EGs in the event
       
@@ -918,7 +919,7 @@ void TkEG::Loop()
       //====================================================
       // MC Matching of Tau Candidates
       //====================================================
-      if (cfg_DEBUG) std::cout << "\n=== MC Matching of Tau Candidates" << endl;
+      if (DEBUG) std::cout << "\n=== MC Matching of Tau Candidates" << endl;
 
 
       // Find the genTau matching to the lead track
@@ -949,7 +950,7 @@ void TkEG::Loop()
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// Tk+EG algorithm representation in Gen-Level (Charged and Neutral daughters multiplicity) 
 	//////////////////////////////////////////////////////////////////////////////////////////
-	if (cfg_DEBUG) std::cout << "\n=== Tk+EG algorithm representation in Gen-Level" << endl;
+	if (DEBUG) std::cout << "\n=== Tk+EG algorithm representation in Gen-Level" << endl;
 
 	// Find the leading charged daughter
 	GenParticle d_ldg = genTau.finalDaughtersCharged().at(0);
@@ -1048,44 +1049,213 @@ void TkEG::Loop()
       //====================================================
       // Build Tau Candidate
       //====================================================
-      if (cfg_DEBUG) std::cout << "\n=== Build Tau Candidate" << endl;
+      if (DEBUG) std::cout << "\n=== Build Tau Candidate" << endl;
 
 
       // Build a tau candidate from tracks and EGs
       L1TkEGParticle newTauCandidate(trackTauCandidates[i], EGcluster, genTau, hasGenTau);
-      if (cfg_DEBUG) { //marina
+      if (DEBUG) { //marina
 	cout << "Constructed a new tau candidate with a track invariant mass of " << newTauCandidate.GetTrackInvMass() 
 	     << ", an EG invariant mass of " << newTauCandidate.GetEGInvMass();
 	if (hasGenTau) cout  << " and a generator tau with visible pT " << newTauCandidate.GetGenTauPt() << endl;
 	else cout << " and does not have a matching generator tau" << endl;
       }
       
-      TauCandidates.push_back(newTauCandidate);
+      L1TkEGTauCandidates.push_back(newTauCandidate);
       
     }
     
-    if (TauCandidates.size() >=1){
-      h_ldgTkEG_ET -> Fill( TauCandidates.at(0).GetTotalEt());
+    if (L1TkEGTauCandidates.size() >=1){
+      h_ldgTkEG_ET -> Fill( L1TkEGTauCandidates.at(0).GetTotalEt());
     }
-    
-    
 
-    for (auto tkeg = TauCandidates.begin(); tkeg != TauCandidates.end(); tkeg++) {
 
-      h_TkEG_Pt      -> Fill (tkeg->GetTotalPt());
-      h_TkEG_ET      -> Fill (tkeg->GetTotalEt());
-      h_TkEG_Eta     -> Fill (tkeg->GetTotalP4().Eta());
-      h_TkEG_Phi     -> Fill (tkeg->GetTotalP4().Phi());
-      h_TkEG_InvMass -> Fill (tkeg->GetTotalP4().M());
-      h_TkEG_CHF     -> Fill (tkeg->GetTrackBasedPt() / tkeg->GetTotalP4().Pt());
-      h_TkEG_NHF     -> Fill ( (tkeg->GetTotalP4().Pt() - tkeg->GetTrackBasedPt() ) / tkeg->GetTotalP4().Pt());
+    
+    //====================================================
+    // Apply Isolation (Vertex, Relative)
+    //====================================================
+    if (DEBUG) std::cout << "\n=== Apply Isolation (Vertex, Relative)" << endl;
+
+    // Check relative isolation of tau candidates
+    float relIso = -1.0;
+    float ptSum, minDeltaR_iso;
+    TTTrack leadingTrack;
+    vector<TTTrack> clustTracks;
+    L1TkEGTaus_RelIso.clear();
+    L1TkEGTaus_RelIsoLoose.clear();
+    L1TkEGTaus_RelIsoTight.clear();
+
+    for (auto tkeg = L1TkEGTauCandidates.begin(); tkeg != L1TkEGTauCandidates.end(); tkeg++) {
       
-      if (tkeg->GetEGs().size() > 0) {
-	h_TkEG_CHF_withNeutrals     -> Fill (tkeg->GetTrackBasedPt() / tkeg->GetTotalP4().Pt());
-	h_TkEG_NHF_withNeutrals     -> Fill ( (tkeg->GetTotalP4().Pt() - tkeg->GetTrackBasedPt() ) / tkeg->GetTotalP4().Pt());
-      }
+      leadingTrack = tkeg->GetLeadingTrack();
+      clustTracks  = tkeg->GetTracks();
+    
+      // Shrinking cone size
+      maxDeltaR = maxDeltaR_const/leadingTrack.getPt();
+      if (maxDeltaR > maxDeltaR_leadtrk) maxDeltaR = maxDeltaR_leadtrk;
+      minDeltaR_iso = maxDeltaR;
+      
+      // Sum Pt's inside the isolation cone
+      ptSum = 0.0;
+      // For-loop: All TTTracks
+      for (auto tk = TTTracks.begin(); tk != TTTracks.end(); tk++) {
 
+	// Check if the track is clustered in the tau candidate
+	bool clustered = false;
+	
+	for (auto clusttk = clustTracks.begin(); clusttk != clustTracks.end(); clusttk++){
+	  if (clusttk->index() == tk->index()) clustered = true;
+	}
+	if (clustered) continue;	
+	
+	// Check if the track is from the same vertex and within an isolation cone of 0.5
+	if (abs (tk->getZ0() - leadingTrack.getZ0() ) > maxDeltaZ_iso) continue;
+	deltaR = auxTools_.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), tk->getEta(), tk->getPhi());
+
+
+        if (deltaR > minDeltaR_iso && deltaR < maxDeltaR_iso)
+	  
+          ptSum += tk -> getPt();
+	
+      } // For-loop: All TTTracks
+    
+      // Calculate relative isolation
+      relIso = ptSum / tkeg->GetTotalEt();
+      tkeg->SetRelIso(relIso);
+      
+      // Fill relative isolation histogram
+      h_TkEG_relIso->Fill( relIso );
+
+      bool bPassRelIso      = (relIso < relIso_WP); // orthogonal to VtxIso
+      bool bPassRelIsoLoose = (relIso < 0.3);
+      bool bPassRelIsoTight = (relIso < 0.1);
+      
+      // Fill containers with TkEGTaus
+      if (bPassRelIso) L1TkEGTaus_RelIso.push_back(*tkeg);
+      if (bPassRelIsoLoose) L1TkEGTaus_RelIsoLoose.push_back(*tkeg);
+      if (bPassRelIsoTight) L1TkEGTaus_RelIsoTight.push_back(*tkeg);
+    }
+
+    // Check vertex isolation of tau candidates
+    float mindZ0;
+    float dz0;
+    int isoTracks_N;
+    L1TkEGTaus_VtxIso.clear();
+    L1TkEGTaus_VtxIsoLoose.clear();
+    L1TkEGTaus_VtxIsoTight.clear();
+    
+    for (auto tkeg = L1TkEGTauCandidates.begin(); tkeg != L1TkEGTauCandidates.end(); tkeg++) {
+      
+      leadingTrack = tkeg->GetLeadingTrack();
+      clustTracks  = tkeg->GetTracks();
+      mindZ0 = 1000000.0;
+      isoTracks_N =0;
+      TLorentzVector p4sum;
+      
+
+      // Shrinking cone size
+      maxDeltaR = maxDeltaR_const/leadingTrack.getPt();
+      if (maxDeltaR > maxDeltaR_leadtrk) maxDeltaR = maxDeltaR_leadtrk;
+      minDeltaR_iso = maxDeltaR;
+      
+      // For-loop: All TTTracks
+      for (auto tk = TTTracks.begin(); tk != TTTracks.end(); tk++) {
+
+	// Check if the track is clustered in the tau candidate
+	bool clustered = false;
+	
+	for (auto clusttk = clustTracks.begin(); clusttk != clustTracks.end(); clusttk++){
+	  if (clusttk->index() == tk->index()) clustered = true;
+	}
+	if (clustered) continue;	
+
+	// Check if the track is in the iso-cone
+	deltaR = auxTools_.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), tk->getEta(), tk->getPhi());
+	if (deltaR > minDeltaR_iso && deltaR < maxDeltaR_iso) {
+	  isoTracks_N++;
+
+	  // Calclulate total p4 of isolation annulus tracks
+	  p4sum += tk->p4();
+	  
+	  // Calculate mindz0
+	  dz0 = abs (tk->getZ0() - leadingTrack.getZ0() );
+	  if (dz0 < mindZ0) mindZ0 = dz0;
+	}
+	
+      } // For-loop: All TTTracks
+
+      float vtxIso = mindZ0;
+      tkeg->SetVtxIso(vtxIso);
+      tkeg->SetIsoTracksN(isoTracks_N);
+
+      // Fill relative isolation histogram
+      h_TkEG_vtxIso                 -> Fill( vtxIso );
+      h_TkEG_isoTracks_InvMass      -> Fill( p4sum.M() );
+      h_TkEG_isoTracks_Multiplicity -> Fill( isoTracks_N );
+
+      bool bPassVtxIso      = (vtxIso > vtxIso_WP); // orthogona1 to RelIso
+      bool bPassVtxIsoLoose = (vtxIso > 0.2);
+      bool bPassVtxIsoTight = (vtxIso > 1.0);
+      
+      // Fill containers with TkEGTaus
+      if (bPassVtxIso) L1TkEGTaus_VtxIso.push_back(*tkeg);
+      if (bPassVtxIsoLoose) L1TkEGTaus_VtxIsoLoose.push_back(*tkeg);
+      if (bPassVtxIsoTight) L1TkEGTaus_VtxIsoTight.push_back(*tkeg);
+
+    }
+
+    if (L1TkEGTaus_RelIso.size() > 0) nEvtsRelIso++;
+    if (L1TkEGTaus_VtxIso.size() > 0) nEvtsVtxIso++;
+    if (L1TkEGTaus_RelIsoLoose.size() > 0) nEvtsRelIsoLoose++;
+    if (L1TkEGTaus_VtxIsoLoose.size() > 0) nEvtsVtxIsoLoose++;
+    if (L1TkEGTaus_RelIsoTight.size() > 0) nEvtsRelIsoTight++;
+    if (L1TkEGTaus_VtxIsoTight.size() > 0) nEvtsVtxIsoTight++;
+    
+    
+    // Tau Candidates Properties & Resolution
+    //for (auto tkeg = L1TkEGTauCandidates.begin(); tkeg != L1TkEGTauCandidates.end(); tkeg++) {
+    for (auto tkeg = L1TkEGTaus_VtxIsoTight.begin(); tkeg != L1TkEGTaus_VtxIsoTight.end(); tkeg++) {
+     
       if (tkeg->HasMatchingGenParticle()){
+	
+	float tkeg_eta = tkeg->GetTotalP4().Eta();
+	int NEGs       = tkeg->GetEGs().size();
+	int NTracks    = tkeg->GetTracks().size();
+	
+	h_TkEG_Pt      -> Fill (tkeg->GetTotalPt());
+	h_TkEG_ET      -> Fill (tkeg->GetTotalEt());
+	h_TkEG_Eta     -> Fill (tkeg->GetTotalP4().Eta());
+	h_TkEG_Phi     -> Fill (tkeg->GetTotalP4().Phi());
+	h_TkEG_InvMass -> Fill (tkeg->GetTotalP4().M());
+	h_TkEG_NEGs    -> Fill (NEGs);
+	h_TkEG_NTks    -> Fill (NTracks);
+	
+	
+	if ( IsWithinEtaRegion("Central", tkeg_eta) ) {
+	  h_TkEG_NEGs_C  -> Fill(NEGs);
+	}
+	else if ( IsWithinEtaRegion("Intermediate", tkeg_eta) ) {	
+	  h_TkEG_NEGs_I  -> Fill(NEGs);
+	}
+	else if ( IsWithinEtaRegion("Forward", tkeg_eta) ) {
+	  h_TkEG_NEGs_F  -> Fill(NEGs);
+	}
+	
+	// h_TkEG_CHF     -> Fill (tkeg->GetTrackBasedPt() / tkeg->GetTotalP4().Pt());
+	// h_TkEG_NHF     -> Fill ( (tkeg->GetTotalP4().Pt() - tkeg->GetTrackBasedPt() ) / tkeg->GetTotalP4().Pt());
+	
+	if (NEGs > 0) {
+	  double CHF = tkeg->GetTrackBasedPt() / tkeg->GetTotalP4().Pt();
+	  double NHF = (tkeg->GetTotalP4().Pt() - tkeg->GetTrackBasedPt() ) / tkeg->GetTotalP4().Pt();
+	  
+	  tkeg->SetCHF(CHF);
+	  tkeg->SetNHF(NHF);
+	  
+	  h_TkEG_CHF_withNeutrals     -> Fill (CHF);
+	  h_TkEG_NHF_withNeutrals     -> Fill (NHF);
+	}
+	
+	//if (tkeg->HasMatchingGenParticle()){
 	
 	// Pt resolution
 	double pTresolution = ( tkeg->GetTotalPt()- tkeg->GetGenTauPt() ) / tkeg->GetGenTauPt();
@@ -1105,8 +1275,6 @@ void TkEG::Loop()
 
 
 	// Resolution in different eta regions
-	float tkeg_eta = tkeg->GetTotalP4().Eta();
-
 	if ( IsWithinEtaRegion("Central", tkeg_eta) ) {
 	  h_TkEG_PtResolution_C  -> Fill(pTresolution);
 	  h_TkEG_EtResolution_C  -> Fill(ETresolution);
@@ -1124,6 +1292,65 @@ void TkEG::Loop()
 	  h_TkEG_EtResolution_F  -> Fill(ETresolution);
 	  h_TkEG_EtaResolution_F -> Fill(EtaResolution);
 	  h_TkEG_PhiResolution_F -> Fill(PhiResolution);
+	  
+	  if (tkeg->GetEGs().size() > 0) {
+	    h_TkEG_PtResolution_F_withEGs  -> Fill(pTresolution);
+	    h_TkEG_EtResolution_F_withEGs  -> Fill(ETresolution);
+	    h_TkEG_EtaResolution_F_withEGs -> Fill(EtaResolution);
+	    h_TkEG_PhiResolution_F_withEGs -> Fill(PhiResolution);
+	    
+	    if (tkeg_eta >= 0){
+	      h_TkEG_PtResolution_F_withEGs_posEta -> Fill(pTresolution);
+	      h_TkEG_EtResolution_F_withEGs_posEta  -> Fill(ETresolution);
+	      h_TkEG_EtaResolution_F_withEGs_posEta -> Fill(EtaResolution);
+	      h_TkEG_PhiResolution_F_withEGs_posEta -> Fill(PhiResolution);
+	    }
+	    else{
+	      h_TkEG_PtResolution_F_withEGs_negEta -> Fill(pTresolution);
+	      h_TkEG_EtResolution_F_withEGs_negEta  -> Fill(ETresolution);
+	      h_TkEG_EtaResolution_F_withEGs_negEta -> Fill(EtaResolution);
+	      h_TkEG_PhiResolution_F_withEGs_negEta -> Fill(PhiResolution);
+	    }
+	    
+	  }
+	  else {
+	    h_TkEG_PtResolution_F_noEGs  -> Fill(pTresolution);
+	    h_TkEG_EtResolution_F_noEGs  -> Fill(ETresolution);
+	    h_TkEG_EtaResolution_F_noEGs -> Fill(EtaResolution);
+	    h_TkEG_PhiResolution_F_noEGs -> Fill(PhiResolution);
+	    
+	    if (tkeg_eta >= 0){
+	      h_TkEG_PtResolution_F_noEGs_posEta -> Fill(pTresolution);
+	      h_TkEG_EtResolution_F_noEGs_posEta  -> Fill(ETresolution);
+	      h_TkEG_EtaResolution_F_noEGs_posEta -> Fill(EtaResolution);
+	      h_TkEG_PhiResolution_F_noEGs_posEta -> Fill(PhiResolution);
+	    }
+	    else{
+	      h_TkEG_PtResolution_F_noEGs_negEta -> Fill(pTresolution);
+	      h_TkEG_EtResolution_F_noEGs_negEta  -> Fill(ETresolution);
+	      h_TkEG_EtaResolution_F_noEGs_negEta -> Fill(EtaResolution);
+	      h_TkEG_PhiResolution_F_noEGs_negEta -> Fill(PhiResolution);
+	    }
+	  }
+	  
+	  if ((ETresolution > 0.4) && (ETresolution < 0.8)) {
+	    h_BadEtResolCand_InvMass -> Fill(tkeg->GetTotalP4().M());
+	    h_BadEtResolCand_RelIso  -> Fill(tkeg->GetRelIso());
+	    h_BadEtResolCand_VtxIso  -> Fill(tkeg->GetVtxIso());
+	    h_BadEtResolCand_CHF     -> Fill(tkeg->GetCHF());
+	    h_BadEtResolCand_IsoTracks_N -> Fill(tkeg->GetIsoTracksN());
+	    
+	    vector <EG> EGs = tkeg->GetEGs();
+	    for (auto eg = EGs.begin(); eg != EGs.end(); eg++) {
+	      for (unsigned int i = 0; i<= tkeg->GetEGs().size(); i++){
+		leadingTrack = tkeg->GetLeadingTrack();
+		
+		deltaR = auxTools_.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), CorrectedEta(eg->getEta(), leadingTrack.getZ0()), eg->getPhi());
+		
+		h_BadEtResolCand_dR_EG_Seed -> Fill(deltaR);
+	      }
+	    }
+	  }
 	}
 
 	// Resolution in case of zero or more than one neutral products 
@@ -1134,14 +1361,109 @@ void TkEG::Loop()
 	  h_TkEG_EtResolution_noNeutrals  -> Fill(ETresolution);
 	  h_TkEG_EtaResolution_noNeutrals -> Fill(EtaResolution);
 	  h_TkEG_PhiResolution_noNeutrals -> Fill(PhiResolution);
+	  
+	  
+	  if ( IsWithinEtaRegion("Forward", tkeg_eta) ){
+	    h_TkEG_PtResolution_noNeutrals_F  -> Fill(pTresolution);
+	    h_TkEG_EtResolution_noNeutrals_F  -> Fill(ETresolution);
+	    h_TkEG_EtaResolution_noNeutrals_F -> Fill(EtaResolution);
+	    h_TkEG_PhiResolution_noNeutrals_F -> Fill(PhiResolution);
+	    
+	    if (tkeg->GetEGs().size() > 0) {
+	      h_TkEG_PtResolution_noNeutrals_F_withEGs  -> Fill(pTresolution);
+	      h_TkEG_EtResolution_noNeutrals_F_withEGs  -> Fill(ETresolution);
+	      h_TkEG_EtaResolution_noNeutrals_F_withEGs -> Fill(EtaResolution);
+	      h_TkEG_PhiResolution_noNeutrals_F_withEGs -> Fill(PhiResolution);
+	      
+	      if (tkeg_eta >= 0){
+		h_TkEG_PtResolution_noNeutrals_F_withEGs_posEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_noNeutrals_F_withEGs_posEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_noNeutrals_F_withEGs_posEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_noNeutrals_F_withEGs_posEta -> Fill(PhiResolution);
+	      }
+	      else{
+		h_TkEG_PtResolution_noNeutrals_F_withEGs_negEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_noNeutrals_F_withEGs_negEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_noNeutrals_F_withEGs_negEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_noNeutrals_F_withEGs_negEta -> Fill(PhiResolution);
+	      }
+	    }
+	    else {
+	      h_TkEG_PtResolution_noNeutrals_F_noEGs  -> Fill(pTresolution);
+	      h_TkEG_EtResolution_noNeutrals_F_noEGs  -> Fill(ETresolution);
+	      h_TkEG_EtaResolution_noNeutrals_F_noEGs -> Fill(EtaResolution);
+	      h_TkEG_PhiResolution_noNeutrals_F_noEGs -> Fill(PhiResolution);
+	      
+	      if (tkeg_eta >= 0){
+		h_TkEG_PtResolution_noNeutrals_F_noEGs_posEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_noNeutrals_F_noEGs_posEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_noNeutrals_F_noEGs_posEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_noNeutrals_F_noEGs_posEta -> Fill(PhiResolution);
+	      }
+	      else{
+		h_TkEG_PtResolution_noNeutrals_F_noEGs_negEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_noNeutrals_F_noEGs_negEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_noNeutrals_F_noEGs_negEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_noNeutrals_F_noEGs_negEta -> Fill(PhiResolution);
+	      }
+	    }
+	  }
 	}
 	else {
 	  h_TkEG_PtResolution_withNeutrals  -> Fill(pTresolution);
 	  h_TkEG_EtResolution_withNeutrals  -> Fill(ETresolution);
 	  h_TkEG_EtaResolution_withNeutrals -> Fill(EtaResolution);
 	  h_TkEG_PhiResolution_withNeutrals -> Fill(PhiResolution);
-	}
 	  
+	  if ( IsWithinEtaRegion("Forward", tkeg_eta) ) {
+	    h_TkEG_PtResolution_withNeutrals_F  -> Fill(pTresolution);
+	    h_TkEG_EtResolution_withNeutrals_F  -> Fill(ETresolution);
+	    h_TkEG_EtaResolution_withNeutrals_F -> Fill(EtaResolution);
+	    h_TkEG_PhiResolution_withNeutrals_F -> Fill(PhiResolution);
+	    
+	    if (tkeg->GetEGs().size() > 0) {
+	      h_TkEG_PtResolution_withNeutrals_F_withEGs  -> Fill(pTresolution);
+	      h_TkEG_EtResolution_withNeutrals_F_withEGs  -> Fill(ETresolution);
+	      h_TkEG_EtaResolution_withNeutrals_F_withEGs -> Fill(EtaResolution);
+	      h_TkEG_PhiResolution_withNeutrals_F_withEGs -> Fill(PhiResolution);
+	      
+	      if (tkeg_eta >= 0){
+		h_TkEG_PtResolution_withNeutrals_F_withEGs_posEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_withNeutrals_F_withEGs_posEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_withNeutrals_F_withEGs_posEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_withNeutrals_F_withEGs_posEta -> Fill(PhiResolution);
+	      }
+	      else{
+		h_TkEG_PtResolution_withNeutrals_F_withEGs_negEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_withNeutrals_F_withEGs_negEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_withNeutrals_F_withEGs_negEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_withNeutrals_F_withEGs_negEta -> Fill(PhiResolution);
+	      }
+	      
+	    }
+	    else {
+	      h_TkEG_PtResolution_withNeutrals_F_noEGs  -> Fill(pTresolution);
+	      h_TkEG_EtResolution_withNeutrals_F_noEGs  -> Fill(ETresolution);
+	      h_TkEG_EtaResolution_withNeutrals_F_noEGs -> Fill(EtaResolution);
+	      h_TkEG_PhiResolution_withNeutrals_F_noEGs -> Fill(PhiResolution);
+
+	      if (tkeg_eta >= 0){
+		h_TkEG_PtResolution_withNeutrals_F_noEGs_posEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_withNeutrals_F_noEGs_posEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_withNeutrals_F_noEGs_posEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_withNeutrals_F_noEGs_posEta -> Fill(PhiResolution);
+	      }
+	      else{
+		h_TkEG_PtResolution_withNeutrals_F_noEGs_negEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_withNeutrals_F_noEGs_negEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_withNeutrals_F_noEGs_negEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_withNeutrals_F_noEGs_negEta -> Fill(PhiResolution);
+	      }
+
+	    }
+	  }
+	}
+	
 	// Resolution for 1- and 3-prong decays
 	int chargedDaugh_N = tkeg->GetMatchingGenParticle().finalDaughtersCharged().size();
 	
@@ -1150,187 +1472,216 @@ void TkEG::Loop()
 	  h_TkEG_EtResolution_1pr  -> Fill(ETresolution);
 	  h_TkEG_EtaResolution_1pr -> Fill(EtaResolution);
 	  h_TkEG_PhiResolution_1pr -> Fill(PhiResolution);
+	  
+	  if ( IsWithinEtaRegion("Forward", tkeg_eta) ) {
+	    h_TkEG_PtResolution_1pr_F  -> Fill(pTresolution);
+	    h_TkEG_EtResolution_1pr_F  -> Fill(ETresolution);
+	    h_TkEG_EtaResolution_1pr_F -> Fill(EtaResolution);
+	    h_TkEG_PhiResolution_1pr_F -> Fill(PhiResolution);
+	    
+	    if (tkeg->GetEGs().size() > 0) {
+	      h_TkEG_PtResolution_1pr_F_withEGs  -> Fill(pTresolution);
+	      h_TkEG_EtResolution_1pr_F_withEGs  -> Fill(ETresolution);
+	      h_TkEG_EtaResolution_1pr_F_withEGs -> Fill(EtaResolution);
+	      h_TkEG_PhiResolution_1pr_F_withEGs -> Fill(PhiResolution);
+	
+	      if (tkeg_eta >= 0){
+		h_TkEG_PtResolution_1pr_F_withEGs_posEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_1pr_F_withEGs_posEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_1pr_F_withEGs_posEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_1pr_F_withEGs_posEta -> Fill(PhiResolution);
+	      }
+	      else{
+		h_TkEG_PtResolution_1pr_F_withEGs_negEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_1pr_F_withEGs_negEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_1pr_F_withEGs_negEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_1pr_F_withEGs_negEta -> Fill(PhiResolution);
+	      }
+	      
+	    }
+	    else {
+	      h_TkEG_PtResolution_1pr_F_noEGs  -> Fill(pTresolution);
+	      h_TkEG_EtResolution_1pr_F_noEGs  -> Fill(ETresolution);
+	      h_TkEG_EtaResolution_1pr_F_noEGs -> Fill(EtaResolution);
+	      h_TkEG_PhiResolution_1pr_F_noEGs -> Fill(PhiResolution);
+
+	      if (tkeg_eta >= 0){
+		h_TkEG_PtResolution_1pr_F_noEGs_posEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_1pr_F_noEGs_posEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_1pr_F_noEGs_posEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_1pr_F_noEGs_posEta -> Fill(PhiResolution);
+	      }
+	      else{
+		h_TkEG_PtResolution_1pr_F_noEGs_negEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_1pr_F_noEGs_negEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_1pr_F_noEGs_negEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_1pr_F_noEGs_negEta -> Fill(PhiResolution);
+	      }
+
+	    }
+	  }
 	}
 	else if (chargedDaugh_N == 3){
 	  h_TkEG_PtResolution_3pr  -> Fill(pTresolution);
 	  h_TkEG_EtResolution_3pr  -> Fill(ETresolution);
 	  h_TkEG_EtaResolution_3pr -> Fill(EtaResolution);
 	  h_TkEG_PhiResolution_3pr -> Fill(PhiResolution);
-	}
-	
-      }
-      
-      /*
-      // Pt resolution
-      TLorentzVector p4tracks; // initialized to (0,0,0,0) 
-      for (auto tk = trackTauCandidates[i].begin(); tk != trackTauCandidates[i].end(); tk++) {
-      p4tracks += tk->p4();
-      }
-      double pTresolution = ( p4tracks.Pt()-genTau.p4vis().Pt() ) / genTau.p4vis().Pt();
-      h_trkClusters_PtResolution->Fill(pTresolution);
-      // FIX ME: ET resolution
-      if (EGcluster.size() >=1) {
-      hTkEG_genVisEt_clustEG -> Fill( genTau.p4vis().Et() );
-      hTkEG_genVisPt_clustEG -> Fill( genTau.p4vis().Pt() );
-      
-      double ETresolution = ( ET -genTau.p4vis().Et() ) / genTau.p4vis().Et(); //marina
-      h_TkEG_EtResolution->Fill(ETresolution);
-      }
-      */
-      
-      
-      //cout<< tkeg->GetTotalEt()<<endl;
-      
-      //float sumET=0;
-      //for (auto clusteg = tkeg->GetEGs().begin(); clusteg != tkeg->GetEGs().end(); clusteg++){ 
-      //sumET += clusteg->getEt();
-      //}
-      //cout <<"--- "<< tkeg->GetTrackBasedPt()+sumET<<endl;
-    }
-    
-
-    //====================================================
-    // Apply Isolation (Vertex, Relative)
-    //====================================================
-    if (cfg_DEBUG) std::cout << "\n=== Apply Isolation (Vertex, Relative)" << endl;
-
-    // Check relative isolation of tau candidates
-    float relIso = -1.0;
-    float ptSum;
-    TTTrack leadingTrack;
-    vector<TTTrack> clustTracks;
-    TauCandidatesRelIsolated.clear();
-    
-    for (auto tkeg = TauCandidates.begin(); tkeg != TauCandidates.end(); tkeg++) {
-    
-      leadingTrack = tkeg->GetLeadingTrack();
-      clustTracks  = tkeg->GetTracks();
-
-      // Sum Pt's inside the isolation cone
-      ptSum = 0.0;
-      // For-loop: All TTTracks
-      for (auto tk = TTTracks.begin(); tk != TTTracks.end(); tk++) {
-
-	// Check if the track is clustered in the tau candidate
-	bool clustered = false;
-	
-	for (auto clusttk = clustTracks.begin(); clusttk != clustTracks.end(); clusttk++){
-	  if (clusttk->index() == tk->index()) clustered = true;
-	}
-	if (clustered) continue;	
-	
-	// Check if the track is from the same vertex and within an isolation cone of 0.5
-	if (abs (tk->getZ0() - leadingTrack.getZ0() ) > maxDeltaZ_iso) continue;
-	deltaR = auxTools_.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), tk->getEta(), tk->getPhi());
-
-        if (deltaR > minDeltaR_iso && deltaR < maxDeltaR_iso)
 	  
-          ptSum += tk -> getPt();
-	
-      } // For-loop: All TTTracks
+	  if ( IsWithinEtaRegion("Forward", tkeg_eta) ) {
+	    h_TkEG_PtResolution_3pr_F  -> Fill(pTresolution);
+	    h_TkEG_EtResolution_3pr_F  -> Fill(ETresolution);
+	    h_TkEG_EtaResolution_3pr_F -> Fill(EtaResolution);
+	    h_TkEG_PhiResolution_3pr_F -> Fill(PhiResolution);
+	    
+	    if (tkeg->GetEGs().size() > 0) {
+	      h_TkEG_PtResolution_3pr_F_withEGs  -> Fill(pTresolution);
+	      h_TkEG_EtResolution_3pr_F_withEGs  -> Fill(ETresolution);
+	      h_TkEG_EtaResolution_3pr_F_withEGs -> Fill(EtaResolution);
+	      h_TkEG_PhiResolution_3pr_F_withEGs -> Fill(PhiResolution);
 
-      // Calculate relative isolation
-      relIso = ptSum / tkeg->GetTotalEt();
-      // Fill relative isolation histogram
-      h_TkEG_relIso->Fill( relIso );
+	      if (tkeg_eta >= 0){
+		h_TkEG_PtResolution_3pr_F_withEGs_posEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_3pr_F_withEGs_posEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_3pr_F_withEGs_posEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_3pr_F_withEGs_posEta -> Fill(PhiResolution);
+	      }
+	      else{
+		h_TkEG_PtResolution_3pr_F_withEGs_negEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_3pr_F_withEGs_negEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_3pr_F_withEGs_negEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_3pr_F_withEGs_negEta -> Fill(PhiResolution);
+	      }
 
-      if(relIso < maxRelIso) {
-        TauCandidatesRelIsolated.push_back(*tkeg);
+	    }
+	    else {
+	      h_TkEG_PtResolution_3pr_F_noEGs  -> Fill(pTresolution);
+	      h_TkEG_EtResolution_3pr_F_noEGs  -> Fill(ETresolution);
+	      h_TkEG_EtaResolution_3pr_F_noEGs -> Fill(EtaResolution);
+	      h_TkEG_PhiResolution_3pr_F_noEGs -> Fill(PhiResolution);
+	      
+	      if (tkeg_eta >= 0){
+		h_TkEG_PtResolution_3pr_F_noEGs_posEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_3pr_F_noEGs_posEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_3pr_F_noEGs_posEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_3pr_F_noEGs_posEta -> Fill(PhiResolution);
+	      }
+	      else{
+		h_TkEG_PtResolution_3pr_F_noEGs_negEta -> Fill(pTresolution);
+		h_TkEG_EtResolution_3pr_F_noEGs_negEta  -> Fill(ETresolution);
+		h_TkEG_EtaResolution_3pr_F_noEGs_negEta -> Fill(EtaResolution);
+		h_TkEG_PhiResolution_3pr_F_noEGs_negEta -> Fill(PhiResolution);
+	      }
+	    }
+	  }
+	}	
       }
-    }
-
-    // Check vertex isolation of tau candidates
-    float mindZ0 = 1000000.0;
-    float dz0;
-    TauCandidatesVtxIsolated.clear();
-
-    for (auto tkeg = TauCandidates.begin(); tkeg != TauCandidates.end(); tkeg++) {
-
-      leadingTrack = tkeg->GetLeadingTrack();
-      clustTracks  = tkeg->GetTracks();
-
-      // For-loop: All TTTracks
-      for (auto tk = TTTracks.begin(); tk != TTTracks.end(); tk++) {
-
-	// Check if the track is clustered in the tau candidate
-	bool clustered = false;
-	
-	for (auto clusttk = clustTracks.begin(); clusttk != clustTracks.end(); clusttk++){
-	  if (clusttk->index() == tk->index()) clustered = true;
-	}
-	if (clustered) continue;	
-	
-	// Check if the track is in the iso-cone
-	deltaR = auxTools_.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), tk->getEta(), tk->getPhi());
-	if (deltaR > minDeltaR_iso && deltaR < maxDeltaR_iso) {
-	  dz0 = abs (tk->getZ0() - leadingTrack.getZ0() );
-
-	  if (dz0 < mindZ0) mindZ0 = dz0;
-	  
-	}
-
-      } // For-loop: All TTTracks
-
-      // Fill relative isolation histogram
-      h_TkEG_vtxIso->Fill( mindZ0 );
-
-      if(mindZ0 > maxVtxIso) {
-        TauCandidatesVtxIsolated.push_back(*tkeg);
-      }
+      
     }
     
-    if (TauCandidatesRelIsolated.size() > 0) nEvtsRelIso++;
-    if (TauCandidatesVtxIsolated.size() > 0) nEvtsVtxIso++;
-
-
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Fill Turn-On histograms
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    if (cfg_DEBUG) std::cout << "\n=== Fill Turn-On histograms" << endl;
-
-    
-    // Fill visible Et of hadronic taus to a histogram
-    for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++) hMcHadronicTau_VisEt->Fill( tau->p4vis().Et() );
-    //for (vector<GenParticle>::iterator tau = GenTausTrigger.begin(); tau != GenTausTrigger.end(); tau++) hMcHadronicTau_VisEt->Fill( tau->p4vis().Et() );
+    if (DEBUG) std::cout << "\n=== Fill Turn-On histograms" << endl;
 
 
-    // Fill turn-on numerators
-    FillTurnOn_Numerator_(TauCandidates, 25.0, hTurnOn25_TkEG);
-    FillTurnOn_Numerator_(TauCandidatesRelIsolated, 25.0, hTurnOn25_relIso);
-    FillTurnOn_Numerator_(TauCandidatesVtxIsolated, 25.0, hTurnOn25_vtxIso);
-    FillTurnOn_Numerator_(TauCandidates, 50.0, hTurnOn50_TkEG);
-    FillTurnOn_Numerator_(TauCandidatesRelIsolated, 50.0, hTurnOn50_relIso);
-    FillTurnOn_Numerator_(TauCandidatesVtxIsolated, 50.0, hTurnOn50_vtxIso);
+    for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++)
+      {
+	hMcHadronicTau_VisEt->Fill( tau->p4vis().Et() );
+	
+	if (tau->finalDaughtersNeutral().size() > 0)
+	  {
+	    hMcHadronicTau_VisEt_withNeutrals->Fill( tau->p4vis().Et() );
+	  }
+	else
+	  {
+	    hMcHadronicTau_VisEt_noNeutrals->Fill( tau->p4vis().Et() );
+	  }
+	if (tau->finalDaughtersCharged().size() == 1) 
+	  {
+	    hMcHadronicTau_VisEt_1pr->Fill( tau->p4vis().Et() );
+	  }
+	else if (tau->finalDaughtersCharged().size() == 3) 
+	  {
+	    hMcHadronicTau_VisEt_3pr->Fill( tau->p4vis().Et() );
+	  }
+      }
+
+    FillTurnOn_Numerator_(L1TkEGTauCandidates     , 25.0, hTkEG_TurnOn25, hTkEG_TurnOn25_1pr, hTkEG_TurnOn25_3pr, hTkEG_TurnOn25_withNeutrals, hTkEG_TurnOn25_noNeutrals);
+    FillTurnOn_Numerator_(L1TkEGTaus_RelIso , 25.0, hVtxIso_TurnOn25, hVtxIso_TurnOn25_1pr, hVtxIso_TurnOn25_3pr, hVtxIso_TurnOn25_withNeutrals, hVtxIso_TurnOn25_noNeutrals); 
+    FillTurnOn_Numerator_(L1TkEGTaus_VtxIso , 25.0, hRelIso_TurnOn25, hRelIso_TurnOn25_1pr, hRelIso_TurnOn25_3pr, hRelIso_TurnOn25_withNeutrals, hRelIso_TurnOn25_noNeutrals);
+    FillTurnOn_Numerator_(L1TkEGTaus_RelIsoLoose , 25.0, hVtxIsoLoose_TurnOn25, hVtxIsoLoose_TurnOn25_1pr, hVtxIsoLoose_TurnOn25_3pr, hVtxIsoLoose_TurnOn25_withNeutrals, hVtxIsoLoose_TurnOn25_noNeutrals); 
+    FillTurnOn_Numerator_(L1TkEGTaus_VtxIsoLoose , 25.0, hRelIsoLoose_TurnOn25, hRelIsoLoose_TurnOn25_1pr, hRelIsoLoose_TurnOn25_3pr, hRelIsoLoose_TurnOn25_withNeutrals, hRelIsoLoose_TurnOn25_noNeutrals);
+    FillTurnOn_Numerator_(L1TkEGTaus_RelIsoTight , 25.0, hVtxIsoTight_TurnOn25, hVtxIsoTight_TurnOn25_1pr, hVtxIsoTight_TurnOn25_3pr, hVtxIsoTight_TurnOn25_withNeutrals, hVtxIsoTight_TurnOn25_noNeutrals); 
+    FillTurnOn_Numerator_(L1TkEGTaus_VtxIsoTight , 25.0, hRelIsoTight_TurnOn25, hRelIsoTight_TurnOn25_1pr, hRelIsoTight_TurnOn25_3pr, hRelIsoTight_TurnOn25_withNeutrals, hRelIsoTight_TurnOn25_noNeutrals);
+
+
+    FillTurnOn_Numerator_(L1TkEGTauCandidates     , 50.0, hTkEG_TurnOn50, hTkEG_TurnOn50_1pr, hTkEG_TurnOn50_3pr, hTkEG_TurnOn50_withNeutrals, hTkEG_TurnOn50_noNeutrals);
+    FillTurnOn_Numerator_(L1TkEGTaus_RelIso , 50.0, hVtxIso_TurnOn50, hVtxIso_TurnOn50_1pr, hVtxIso_TurnOn50_3pr, hVtxIso_TurnOn50_withNeutrals, hVtxIso_TurnOn50_noNeutrals); 
+    FillTurnOn_Numerator_(L1TkEGTaus_VtxIso , 50.0, hRelIso_TurnOn50, hRelIso_TurnOn50_1pr, hRelIso_TurnOn50_3pr, hRelIso_TurnOn50_withNeutrals, hRelIso_TurnOn50_noNeutrals);
+    FillTurnOn_Numerator_(L1TkEGTaus_RelIsoLoose , 50.0, hVtxIsoLoose_TurnOn50, hVtxIsoLoose_TurnOn50_1pr, hVtxIsoLoose_TurnOn50_3pr, hVtxIsoLoose_TurnOn50_withNeutrals, hVtxIsoLoose_TurnOn50_noNeutrals); 
+    FillTurnOn_Numerator_(L1TkEGTaus_VtxIsoLoose , 50.0, hRelIsoLoose_TurnOn50, hRelIsoLoose_TurnOn50_1pr, hRelIsoLoose_TurnOn50_3pr, hRelIsoLoose_TurnOn50_withNeutrals, hRelIsoLoose_TurnOn50_noNeutrals);
+    FillTurnOn_Numerator_(L1TkEGTaus_RelIsoTight , 50.0, hVtxIsoTight_TurnOn50, hVtxIsoTight_TurnOn50_1pr, hVtxIsoTight_TurnOn50_3pr, hVtxIsoTight_TurnOn50_withNeutrals, hVtxIsoTight_TurnOn50_noNeutrals); 
+    FillTurnOn_Numerator_(L1TkEGTaus_VtxIsoTight , 50.0, hRelIsoTight_TurnOn50, hRelIsoTight_TurnOn50_1pr, hRelIsoTight_TurnOn50_3pr, hRelIsoTight_TurnOn50_withNeutrals, hRelIsoTight_TurnOn50_noNeutrals);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Rates and efficiencies for single tau
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    if (cfg_DEBUG) std::cout << "\n=== Rates and efficiencies for single tau" << endl;
+    if (DEBUG) std::cout << "\n=== Rates and efficiencies for single tau" << endl;
 
+    FillSingleTau_(L1TkEGTauCandidates    , hTkEG_Rate  , hTkEG_Eff  );
+    FillSingleTau_(L1TkEGTauCandidates    , hTkEG_Rate_C, hTkEG_Eff_C, 0.0, 1.0);
+    FillSingleTau_(L1TkEGTauCandidates    , hTkEG_Rate_I, hTkEG_Eff_I, 1.0, 1.6);
+    FillSingleTau_(L1TkEGTauCandidates    , hTkEG_Rate_F, hTkEG_Eff_F, 1.6, 3.0); // 2.5 is max
+    FillSingleTau_(L1TkEGTaus_VtxIso, hVtxIso_Rate  , hVtxIso_Eff);
+    FillSingleTau_(L1TkEGTaus_VtxIso, hVtxIso_Rate_C, hVtxIso_Eff_C, 0.0, 1.0);
+    FillSingleTau_(L1TkEGTaus_VtxIso, hVtxIso_Rate_I, hVtxIso_Eff_I, 1.0, 1.6);
+    FillSingleTau_(L1TkEGTaus_VtxIso, hVtxIso_Rate_F, hVtxIso_Eff_F, 1.6, 3.0); // 2.5 is max
 
-    FillSingleTau_(TauCandidates, hRateSingleTau_TkEG, hEffSingleTau_TkEG);
-    FillSingleTau_(TauCandidates, hRateSingleTau_C, hEffSingleTau_C, 0.0, 1.0);
-    FillSingleTau_(TauCandidates, hRateSingleTau_I, hEffSingleTau_I, 1.0, 1.6);
-    FillSingleTau_(TauCandidates, hRateSingleTau_F, hEffSingleTau_F, 1.6, 3.0); // 2.5 is max
-
-    FillSingleTau_(TauCandidatesRelIsolated, hRateSingleTau_relIso, hEffSingleTau_relIso);
-    FillSingleTau_(TauCandidatesVtxIsolated, hRateSingleTau_vtxIso, hEffSingleTau_vtxIso);
+    FillSingleTau_(L1TkEGTaus_RelIso, hRelIso_Rate  , hRelIso_Eff);
+    FillSingleTau_(L1TkEGTaus_RelIso, hRelIso_Rate_C, hRelIso_Eff_C, 0.0, 1.0);
+    FillSingleTau_(L1TkEGTaus_RelIso, hRelIso_Rate_I, hRelIso_Eff_I, 1.0, 1.6);
+    FillSingleTau_(L1TkEGTaus_RelIso, hRelIso_Rate_F, hRelIso_Eff_F, 1.6, 3.0); // 2.5 is max
     
+    FillSingleTau_(L1TkEGTaus_VtxIsoLoose, hVtxIsoLoose_Rate  , hVtxIsoLoose_Eff);
+    FillSingleTau_(L1TkEGTaus_VtxIsoLoose, hVtxIsoLoose_Rate_C, hVtxIsoLoose_Eff_C, 0.0, 1.0);
+    FillSingleTau_(L1TkEGTaus_VtxIsoLoose, hVtxIsoLoose_Rate_I, hVtxIsoLoose_Eff_I, 1.0, 1.6);
+    FillSingleTau_(L1TkEGTaus_VtxIsoLoose, hVtxIsoLoose_Rate_F, hVtxIsoLoose_Eff_F, 1.6, 3.0); // 2.5 is max
+
+    FillSingleTau_(L1TkEGTaus_VtxIsoTight, hVtxIsoTight_Rate  , hVtxIsoTight_Eff);
+    FillSingleTau_(L1TkEGTaus_VtxIsoTight, hVtxIsoTight_Rate_C, hVtxIsoTight_Eff_C, 0.0, 1.0);
+    FillSingleTau_(L1TkEGTaus_VtxIsoTight, hVtxIsoTight_Rate_I, hVtxIsoTight_Eff_I, 1.0, 1.6);
+    FillSingleTau_(L1TkEGTaus_VtxIsoTight, hVtxIsoTight_Rate_F, hVtxIsoTight_Eff_F, 1.6, 3.0); // 2.5 is max
+
+    FillSingleTau_(L1TkEGTaus_RelIsoLoose, hRelIsoLoose_Rate  , hRelIsoLoose_Eff);
+    FillSingleTau_(L1TkEGTaus_RelIsoLoose, hRelIsoLoose_Rate_C, hRelIsoLoose_Eff_C, 0.0, 1.0);
+    FillSingleTau_(L1TkEGTaus_RelIsoLoose, hRelIsoLoose_Rate_I, hRelIsoLoose_Eff_I, 1.0, 1.6);
+    FillSingleTau_(L1TkEGTaus_RelIsoLoose, hRelIsoLoose_Rate_F, hRelIsoLoose_Eff_F, 1.6, 3.0); // 2.5 is max
+
+    FillSingleTau_(L1TkEGTaus_RelIsoTight, hRelIsoTight_Rate  , hRelIsoTight_Eff);
+    FillSingleTau_(L1TkEGTaus_RelIsoTight, hRelIsoTight_Rate_C, hRelIsoTight_Eff_C, 0.0, 1.0);
+    FillSingleTau_(L1TkEGTaus_RelIsoTight, hRelIsoTight_Rate_I, hRelIsoTight_Eff_I, 1.0, 1.6);
+    FillSingleTau_(L1TkEGTaus_RelIsoTight, hRelIsoTight_Rate_F, hRelIsoTight_Eff_F, 1.6, 3.0); // 2.5 is max
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Rates and efficiencies for ditau
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    if (cfg_DEBUG) std::cout << "\n=== Rates and efficiencies for ditau" << endl;
+    if (DEBUG) std::cout << "\n=== Rates and efficiencies for ditau" << endl;
 
 
-    FillDiTau_(TauCandidates, hRateDiTau_TkEG, hEffDiTau_TkEG);
-    FillDiTau_(TauCandidates, hRateDiTau_C, hEffDiTau_C, 0.0, 1.0);
-    FillDiTau_(TauCandidates, hRateDiTau_I, hEffDiTau_I, 1.0, 1.6);
-    FillDiTau_(TauCandidates, hRateDiTau_F, hEffDiTau_F, 1.6, 3.0); // 2.5 is max
-
-    FillDiTau_(TauCandidatesRelIsolated, hRateDiTau_relIso, hEffDiTau_relIso);
-    FillDiTau_(TauCandidatesVtxIsolated, hRateDiTau_vtxIso, hEffDiTau_vtxIso);
+    FillDiTau_(L1TkEGTauCandidates, hRateDiTau_TkEG, hEffDiTau_TkEG);
+    FillDiTau_(L1TkEGTauCandidates, hRateDiTau_C, hEffDiTau_C, 0.0, 1.0);
+    FillDiTau_(L1TkEGTauCandidates, hRateDiTau_I, hEffDiTau_I, 1.0, 1.6);
+    FillDiTau_(L1TkEGTauCandidates, hRateDiTau_F, hEffDiTau_F, 1.6, 3.0); // 2.5 is max
+    
+    FillDiTau_(L1TkEGTaus_RelIso, hRateDiTau_relIso, hEffDiTau_relIso);
+    FillDiTau_(L1TkEGTaus_VtxIso, hRateDiTau_vtxIso, hEffDiTau_vtxIso);
+    
+    // FIX ME: ADD Di-Tau properly
+    // FillDiTau_(L1TkEGTaus_RelIsoLoose, hRateDiTau_relIsoLoose, hEffDiTau_relIsoLoose);
+    // FillDiTau_(L1TkEGTaus_VtxIsoLoose, hRateDiTau_vtxIsoLoose, hEffDiTau_vtxIsoLoose);
+    // FillDiTau_(L1TkEGTaus_RelIsoTight, hRateDiTau_relIsoTight, hEffDiTau_relIsoTight);
+    // FillDiTau_(L1TkEGTaus_VtxIsoTight, hRateDiTau_vtxIsoTight, hEffDiTau_vtxIsoTight);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // WARNING: Erases L1TkTaus from vector!
@@ -1342,7 +1693,7 @@ void TkEG::Loop()
     //FillDiTau_(L1TkTaus_Tk, hDiTau_Rate_Tk_F, hDiTau_Eff_Tk_F, 1.6, 3.0); 
     
     // Progress bar
-    if (!cfg_DEBUG) auxTools_.ProgressBar(jentry, nEntries, 100, 100);
+    if (!DEBUG) auxTools_.ProgressBar(jentry, nEntries, 100, 100);
    
   } // For-loop: Entries
 
@@ -1350,7 +1701,7 @@ void TkEG::Loop()
   ////////////////////////////////////////////////////////////////////////////////////////////////
   // Fill counters
   ////////////////////////////////////////////////////////////////////////////////////////////////
-  if (cfg_DEBUG) std::cout << "\n=== Fill counters" << endl;
+  if (DEBUG) std::cout << "\n=== Fill counters" << endl;
 
 
   // Event counters (smart counters)
@@ -1363,18 +1714,18 @@ void TkEG::Loop()
   h_Counters->SetBinContent( 7, nEvtsNoHigherPt);
   h_Counters->SetBinContent( 8, nEvtsRelIso);
   h_Counters->SetBinContent( 9, nEvtsVtxIso);
-  h_Counters->SetBinContent(10, nEvtsMcMatch);
-  
-  // events with EGs counters
+  h_Counters->SetBinContent( 10, nEvtsVtxIsoLoose);
+  h_Counters->SetBinContent( 11, nEvtsVtxIsoTight);
+  h_Counters->SetBinContent( 12, nEvtsRelIsoLoose);
+  h_Counters->SetBinContent( 13, nEvtsRelIsoTight);
+
+    // events with EGs counters
   h_Counters_events_EGs->SetBinContent(1, nAllEvts);
   h_Counters_events_EGs->SetBinContent(2, counters_events_EGs);
   h_Counters_events_EGs->SetBinContent(3, counters_events_1GenTauHad_EGs);
   h_Counters_events_EGs->SetBinContent(4, counters_events_2GenTauHad_EGs);
 
-  //cout<< "counters_events_EGs = "<< counters_events_EGs <<endl;
-  //  cout<< "counters_events_noEGs = "<< counters_events_noEGs <<endl;
-
-  // Leading Tracks Counters 
+    // Leading Tracks Counters 
   h_Counters_leadTrks -> SetBinContent(1, counter_allTracks);
   h_Counters_leadTrks -> SetBinContent(2, counter_passChi2100);
   h_Counters_leadTrks -> SetBinContent(3, counter_passPtCut);
@@ -1382,7 +1733,6 @@ void TkEG::Loop()
   h_Counters_leadTrks -> SetBinContent(5, counter_passChi2Nstubs);
   h_Counters_leadTrks -> SetBinContent(6, counter_passNoHigherPtNeigh);
   
-
   // Clustered Tracks Counters 
   h_Counters_clustTrks -> SetBinContent(1,trkcounter_allTracks);
   h_Counters_clustTrks -> SetBinContent(2,trkcounter_allNonLeading);
@@ -1390,24 +1740,7 @@ void TkEG::Loop()
   h_Counters_clustTrks -> SetBinContent(4,trkcounter_passDRmax);
   h_Counters_clustTrks -> SetBinContent(5,trkcounter_passDRmin);
   h_Counters_clustTrks -> SetBinContent(6,trkcounter_passInvMass);
-  
-  // cout<<"counter_allHadGenTaus = "<< counter_allHadGenTaus<<endl;
-  // cout<<"counter_ldgPtCut = " << counter_ldgPtCut<<endl;
-  // cout<<"counter_sumETcut = "<< counter_sumETcut<<endl;
-
-  // cout <<"counter_allTrkTauCand = " << counter_allTrkTauCand<<endl;
-  // cout <<"counter_1trk = "<< counter_1trk<<endl;
-  // cout <<"counter_2trk = "<< counter_2trk<<endl;
-  // cout <<"counter_3trk = "<< counter_3trk<<endl;
-  // cout <<"counter_4trk = "<< counter_4trk<<endl;
-  // cout <<"counter_5trk = "<< counter_5trk<<endl;
-
-  // cout <<"counter_1eg = "<< counter_1eg<<endl;
-  // cout <<"counter_2eg = "<< counter_2eg<<endl;
-  // cout <<"counter_3eg = "<< counter_3eg<<endl;
-  // cout <<"counter_4eg = "<< counter_4eg<<endl;
-  // cout <<"counter_5eg = "<< counter_5eg<<endl;
-  
+    
   // Fill MCmatch counters 
   h_MCmatch_counters -> SetBinContent(1, counter_allTrkTauCand);
   h_MCmatch_counters -> SetBinContent(2, counter_MCmatched_Tk );
@@ -1420,26 +1753,171 @@ void TkEG::Loop()
   ////////////////////////////////////////////////////////////////////////////////////////////////
   // Convert/Finalise histograms
   ////////////////////////////////////////////////////////////////////////////////////////////////
-  if (cfg_DEBUG) std::cout << "\n=== Convert/Finalise histograms" << endl;
+  if (DEBUG) std::cout << "\n=== Convert/Finalise histograms" << endl;
 
   // Divide turn-on numerators by the denumerator
-  histoTools_.DivideHistos_1D(hTurnOn25_TkEG, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hTurnOn25_relIso, hMcHadronicTau_VisEt); 
-  histoTools_.DivideHistos_1D(hTurnOn25_vtxIso, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hTurnOn50_TkEG, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hTurnOn50_relIso, hMcHadronicTau_VisEt); 
-  histoTools_.DivideHistos_1D(hTurnOn50_vtxIso, hMcHadronicTau_VisEt); 
+  histoTools_.DivideHistos_1D(hTkEG_TurnOn25, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hTkEG_TurnOn25_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hTkEG_TurnOn25_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hTkEG_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hTkEG_TurnOn25_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
+
+  histoTools_.DivideHistos_1D(hVtxIso_TurnOn25, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hVtxIso_TurnOn25_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hVtxIso_TurnOn25_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hVtxIso_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hVtxIso_TurnOn25_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
+
+  histoTools_.DivideHistos_1D(hRelIso_TurnOn25, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hRelIso_TurnOn25_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hRelIso_TurnOn25_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hRelIso_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hRelIso_TurnOn25_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
   
-  // Convert rate histograms
-  histoTools_.ConvertToRateHisto_1D(hRateSingleTau_TkEG, nEntries);
+  histoTools_.DivideHistos_1D(hVtxIsoLoose_TurnOn25, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hVtxIsoLoose_TurnOn25_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hVtxIsoLoose_TurnOn25_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hVtxIsoLoose_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hVtxIsoLoose_TurnOn25_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
 
-  histoTools_.ConvertToRateHisto_1D(hRateSingleTau_C, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hRateSingleTau_I, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hRateSingleTau_F, nEntries);
+  histoTools_.DivideHistos_1D(hVtxIsoTight_TurnOn25, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hVtxIsoTight_TurnOn25_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hVtxIsoTight_TurnOn25_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hVtxIsoTight_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hVtxIsoTight_TurnOn25_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
 
-  histoTools_.ConvertToRateHisto_1D(hRateSingleTau_relIso, nEntries);
-  histoTools_.ConvertToRateHisto_1D(hRateSingleTau_vtxIso, nEntries);
+  histoTools_.DivideHistos_1D(hRelIsoLoose_TurnOn25, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hRelIsoLoose_TurnOn25_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hRelIsoLoose_TurnOn25_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hRelIsoLoose_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hRelIsoLoose_TurnOn25_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
 
+  histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn25, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn25_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn25_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn25_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
+  
+  //
+
+  histoTools_.DivideHistos_1D(hTkEG_TurnOn50, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hTkEG_TurnOn50_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hTkEG_TurnOn50_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hTkEG_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hTkEG_TurnOn50_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
+
+  histoTools_.DivideHistos_1D(hVtxIso_TurnOn50, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hVtxIso_TurnOn50_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hVtxIso_TurnOn50_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hVtxIso_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hVtxIso_TurnOn50_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
+
+  histoTools_.DivideHistos_1D(hRelIso_TurnOn50, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hRelIso_TurnOn50_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hRelIso_TurnOn50_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hRelIso_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hRelIso_TurnOn50_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
+
+  histoTools_.DivideHistos_1D(hVtxIsoLoose_TurnOn50, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hVtxIsoLoose_TurnOn50_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hVtxIsoLoose_TurnOn50_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hVtxIsoLoose_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hVtxIsoLoose_TurnOn50_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
+
+  histoTools_.DivideHistos_1D(hVtxIsoTight_TurnOn50, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hVtxIsoTight_TurnOn50_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hVtxIsoTight_TurnOn50_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hVtxIsoTight_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hVtxIsoTight_TurnOn50_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
+
+  histoTools_.DivideHistos_1D(hRelIsoLoose_TurnOn50, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hRelIsoLoose_TurnOn50_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hRelIsoLoose_TurnOn50_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hRelIsoLoose_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hRelIsoLoose_TurnOn50_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
+
+  histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn50, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn50_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn50_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn50_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
+
+
+    // SingleTau
+  double N = nEntries;
+  histoTools_.ConvertToRateHisto_1D(hTkEG_Rate  , N);
+  histoTools_.ConvertToRateHisto_1D(hTkEG_Rate_C, N);
+  histoTools_.ConvertToRateHisto_1D(hTkEG_Rate_I, N);
+  histoTools_.ConvertToRateHisto_1D(hTkEG_Rate_F, N);
+      
+  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate  , N);
+  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_C, N);
+  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_I, N);
+  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_F, N);
+
+  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate  , N);
+  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_C, N);
+  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_I, N);
+  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_F, N);
+
+  histoTools_.ConvertToRateHisto_1D(hVtxIsoLoose_Rate  , N);
+  histoTools_.ConvertToRateHisto_1D(hVtxIsoLoose_Rate_C, N);
+  histoTools_.ConvertToRateHisto_1D(hVtxIsoLoose_Rate_I, N);
+  histoTools_.ConvertToRateHisto_1D(hVtxIsoLoose_Rate_F, N);
+
+  histoTools_.ConvertToRateHisto_1D(hVtxIsoTight_Rate  , N);
+  histoTools_.ConvertToRateHisto_1D(hVtxIsoTight_Rate_C, N);
+  histoTools_.ConvertToRateHisto_1D(hVtxIsoTight_Rate_I, N);
+  histoTools_.ConvertToRateHisto_1D(hVtxIsoTight_Rate_F, N);
+
+  histoTools_.ConvertToRateHisto_1D(hRelIsoLoose_Rate  , N);
+  histoTools_.ConvertToRateHisto_1D(hRelIsoLoose_Rate_C, N);
+  histoTools_.ConvertToRateHisto_1D(hRelIsoLoose_Rate_I, N);
+  histoTools_.ConvertToRateHisto_1D(hRelIsoLoose_Rate_F, N);
+
+  histoTools_.ConvertToRateHisto_1D(hRelIsoTight_Rate  , N);
+  histoTools_.ConvertToRateHisto_1D(hRelIsoTight_Rate_C, N);
+  histoTools_.ConvertToRateHisto_1D(hRelIsoTight_Rate_I, N);
+  histoTools_.ConvertToRateHisto_1D(hRelIsoTight_Rate_F, N);
+
+  FinaliseEffHisto_( hTkEG_Eff  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hTkEG_Eff_C, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hTkEG_Eff_I, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hTkEG_Eff_F, nEvtsWithMaxHTaus);
+  
+  FinaliseEffHisto_( hVtxIso_Eff  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hVtxIso_Eff_C, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hVtxIso_Eff_I, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hVtxIso_Eff_F, nEvtsWithMaxHTaus);
+
+  FinaliseEffHisto_( hRelIso_Eff  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hRelIso_Eff_C, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hRelIso_Eff_I, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hRelIso_Eff_F, nEvtsWithMaxHTaus);
+
+  FinaliseEffHisto_( hVtxIsoLoose_Eff  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hVtxIsoLoose_Eff_C, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hVtxIsoLoose_Eff_I, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hVtxIsoLoose_Eff_F, nEvtsWithMaxHTaus);
+
+  FinaliseEffHisto_( hVtxIsoTight_Eff  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hVtxIsoTight_Eff_C, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hVtxIsoTight_Eff_I, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hVtxIsoTight_Eff_F, nEvtsWithMaxHTaus);
+
+  FinaliseEffHisto_( hRelIsoLoose_Eff  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hRelIsoLoose_Eff_C, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hRelIsoLoose_Eff_I, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hRelIsoLoose_Eff_F, nEvtsWithMaxHTaus);
+
+  FinaliseEffHisto_( hRelIsoTight_Eff  , nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hRelIsoTight_Eff_C, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hRelIsoTight_Eff_I, nEvtsWithMaxHTaus);
+  FinaliseEffHisto_( hRelIsoTight_Eff_F, nEvtsWithMaxHTaus);
+
+  // FIX ME: ADD DiTau Properly
+  
+  // DiTau
   histoTools_.ConvertToRateHisto_1D(hRateDiTau_TkEG, nEntries);
   histoTools_.ConvertToRateHisto_1D(hRateDiTau_C, nEntries);
   histoTools_.ConvertToRateHisto_1D(hRateDiTau_I, nEntries);
@@ -1447,15 +1925,6 @@ void TkEG::Loop()
 
   histoTools_.ConvertToRateHisto_1D(hRateDiTau_relIso, nEntries);
   histoTools_.ConvertToRateHisto_1D(hRateDiTau_vtxIso, nEntries);
-
-  // Finalise efficiency histograms
-  FinaliseEffHisto_(hEffSingleTau_TkEG  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_(hEffSingleTau_C, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_(hEffSingleTau_I, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_(hEffSingleTau_F, nEvtsWithMaxHTaus);
-
-  FinaliseEffHisto_(hEffSingleTau_relIso  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_(hEffSingleTau_vtxIso  , nEvtsWithMaxHTaus);
 
   FinaliseEffHisto_(hRateDiTau_TkEG  , nEvtsWithMaxHTaus);
   FinaliseEffHisto_(hRateDiTau_C, nEvtsWithMaxHTaus);
@@ -1468,11 +1937,11 @@ void TkEG::Loop()
   ////////////////////////////////////////////////////////////////////////////////////////////////
   // Write the histograms to the file
   ////////////////////////////////////////////////////////////////////////////////////////////////
-  if (cfg_DEBUG) std::cout << "\n=== Write the histograms to the file" << endl;
+  if (DEBUG) std::cout << "\n=== Write the histograms to the file" << endl;
   
   WriteHistos_();
   auxTools_.StopwatchStop(5, "minutes", "Total Time");
-
+  
 }
 
 
@@ -1553,18 +2022,30 @@ bool TkEG::IsWithinEtaRegion(string etaRegion,
 void TkEG::BookHistos_(void)
 //============================================================================
 {
+
+  // Binning
+  const unsigned int nEt = 300;
+  const float minEt = 0.0;
+  const float maxEt = +300.0;
+
+
   // Event-Type Histograms
-  histoTools_.BookHisto_1D(h_Counters, "Counters",  "", 10, 0.0, +10.0);
+  histoTools_.BookHisto_1D(h_Counters, "Counters",  "", 13, 0.0, +13.0);
   h_Counters->GetXaxis()->SetBinLabel( 1, "All Evts");
   h_Counters->GetXaxis()->SetBinLabel( 2, "Evts");
   h_Counters->GetXaxis()->SetBinLabel( 3, "Seed Pt");
   h_Counters->GetXaxis()->SetBinLabel( 4, "Seed Eta");
   h_Counters->GetXaxis()->SetBinLabel( 5, "Seed ChiSq");
   h_Counters->GetXaxis()->SetBinLabel( 6, "Seed Stubs");
-  h_Counters->GetXaxis()->SetBinLabel( 7, "Seed - No higher p_{T} neighbours");
+  h_Counters->GetXaxis()->SetBinLabel( 7, "Seed ldg in SigCone");
   h_Counters->GetXaxis()->SetBinLabel( 8, "RelIso");
   h_Counters->GetXaxis()->SetBinLabel( 9, "VtxIso");
-  h_Counters->GetXaxis()->SetBinLabel(10, "Matched");
+  h_Counters->GetXaxis()->SetBinLabel(10, "VtxIso (L)");
+  h_Counters->GetXaxis()->SetBinLabel(11, "VtxIso (T)");
+  h_Counters->GetXaxis()->SetBinLabel(12, "RelIso (L)");
+  h_Counters->GetXaxis()->SetBinLabel(13, "RelIso (T)");
+
+  //h_Counters->GetXaxis()->SetBinLabel(10, "Matched");
 
 
   histoTools_.BookHisto_1D(h_Counters_events_EGs, "Counters_events_EGs", ";;Entries", 4, 0, 4);
@@ -1680,7 +2161,7 @@ void TkEG::BookHistos_(void)
   h_Counters_leadTrks->GetXaxis()->SetBinLabel(6, "No higher p_{T} neighbour");
 
   // Number of lead tracks (per event)
-  histoTools_.BookHisto_1D(h_leadTrks_Multiplicity, "leadTrks_Multiplicity", ";Number of lead tracks in event;Events / bin", 11, -0.5, +10.5);
+  histoTools_.BookHisto_1D(h_leadTrks_Multiplicity, "leadTrks_Multiplicity", ";Number of lead tracks in event;Events / bin", 16, -0.5, +15.5);
 
   // Lead track Pt
   histoTools_.BookHisto_1D(h_leadTrks_Pt, "leadTrks_Pt", ";p_{T} (GeV);Tracks / bin", 300, +0.0, +300.0);
@@ -1727,12 +2208,14 @@ void TkEG::BookHistos_(void)
 
   histoTools_.BookHisto_1D(h_MCmatch_neutralDaugh_N, "MCmatch_neutralDaugh_N", ";Number of daughters^{0} of matched gen-#tau; entries / bin", 16, -0.5, +15.5);
 
+  // Opening of signal cone 
+  histoTools_.BookHisto_1D(h_SigCone_DeltaR, "SigCone_DeltaR", ";#DeltaR; Entries/ bin", 150, 0, 0.3 );
+
   // Pt of track clusters
   histoTools_.BookHisto_1D(h_trkClusters_Pt, "trkClusters_Pt", ";p_{T} (GeV);Clusters / bin", 150, +0.0, +300.0);
 
-  
   // Invariant mass of track clusters (before cut)
-  // histoTools_.BookHisto_1D(h_trkClusters_M_beforeCut, "trkClusters_M_beforeCut", ";Invariant mass;Clusters / bin", 40, 0.0, +4.0);
+  histoTools_.BookHisto_1D(h_trkClusters_M_beforeCut, "trkClusters_M_beforeCut", ";Invariant mass;Clusters / bin", 40, 0.0, +4.0);
 
   // Invariant mass of track clusters
   histoTools_.BookHisto_1D(h_trkClusters_M, "trkClusters_M", ";Invariant mass;Clusters / bin", 40, 0.0, +4.0);
@@ -1821,7 +2304,7 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_EGClusters_MultiplicityPerCluster, "EGClusters_MultiplicityPerCluster", ";Number of EGs in cluster;Clusters / bin", 16, -0.5, +15.5);
 
   // Et of EG clusters
-  histoTools_.BookHisto_1D(h_EGClusters_Et, "EGClusters_Et", ";Et (GeV);Clusters / bin", 30, +0.0, +150.0);
+  histoTools_.BookHisto_1D(h_EGClusters_Et, "EGClusters_Et", ";Et (GeV);Clusters / bin", 150, +0.0, +150.0);
 
   
   // Invariant mass of EG clusters
@@ -1830,7 +2313,7 @@ void TkEG::BookHistos_(void)
   // Track-based relative isolation of tau candidates
   histoTools_.BookHisto_1D(h_TkEG_relIso, "TkEG_relIso", ";Relative isolation;Clusters / bin", 100, 0.0, +5.0);
 
-    // Track-based relative isolation of tau candidates
+  // Track-based relative isolation of tau candidates
   histoTools_.BookHisto_1D(h_TkEG_vtxIso, "TkEG_vtxIso", ";Vertex isolation;Clusters / bin", 100, 0.0, +5.0);
   
   // Et of the tkeg when it has a matched genTau
@@ -1851,60 +2334,246 @@ void TkEG::BookHistos_(void)
   // Visible Pt of the matched generator taus (when there is at least one EG clustered)
   histoTools_.BookHisto_1D(hTkEG_genVisPt_clustEG, "TkEG_genVisPt_clustEG", ";p_{T}^{vis} (gen) (GeV);Particles / bin", 40, 0.0,  +200.0);
 
-  // Visible Et of all generator taus
-  histoTools_.BookHisto_1D(hMcHadronicTau_VisEt, "hMcHadronicTau_VisEt", ";VisEt (GeV);Particles / bin", 40, 0.0,  +200.0);
-
   // Properties of tau candidate 
   histoTools_.BookHisto_1D(h_TkEG_Pt, "TkEG_Pt", ";p_{T} (GeV);Entries / bin", 300, +0.0, +300.0);
   histoTools_.BookHisto_1D(h_TkEG_ET, "TkEG_ET", ";E_{T} (GeV);Entries / bin", 300, +0.0, +300.0);
   histoTools_.BookHisto_1D(h_TkEG_Eta, "TkEG_Eta", ";#eta;Entries / bin", 60, -3.0, +3.0);
   histoTools_.BookHisto_1D(h_TkEG_Phi, "TkEG_Phi", ";#phi (rads); Entries / bin", 21,  -3.15,  +3.15);
   histoTools_.BookHisto_1D(h_TkEG_InvMass, "TkEG_InvMass", ";Mass (GeV); Entries / bin", 40, 0.0, +4.0);
+  histoTools_.BookHisto_1D(h_TkEG_NEGs, "TkEG_NEGs", "N_{EGs};Entries / bin", 5,0, 5);
+  histoTools_.BookHisto_1D(h_TkEG_NTks, "TkEG_NTks", "N_{Tks};Entries / bin", 5,0, 5);
+  histoTools_.BookHisto_1D(h_TkEG_NEGs_C, "TkEG_NEGs_C", "N_{EGs};Entries / bin", 5,0, 5);
+  histoTools_.BookHisto_1D(h_TkEG_NEGs_I, "TkEG_NEGs_I", "N_{EGs};Entries / bin", 5,0, 5);
+  histoTools_.BookHisto_1D(h_TkEG_NEGs_F, "TkEG_NEGs_F", "N_{EGs};Entries / bin", 5,0, 5);
   histoTools_.BookHisto_1D(h_TkEG_CHF, "TkEG_CHF", ";CHF; Entries / bin", 200,  0.0,   +2.0);
   histoTools_.BookHisto_1D(h_TkEG_NHF, "TkEG_NHF", ";NHF; Entries / bin", 200,  0.0,   +2.0);
-  histoTools_.BookHisto_1D(h_TkEG_CHF_withNeutrals, "TkEG_CHF_withNeutrals", ";CHF; Entries / bin", 200,  0.0,   +2.0);
-  histoTools_.BookHisto_1D(h_TkEG_NHF_withNeutrals, "TkEG_NHF_withNeutrals", ";NHF; Entries / bin", 200,  0.0,   +2.0);
+  histoTools_.BookHisto_1D(h_TkEG_CHF_withNeutrals, "TkEG_CHF_withNeutrals", ";CHF; Entries / bin", 100,  0.0,   +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_NHF_withNeutrals, "TkEG_NHF_withNeutrals", ";NHF; Entries / bin", 100,  0.0,   +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_isoTracks_InvMass, "TkEG_isoTracks_InvMass", ";Invariant mass (iso-cone); Entries / bin", 500, +0.0, +0.5);
+  histoTools_.BookHisto_1D(h_TkEG_isoTracks_Multiplicity, "TkEG_isoTracks_Multiplicity", ";N_{iso-tks}; Entries / bin",10, 0, 10.0);
 
+  // Bad Et Resolution Candidates Properties
+  histoTools_.BookHisto_1D(h_BadEtResolCand_InvMass, "BadEtResolCand_InvMass", ";Mass (GeV); Entries / bin", 40, 0.0, +4.0);
+  histoTools_.BookHisto_1D(h_BadEtResolCand_RelIso, "BadEtResolCand_RelIso", ";Relative isolation;Clusters / bin", 100, 0.0, +5.0);
+  histoTools_.BookHisto_1D(h_BadEtResolCand_VtxIso, "BadEtResolCand_VtxIso", ";Vertex isolation;Clusters / bin", 100, 0.0, +5.0);
+  histoTools_.BookHisto_1D(h_BadEtResolCand_CHF, "BadEtResolCand_CHF", ";CHF; Entries / bin", 100,  0.0,   +1.0);
+  histoTools_.BookHisto_1D(h_BadEtResolCand_IsoTracks_N, "BadEtResolCand_IsoTracks_N", ";N_{iso-tks}; Entries / bin",10, 0, 10.0);
+  histoTools_.BookHisto_1D(h_BadEtResolCand_dR_EG_Seed, "BadEtResolCand_dR_EG_Seed", "#DeltaR(#tau-seed, EG); Entries / bin",100,  0.0,   +1.0);
 
   // Pt resolution of TkEG candidate
-  histoTools_.BookHisto_1D(h_TkEG_PtResolution, "TkEG_PtResolution", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_PtResolution_C, "TkEG_PtResolution_C", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_PtResolution_I, "TkEG_PtResolution_I", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_PtResolution_F, "TkEG_PtResolution_F", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_PtResolution_noNeutrals, "TkEG_PtResolution_noNeutrals", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_PtResolution_withNeutrals, "TkEG_PtResolution_withNeutrals", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_PtResolution_1pr, "TkEG_PtResolution_1pr", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_PtResolution_3pr, "TkEG_PtResolution_3pr", ";p_{T} resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution, "TkEG_PtResolution", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_C, "TkEG_PtResolution_C", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_I, "TkEG_PtResolution_I", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_F, "TkEG_PtResolution_F", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_noNeutrals, "TkEG_PtResolution_noNeutrals", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_withNeutrals, "TkEG_PtResolution_withNeutrals", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_1pr, "TkEG_PtResolution_1pr", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_3pr, "TkEG_PtResolution_3pr", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_F_withEGs, "TkEG_PtResolution_F_withEGs", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_F_withEGs_posEta, "TkEG_PtResolution_F_withEGs_posEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_F_withEGs_negEta, "TkEG_PtResolution_F_withEGs_negEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_F_noEGs, "TkEG_PtResolution_F_noEGs", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_F_noEGs_posEta, "TkEG_PtResolution_F_noEGs_posEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_F_noEGs_negEta, "TkEG_PtResolution_F_noEGs_negEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
   
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_noNeutrals_F, "TkEG_PtResolution_noNeutrals_F", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_withNeutrals_F, "TkEG_PtResolution_withNeutrals_F", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_1pr_F, "TkEG_PtResolution_1pr_F", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_3pr_F, "TkEG_PtResolution_3pr_F", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_noNeutrals_F_withEGs, "TkEG_PtResolution_noNeutrals_F_withEGs", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_withNeutrals_F_withEGs, "TkEG_PtResolution_withNeutrals_F_withEGs", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_1pr_F_withEGs, "TkEG_PtResolution_1pr_F_withEGs", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_3pr_F_withEGs, "TkEG_PtResolution_3pr_F_withEGs", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_noNeutrals_F_noEGs, "TkEG_PtResolution_noNeutrals_F_noEGs", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_withNeutrals_F_noEGs, "TkEG_PtResolution_withNeutrals_F_noEGs", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_1pr_F_noEGs, "TkEG_PtResolution_1pr_F_noEGs", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_3pr_F_noEGs, "TkEG_PtResolution_3pr_F_noEGs", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  // eta > 0
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_noNeutrals_F_withEGs_posEta, "TkEG_PtResolution_noNeutrals_F_withEGs_posEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_withNeutrals_F_withEGs_posEta, "TkEG_PtResolution_withNeutrals_F_withEGs_posEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_1pr_F_withEGs_posEta, "TkEG_PtResolution_1pr_F_withEGs_posEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_3pr_F_withEGs_posEta, "TkEG_PtResolution_3pr_F_withEGs_posEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_noNeutrals_F_noEGs_posEta, "TkEG_PtResolution_noNeutrals_F_noEGs_posEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_withNeutrals_F_noEGs_posEta, "TkEG_PtResolution_withNeutrals_F_noEGs_posEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_1pr_F_noEGs_posEta, "TkEG_PtResolution_1pr_F_noEGs_posEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_3pr_F_noEGs_posEta, "TkEG_PtResolution_3pr_F_noEGs_posEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  // eta < 0
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_noNeutrals_F_withEGs_negEta, "TkEG_PtResolution_noNeutrals_F_withEGs_negEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_withNeutrals_F_withEGs_negEta, "TkEG_PtResolution_withNeutrals_F_withEGs_negEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_1pr_F_withEGs_negEta, "TkEG_PtResolution_1pr_F_withEGs_negEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_3pr_F_withEGs_negEta, "TkEG_PtResolution_3pr_F_withEGs_negEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_noNeutrals_F_noEGs_negEta, "TkEG_PtResolution_noNeutrals_F_noEGs_negEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_withNeutrals_F_noEGs_negEta, "TkEG_PtResolution_withNeutrals_F_noEGs_negEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_1pr_F_noEGs_negEta, "TkEG_PtResolution_1pr_F_noEGs_negEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PtResolution_3pr_F_noEGs_negEta, "TkEG_PtResolution_3pr_F_noEGs_negEta", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
   // Et resolution of TkEG candidate
-  histoTools_.BookHisto_1D(h_TkEG_EtResolution, "TkEG_EtResolution", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_EtResolution_C, "TkEG_EtResolution_C", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_EtResolution_I, "TkEG_EtResolution_I", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_EtResolution_F, "TkEG_EtResolution_F", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_EtResolution_noNeutrals, "TkEG_EtResolution_noNeutrals", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals, "TkEG_EtResolution_withNeutrals", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_EtResolution_1pr, "TkEG_EtResolution_1pr", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_EtResolution_3pr, "TkEG_EtResolution_3pr", ";Et resolution (GeV);Clusters / bin", 200, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution, "TkEG_EtResolution", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_C, "TkEG_EtResolution_C", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_I, "TkEG_EtResolution_I", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_F, "TkEG_EtResolution_F", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_noNeutrals, "TkEG_EtResolution_noNeutrals", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals, "TkEG_EtResolution_withNeutrals", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_1pr, "TkEG_EtResolution_1pr", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_3pr, "TkEG_EtResolution_3pr", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_F_withEGs, "TkEG_EtResolution_F_withEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_F_withEGs_posEta, "TkEG_EtResolution_F_withEGs_posEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_F_withEGs_negEta, "TkEG_EtResolution_F_withEGs_negEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_F_noEGs, "TkEG_EtResolution_F_noEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_F_noEGs_posEta, "TkEG_EtResolution_F_noEGs_posEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_F_noEGs_negEta, "TkEG_EtResolution_F_noEGs_negEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_noNeutrals_F, "TkEG_EtResolution_noNeutrals_F", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_F, "TkEG_EtResolution_withNeutrals_F", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_1pr_F, "TkEG_EtResolution_1pr_F", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_3pr_F, "TkEG_EtResolution_3pr_F", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_noNeutrals_F_withEGs, "TkEG_EtResolution_noNeutrals_F_withEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_F_withEGs, "TkEG_EtResolution_withNeutrals_F_withEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_1pr_F_withEGs, "TkEG_EtResolution_1pr_F_withEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_3pr_F_withEGs, "TkEG_EtResolution_3pr_F_withEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_noNeutrals_F_noEGs, "TkEG_EtResolution_noNeutrals_F_noEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_F_noEGs, "TkEG_EtResolution_withNeutrals_F_noEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_1pr_F_noEGs, "TkEG_EtResolution_1pr_F_noEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_3pr_F_noEGs, "TkEG_EtResolution_3pr_F_noEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  // eta > 0
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_noNeutrals_F_withEGs_posEta, "TkEG_EtResolution_noNeutrals_F_withEGs_posEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_F_withEGs_posEta, "TkEG_EtResolution_withNeutrals_F_withEGs_posEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_1pr_F_withEGs_posEta, "TkEG_EtResolution_1pr_F_withEGs_posEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_3pr_F_withEGs_posEta, "TkEG_EtResolution_3pr_F_withEGs_posEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_noNeutrals_F_noEGs_posEta, "TkEG_EtResolution_noNeutrals_F_noEGs_posEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_F_noEGs_posEta, "TkEG_EtResolution_withNeutrals_F_noEGs_posEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_1pr_F_noEGs_posEta, "TkEG_EtResolution_1pr_F_noEGs_posEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_3pr_F_noEGs_posEta, "TkEG_EtResolution_3pr_F_noEGs_posEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  
+    // eta < 0
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_noNeutrals_F_withEGs_negEta, "TkEG_EtResolution_noNeutrals_F_withEGs_negEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_F_withEGs_negEta, "TkEG_EtResolution_withNeutrals_F_withEGs_negEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_1pr_F_withEGs_negEta, "TkEG_EtResolution_1pr_F_withEGs_negEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_3pr_F_withEGs_negEta, "TkEG_EtResolution_3pr_F_withEGs_negEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_noNeutrals_F_noEGs_negEta, "TkEG_EtResolution_noNeutrals_F_noEGs_negEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_F_noEGs_negEta, "TkEG_EtResolution_withNeutrals_F_noEGs_negEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_1pr_F_noEGs_negEta, "TkEG_EtResolution_1pr_F_noEGs_negEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_3pr_F_noEGs_negEta, "TkEG_EtResolution_3pr_F_noEGs_negEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
 
   // Eta resolution of TkEG candidate
-  histoTools_.BookHisto_1D(h_TkEG_EtaResolution, "TkEG_EtaResolution", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_C, "TkEG_EtaResolution_C", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_I, "TkEG_EtaResolution_I", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_F, "TkEG_EtaResolution_F", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_noNeutrals, "TkEG_EtaResolution_noNeutrals", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_withNeutrals, "TkEG_EtaResolution_withNeutrals", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_1pr, "TkEG_EtaResolution_1pr", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_3pr, "TkEG_EtaResolution_3pr", ";#eta resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution, "TkEG_EtaResolution", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_C, "TkEG_EtaResolution_C", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_I, "TkEG_EtaResolution_I", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_F, "TkEG_EtaResolution_F", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_noNeutrals, "TkEG_EtaResolution_noNeutrals", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_withNeutrals, "TkEG_EtaResolution_withNeutrals", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_1pr, "TkEG_EtaResolution_1pr", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_3pr, "TkEG_EtaResolution_3pr", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_F_withEGs, "TkEG_EtaResolution_F_withEGs", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_F_withEGs_posEta, "TkEG_EtaResolution_F_withEGs_posEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_F_withEGs_negEta, "TkEG_EtaResolution_F_withEGs_negEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_F_noEGs, "TkEG_EtaResolution_F_noEGs", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_F_noEGs_posEta, "TkEG_EtaResolution_F_noEGs_posEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_F_noEGs_negEta, "TkEG_EtaResolution_F_noEGs_negEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_noNeutrals_F, "TkEG_EtaResolution_noNeutrals_F", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_withNeutrals_F, "TkEG_EtaResolution_withNeutrals_F", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_1pr_F, "TkEG_EtaResolution_1pr_F", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_3pr_F, "TkEG_EtaResolution_3pr_F", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_noNeutrals_F_withEGs, "TkEG_EtaResolution_noNeutrals_F_withEGs", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_withNeutrals_F_withEGs, "TkEG_EtaResolution_withNeutrals_F_withEGs", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_1pr_F_withEGs, "TkEG_EtaResolution_1pr_F_withEGs", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_3pr_F_withEGs, "TkEG_EtaResolution_3pr_F_withEGs", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_noNeutrals_F_noEGs, "TkEG_EtaResolution_noNeutrals_F_noEGs", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_withNeutrals_F_noEGs, "TkEG_EtaResolution_withNeutrals_F_noEGs", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_1pr_F_noEGs, "TkEG_EtaResolution_1pr_F_noEGs", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_3pr_F_noEGs, "TkEG_EtaResolution_3pr_F_noEGs", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  // eta > 0
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_noNeutrals_F_withEGs_posEta, "TkEG_EtaResolution_noNeutrals_F_withEGs_posEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_withNeutrals_F_withEGs_posEta, "TkEG_EtaResolution_withNeutrals_F_withEGs_posEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_1pr_F_withEGs_posEta, "TkEG_EtaResolution_1pr_F_withEGs_posEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_3pr_F_withEGs_posEta, "TkEG_EtaResolution_3pr_F_withEGs_posEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_noNeutrals_F_noEGs_posEta, "TkEG_EtaResolution_noNeutrals_F_noEGs_posEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_withNeutrals_F_noEGs_posEta, "TkEG_EtaResolution_withNeutrals_F_noEGs_posEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_1pr_F_noEGs_posEta, "TkEG_EtaResolution_1pr_F_noEGs_posEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_3pr_F_noEGs_posEta, "TkEG_EtaResolution_3pr_F_noEGs_posEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  // eta < 0
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_noNeutrals_F_withEGs_negEta, "TkEG_EtaResolution_noNeutrals_F_withEGs_negEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_withNeutrals_F_withEGs_negEta, "TkEG_EtaResolution_withNeutrals_F_withEGs_negEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_1pr_F_withEGs_negEta, "TkEG_EtaResolution_1pr_F_withEGs_negEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_3pr_F_withEGs_negEta, "TkEG_EtaResolution_3pr_F_withEGs_negEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_noNeutrals_F_noEGs_negEta, "TkEG_EtaResolution_noNeutrals_F_noEGs_negEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_withNeutrals_F_noEGs_negEta, "TkEG_EtaResolution_withNeutrals_F_noEGs_negEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_1pr_F_noEGs_negEta, "TkEG_EtaResolution_1pr_F_noEGs_negEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtaResolution_3pr_F_noEGs_negEta, "TkEG_EtaResolution_3pr_F_noEGs_negEta", ";#eta resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
   
   // Phi resolution of TkEG candidate
-  histoTools_.BookHisto_1D(h_TkEG_PhiResolution, "TkEG_PhiResolution", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_C, "TkEG_PhiResolution_C", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_I, "TkEG_PhiResolution_I", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_F, "TkEG_PhiResolution_F", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_noNeutrals, "TkEG_PhiResolution_noNeutrals", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_withNeutrals, "TkEG_PhiResolution_withNeutrals", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_1pr, "TkEG_PhiResolution_1pr", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_3pr, "TkEG_PhiResolution_3pr", ";#phi resolution (GeV);Clusters / bin", 1000, -5.0, +5.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution, "TkEG_PhiResolution", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_C, "TkEG_PhiResolution_C", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_I, "TkEG_PhiResolution_I", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_F, "TkEG_PhiResolution_F", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_noNeutrals, "TkEG_PhiResolution_noNeutrals", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_withNeutrals, "TkEG_PhiResolution_withNeutrals", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_1pr, "TkEG_PhiResolution_1pr", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_3pr, "TkEG_PhiResolution_3pr", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_F_withEGs, "TkEG_PhiResolution_F_withEGs", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_F_withEGs_posEta, "TkEG_PhiResolution_F_withEGs_posEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_F_withEGs_negEta, "TkEG_PhiResolution_F_withEGs_negEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_F_noEGs, "TkEG_PhiResolution_F_noEGs", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_F_noEGs_posEta, "TkEG_PhiResolution_F_noEGs_posEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_F_noEGs_negEta, "TkEG_PhiResolution_F_noEGs_negEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_noNeutrals_F, "TkEG_PhiResolution_noNeutrals_F", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_withNeutrals_F, "TkEG_PhiResolution_withNeutrals_F", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_1pr_F, "TkEG_PhiResolution_1pr_F", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_3pr_F, "TkEG_PhiResolution_3pr_F", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_noNeutrals_F_withEGs, "TkEG_PhiResolution_noNeutrals_F_withEGs", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_withNeutrals_F_withEGs, "TkEG_PhiResolution_withNeutrals_F_withEGs", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_1pr_F_withEGs, "TkEG_PhiResolution_1pr_F_withEGs", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_3pr_F_withEGs, "TkEG_PhiResolution_3pr_F_withEGs", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_noNeutrals_F_noEGs, "TkEG_PhiResolution_noNeutrals_F_noEGs", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_withNeutrals_F_noEGs, "TkEG_PhiResolution_withNeutrals_F_noEGs", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_1pr_F_noEGs, "TkEG_PhiResolution_1pr_F_noEGs", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_3pr_F_noEGs, "TkEG_PhiResolution_3pr_F_noEGs", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  // eta > 0
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_noNeutrals_F_withEGs_posEta, "TkEG_PhiResolution_noNeutrals_F_withEGs_posEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_withNeutrals_F_withEGs_posEta, "TkEG_PhiResolution_withNeutrals_F_withEGs_posEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_1pr_F_withEGs_posEta, "TkEG_PhiResolution_1pr_F_withEGs_posEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_3pr_F_withEGs_posEta, "TkEG_PhiResolution_3pr_F_withEGs_posEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_noNeutrals_F_noEGs_posEta, "TkEG_PhiResolution_noNeutrals_F_noEGs_posEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_withNeutrals_F_noEGs_posEta, "TkEG_PhiResolution_withNeutrals_F_noEGs_posEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_1pr_F_noEGs_posEta, "TkEG_PhiResolution_1pr_F_noEGs_posEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_3pr_F_noEGs_posEta, "TkEG_PhiResolution_3pr_F_noEGs_posEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  // eta < 0
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_noNeutrals_F_withEGs_negEta, "TkEG_PhiResolution_noNeutrals_F_withEGs_negEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_withNeutrals_F_withEGs_negEta, "TkEG_PhiResolution_withNeutrals_F_withEGs_negEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_1pr_F_withEGs_negEta, "TkEG_PhiResolution_1pr_F_withEGs_negEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_3pr_F_withEGs_negEta, "TkEG_PhiResolution_3pr_F_withEGs_negEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_noNeutrals_F_noEGs_negEta, "TkEG_PhiResolution_noNeutrals_F_noEGs_negEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_withNeutrals_F_noEGs_negEta, "TkEG_PhiResolution_withNeutrals_F_noEGs_negEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_1pr_F_noEGs_negEta, "TkEG_PhiResolution_1pr_F_noEGs_negEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_PhiResolution_3pr_F_noEGs_negEta, "TkEG_PhiResolution_3pr_F_noEGs_negEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
   
   // MC match counters 
   histoTools_.BookHisto_1D(h_MCmatch_counters, "MCmatch_counters", ";;Events", 7, 0, 7);
@@ -1939,22 +2608,128 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_MCmatch_dR, "MCmatch_dR", ";#DeltaR_{min}(trk_{ldg}, gen-#tau); entries / bin",   60,  0.0,   +6.0);
 
   // Turn-on histograms
-  histoTools_.BookHisto_1D(hTurnOn25_TkEG, "TurnOn25_TkEG", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTurnOn25_relIso, "TurnOn25_RelIso", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTurnOn25_vtxIso, "TurnOn25_VtxIso", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hMcHadronicTau_VisEt    , "McHadronicTau_VisEt"    , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hMcHadronicTau_VisEt_1pr, "McHadronicTau_VisEt_1pr", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hMcHadronicTau_VisEt_3pr, "McHadronicTau_VisEt_3pr", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hMcHadronicTau_VisEt_withNeutrals, "McHadronicTau_VisEt_withNeutrals", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hMcHadronicTau_VisEt_noNeutrals, "McHadronicTau_VisEt_noNeutrals", "", 60 , minEt , maxEt );
+  
 
-  histoTools_.BookHisto_1D(hTurnOn50_TkEG, "TurnOn50_TkEG", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTurnOn50_relIso, "TurnOn50_RelIso", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
-  histoTools_.BookHisto_1D(hTurnOn50_vtxIso, "TurnOn50_VtxIso", ";E_{T} (GeV); Efficiency / bin", 40, 0.0,  +200.0);
-  
-  // Single-tau rates
-  histoTools_.BookHisto_1D(hRateSingleTau_TkEG, "Rate_SingleTau_TkEG"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
-  histoTools_.BookHisto_1D(hRateSingleTau_C  , "Rate_SingleTau_C"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
-  histoTools_.BookHisto_1D(hRateSingleTau_I  , "Rate_SingleTau_I"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
-  histoTools_.BookHisto_1D(hRateSingleTau_F  , "Rate_SingleTau_F"  , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);  
-  
-  histoTools_.BookHisto_1D(hRateSingleTau_relIso  , "Rate_SingleTau_RelIso"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
-  histoTools_.BookHisto_1D(hRateSingleTau_vtxIso  , "Rate_SingleTau_VtxIso"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hTkEG_TurnOn25, "TkEG_TurnOn25", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTkEG_TurnOn25_1pr, "TkEG_TurnOn25_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTkEG_TurnOn25_3pr, "TkEG_TurnOn25_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTkEG_TurnOn25_withNeutrals, "TkEG_TurnOn25_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTkEG_TurnOn25_noNeutrals, "TkEG_TurnOn25_noNeutrals" , "", 60 , minEt , maxEt );
+
+  histoTools_.BookHisto_1D(hVtxIso_TurnOn25, "VtxIso_TurnOn25", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_TurnOn25_1pr, "VtxIso_TurnOn25_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_TurnOn25_3pr, "VtxIso_TurnOn25_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_TurnOn25_withNeutrals, "VtxIso_TurnOn25_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_TurnOn25_noNeutrals, "VtxIso_TurnOn25_noNeutrals" , "", 60 , minEt , maxEt );
+
+  histoTools_.BookHisto_1D(hRelIso_TurnOn25, "RelIso_TurnOn25", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_TurnOn25_1pr, "RelIso_TurnOn25_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_TurnOn25_3pr, "RelIso_TurnOn25_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_TurnOn25_withNeutrals, "RelIso_TurnOn25_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_TurnOn25_noNeutrals, "RelIso_TurnOn25_noNeutrals" , "", 60 , minEt , maxEt );
+
+    histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn25, "VtxIsoLoose_TurnOn25", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn25_1pr, "VtxIsoLoose_TurnOn25_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn25_3pr, "VtxIsoLoose_TurnOn25_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn25_withNeutrals, "VtxIsoLoose_TurnOn25_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn25_noNeutrals, "VtxIsoLoose_TurnOn25_noNeutrals" , "", 60 , minEt , maxEt );
+
+  histoTools_.BookHisto_1D(hVtxIsoTight_TurnOn25, "VtxIsoTight_TurnOn25", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_TurnOn25_1pr, "VtxIsoTight_TurnOn25_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_TurnOn25_3pr, "VtxIsoTight_TurnOn25_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_TurnOn25_withNeutrals, "VtxIsoTight_TurnOn25_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_TurnOn25_noNeutrals, "VtxIsoTight_TurnOn25_noNeutrals" , "", 60 , minEt , maxEt );
+
+  histoTools_.BookHisto_1D(hRelIsoLoose_TurnOn25, "RelIsoLoose_TurnOn25", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_TurnOn25_1pr, "RelIsoLoose_TurnOn25_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_TurnOn25_3pr, "RelIsoLoose_TurnOn25_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_TurnOn25_withNeutrals, "RelIsoLoose_TurnOn25_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_TurnOn25_noNeutrals, "RelIsoLoose_TurnOn25_noNeutrals" , "", 60 , minEt , maxEt );
+
+  histoTools_.BookHisto_1D(hRelIsoTight_TurnOn25, "RelIsoTight_TurnOn25", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_TurnOn25_1pr, "RelIsoTight_TurnOn25_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_TurnOn25_3pr, "RelIsoTight_TurnOn25_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_TurnOn25_withNeutrals, "RelIsoTight_TurnOn25_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_TurnOn25_noNeutrals, "RelIsoTight_TurnOn25_noNeutrals" , "", 60 , minEt , maxEt );
+
+
+  histoTools_.BookHisto_1D(hTkEG_TurnOn50, "TkEG_TurnOn50", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTkEG_TurnOn50_1pr, "TkEG_TurnOn50_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTkEG_TurnOn50_3pr, "TkEG_TurnOn50_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTkEG_TurnOn50_withNeutrals, "TkEG_TurnOn50_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTkEG_TurnOn50_noNeutrals, "TkEG_TurnOn50_noNeutrals" , "", 60 , minEt , maxEt );
+
+  histoTools_.BookHisto_1D(hVtxIso_TurnOn50, "VtxIso_TurnOn50", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_TurnOn50_1pr, "VtxIso_TurnOn50_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_TurnOn50_3pr, "VtxIso_TurnOn50_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_TurnOn50_withNeutrals, "VtxIso_TurnOn50_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_TurnOn50_noNeutrals, "VtxIso_TurnOn50_noNeutrals" , "", 60 , minEt , maxEt );
+
+  histoTools_.BookHisto_1D(hRelIso_TurnOn50, "RelIso_TurnOn50", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_TurnOn50_1pr, "RelIso_TurnOn50_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_TurnOn50_3pr, "RelIso_TurnOn50_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_TurnOn50_withNeutrals, "RelIso_TurnOn50_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_TurnOn50_noNeutrals, "RelIso_TurnOn50_noNeutrals" , "", 60 , minEt , maxEt );
+
+  histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn50, "VtxIsoLoose_TurnOn50", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn50_1pr, "VtxIsoLoose_TurnOn50_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn50_3pr, "VtxIsoLoose_TurnOn50_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn50_withNeutrals, "VtxIsoLoose_TurnOn50_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn50_noNeutrals, "VtxIsoLoose_TurnOn50_noNeutrals" , "", 60 , minEt , maxEt );
+
+  histoTools_.BookHisto_1D(hVtxIsoTight_TurnOn50, "VtxIsoTight_TurnOn50", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_TurnOn50_1pr, "VtxIsoTight_TurnOn50_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_TurnOn50_3pr, "VtxIsoTight_TurnOn50_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_TurnOn50_withNeutrals, "VtxIsoTight_TurnOn50_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_TurnOn50_noNeutrals, "VtxIsoTight_TurnOn50_noNeutrals" , "", 60 , minEt , maxEt );
+
+  histoTools_.BookHisto_1D(hRelIsoLoose_TurnOn50, "RelIsoLoose_TurnOn50", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_TurnOn50_1pr, "RelIsoLoose_TurnOn50_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_TurnOn50_3pr, "RelIsoLoose_TurnOn50_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_TurnOn50_withNeutrals, "RelIsoLoose_TurnOn50_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_TurnOn50_noNeutrals, "RelIsoLoose_TurnOn50_noNeutrals" , "", 60 , minEt , maxEt );
+
+  histoTools_.BookHisto_1D(hRelIsoTight_TurnOn50, "RelIsoTight_TurnOn50", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_TurnOn50_1pr, "RelIsoTight_TurnOn50_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_TurnOn50_3pr, "RelIsoTight_TurnOn50_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_TurnOn50_withNeutrals, "RelIsoTight_TurnOn50_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_TurnOn50_noNeutrals, "RelIsoTight_TurnOn50_noNeutrals" , "", 60 , minEt , maxEt );
+
+  // Single tau rates
+  histoTools_.BookHisto_1D(hTkEG_Rate      , "TkEG_Rate"      , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTkEG_Rate_C    , "TkEG_Rate_C"    , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTkEG_Rate_I    , "TkEG_Rate_I"    , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTkEG_Rate_F    , "TkEG_Rate_F"    , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_Rate  , "VtxIso_Rate"  , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_Rate_C, "VtxIso_Rate_C", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_Rate_I, "VtxIso_Rate_I", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_Rate_F, "VtxIso_Rate_F", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_Rate  , "RelIso_Rate"  , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_Rate_C, "RelIso_Rate_C", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_Rate_I, "RelIso_Rate_I", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_Rate_F, "RelIso_Rate_F", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_Rate  , "VtxIsoLoose_Rate"  , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_Rate_C, "VtxIsoLoose_Rate_C", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_Rate_I, "VtxIsoLoose_Rate_I", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_Rate_F, "VtxIsoLoose_Rate_F", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_Rate  , "VtxIsoTight_Rate"  , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_Rate_C, "VtxIsoTight_Rate_C", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_Rate_I, "VtxIsoTight_Rate_I", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_Rate_F, "VtxIsoTight_Rate_F", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_Rate  , "RelIsoLoose_Rate"  , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_Rate_C, "RelIsoLoose_Rate_C", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_Rate_I, "RelIsoLoose_Rate_I", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_Rate_F, "RelIsoLoose_Rate_F", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_Rate  , "RelIsoTight_Rate"  , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_Rate_C, "RelIsoTight_Rate_C", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_Rate_I, "RelIsoTight_Rate_I", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_Rate_F, "RelIsoTight_Rate_F", "", nEt , minEt , maxEt );
+
 
   // Di-tau rates
   histoTools_.BookHisto_1D(hRateDiTau_TkEG, "Rate_DiTau_TkEG"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
@@ -1964,15 +2739,36 @@ void TkEG::BookHistos_(void)
 
   histoTools_.BookHisto_1D(hRateDiTau_relIso    , "Rate_DiTau_RelIso"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0); 
   histoTools_.BookHisto_1D(hRateDiTau_vtxIso    , "Rate_DiTau_VtxIso"    , ";E_{T} threshold (GeV); Rate (kHz) / bin", 400, 0.0, +400.0);
- 
+  
   // Single-tau efficiencies
-  histoTools_.BookHisto_1D(hEffSingleTau_TkEG , "Eff_SingleTau_TkEG"     , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
-  histoTools_.BookHisto_1D(hEffSingleTau_C   , "Eff_SingleTau_C"   , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
-  histoTools_.BookHisto_1D(hEffSingleTau_I   , "Eff_SingleTau_I"   , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
-  histoTools_.BookHisto_1D(hEffSingleTau_F   , "Eff_SingleTau_F"   , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
-
-  histoTools_.BookHisto_1D(hEffSingleTau_relIso     , "Eff_SingleTau_RelIso"     , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
-  histoTools_.BookHisto_1D(hEffSingleTau_vtxIso     , "Eff_SingleTau_VtxIso"     , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
+  histoTools_.BookHisto_1D(hTkEG_Eff       , "TkEG_Eff"       , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTkEG_Eff_C     , "TkEG_Eff_C"     , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTkEG_Eff_I     , "TkEG_Eff_I"     , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hTkEG_Eff_F     , "TkEG_Eff_F"     , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_Eff   , "VtxIso_Eff"   , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_Eff_C , "VtxIso_Eff_C" , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_Eff_I , "VtxIso_Eff_I" , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIso_Eff_F , "VtxIso_Eff_F" , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_Eff   , "RelIso_Eff"   , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_Eff_C , "RelIso_Eff_C" , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_Eff_I , "RelIso_Eff_I" , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIso_Eff_F , "RelIso_Eff_F" , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_Eff  , "VtxIsoLoose_Eff"  , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_Eff_C, "VtxIsoLoose_Eff_C", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_Eff_I, "VtxIsoLoose_Eff_I", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_Eff_F, "VtxIsoLoose_Eff_F", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_Eff  , "VtxIsoTight_Eff"  , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_Eff_C, "VtxIsoTight_Eff_C", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_Eff_I, "VtxIsoTight_Eff_I", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoTight_Eff_F, "VtxIsoTight_Eff_F", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_Eff  , "RelIsoLoose_Eff"  , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_Eff_C, "RelIsoLoose_Eff_C", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_Eff_I, "RelIsoLoose_Eff_I", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoLoose_Eff_F, "RelIsoLoose_Eff_F", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_Eff  , "RelIsoTight_Eff"  , "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_Eff_C, "RelIsoTight_Eff_C", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_Eff_I, "RelIsoTight_Eff_I", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hRelIsoTight_Eff_F, "RelIsoTight_Eff_F", "", nEt , minEt , maxEt );
 
   // Di-tau efficiencies
   histoTools_.BookHisto_1D(hEffDiTau_TkEG , "Eff_DiTau_TkEG"     , ";E_{T} threshold (GeV); Efficiency / bin", 400, 0.0, +400.0);
@@ -2050,12 +2846,14 @@ void TkEG::WriteHistos_(void)
   h_clustTrks_Phi->Write();
   h_Counters_clustTrks->Write();
 
+  h_SigCone_DeltaR->Write();
+
   h_trkClusters_MultiplicityPerCluster->Write();
   h_MCmatch_chargedDaugh_N->Write();
   h_MCmatch_neutralDaugh_N->Write();
   h_trkClusters_Pt->Write();
   h_trkClusters_M->Write();
-  //h_trkClusters_M_beforeCut->Write();
+  h_trkClusters_M_beforeCut->Write();
 
   h_clustEGs_Et->Write();
   h_clustEGs_Eta->Write();
@@ -2097,11 +2895,26 @@ void TkEG::WriteHistos_(void)
   h_TkEG_Eta->Write();
   h_TkEG_Phi->Write();
   h_TkEG_InvMass->Write();
+  h_TkEG_NEGs->Write();
+  h_TkEG_NTks->Write();
+  h_TkEG_NEGs_C->Write();
+  h_TkEG_NEGs_I->Write();
+  h_TkEG_NEGs_F->Write();
   h_TkEG_CHF->Write();
   h_TkEG_NHF->Write();
   h_TkEG_CHF_withNeutrals->Write();
   h_TkEG_NHF_withNeutrals->Write();
+  h_TkEG_isoTracks_InvMass->Write();
+  h_TkEG_isoTracks_Multiplicity->Write();
   
+  // Bad Et Resolution Candidates Properties
+  h_BadEtResolCand_InvMass->Write();
+  h_BadEtResolCand_RelIso->Write();
+  h_BadEtResolCand_VtxIso->Write();
+  h_BadEtResolCand_CHF->Write();
+  h_BadEtResolCand_IsoTracks_N->Write();
+  h_BadEtResolCand_dR_EG_Seed->Write();
+    
   h_TkEG_PtResolution->Write();
   h_TkEG_PtResolution_C->Write();
   h_TkEG_PtResolution_I->Write();
@@ -2110,7 +2923,47 @@ void TkEG::WriteHistos_(void)
   h_TkEG_PtResolution_withNeutrals->Write();
   h_TkEG_PtResolution_1pr->Write();
   h_TkEG_PtResolution_3pr->Write();
+
+  h_TkEG_PtResolution_F_withEGs->Write();
+  h_TkEG_PtResolution_F_withEGs_posEta->Write();
+  h_TkEG_PtResolution_F_withEGs_negEta->Write();
+  h_TkEG_PtResolution_F_noEGs->Write();
+  h_TkEG_PtResolution_F_noEGs_posEta->Write();
+  h_TkEG_PtResolution_F_noEGs_negEta->Write();
   
+  h_TkEG_PtResolution_withNeutrals_F->Write();
+  h_TkEG_PtResolution_1pr_F->Write();
+  h_TkEG_PtResolution_3pr_F->Write();
+
+  h_TkEG_PtResolution_noNeutrals_F_withEGs->Write();
+  h_TkEG_PtResolution_withNeutrals_F_withEGs->Write();
+  h_TkEG_PtResolution_1pr_F_withEGs->Write();
+  h_TkEG_PtResolution_3pr_F_withEGs->Write();
+  h_TkEG_PtResolution_noNeutrals_F_noEGs->Write();
+  h_TkEG_PtResolution_withNeutrals_F_noEGs->Write();
+  h_TkEG_PtResolution_1pr_F_noEGs->Write();
+  h_TkEG_PtResolution_3pr_F_noEGs->Write();
+
+  // eta > 0
+  h_TkEG_PtResolution_noNeutrals_F_withEGs_posEta->Write();
+  h_TkEG_PtResolution_withNeutrals_F_withEGs_posEta->Write();
+  h_TkEG_PtResolution_1pr_F_withEGs_posEta->Write();
+  h_TkEG_PtResolution_3pr_F_withEGs_posEta->Write();
+  h_TkEG_PtResolution_noNeutrals_F_noEGs_posEta->Write();
+  h_TkEG_PtResolution_withNeutrals_F_noEGs_posEta->Write();
+  h_TkEG_PtResolution_1pr_F_noEGs_posEta->Write();
+  h_TkEG_PtResolution_3pr_F_noEGs_posEta->Write();
+
+  // eta < 0
+  h_TkEG_PtResolution_noNeutrals_F_withEGs_negEta->Write();
+  h_TkEG_PtResolution_withNeutrals_F_withEGs_negEta->Write();
+  h_TkEG_PtResolution_1pr_F_withEGs_negEta->Write();
+  h_TkEG_PtResolution_3pr_F_withEGs_negEta->Write();
+  h_TkEG_PtResolution_noNeutrals_F_noEGs_negEta->Write();
+  h_TkEG_PtResolution_withNeutrals_F_noEGs_negEta->Write();
+  h_TkEG_PtResolution_1pr_F_noEGs_negEta->Write();
+  h_TkEG_PtResolution_3pr_F_noEGs_negEta->Write();
+
   h_TkEG_EtResolution->Write();
   h_TkEG_EtResolution_C->Write();
   h_TkEG_EtResolution_I->Write();
@@ -2119,7 +2972,48 @@ void TkEG::WriteHistos_(void)
   h_TkEG_EtResolution_withNeutrals->Write();
   h_TkEG_EtResolution_1pr->Write();
   h_TkEG_EtResolution_3pr->Write();
-  
+
+  h_TkEG_EtResolution_F_withEGs->Write();
+  h_TkEG_EtResolution_F_withEGs_posEta->Write();
+  h_TkEG_EtResolution_F_withEGs_negEta->Write();
+  h_TkEG_EtResolution_F_noEGs->Write();
+  h_TkEG_EtResolution_F_noEGs_posEta->Write();
+  h_TkEG_EtResolution_F_noEGs_negEta->Write();
+
+  h_TkEG_EtResolution_noNeutrals_F->Write();
+  h_TkEG_EtResolution_withNeutrals_F->Write();
+  h_TkEG_EtResolution_1pr_F->Write();
+  h_TkEG_EtResolution_3pr_F->Write();
+
+  h_TkEG_EtResolution_noNeutrals_F_withEGs->Write();
+  h_TkEG_EtResolution_withNeutrals_F_withEGs->Write();
+  h_TkEG_EtResolution_1pr_F_withEGs->Write();
+  h_TkEG_EtResolution_3pr_F_withEGs->Write();
+  h_TkEG_EtResolution_noNeutrals_F_noEGs->Write();
+  h_TkEG_EtResolution_withNeutrals_F_noEGs->Write();
+  h_TkEG_EtResolution_1pr_F_noEGs->Write();
+  h_TkEG_EtResolution_3pr_F_noEGs->Write();
+
+  // eta > 0
+  h_TkEG_EtResolution_noNeutrals_F_withEGs_posEta->Write();
+  h_TkEG_EtResolution_withNeutrals_F_withEGs_posEta->Write();
+  h_TkEG_EtResolution_1pr_F_withEGs_posEta->Write();
+  h_TkEG_EtResolution_3pr_F_withEGs_posEta->Write();
+  h_TkEG_EtResolution_noNeutrals_F_noEGs_posEta->Write();
+  h_TkEG_EtResolution_withNeutrals_F_noEGs_posEta->Write();
+  h_TkEG_EtResolution_1pr_F_noEGs_posEta->Write();
+  h_TkEG_EtResolution_3pr_F_noEGs_posEta->Write();
+
+  // eta < 0
+  h_TkEG_EtResolution_noNeutrals_F_withEGs_negEta->Write();
+  h_TkEG_EtResolution_withNeutrals_F_withEGs_negEta->Write();
+  h_TkEG_EtResolution_1pr_F_withEGs_negEta->Write();
+  h_TkEG_EtResolution_3pr_F_withEGs_negEta->Write();
+  h_TkEG_EtResolution_noNeutrals_F_noEGs_negEta->Write();
+  h_TkEG_EtResolution_withNeutrals_F_noEGs_negEta->Write();
+  h_TkEG_EtResolution_1pr_F_noEGs_negEta->Write();
+  h_TkEG_EtResolution_3pr_F_noEGs_negEta->Write();
+
   h_TkEG_EtaResolution->Write();
   h_TkEG_EtaResolution_C->Write();
   h_TkEG_EtaResolution_I->Write();
@@ -2128,6 +3022,47 @@ void TkEG::WriteHistos_(void)
   h_TkEG_EtaResolution_withNeutrals->Write();
   h_TkEG_EtaResolution_1pr->Write();
   h_TkEG_EtaResolution_3pr->Write();
+
+  h_TkEG_EtaResolution_F_withEGs->Write();
+  h_TkEG_EtaResolution_F_withEGs_posEta->Write();
+  h_TkEG_EtaResolution_F_withEGs_negEta->Write();
+  h_TkEG_EtaResolution_F_noEGs->Write();
+  h_TkEG_EtaResolution_F_noEGs_posEta->Write();
+  h_TkEG_EtaResolution_F_noEGs_negEta->Write();
+
+  h_TkEG_EtaResolution_noNeutrals_F->Write();
+  h_TkEG_EtaResolution_withNeutrals_F->Write();
+  h_TkEG_EtaResolution_1pr_F->Write();
+  h_TkEG_EtaResolution_3pr_F->Write();
+
+  h_TkEG_EtaResolution_noNeutrals_F_withEGs->Write();
+  h_TkEG_EtaResolution_withNeutrals_F_withEGs->Write();
+  h_TkEG_EtaResolution_1pr_F_withEGs->Write();
+  h_TkEG_EtaResolution_3pr_F_withEGs->Write();
+  h_TkEG_EtaResolution_noNeutrals_F_noEGs->Write();
+  h_TkEG_EtaResolution_withNeutrals_F_noEGs->Write();
+  h_TkEG_EtaResolution_1pr_F_noEGs->Write();
+  h_TkEG_EtaResolution_3pr_F_noEGs->Write();
+
+  // eta > 0
+  h_TkEG_EtaResolution_noNeutrals_F_withEGs_posEta->Write();
+  h_TkEG_EtaResolution_withNeutrals_F_withEGs_posEta->Write();
+  h_TkEG_EtaResolution_1pr_F_withEGs_posEta->Write();
+  h_TkEG_EtaResolution_3pr_F_withEGs_posEta->Write();
+  h_TkEG_EtaResolution_noNeutrals_F_noEGs_posEta->Write();
+  h_TkEG_EtaResolution_withNeutrals_F_noEGs_posEta->Write();
+  h_TkEG_EtaResolution_1pr_F_noEGs_posEta->Write();
+  h_TkEG_EtaResolution_3pr_F_noEGs_posEta->Write();
+
+  // eta < 0
+  h_TkEG_EtaResolution_noNeutrals_F_withEGs_negEta->Write();
+  h_TkEG_EtaResolution_withNeutrals_F_withEGs_negEta->Write();
+  h_TkEG_EtaResolution_1pr_F_withEGs_negEta->Write();
+  h_TkEG_EtaResolution_3pr_F_withEGs_negEta->Write();
+  h_TkEG_EtaResolution_noNeutrals_F_noEGs_negEta->Write();
+  h_TkEG_EtaResolution_withNeutrals_F_noEGs_negEta->Write();
+  h_TkEG_EtaResolution_1pr_F_noEGs_negEta->Write();
+  h_TkEG_EtaResolution_3pr_F_noEGs_negEta->Write();
 
   h_TkEG_PhiResolution->Write();
   h_TkEG_PhiResolution_C->Write();
@@ -2138,13 +3073,53 @@ void TkEG::WriteHistos_(void)
   h_TkEG_PhiResolution_1pr->Write();
   h_TkEG_PhiResolution_3pr->Write();
 
+  h_TkEG_PhiResolution_F_withEGs->Write();
+  h_TkEG_PhiResolution_F_withEGs_posEta->Write();
+  h_TkEG_PhiResolution_F_withEGs_negEta->Write();
+  h_TkEG_PhiResolution_F_noEGs->Write();
+  h_TkEG_PhiResolution_F_noEGs_posEta->Write();
+  h_TkEG_PhiResolution_F_noEGs_negEta->Write();
+
+  h_TkEG_PhiResolution_noNeutrals_F->Write();
+  h_TkEG_PhiResolution_withNeutrals_F->Write();
+  h_TkEG_PhiResolution_1pr_F->Write();
+  h_TkEG_PhiResolution_3pr_F->Write();
+
+  h_TkEG_PhiResolution_noNeutrals_F_withEGs->Write();
+  h_TkEG_PhiResolution_withNeutrals_F_withEGs->Write();
+  h_TkEG_PhiResolution_1pr_F_withEGs->Write();
+  h_TkEG_PhiResolution_3pr_F_withEGs->Write();
+  h_TkEG_PhiResolution_noNeutrals_F_noEGs->Write();
+  h_TkEG_PhiResolution_withNeutrals_F_noEGs->Write();
+  h_TkEG_PhiResolution_1pr_F_noEGs->Write();
+  h_TkEG_PhiResolution_3pr_F_noEGs->Write();
+
+  // eta > 0
+  h_TkEG_PhiResolution_noNeutrals_F_withEGs_posEta->Write();
+  h_TkEG_PhiResolution_withNeutrals_F_withEGs_posEta->Write();
+  h_TkEG_PhiResolution_1pr_F_withEGs_posEta->Write();
+  h_TkEG_PhiResolution_3pr_F_withEGs_posEta->Write();
+  h_TkEG_PhiResolution_noNeutrals_F_noEGs_posEta->Write();
+  h_TkEG_PhiResolution_withNeutrals_F_noEGs_posEta->Write();
+  h_TkEG_PhiResolution_1pr_F_noEGs_posEta->Write();
+  h_TkEG_PhiResolution_3pr_F_noEGs_posEta->Write();
+
+  // eta < 0
+  h_TkEG_PhiResolution_noNeutrals_F_withEGs_negEta->Write();
+  h_TkEG_PhiResolution_withNeutrals_F_withEGs_negEta->Write();
+  h_TkEG_PhiResolution_1pr_F_withEGs_negEta->Write();
+  h_TkEG_PhiResolution_3pr_F_withEGs_negEta->Write();
+  h_TkEG_PhiResolution_noNeutrals_F_noEGs_negEta->Write();
+  h_TkEG_PhiResolution_withNeutrals_F_noEGs_negEta->Write();
+  h_TkEG_PhiResolution_1pr_F_noEGs_negEta->Write();
+  h_TkEG_PhiResolution_3pr_F_noEGs_negEta->Write();
+
   hTkEG_matched_Et->Write();
   h_ldgTkEG_ET->Write();
   hTkEG_DeltaRmatch->Write();
   hTkEG_genVisEt->Write();
   hTkEG_genVisEt_clustEG->Write();
   hTkEG_genVisPt_clustEG->Write();
-  hMcHadronicTau_VisEt->Write();
 
   
   h_MCmatch_counters->Write(); 
@@ -2154,45 +3129,163 @@ void TkEG::WriteHistos_(void)
   
   h_nonMCmatched_EGenergyOverTracksPt->Write();
   h_nonMCmatchedCandidates_decayMode->Write();
+  
+  // Turn-on histograms
+  hMcHadronicTau_VisEt->Write();
+  hMcHadronicTau_VisEt_1pr->Write();
+  hMcHadronicTau_VisEt_3pr->Write();
+  hMcHadronicTau_VisEt_withNeutrals->Write();
+  hMcHadronicTau_VisEt_noNeutrals->Write();
 
-  hTurnOn25_TkEG->Write();
-  hTurnOn25_relIso->Write();
-  hTurnOn25_vtxIso->Write();
-  hTurnOn50_TkEG->Write();
-  hTurnOn50_relIso->Write();
-  hTurnOn50_vtxIso->Write();
+  hTkEG_TurnOn25->Write();
+  hTkEG_TurnOn25_1pr->Write();
+  hTkEG_TurnOn25_3pr->Write();
+  hTkEG_TurnOn25_withNeutrals->Write();
+  hTkEG_TurnOn25_noNeutrals->Write();
+  hVtxIso_TurnOn25->Write();
+  hVtxIso_TurnOn25_1pr->Write();
+  hVtxIso_TurnOn25_3pr->Write();
+  hVtxIso_TurnOn25_withNeutrals->Write();
+  hVtxIso_TurnOn25_noNeutrals->Write();
+  hRelIso_TurnOn25->Write();
+  hRelIso_TurnOn25_1pr->Write();
+  hRelIso_TurnOn25_3pr->Write();
+  hRelIso_TurnOn25_withNeutrals->Write();
+  hRelIso_TurnOn25_noNeutrals->Write();
+  hVtxIsoLoose_TurnOn25->Write();
+  hVtxIsoLoose_TurnOn25_1pr->Write();
+  hVtxIsoLoose_TurnOn25_3pr->Write();
+  hVtxIsoLoose_TurnOn25_withNeutrals->Write();
+  hVtxIsoLoose_TurnOn25_noNeutrals->Write();
+  hVtxIsoTight_TurnOn25->Write();
+  hVtxIsoTight_TurnOn25_1pr->Write();
+  hVtxIsoTight_TurnOn25_3pr->Write();
+  hVtxIsoTight_TurnOn25_withNeutrals->Write();
+  hVtxIsoTight_TurnOn25_noNeutrals->Write();
+  hRelIsoLoose_TurnOn25->Write();
+  hRelIsoLoose_TurnOn25_1pr->Write();
+  hRelIsoLoose_TurnOn25_3pr->Write();
+  hRelIsoLoose_TurnOn25_withNeutrals->Write();
+  hRelIsoLoose_TurnOn25_noNeutrals->Write();
+  hRelIsoTight_TurnOn25->Write();
+  hRelIsoTight_TurnOn25_1pr->Write();
+  hRelIsoTight_TurnOn25_3pr->Write();
+  hRelIsoTight_TurnOn25_withNeutrals->Write();
+  hRelIsoTight_TurnOn25_noNeutrals->Write();
 
-  hRateSingleTau_TkEG->Write(); // Inclusive = C+I+F                                                                                                                   
-  hRateSingleTau_C->Write();
-  hRateSingleTau_I->Write();
-  hRateSingleTau_F->Write();
+  hTkEG_TurnOn50->Write();
+  hTkEG_TurnOn50_1pr->Write();
+  hTkEG_TurnOn50_3pr->Write();
+  hTkEG_TurnOn50_withNeutrals->Write();
+  hTkEG_TurnOn50_noNeutrals->Write();
+  hVtxIso_TurnOn50->Write();
+  hVtxIso_TurnOn50_1pr->Write();
+  hVtxIso_TurnOn50_3pr->Write();
+  hVtxIso_TurnOn50_withNeutrals->Write();
+  hVtxIso_TurnOn50_noNeutrals->Write();
+  hRelIso_TurnOn50->Write();
+  hRelIso_TurnOn50_1pr->Write();
+  hRelIso_TurnOn50_3pr->Write();
+  hRelIso_TurnOn50_withNeutrals->Write();
+  hRelIso_TurnOn50_noNeutrals->Write();
+  hVtxIsoLoose_TurnOn50->Write();
+  hVtxIsoLoose_TurnOn50_1pr->Write();
+  hVtxIsoLoose_TurnOn50_3pr->Write();
+  hVtxIsoLoose_TurnOn50_withNeutrals->Write();
+  hVtxIsoLoose_TurnOn50_noNeutrals->Write();
+  hVtxIsoTight_TurnOn50->Write();
+  hVtxIsoTight_TurnOn50_1pr->Write();
+  hVtxIsoTight_TurnOn50_3pr->Write();
+  hVtxIsoTight_TurnOn50_withNeutrals->Write();
+  hVtxIsoTight_TurnOn50_noNeutrals->Write();
+  hRelIsoLoose_TurnOn50->Write();
+  hRelIsoLoose_TurnOn50_1pr->Write();
+  hRelIsoLoose_TurnOn50_3pr->Write();
+  hRelIsoLoose_TurnOn50_withNeutrals->Write();
+  hRelIsoLoose_TurnOn50_noNeutrals->Write();
+  hRelIsoTight_TurnOn50->Write();
+  hRelIsoTight_TurnOn50_1pr->Write();
+  hRelIsoTight_TurnOn50_3pr->Write();
+  hRelIsoTight_TurnOn50_withNeutrals->Write();
+  hRelIsoTight_TurnOn50_noNeutrals->Write();
 
-  hRateSingleTau_relIso->Write(); // Inclusive = C+I+F                                                                                                                   
-  hRateSingleTau_vtxIso->Write(); // Inclusive = C+I+F                                                                                                                   
+  // SingleTau: Efficiencies
+  hTkEG_Rate->Write();
+  hTkEG_Rate_C->Write();
+  hTkEG_Rate_I->Write();
+  hTkEG_Rate_F->Write();
+  hVtxIso_Rate->Write();
+  hVtxIso_Rate_C->Write();
+  hVtxIso_Rate_I->Write();
+  hVtxIso_Rate_F->Write();
+  hRelIso_Rate->Write();
+  hRelIso_Rate_C->Write();
+  hRelIso_Rate_I->Write();
+  hRelIso_Rate_F->Write();
+  hVtxIsoLoose_Rate->Write();
+  hVtxIsoLoose_Rate_C->Write();
+  hVtxIsoLoose_Rate_I->Write();
+  hVtxIsoLoose_Rate_F->Write();
+  hVtxIsoTight_Rate->Write();
+  hVtxIsoTight_Rate_C->Write();
+  hVtxIsoTight_Rate_I->Write();
+  hVtxIsoTight_Rate_F->Write();
+  hRelIsoLoose_Rate->Write();
+  hRelIsoLoose_Rate_C->Write();
+  hRelIsoLoose_Rate_I->Write();
+  hRelIsoLoose_Rate_F->Write();
+  hRelIsoTight_Rate->Write();
+  hRelIsoTight_Rate_C->Write();
+  hRelIsoTight_Rate_I->Write();
+  hRelIsoTight_Rate_F->Write();
 
-  hRateDiTau_TkEG->Write(); // Inclusive = C+I+F                                                                                                                       
+  // DiTau: Rates
+  hRateDiTau_TkEG->Write(); // Inclusive = C+I+F                                   
   hRateDiTau_C->Write();
   hRateDiTau_I->Write();
   hRateDiTau_F->Write();
 
-  hRateDiTau_relIso->Write(); // Inclusive = C+I+F                                                                                                                       
-  hRateDiTau_vtxIso->Write(); // Inclusive = C+I+F                                                                                                                       
+  hRateDiTau_relIso->Write(); // Inclusive = C+I+F                                 
+  hRateDiTau_vtxIso->Write(); // Inclusive = C+I+F                                 
 
-  hEffSingleTau_TkEG->Write();  // Inclusive = C+I+F                                                                                                                   
-  hEffSingleTau_C->Write();
-  hEffSingleTau_I->Write();
-  hEffSingleTau_F->Write();
+  // SingleTau: Efficiencies
+  hTkEG_Eff->Write();
+  hTkEG_Eff_C->Write();
+  hTkEG_Eff_I->Write();
+  hTkEG_Eff_F->Write();
+  hVtxIso_Eff->Write();
+  hVtxIso_Eff_C->Write();
+  hVtxIso_Eff_I->Write();
+  hVtxIso_Eff_F->Write();
+  hRelIso_Eff->Write();
+  hRelIso_Eff_C->Write();
+  hRelIso_Eff_I->Write();
+  hRelIso_Eff_F->Write();
+  hVtxIsoLoose_Eff->Write();
+  hVtxIsoLoose_Eff_C->Write();
+  hVtxIsoLoose_Eff_I->Write();
+  hVtxIsoLoose_Eff_F->Write();
+  hVtxIsoTight_Eff->Write();
+  hVtxIsoTight_Eff_C->Write();
+  hVtxIsoTight_Eff_I->Write();
+  hVtxIsoTight_Eff_F->Write();
+  hRelIsoLoose_Eff->Write();
+  hRelIsoLoose_Eff_C->Write();
+  hRelIsoLoose_Eff_I->Write();
+  hRelIsoLoose_Eff_F->Write();
+  hRelIsoTight_Eff->Write();
+  hRelIsoTight_Eff_C->Write();
+  hRelIsoTight_Eff_I->Write();
+  hRelIsoTight_Eff_F->Write();
 
-  hEffSingleTau_relIso->Write();  // Inclusive = C+I+F                                                                                                                   
-  hEffSingleTau_vtxIso->Write();  // Inclusive = C+I+F                                                                                                                   
-
-  hEffDiTau_TkEG->Write();  // Inclusive = C+I+F                                                                                                                       
+  // DiTau: Efficiencies
+  hEffDiTau_TkEG->Write();  // Inclusive = C+I+F                                   
   hEffDiTau_C->Write();
   hEffDiTau_I->Write();
   hEffDiTau_F->Write();
 
-  hEffDiTau_relIso->Write();  // Inclusive = C+I+F                                                                                                                       
-  hEffDiTau_vtxIso->Write();  // Inclusive = C+I+F                                                                                                                       
+  hEffDiTau_relIso->Write();  // Inclusive = C+I+F                                 
+  hEffDiTau_vtxIso->Write();  // Inclusive = C+I+F                                 
   
   // Write 2-D histograms
   h_leadTrks_Phi_Eta->Write();
@@ -2236,12 +3329,12 @@ double TkEG::GetMatchingGenParticle(TTTrack track, GenParticle *genParticlePtr)
   // Returns the match dR.
 
   // Sanity check
-  // if (GenTausHadronic.size() < 1 ) return; // FIXME: move outside this function
+  if (GenTausHadronic.size() < 1 ) return 999.9; // FIXME: move outside this function
 
   // Initialise the GenParticle (to be returned)
   GenParticle match_GenParticle;
   double deltaR;
-  double match_dR = 999;
+  double match_dR = 9999.9;
   
   // For-loop: All hadronic GenTaus
   for (vector<GenParticle>::iterator tau = GenTausHadronic.begin(); tau != GenTausHadronic.end(); tau++) {
@@ -2249,7 +3342,7 @@ double TkEG::GetMatchingGenParticle(TTTrack track, GenParticle *genParticlePtr)
       // If no hadronic decay products found (pi+/-, pi0, K+/-, K0, K0L), skip this tau
       if (tau->finalDaughtersCharged().size() < 1) continue;
       deltaR = auxTools_.DeltaR( track.getEta(), track.getPhi(), tau->eta(), tau->phi() );
-      //if (deltaR > maxDeltaR_MCmatch) continue;
+      if (deltaR > maxDeltaR_MCmatch) continue;
       if (deltaR < match_dR) {
         match_dR = deltaR;
         *genParticlePtr = *tau;
@@ -2284,7 +3377,7 @@ void TkEG::FillSingleTau_(vector<L1TkEGParticle> L1TkEGs,
   FillRate_(hRate, ldgEt);
   
   // Get MC-matched trigger objects
-  vector<L1TkEGParticle> L1TkEGs_mcMatched = GetMcMatchedL1TkEGs(TauCandidates);
+  vector<L1TkEGParticle> L1TkEGs_mcMatched = GetMcMatchedL1TkEGs(L1TkEGs);
   if (L1TkEGs_mcMatched.size() < 1) return;
   
   // Check that all taus were found (needed due to the efficiency defintion)
@@ -2443,36 +3536,53 @@ void TkEG::FillEfficiency_(TH1D *hEfficiency,
 
 //============================================================================
 void TkEG::FillTurnOn_Numerator_(vector<L1TkEGParticle> L1TkEGs, 
-				   const double minPt,
-				   TH1D *hTurnOn)
+				 const double minEt,
+				 TH1D *hTurnOn,
+				 TH1D *hTurnOn_1pr,
+				 TH1D *hTurnOn_3pr,
+				 TH1D *hTurnOn_withNeutrals,
+				 TH1D *hTurnOn_noNeutrals)
 //============================================================================
 {
   
   // For-loop: L1TkEGs
-  int iterated_particles = 0;
-  int matched_particles = 0;
-  int passed_cut = 0;
-  for (vector<L1TkEGParticle>::iterator tau = L1TkEGs.begin(); tau != L1TkEGs.end(); tau++)
+  for (vector<L1TkEGParticle>::iterator L1TkEG = L1TkEGs.begin(); L1TkEG != L1TkEGs.end(); L1TkEG++)
     {
       
-      iterated_particles++;
       // Skip if trigger object is not MC matched
-      if (!tau->HasMatchingGenParticle()) continue;	 
+      if (!L1TkEG->HasMatchingGenParticle()) continue;	 
       
-      matched_particles++;
-      // Skip if trigger object has Pt < minPt
-      if (tau->GetTotalEt() < minPt) continue;
-      passed_cut++;      
+      // Skip if trigger object has eT < minEt
+      if (L1TkEG->GetTotalEt() < minEt) continue;
             
+      // Get MC-match
+      GenParticle p = L1TkEG->GetMatchingGenParticle();
+      
       // Fill the turn-on
-      hTurnOn->Fill( tau->GetGenTauEt() );
-      // DEBUG
+      hTurnOn->Fill( p.p4vis().Et() );
 
+	
+      if (p.finalDaughtersNeutral().size() > 0)
+	  {
+	    hTurnOn_withNeutrals->Fill( p.p4vis().Et() );
+	  }
+      else
+	  {
+	    hTurnOn_noNeutrals->Fill( p.p4vis().Et() );
+	  }
+      if (p.finalDaughtersCharged().size() == 1) 
+	  {
+	    hTurnOn_1pr->Fill( p.p4vis().Et() );	    
+	  }
+      else if (p.finalDaughtersCharged().size() == 3) 
+	{
+	  hTurnOn_3pr->Fill( p.p4vis().Et() );
+	}
+      
     } // For-loop: L1TkEGs
-//      cout << "Filling turn-on histogram: iterated particles=" << iterated_particles << ", matched=" << matched_particles << ", passed_cut=" << passed_cut << endl;
 
   return;
-   
+
 }
 
 //============================================================================

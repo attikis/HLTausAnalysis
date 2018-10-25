@@ -18,7 +18,17 @@ class L1TkEGParticle{
  public:
   // Constructors
   L1TkEGParticle();
-  L1TkEGParticle(vector<TTTrack> tracks, vector<EG> EGs, GenParticle genTau, bool match);
+  L1TkEGParticle(vector<TTTrack> tracks,
+		 vector<EG> EGs,
+		 GenParticle genTau,
+		 bool match);
+
+  L1TkEGParticle(double vtxIso,
+		 double relIso,
+		 double CHF,
+		 double NHF, 
+		 int isoTracks_N);
+
   // Destructor
   ~L1TkEGParticle() {};
   
@@ -33,7 +43,24 @@ class L1TkEGParticle{
   
   GenParticle GetMatchingGenParticle() const {return theGenTau;}
   TLorentzVector GetTotalP4();
-  
+
+  double GetVtxIso()  const { return vtxIso_;}
+  double GetRelIso()  const { return relIso_;}
+  void SetVtxIso(double vtxIso) { vtxIso_ = vtxIso;}
+  void SetRelIso(double relIso) { relIso_ = relIso;}
+  double GetCHF() const { return CHF_;}
+  void SetCHF(double CHF) { CHF_ = CHF;}
+  double GetNHF() const { return NHF_;}
+  void SetNHF(double NHF) { NHF_ = NHF;}
+  int GetIsoTracksN() const { return isoTracks_N_;}
+  void SetIsoTracksN(int isoTracks_N) { isoTracks_N_ = isoTracks_N;}
+
+  double vtxIso_;
+  double relIso_;
+  double CHF_;
+  double NHF_;
+  double isoTracks_N_;
+
   double GetTrackBasedPt();  
   double GetTotalPt();
   double GetTrackInvMass();
