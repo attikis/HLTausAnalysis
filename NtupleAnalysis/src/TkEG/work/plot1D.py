@@ -367,14 +367,16 @@ def GetHistoKwargs(h, opts):
     if "tkeg_isocone_invmass" in h.lower():
         kwargs["log"]  = True
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.5, "ymin": 0.0001, "ymaxfactor": _yMaxF}
-
         
-    if "tkeg_reliso" in h.lower():
+    if "isotracks_n" in h.lower():
+        kwargs["opts"]   = {"xmin": 0, "xmax": 10.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        
+    if "tkeg_reliso" in h.lower() or "badetresolcand_reliso" in h.lower():
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 1.2, "ymin": 0.001, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 0.20, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["log"]  = True
         
-    if "tkeg_vtxiso" in h.lower():
+    if "tkeg_vtxiso" in h.lower() or "badetresolcand_vtxiso" in h.lower():
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 4.0, "ymin": 0.0001, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["log"]  = True
@@ -582,6 +584,10 @@ def main(opts):
         
         aux.PrintFlushed(h, plotCount==0)
         plotCount += 1
+        
+        if "negs" in h.lower() or "ntks" in h.lower():
+            ROOT.gStyle.SetNdivisions(8, "X")
+        
         PlotHisto(datasetsMgr, h)
 
     print

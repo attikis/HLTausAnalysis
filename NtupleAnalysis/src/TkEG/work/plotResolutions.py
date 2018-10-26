@@ -334,7 +334,7 @@ def GetHistoKwargs(h, opts):
         "opts"             : {"xmin": 0.0, "xmax": 0.8, "ymin": yMin, "ymax":1000, "ymaxfactor": yMaxF},
         "opts2"            : {"ymin": 0.59, "ymax": 1.41},
         "log"              : logY,
-        "rebinX"           : 10,
+        "rebinX"           : 5,
         "moveLegend"       : _mvLeg2,
         "xtitlesize"       : 0.1,#xlabelSize,
         "ytitlesize"       : 0.1,#ylabelSize,
@@ -344,17 +344,20 @@ def GetHistoKwargs(h, opts):
 
     if "resolutionet_" in h.lower():
         _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
-        _kwargs["opts"]       = {"xmin": -1.2, "xmax": 1.5, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
-        _kwargs["rebinX"]     = 50
+        _kwargs["opts"]       = {"xmin": -0.2, "xmax": 0.2, "ymin": 0, "ymaxfactor": yMaxF}
+        if "_all_f" in h.lower() or "_cif" in h.lower():
+            _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
+            _kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0, "ymaxfactor": yMaxF}
+            _kwargs["rebinX"]     = 50
         #_kwargs["moveLegend"] = _mvLeg1
     if "resolutioneta_" in h.lower():
         _kwargs["xlabel"]     = "#delta#eta / #eta^{vis}"
         #_kwargs["opts"]       = {"xmin": -3.2, "xmax": 3.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
-        _kwargs["opts"]       = {"xmin": -0.3, "xmax": 0.3, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": -0.1, "xmax": 0.1, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         #_kwargs["rebinX"]     = 1
     if "resolutionphi_" in h.lower():
         _kwargs["xlabel"]     = "#delta#phi / #phi^{vis}"
-        _kwargs["opts"]       = {"xmin": -0.3, "xmax": 0.3, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": -0.1, "xmax": 0.1, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         #_kwargs["opts"]       = {"xmin": -2.2, "xmax": 2.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         #_kwargs["rebinX"]     = 1
 

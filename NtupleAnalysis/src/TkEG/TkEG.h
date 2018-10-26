@@ -307,6 +307,14 @@ class TkEG : public TreeAnalyserMC{
   TH1D* hTkEG_genVisEt_clustEG;
   TH1D* hTkEG_genVisPt_clustEG;
 
+  TH1D* h_TkEG_N;
+  TH1D* h_TkEG_RelIso_N;
+  TH1D* h_TkEG_VtxIso_N;
+  TH1D* h_TkEG_RelIsoLoose_N;
+  TH1D* h_TkEG_VtxIsoLoose_N;
+  TH1D* h_TkEG_RelIsoTight_N;
+  TH1D* h_TkEG_VtxIsoTight_N;
+
   TH1D* h_TkEG_Pt;
   TH1D* h_TkEG_ET;
   TH1D* h_TkEG_Eta;
