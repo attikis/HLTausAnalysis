@@ -1,0 +1,71 @@
+# On branch master
+# Your branch is ahead of 'origin/master' by 87 commits.
+#
+# Changed but not updated:
+#   (use "git add/rm <file>..." to update what will be committed)
+#   (use "git checkout -- <file>..." to discard changes in working directory)
+#
+#	modified:   ../../../scripts/hltausPseudoMulticrab.py
+#	modified:   ../CaloTk.C
+#	modified:   ../CaloTk.h
+#	deleted:    plot2D.py
+#	deleted:    plotL1TkTau.py
+#	modified:   plotRateVsEff.py
+#	modified:   run.cc
+#	modified:   run.sh
+#	modified:   ../../DataFormat/interface/L1TkTauParticle.h
+#	modified:   ../../DataFormat/src/L1TkTauParticle.C
+#	modified:   ../../Framework/src/TreeReaderMC.C
+#	modified:   ../../TkTaus/TkTaus.C
+#	modified:   ../../TkTaus/TkTaus.h
+#	deleted:    ../../TkTaus/work/.__afs00CE
+#	deleted:    ../../TkTaus/work/.__afs10C7
+#	deleted:    ../../TkTaus/work/.__afs20E8
+#	deleted:    ../../TkTaus/work/.__afs39D1
+#	deleted:    ../../TkTaus/work/.__afs4623
+#	deleted:    ../../TkTaus/work/.__afs4B82
+#	deleted:    ../../TkTaus/work/.__afs593B
+#	deleted:    ../../TkTaus/work/.__afs5AFD
+#	deleted:    ../../TkTaus/work/.__afs6C61
+#	deleted:    ../../TkTaus/work/.__afs716A
+#	deleted:    ../../TkTaus/work/.__afs8D44
+#	deleted:    ../../TkTaus/work/.__afs9F92
+#	deleted:    ../../TkTaus/work/.__afsA11D
+#	modified:   ../../TkTaus/work/doPlots.csh
+#	deleted:    ../../TkTaus/work/lxplus_04Oct2018.txt
+#	modified:   ../../TkTaus/work/plotRateVsEff.py
+#	modified:   ../../TkTaus/work/plotResolutions.py
+#	modified:   ../../TkTaus/work/plotTH2.py
+#	modified:   ../../TkTaus/work/plotTkTau.py
+#	modified:   ../../TkTaus/work/run.sh
+#	deleted:    ../../Tracking/work/results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/opt1/CaloTk_Histograms_MinBias.txt
+#	deleted:    ../../Tracking/work/results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/opt1/CaloTk_Histograms_VBF.txt
+#	deleted:    ../../Tracking/work/results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/opt2/settings.txt
+#	modified:   ../../../../Raw2TTree/python/tools/datasets.py
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	../CaloTk_C_ACLiC_dict_rdict.pcm
+#	doPlots.csh
+#	lxplus087_15h23m.txt
+#	multicrab_CaloTk_v92X_14h52m50s_29Oct2018/
+#	plotCounters.py
+#	plotResolutions.py
+#	plotTH2.py
+#	plotTkTau.py
+#	../../CaloTk_old/
+#	../../TkTaus/.__afsBB87
+#	../../TkTaus/TkTaus_C_ACLiC_dict_rdict.pcm
+#	../../TkTaus/work/.__afsAF89
+#	../../TkTaus/work/.__afsCE8D
+#	../../TkTaus/work/.__afsD792
+#	../../TkTaus/work/multicrabV4_TkTau_SeedPt3Stubs5_SigRMax0p25Const2p5Pt2Stub5dZ1p0_IsoRMax0p40Pt2Stubs5_ChiSqr50_VtxIso0p5_RelIso0p20dZ0p5_IsoCone_08h13m28s_26Oct2018/
+#	../../TkTaus/work/multicrabV4_TkTau_SeedPt3Stubs5_SigRMax0p25Const2p5Pt2Stub5dZ1p0_IsoRMax0p40Pt2Stubs5_ChiSqr50_VtxIso0p5_RelIso0p20dZ0p5_IsoCone_10h37m14s_26Oct2018/
+#	../../TkTaus/work/multicrabV4_TkTau_SeedPt5_SigRMax0p25Const2p5Pt2dZ1p0_IsoRMax0p40Pt2Stubs5_Stubs5ChiSqr50_VtxIso0p5_RelIso0p15dZ0p5_IsoCone_13h48m26s_26Oct2018/
+#	../../TkTaus/work/multicrab_CaloTk_v92X_12h44m15s_29Oct2018/
+#	../../TkTaus/work/results/
+#	../../Tracking/Tracking_C_ACLiC_dict_rdict.pcm
+#	../../Tracking/work/multicrab_Tracking_v92X_FitParams4Pt2Eta999Stubs0_14h58m32s_15Oct2018/
+no changes added to commit (use "git add" and/or "git commit -a")
+
