@@ -286,16 +286,22 @@ def GetHistoKwargs(h, opts):
         _yLabel = _yNorm + " / " + _format
         _xMin   = +0.0
         _xMax   = +1.0
-    if "_invmass" in hName:
+    #if "_invmass" in hName:
+    if "mass" in hName:
         _units  = "GeV/c^{2}"
         _format = "%0.1f " + _units
         _xLabel = "m (%s)" % (_units)
-        _cutBox = {"cutValue": 1.776, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        if "_invmass" in hName:
+            _cutBox = {"cutValue": 1.776, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+            _xMin   = +0.0
+            _xMax   = +2.0
+        else:
+            _cutBox = {"cutValue": 1.776, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+            _xMin   = +0.0
+            _xMax   = +5.0
         _rebinX = 1
         _yLabel = _yNorm + " / " + _format
         _log    = True
-        _xMin   = +0.0
-        _xMax   = +2.0
     if "_sigconermin" in hName:
         _units  = ""
         _format = "%0.2f " + _units
@@ -628,7 +634,7 @@ def GetHistoKwargs(h, opts):
         _format = "%0.0f " + _units
         _xLabel = "tau candidate multiplicity"
         _rebinX = 1
-        _xMax   = +10.0
+        _xMax   = 20.0 #+10.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
     if "_nisotks" in hName:
@@ -636,7 +642,7 @@ def GetHistoKwargs(h, opts):
         _format = "%0.0f " + _units
         _xLabel = "isolation track multiplicity"
         _rebinX = 1
-        _xMax   = +8.0
+        _xMax   = +6.0 #+8.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
     if "_nsigtks" in hName:
@@ -644,7 +650,7 @@ def GetHistoKwargs(h, opts):
         _format = "%0.0f " + _units
         _xLabel = "signal track multiplicity"
         _rebinX = 1
-        _xMax   = +8.0
+        _xMax   = +6.0 #+8.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
     if "_reliso" in hName:
@@ -913,29 +919,26 @@ def main(opts):
     plotCount  = 0
     skipList   = ["L1TkTau_MatchTk_d0", "L1TkTau_MatchTk_d0Abs", "L1TkTau_SigTks_d0", 
                   "L1TkTau_SigTks_d0Abs", "L1TkTau_SigTks_d0Sig", "L1TkTau_SigTks_d0SigAbs",
-                  "L1TkTau_IsoTks_d0", "L1TkTau_IsoTks_d0Abs", "L1TkTau_IsoTks_d0Sig", "L1TkTau_IsoTks_d0SigAbs",
-                  "L1TkIsoTau_IsoTksEt", "L1TkIsoTau_IsoTksEta", "L1TkIsoTau_IsoTks_Pt", "L1TkIsoTau_IsoTks_PtRel", 
-                  "L1TkIsoTau_IsoTks_DeltaPOCAz", "L1TkIsoTau_IsoTks_DeltaR", "L1TkIsoTau_IsoTks_ChiSquared", 
-                  "L1TkIsoTau_IsoTks_RedChiSquared", "L1TkIsoTau_IsoTksEtError"]
+                  "L1TkTau_IsoTks_d0", "L1TkTau_IsoTks_d0Abs", "L1TkTau_IsoTks_d0Sig", "L1TkTau_IsoTks_d0SigAbs"]#,
+                  #"L1TkIsoTau_IsoTksEt", "L1TkIsoTau_IsoTksEta", "L1TkIsoTau_IsoTks_Pt", "L1TkIsoTau_IsoTks_PtRel", 
+                  #"L1TkIsoTau_IsoTks_DeltaPOCAz", "L1TkIsoTau_IsoTks_DeltaR", "L1TkIsoTau_IsoTks_ChiSquared", 
+                  #"L1TkIsoTau_IsoTks_RedChiSquared", "L1TkIsoTau_IsoTksEtError"]
 
-    # For-loop: All histos in opts.folder
+    inList = ["_eff", "_rate", "mchadronic", "turnon", "resolution", "counters"]
+    # For-loop: All# histos in opts.folder
     for i, h in enumerate(histoPaths, 1):
 
         # Obsolete quantity
         if h in skipList:
             continue
-
-        # Skip resolution plots (now done by dedicated script)
-        if "resolution" in h.lower():
-            continue
-
-        # Skip turn-on plots (now done by dedicated script)
-        if "turnon" in h.lower():
-            continue
-
-        # Skip Counters (now done by dedicated script)
-        if "counters" in h.lower():
-            continue
+        
+        # Rate and/or Efficiency histos have not been useful (thus far)
+        bSkip = False
+        for s in inList:
+            if s in h.lower():
+                bSkip = True
+        if bSkip:
+            continue                
 
         histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))
         if "TH1" not in histoType:

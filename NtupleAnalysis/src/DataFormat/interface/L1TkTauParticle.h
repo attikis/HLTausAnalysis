@@ -45,8 +45,8 @@ class L1TkTauParticle{
   void InitVars_(void);
   int GetCaloTauIndex() const { return caloTau_Index_;}
   int GetMatchTk()   const { return matchTk_Index_;}
-  double GetVtxIso()  const { return vtxIso_;}
-  double GetRelIso()  const { return relIso_;}
+  // double GetVtxIso()  const { return vtxIso_;}
+  // double GetRelIso()  const { return relIso_;}
   vector<int> GetSigConeTks()  const { return sigTks_Index_;}
   vector<int> GetIsoConeTks()  const { return isoTks_Index_;} 
   void SetCaloTau(int caloTau_Index) { caloTau_Index_ = caloTau_Index;}
@@ -55,10 +55,8 @@ class L1TkTauParticle{
   void SetMatchTk(int matchTk_Index) { matchTk_Index_ = matchTk_Index;}
   void SetMatchTkDeltaR(double matchTk_deltaR) { matchTk_deltaR_ = matchTk_deltaR;}
   void SetMatchGenp(int matchGenp_Index, double matchGenp_deltaR);
-  void SetVtxIso(double vtxIso) { vtxIso_ = vtxIso;}
-  void SetRelIso(double relIso) { relIso_ = relIso;}
-  // void PrintProperties(void);
-  // NEW
+  // void SetVtxIso(double vtxIso) { vtxIso_ = vtxIso;}
+  //void SetRelIso(double relIso) { relIso_ = relIso;}
   void SetSigConeTks(vector<int> sigTksIndices) { sigTks_Index_ = sigTksIndices;}
   void SetIsoConeTks(vector<int> isoTksIndices) { isoTks_Index_ = isoTksIndices;}
   double GetMatchConeMin(void) const{ return theMatchCone_dRMin;}
@@ -69,8 +67,9 @@ class L1TkTauParticle{
   double GetIsoConeMax(void) const{ return theIsoCone_dRMax;}
   double GetVtxIsolation(void)const { return theVtxIsolation;}
   TTTrack GetVtxIsolationTrack(void)const {return theVtxIsolationTk;}
-  double GetRelIsolation(void)const { return theRelIsolation;}
-  double CalculateRelIso(const double deltaZ0_max=999.9, bool bStoreValue=false, bool bInvert_deltaZ0=false, bool bUseIsoCone=false);
+  double GetRelIsolation(void) const { return theRelIsolation;}
+  double GetRelIsolationDeltaZ0(void)const { return theRelIsolationDeltaZ0;}
+  double CalculateRelIso(const double deltaZ0_max, bool bStoreValue, bool bInvert_deltaZ0, bool bUseIsoCone);
   double CalculateVtxIso(bool bStoreValue=false, bool bUseIsoCone=false);
   L1Tau GetCaloTau(void) const{ return theCaloTau;}
   TTTrack GetMatchingTk(void) const{ return theMatchingTk;}
@@ -100,6 +99,7 @@ class L1TkTauParticle{
   void SetVtxIsolationTrack(TTTrack vtxIsoTk){theVtxIsolationTk = vtxIsoTk;}
   void SetVtxIsolation(double isoValue){theVtxIsolation = isoValue;}
   void SetRelIsolation(double isoValue){theRelIsolation = isoValue;}
+  void SetRelIsolationDeltaZ0(double dZ0){theRelIsolationDeltaZ0 = dZ0;}
   void SetSigConeMinDeltaR(double dRMin){theSigCone_dRMin = dRMin;}
   void SetSigConeMaxDeltaR(double dRMax){theSigCone_dRMax = dRMax;}
   void SetIsoConeMinDeltaR(double dRMin){theIsoCone_dRMin = dRMin;}
@@ -132,8 +132,8 @@ class L1TkTauParticle{
   double matchGenp_deltaR_;
   vector<int> sigTks_Index_;
   vector<int> isoTks_Index_;
-  double vtxIso_;
-  double relIso_;
+  // double vtxIso_;
+  // double relIso_;
   double sigCone_minDeltaR_;
   double sigCone_maxDeltaR_;
   double isoCone_minDeltaR_;
@@ -158,6 +158,7 @@ class L1TkTauParticle{
   TLorentzVector theIsoAnnulusTTTracksP4;
   double theVtxIsolation;
   double theRelIsolation;
+  double theRelIsolationDeltaZ0;
   TTTrack theVtxIsolationTk;
   GenParticle theMatchingGenParticle;
   double theMatchingGenParticle_dR;

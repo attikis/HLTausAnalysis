@@ -262,9 +262,9 @@ def GetHistoKwargs(h, opts):
         yMaxF = 1.2
 
     if opts.normalizeToOne:
-        _yLabel = "Arbitrary Units / %.2f"
+        _yLabel = "Arbitrary Units / %.3f"
     else:
-        _yLabel = "Events / %.2f"
+        _yLabel = "Events / %.3f"
         
     _kwargs = {
         "xlabel"           : "#delta x / x",
@@ -287,21 +287,22 @@ def GetHistoKwargs(h, opts):
 
     if "resolutionet_" in h.lower():
         _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
-        #_kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         _kwargs["opts"]       = {"xmin": -0.20, "xmax": 0.20, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
+        _kwargs["rebinX"]     = 5
+        #_kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         #_kwargs["moveLegend"] = _mvLeg1
         ROOT.gStyle.SetNdivisions(8, "X")
+
     if "resolutioneta_" in h.lower():
         _kwargs["xlabel"]     = "#delta#eta / #eta^{vis}"
-        #_kwargs["opts"]       = {"xmin": -0.3, "xmax": 0.3, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         _kwargs["opts"]       = {"xmin": -0.10, "xmax": 0.10, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
-        _kwargs["rebinX"]     = 1
+        _kwargs["rebinX"]     = 5
         ROOT.gStyle.SetNdivisions(8, "X")
+
     if "resolutionphi_" in h.lower():
         _kwargs["xlabel"]     = "#delta#phi / #phi^{vis}"
-        #_kwargs["opts"]       = {"xmin": -2.2, "xmax": 2.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         _kwargs["opts"]       = {"xmin": -0.10, "xmax": 0.10, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
-        _kwargs["rebinX"]     = 1
+        _kwargs["rebinX"]     = 5
         ROOT.gStyle.SetNdivisions(8, "X")
 
     if "cif" in h.lower():

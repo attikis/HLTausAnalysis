@@ -418,7 +418,7 @@ def Plot2dHistograms(datasetsMgr, dsetName, histoName, index):
         xmin =   0
         xmax =  30
     if "GenP_PtLdg_Vs" in histoName:
-        const=   2.3#2.0
+        const=   2.5 #2.0
         coeff=   1.0
         step = 100
         xmin =   0

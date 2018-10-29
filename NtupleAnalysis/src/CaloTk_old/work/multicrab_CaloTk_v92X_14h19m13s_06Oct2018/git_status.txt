@@ -1,0 +1,48 @@
+# On branch master
+# Your branch is ahead of 'origin/master' by 3 commits.
+#
+# Changed but not updated:
+#   (use "git add/rm <file>..." to update what will be committed)
+#   (use "git checkout -- <file>..." to discard changes in working directory)
+#
+#	deleted:    results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/opt1/CaloTk_Histograms_MinBias.txt
+#	deleted:    results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/opt1/CaloTk_Histograms_VBF.txt
+#	deleted:    results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/opt2/settings.txt
+#	modified:   ../../TkTaus/TkTaus.C
+#	deleted:    ../../TkTaus/work/.__afs00CE
+#	deleted:    ../../TkTaus/work/.__afs10C7
+#	deleted:    ../../TkTaus/work/.__afs20E8
+#	deleted:    ../../TkTaus/work/.__afs39D1
+#	deleted:    ../../TkTaus/work/.__afs4623
+#	deleted:    ../../TkTaus/work/.__afs4B82
+#	deleted:    ../../TkTaus/work/.__afs593B
+#	deleted:    ../../TkTaus/work/.__afs5AFD
+#	deleted:    ../../TkTaus/work/.__afs6C61
+#	deleted:    ../../TkTaus/work/.__afs716A
+#	deleted:    ../../TkTaus/work/.__afs8D44
+#	deleted:    ../../TkTaus/work/.__afs9F92
+#	deleted:    ../../TkTaus/work/.__afsA11D
+#	deleted:    ../../TkTaus/work/.__afsB52C
+#	deleted:    ../../TkTaus/work/.__afsC0CD
+#	deleted:    ../../TkTaus/work/.__afsD167
+#	deleted:    ../../TkTaus/work/.__afsE22B
+#	deleted:    ../../TkTaus/work/.__afsFC4E
+#	deleted:    ../../TkTaus/work/lxplus_04Oct2018.txt
+#	modified:   ../../TkTaus/work/plotL1TkTau.py
+#	modified:   ../../TkTaus/work/plotRateVsEff.py
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	../CaloTk_C_ACLiC_dict_rdict.pcm
+#	lxplus_05Oct2018.txt
+#	multicrab_CaloTk_v92X_14h19m13s_06Oct2018/
+#	../../TkTaus/TkTaus_C_ACLiC_dict_rdict.pcm
+#	../../TkTaus/work/lxplus_06Oct2018.txt
+#	../../TkTaus/work/multicrab_TkTau_v92X_SeedPt10_SigConedRMax0p15_IsoConeRMax0p4_VtxIso0p5_RelIso0p2_09h21m02s_06Oct2018/
+#	../../TkTaus/work/multicrab_TkTau_v92X_SeedPt15_SigConedRMax0p12_IsoConeRMax0p4_VtxIso0p5_RelIso0p2_14h15m05s_06Oct2018/
+#	../../TkTaus/work/multicrab_TkTau_v92X_SeedPt5_SigConedRMax0p15_IsoConeRMax0p4_VtxIso0p5_RelIso0p2_08h06m42s_06Oct2018/
+#	../../TkTaus/work/multicrab_TkTau_v92x_SeedPt15_SigConedRMax0p12_IsoConeRMax0p4_VtxIso0p5_RelIso0p2_13h15m34s_06Oct2018/
+#	../../../../Raw2TTree/multicrab_NEW_v1017_20181005T0955/
+no changes added to commit (use "git add" and/or "git commit -a")
+

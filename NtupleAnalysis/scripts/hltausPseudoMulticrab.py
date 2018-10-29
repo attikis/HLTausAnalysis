@@ -90,7 +90,8 @@ def getDatasetInfo(opts):
     opts.pileup = None    
 
     # For-loop: All datasets objects 
-    for d in dgroup.GetDatasetList():
+    for i,d in enumerate(dgroup.GetDatasetList(),1):
+        Verbose("Attempting to find alias for dataset %s" % d.getName(), i==1)
 
         name  = opts.datasetName
         alias = d.getAlias()
