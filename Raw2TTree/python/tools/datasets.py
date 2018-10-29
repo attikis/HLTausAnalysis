@@ -113,12 +113,12 @@ datasetsHPlus = []
 datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW'  , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs200_14TeV_L1TnoPU"))
 datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW' , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs200_14TeV_L1TPU140"))
 datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs200_14TeV/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW' , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs200_14TeV_L1TPU200"))
-datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW'  , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs500_14TeV_L1TnoPU"))
-datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW' , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs500_14TeV_L1TPU140"))
-datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW' , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs500_14TeV_L1TPU200"))
-datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW' , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs1000_14TeV_L1TnoPU"))
-datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs1000_14TeV_L1TPU140"))
-datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs1000_14TeV_L1TPU200"))
+# datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW'  , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs500_14TeV_L1TnoPU"))
+# datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW' , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs500_14TeV_L1TPU140"))
+# datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs500_14TeV/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW' , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs500_14TeV_L1TPU200"))
+# datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW' , dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs1000_14TeV_L1TnoPU"))
+# datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIIFall17D-L1TPU140_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs1000_14TeV_L1TPU140"))
+# datasetsHPlus.append(Dataset('/PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV/PhaseIIFall17D-L1TPU200_93X_upgrade2023_realistic_v5-v2/GEN-SIM-DIGI-RAW', dataVersion="93Xmc", dasQuery=das, alias="ChargedHiggs1000_14TeV_L1TPU200"))
 
 datasetsSingleE = []
 datasetsSingleE.append(Dataset('/SingleE_FlatPt-2to100/PhaseIIFall17D-L1TnoPU_93X_upgrade2023_realistic_v5-v1/GEN-SIM-DIGI-RAW',dataVersion="93Xmc", dasQuery=das, alias="SingleE_L1TnoPU"))
@@ -134,7 +134,7 @@ PhaseIIFall17D.extend(datasetsTT)
 PhaseIIFall17D.extend(datasetsH2tautau)
 PhaseIIFall17D.extend(datasetsHPlus)
 PhaseIIFall17D.extend(datasetsSingleTau)
-PhaseIIFall17D.extend(datasetsSingleE)
+#PhaseIIFall17D.extend(datasetsSingleE)
 
 AllDatasets = []
 AllDatasets += PhaseIIFall17D
