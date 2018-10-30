@@ -41,9 +41,18 @@ set PSEUDO_MCRAB_DIR = ${1}
 #"ChargedHiggs200_14TeV_L1TPU200|ChargedHiggs500_14TeV_L1TnoPU|ChargedHiggs500_14TeV_L1TPU140|ChargedHiggs500_14TeV_L1TPU200|ChargedHiggs1000_14TeV_L1TnoPU|ChargedHiggs1000_14TeV_L1TPU140|ChargedHiggs1000_14TeV_L1TPU200"
 #"GluGluHToTauTau_14TeV_L1TPU140|GluGluHToTauTau_14TeV_L1TPU200"
 
-./plotCounters.py -i 'SingleTau_L1TnoPU|SingleNeutrino_L1TPU200|Glu' -n -m $PSEUDO_MCRAB_DIR --url
-./plotTkTau.py -n -i "SingleNeutrino|GluGluHToTauTau_14TeV_L1TPU200|SingleTau_L1TPU200" -m $PSEUDO_MCRAB_DIR --url
-#./plotTkTau.py -n -i "SingleNeutrino|GluGluHToTauTau|SingleTau_L1TPU200" -m $PSEUDO_MCRAB_DIR --url
-./plotRateVsEff.py -e "SingleE" -m $PSEUDO_MCRAB_DIR --url
-./plotTH2.py -e "SingleE" --logZ --normalizeToOne -m $PSEUDO_MCRAB_DIR --url
-./plotResolutions.py -i "ChargedHiggs200" -n -m $PSEUDO_MCRAB_DIR --url
+./plotCounters.py -i 'SingleTau|SingleNeutrino_L1TPU200|Glu' -n -m $PSEUDO_MCRAB_DIR --url
+./plotTkTau.py -n -i "SingleTau|SingleNeutrino|GluGluHToTauTau_14TeV_L1TPU200" -m $PSEUDO_MCRAB_DIR --url
+./plotRateVsEff.py -m $PSEUDO_MCRAB_DIR --url
+./plotTH2.py --logZ --normalizeToOne -m $PSEUDO_MCRAB_DIR --url
+./plotResolutions.py -i "ChargedHiggs200_14TeV_L1TnoPU" -n -m $PSEUDO_MCRAB_DIR --url
+./plotResolutions.py -i "ChargedHiggs200_14TeV_L1TPU140" -n -m $PSEUDO_MCRAB_DIR --url
+./plotResolutions.py -i "ChargedHiggs200_14TeV_L1TPU200" -n -m $PSEUDO_MCRAB_DIR --url
+./plotResolutions.py -i "SingleTau_L1TnoPU" -n -m $PSEUDO_MCRAB_DIR --url
+./plotResolutions.py -i "SingleTau_L1TPU200" -n -m $PSEUDO_MCRAB_DIR --url
+
+# ./plotCounters.py -i 'SingleTau_L1TnoPU|SingleNeutrino_L1TPU200|Glu' -n -m $PSEUDO_MCRAB_DIR --url
+# ./plotTkTau.py -n -i "SingleNeutrino|GluGluHToTauTau_14TeV_L1TPU200|SingleTau_L1TPU200" -m $PSEUDO_MCRAB_DIR --url
+# ./plotRateVsEff.py -e "SingleE" -m $PSEUDO_MCRAB_DIR --url
+# ./plotTH2.py -e "SingleE" --logZ --normalizeToOne -m $PSEUDO_MCRAB_DIR --url
+# ./plotResolutions.py -i "ChargedHiggs200" -n -m $PSEUDO_MCRAB_DIR --url

@@ -108,7 +108,9 @@ def getAlgos():
     https://root.cern.ch/doc/master/classTAttText.html
     '''
     #return ["TkTaus", "TkTaus (RelIso)", "TkTaus (VtxIso)", "TkTaus (VtxIso-L)", "TkTaus (VtxIso-T)", "TkTaus (RelIso-L)", "TkTaus (RelIso-T)"]
-    return ["TkTaus", "TkTaus #font[72]{RelIso}", "TkTaus #font[72]{VtxIso}", "TkTaus #font[72]{VtxIso-L}", "TkTaus #font[72]{VtxIso-T}", "TkTaus #font[72]{RelIso-L}", "TkTaus #font[72]{RelIso-T}"]
+    #return ["CaloTaus", "CaloTaus  #font[72]{Tk}", "CaloTaus #font[72]{RelIso}", "CaloTaus #font[72]{VtxIso}", "CaloTaus #font[72]{VtxIso-L}", "CaloTaus #font[72]{VtxIso-T}", "CaloTaus #font[72]{RelIso-L}", "CaloTaus #font[72]{RelIso-T}"]
+    return ["Calo", "Calo  #font[72]{Tk}", "Calo #font[72]{RelIso}", "Calo #font[72]{VtxIso}", "Calo #font[72]{VtxIso-L}", "Calo #font[72]{VtxIso-T}", "Calo #font[72]{RelIso-L}", "Calo #font[72]{RelIso-T}"]
+
 
 def main(opts):
     
@@ -158,26 +160,26 @@ def main(opts):
                 dsets_signal.append(d)
 
         # ROC curve ingredients (histograms)
-        effLists    = [["Tk_Eff", "RelIso_Eff", "VtxIso_Eff", "VtxIsoLoose_Eff", "VtxIsoTight_Eff", "RelIsoaLoose_Eff", "RelIsoTight_Eff"], 
-                       ["DiTau_Eff_Tk", "DiTau_Eff_RelIso", "DiTau_Eff_VtxIso", "DiTau_Eff_VtxIsoLoose", "DiTau_Eff_VtxIsoTight", "DiTau_Eff_RelIsoLoose", "DiTau_Eff_RelIsoTight", ]]
+        effLists    = [["Calo_Ef", "Tk_Eff", "RelIso_Eff", "VtxIso_Eff", "VtxIsoLoose_Eff", "VtxIsoTight_Eff", "RelIsoaLoose_Eff", "RelIsoTight_Eff"], 
+                       ["DiTau_Eff_Calo", "DiTau_Eff_Tk", "DiTau_Eff_RelIso", "DiTau_Eff_VtxIso", "DiTau_Eff_VtxIsoLoose", "DiTau_Eff_VtxIsoTight", "DiTau_Eff_RelIsoLoose", "DiTau_Eff_RelIsoTight", ]]
 
-        rateLists   = [["Tk_Rate", "RelIso_Rate", "VtxIso_Rate", "VtxIsoLoose_Rate", "VtxIsoTight_Rate", "RelIsoLoose_Rate", "RelIsoTight_Rate"], 
-                       ["DiTau_Rate_Tk", "DiTau_Rate_RelIso", "DiTau_Rate_VtxIso", "DiTau_Rate_VtxIsoLoose", "DiTau_Rate_VtxIsoTight", "DiTau_Rate_RelIsoLoose", "DiTau_Rate_RelIsoTight"]]
+        rateLists   = [["Calo_Rate", "Tk_Rate", "RelIso_Rate", "VtxIso_Rate", "VtxIsoLoose_Rate", "VtxIsoTight_Rate", "RelIsoLoose_Rate", "RelIsoTight_Rate"], 
+                       ["DiTau_Rate_Calo", "DiTau_Rate_Tk", "DiTau_Rate_RelIso", "DiTau_Rate_VtxIso", "DiTau_Rate_VtxIsoLoose", "DiTau_Rate_VtxIsoTight", "DiTau_Rate_RelIsoLoose", "DiTau_Rate_RelIsoTight"]]
 
-        turnOnLists = [["Tk_TurnOn25", "RelIso_TurnOn25", "VtxIso_TurnOn25"],# "VtxIsoLoose_TurnOn25", "VtxIsoTight_TurnOn25", "RelIsoLoose_TurnOn25", "RelIsoTight_TurnOn25"], 
-                       ["Tk_TurnOn50", "RelIso_TurnOn50", "VtxIso_TurnOn50"]]#, "VtxIsoLoose_TurnOn50", "VtxIsoTight_TurnOn50", "RelIsoLoose_TurnOn50", "RelIsoTight_TurnOn50"]]
+        turnOnLists = [["Calo_TurnOn25", "Tk_TurnOn25", "RelIso_TurnOn25", "VtxIso_TurnOn25"],# "VtxIsoLoose_TurnOn25", "VtxIsoTight_TurnOn25", "RelIsoLoose_TurnOn25", "RelIsoTight_TurnOn25"], 
+                       ["Calo_TurnOn50", "RelIso_TurnOn50", "VtxIso_TurnOn50"]]#, "VtxIsoLoose_TurnOn50", "VtxIsoTight_TurnOn50", "RelIsoLoose_TurnOn50", "RelIsoTight_TurnOn50"]]
 
-        turnOnLists_noNeutrals = [["Tk_TurnOn25_noNeutrals", "RelIso_TurnOn25_noNeutrals", "VtxIso_TurnOn25_noNeutrals"], 
-                                  ["Tk_TurnOn50_noNeutrals", "RelIso_TurnOn50_noNeutrals", "VtxIso_TurnOn50_noNeutrals"]]
+        turnOnLists_noNeutrals = [["Calo_TurnOn25_noNeutrals","Tk_TurnOn25_noNeutrals", "RelIso_TurnOn25_noNeutrals", "VtxIso_TurnOn25_noNeutrals"], 
+                                  ["Calo_TurnOn50_noNeutrals", "Tk_TurnOn50_noNeutrals", "RelIso_TurnOn50_noNeutrals", "VtxIso_TurnOn50_noNeutrals"]]
 
-        turnOnLists_withNeutrals = [["Tk_TurnOn25_withNeutrals", "RelIso_TurnOn25_withNeutrals", "VtxIso_TurnOn25_withNeutrals"], 
-                                    ["Tk_TurnOn50_withNeutrals", "RelIso_TurnOn50_withNeutrals", "VtxIso_TurnOn50_withNeutrals"]]
+        turnOnLists_withNeutrals = [["Calo_TurnOn25_withNeutrals", "Tk_TurnOn25_withNeutrals", "RelIso_TurnOn25_withNeutrals", "VtxIso_TurnOn25_withNeutrals"], 
+                                    ["Calo_TurnOn50_withNeutrals", "Tk_TurnOn50_withNeutrals", "RelIso_TurnOn50_withNeutrals", "VtxIso_TurnOn50_withNeutrals"]]
 
-        turnOnLists_1pr = [["Tk_TurnOn25_1pr", "RelIso_TurnOn25_1pr", "VtxIso_TurnOn25_1pr"], 
-                           ["Tk_TurnOn50_1pr", "RelIso_TurnOn50_1pr", "VtxIso_TurnOn50_1pr"]]
+        turnOnLists_1pr = [["Calo_TurnOn25_1pr", "Tk_TurnOn25_1pr", "RelIso_TurnOn25_1pr", "VtxIso_TurnOn25_1pr"], 
+                           ["Calo_TurnOn50_1pr", "Tk_TurnOn50_1pr", "RelIso_TurnOn50_1pr", "VtxIso_TurnOn50_1pr"]]
 
-        turnOnLists_3pr = [["Tk_TurnOn25_3pr", "RelIso_TurnOn25_3pr", "VtxIso_TurnOn25_3pr"], 
-                           ["Tk_TurnOn50_3pr", "RelIso_TurnOn50_3pr", "VtxIso_TurnOn50_3pr"]]
+        turnOnLists_3pr = [["Calo_TurnOn25_3pr","Tk_TurnOn25_3pr", "RelIso_TurnOn25_3pr", "VtxIso_TurnOn25_3pr"], 
+                           ["Calo_TurnOn50_3pr","Tk_TurnOn50_3pr", "RelIso_TurnOn50_3pr", "VtxIso_TurnOn50_3pr"]]
 
         turnOnLists_all = [["VtxIso_TurnOn25", "VtxIso_TurnOn25_1pr", "VtxIso_TurnOn25_3pr", "VtxIso_TurnOn25_withNeutrals", "VtxIso_TurnOn25_noNeutrals"],
                            ["VtxIso_TurnOn50", "VtxIso_TurnOn50_1pr", "VtxIso_TurnOn50_3pr", "VtxIso_TurnOn50_withNeutrals", "VtxIso_TurnOn50_noNeutrals"]]
@@ -187,7 +189,8 @@ def main(opts):
             bPU = b.split("PU")[1]
 
             # Create rate plots (SingleTau, DiTau)
-            if 1:
+            if 0:
+                opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="Rates")
                 PlotRate(datasetsMgr, rateLists[0], b, bPU)
                 PlotRate(datasetsMgr, rateLists[1], b, bPU)
             
@@ -197,8 +200,10 @@ def main(opts):
              
                 # Create rate plots (SingleTau, DiTau)
                 if i == 1: # (since inside minBias loop)
-                    PlotEfficiency(datasetsMgr, effLists[0], s, sPU)
-                    PlotEfficiency(datasetsMgr, effLists[1], s, sPU)
+                    opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="Efficiencies")
+                    if 0:
+                        PlotEfficiency(datasetsMgr, effLists[0], s, sPU)
+                        PlotEfficiency(datasetsMgr, effLists[1], s, sPU)
 
                 # Skip non-matching signal and bkg PU pairs?
                 if sPU != bPU and sPU != "":
@@ -212,7 +217,8 @@ def main(opts):
                     eff  = effLists[k]
                     rate = rateLists[k]
                     Verbose("Bkg = %s, Signal = %s" % (b, s), False)
-                    if 1:
+                    if 0:
+                        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="ROC")
                         PlotRateVsEff(datasetsMgr, eff, rate, s, b, sPU, bPU)
 
         # For-loop: All signal histos
@@ -221,6 +227,7 @@ def main(opts):
             
             # Create rate plots (SingleTau, DiTau) 
             if 1: 
+                opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="TurnOns")
                 PlotTurnOns(datasetsMgr, turnOnLists[0], s, PU, "TurnOns_25GeV_%s_Inclusive" % (s) )
                 PlotTurnOns(datasetsMgr, turnOnLists[1], s, PU, "TurnOns_50GeV_%s_Inclusive" % (s) )
                 PlotTurnOns(datasetsMgr, turnOnLists_noNeutrals[0], s, PU, "TurnOns_25GeV_%s_noNeutrals" % (s) )
@@ -666,8 +673,8 @@ def GetHistoKwargs(h, opts):
     if "Rate_" in h:
         _kwargs["xlabel"]     = "E_{T} (GeV)"
         _kwargs["ylabel"]     = "Rate (kHz)"# / %.0f GeV"
-        #_kwargs["opts"]       = {"xmin": 0.0, "xmax": 300.0, "ymin": yMin, "ymax":1e5, "ymaxfactor": yMaxF}
-        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 100.0, "ymin": 1, "ymax":5e4, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 300.0, "ymin": yMin, "ymax":1e5, "ymaxfactor": yMaxF}
+        #_kwargs["opts"]       = {"xmin": 0.0, "xmax": 100.0, "ymin": 1, "ymax":5e4, "ymaxfactor": yMaxF}
         _kwargs["moveLegend"] = _mvLeg2
         _kwargs["cutBoxY"]    = {"cutValue": 50, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}
 

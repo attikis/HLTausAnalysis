@@ -163,9 +163,9 @@ def main(opts):
             ["L1TkIsoTau_ResolutionEt" , "L1TkIsoTau_ResolutionEt_1pr" , "L1TkIsoTau_ResolutionEt_3pr" , "L1TkIsoTau_ResolutionEt_withNeutrals" , "L1TkIsoTau_ResolutionEt_noNeutrals" ], 
             ["L1TkIsoTau_ResolutionEta", "L1TkIsoTau_ResolutionEta_1pr", "L1TkIsoTau_ResolutionEta_3pr", "L1TkIsoTau_ResolutionEta_withNeutrals", "L1TkIsoTau_ResolutionEta_noNeutrals"], 
             ["L1TkIsoTau_ResolutionPhi", "L1TkIsoTau_ResolutionPhi_1pr", "L1TkIsoTau_ResolutionPhi_3pr", "L1TkIsoTau_ResolutionPhi_withNeutrals", "L1TkIsoTau_ResolutionPhi_noNeutrals"],
-            ["L1TkIsoTau_ResolutionEt" , "L1TkIsoTau_ResolutionEt_C"   , "L1TkIsoTau_ResolutionEt_I"   , "L1TkIsoTau_ResolutionEt_F" ],
-            ["L1TkIsoTau_ResolutionEta", "L1TkIsoTau_ResolutionEta_C"  , "L1TkIsoTau_ResolutionEta_I"  , "L1TkIsoTau_ResolutionEta_F"],
-            ["L1TkIsoTau_ResolutionPhi", "L1TkIsoTau_ResolutionPhi_C"  , "L1TkIsoTau_ResolutionPhi_I"  , "L1TkIsoTau_ResolutionPhi_F"],
+            ["L1TkIsoTau_ResolutionEt" , "L1TkIsoTau_ResolutionEt_C"   , "L1TkIsoTau_ResolutionEt_I"], #  , "L1TkIsoTau_ResolutionEt_F" ],
+            ["L1TkIsoTau_ResolutionEta", "L1TkIsoTau_ResolutionEta_C"  , "L1TkIsoTau_ResolutionEta_I"],#  , "L1TkIsoTau_ResolutionEta_F"],
+            ["L1TkIsoTau_ResolutionPhi", "L1TkIsoTau_ResolutionPhi_C"  , "L1TkIsoTau_ResolutionPhi_I"],#  , "L1TkIsoTau_ResolutionPhi_F"],
             ]
                        
     
@@ -287,21 +287,21 @@ def GetHistoKwargs(h, opts):
 
     if "resolutionet_" in h.lower():
         _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
-        _kwargs["opts"]       = {"xmin": -0.20, "xmax": 0.20, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
-        _kwargs["rebinX"]     = 5
+        _kwargs["opts"]       = {"xmin": -1.0, "xmax": 3.0, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
+        _kwargs["rebinX"]     = 50
         #_kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         #_kwargs["moveLegend"] = _mvLeg1
         ROOT.gStyle.SetNdivisions(8, "X")
 
     if "resolutioneta_" in h.lower():
         _kwargs["xlabel"]     = "#delta#eta / #eta^{vis}"
-        _kwargs["opts"]       = {"xmin": -0.10, "xmax": 0.10, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": -0.2, "xmax": 0.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         _kwargs["rebinX"]     = 5
         ROOT.gStyle.SetNdivisions(8, "X")
 
     if "resolutionphi_" in h.lower():
         _kwargs["xlabel"]     = "#delta#phi / #phi^{vis}"
-        _kwargs["opts"]       = {"xmin": -0.10, "xmax": 0.10, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": -0.20, "xmax": 0.20, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         _kwargs["rebinX"]     = 5
         ROOT.gStyle.SetNdivisions(8, "X")
 
