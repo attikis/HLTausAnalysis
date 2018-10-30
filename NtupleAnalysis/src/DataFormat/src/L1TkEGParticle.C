@@ -31,8 +31,10 @@ L1TkEGParticle::L1TkEGParticle(vector<TTTrack> tracks, vector<EG> EGs,
 L1TkEGParticle::L1TkEGParticle(double vtxIso,
 			       double relIso, 
 			       double CHF, 
-			       double NHF, 
-			       int isoTracks_N)
+			       double NHF,
+			       double shrinkConeConst,
+			       double sigConeMaxOpen,
+			       vector<TTTrack> isoTracks)
   
 //****************************************************************************
 {
@@ -40,7 +42,9 @@ L1TkEGParticle::L1TkEGParticle(double vtxIso,
   SetRelIso(relIso);
   SetCHF(CHF);
   SetNHF(NHF);
-  SetIsoTracksN(isoTracks_N);
+  SetShrinkingConeConst(shrinkConeConst);
+  SetSigConeMaxOpen(sigConeMaxOpen);
+  SetIsoConeTracks(isoTracks);
 }
 
 
@@ -68,6 +72,148 @@ TLorentzVector L1TkEGParticle::GetTotalP4()
 
   return sum;
 }
+
+
+//****************************************************************************
+double L1TkEGParticle::GetSigConeMax()
+//****************************************************************************
+{
+  double maxDeltaR = GetShrinkingConeConst()/(theTracks[0].getPt());
+  if (maxDeltaR > GetSigConeMaxOpen()) maxDeltaR = GetSigConeMaxOpen();
+
+  return maxDeltaR;
+  
+}
+
+//****************************************************************************
+double L1TkEGParticle::GetIsoConeMin()
+//****************************************************************************
+{
+  return GetSigConeMax();
+}
+
+//****************************************************************************
+void L1TkEGParticle::FindIsoConeTracks(vector<TTTrack> TTTracks, bool useIsoCone)
+//****************************************************************************
+{
+  vector<TTTrack> isoTracks;
+  TTTrack leadingTrack = theTracks[0];
+  vector<TTTrack> clustTracks  = theTracks;
+  double deltaR;
+
+  // For-loop: All TTTracks
+  for (auto tk = TTTracks.begin(); tk != TTTracks.end(); tk++) {
+  
+    if (useIsoCone) {
+      // Check if the track is clustered in the tau candidate
+      bool clustered = false;
+      
+      for (auto clusttk = clustTracks.begin(); clusttk != clustTracks.end(); clusttk++){
+	if (clusttk->index() == tk->index()) clustered = true;
+      }
+      if (clustered) continue;	
+    }
+    
+    // Check if the track is in the iso-cone
+    deltaR = auxTools.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), tk->getEta(), tk->getPhi());
+    //std::cout << "minDr_FUNC = "<<GetIsoConeMin()<<std::endl; 
+
+    if (deltaR > GetIsoConeMin() && deltaR < GetIsoConeMax()) {
+      isoTracks.push_back(*tk);
+    }
+    
+  } // For-loop: All TTTracks
+  
+  SetIsoConeTracks(isoTracks);
+
+  return;
+
+}
+
+//****************************************************************************
+double L1TkEGParticle::CalculateVtxIso(vector<TTTrack> TTTracks, bool useIsoCone)
+//****************************************************************************
+{
+  TTTrack leadingTrack = theTracks[0];
+  vector<TTTrack> clustTracks  = theTracks;
+  double mindZ0 = 999.9;
+  double dz0, deltaR;
+  
+  // For-loop: All TTTracks
+  for (auto tk = TTTracks.begin(); tk != TTTracks.end(); tk++) {
+    
+    if (useIsoCone) {
+      // Check if the track is clustered in the tau candidate
+      bool clustered = false;
+      
+      for (auto clusttk = clustTracks.begin(); clusttk != clustTracks.end(); clusttk++){
+	if (clusttk->index() == tk->index()) clustered = true;
+      }
+      if (clustered) continue;	
+    }
+    
+    // Check if the track is in the iso-cone
+    deltaR = auxTools.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), tk->getEta(), tk->getPhi());
+    //std::cout << "minDr_FUNC = "<<GetIsoConeMin()<<std::endl; 
+
+    if (deltaR > GetIsoConeMin() && deltaR < GetIsoConeMax()) {
+      
+      // Calculate mindz0
+      dz0 = abs (tk->getZ0() - leadingTrack.getZ0() );
+      if (dz0 < mindZ0) mindZ0 = dz0;
+      }
+    
+  } // For-loop: All TTTracks
+  
+  double vtxIso = mindZ0;
+  SetVtxIso(vtxIso);
+  
+  return vtxIso;
+}
+
+
+//****************************************************************************
+double L1TkEGParticle::CalculateRelIso(vector<TTTrack> TTTracks, double deltaZ0_max, bool useIsoCone)
+//****************************************************************************
+{
+  TTTrack leadingTrack = theTracks[0];
+  vector<TTTrack> clustTracks  = theTracks;
+  double relIso = -1.0;
+  double ptSum  = 0;
+  double deltaR;
+
+  // For-loop: All TTTracks
+  for (auto tk = TTTracks.begin(); tk != TTTracks.end(); tk++) {
+    
+    if (useIsoCone) {
+      // Check if the track is clustered in the tau candidate
+      bool clustered = false;
+      
+      for (auto clusttk = clustTracks.begin(); clusttk != clustTracks.end(); clusttk++){
+	if (clusttk->index() == tk->index()) clustered = true;
+      }
+      if (clustered) continue;	
+    }
+    
+    // Apply dz0 cut
+    if (abs (tk->getZ0() - leadingTrack.getZ0() ) > deltaZ0_max) continue;
+    
+    
+    // Check if the track is in the iso-cone
+    deltaR = auxTools.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), tk->getEta(), tk->getPhi());
+  
+    if (deltaR > GetIsoConeMin() && deltaR < GetIsoConeMax()) ptSum += tk -> getPt();
+    
+  } // For-loop: All TTTracks
+  
+  // Calculate relative isolation
+  relIso = ptSum / GetTotalEt();
+  SetRelIso(relIso);
+  
+  return relIso;
+}
+
+
 
 
 //****************************************************************************
