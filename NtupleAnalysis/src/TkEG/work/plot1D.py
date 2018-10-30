@@ -364,7 +364,7 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.16, "ymin": 0.0001, "ymaxfactor": _yMaxF}
         kwargs["xlabel"] = "R_{max}^{sig}"
 
-    if "tkeg_isocone_invmass" in h.lower():
+    if "tkeg_isotracks_invmass" in h.lower():
         kwargs["log"]  = True
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.5, "ymin": 0.0001, "ymaxfactor": _yMaxF}
         

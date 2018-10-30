@@ -345,10 +345,10 @@ def GetHistoKwargs(h, opts):
     if "resolutionet_" in h.lower():
         _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
         _kwargs["opts"]       = {"xmin": -0.2, "xmax": 0.2, "ymin": 0, "ymaxfactor": yMaxF}
-        if "_all_f" in h.lower() or "_cif" in h.lower():
-            _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
-            _kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0, "ymaxfactor": yMaxF}
-            _kwargs["rebinX"]     = 50
+        #if "_all_f" in h.lower() or "_cif" in h.lower():
+        #    _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
+        #    _kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0, "ymaxfactor": yMaxF}
+        #    _kwargs["rebinX"]     = 50
         #_kwargs["moveLegend"] = _mvLeg1
     if "resolutioneta_" in h.lower():
         _kwargs["xlabel"]     = "#delta#eta / #eta^{vis}"
