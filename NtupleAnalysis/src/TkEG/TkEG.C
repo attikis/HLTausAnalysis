@@ -1236,10 +1236,6 @@ void TkEG::Loop()
 
       // Pi0 Resolution (EGs-GenPi0)
       int NeutralsResolution = (tkeg->GetEGs().size() - tkeg->GetMatchingGenParticle().finalDaughtersNeutral().size()); 
-      if (NeutralsResolution > 4) {
-	cout <<tkeg->GetEGs().size()<< "------------------"<< tkeg->GetMatchingGenParticle().finalDaughtersNeutral().size()<<endl;
-	cout<< "==================== "<< NeutralsResolution<<endl;
-      }
       h_TkEG_NeutralsResolution->Fill(NeutralsResolution); 
       
       // Resolution in different eta regions
