@@ -211,12 +211,12 @@ def GetHistoKwargs(h, opts):
         _xMin   = 1 #don't show Loose/Tight WPs
         _xMax   = 8 #don't show Loose/Tight WPs
         _yLabel = _yNorm + " / " + _format
-        _log    = False
+        #_log    = True
         #_rmLeg  = True
         #_ratio  = False
         _cutBox = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
         ROOT.gStyle.SetLabelSize(13, "X") #"XY"
-
+                
     if _log:
         if _yMin == 0.0:
             if opts.normalizeToOne:
