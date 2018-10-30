@@ -620,11 +620,11 @@ vector<L1Tau> TreeReaderMC::GetL1Taus(bool bPrintList)
   L1Tau theL1Tau;
 
   // For-loop: All L1Taus
-  // for (Size_t iCalo = 0; iCalo < L1TauEmu_Et.size(); iCalo++)
-  for (Size_t iCalo = 0; iCalo < L1Tau_Et.size(); iCalo++)
+  for (Size_t iCalo = 0; iCalo < L1TauEmu_Et.size(); iCalo++)
+  //for (Size_t iCalo = 0; iCalo < L1Tau_Et.size(); iCalo++)
     { 
       theL1Tau = GetL1Tau(iCalo);
-      //if (bPrintList) theL1Tau.PrintProperties(false);
+      if (bPrintList) theL1Tau.PrintProperties(false);
       theL1Taus.push_back( theL1Tau );
     }
   
