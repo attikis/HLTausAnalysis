@@ -61,7 +61,7 @@ class TkEG : public TreeAnalyserMC{
   // Public function declarations
   virtual void Loop();
   void PrintSettings(void);
-  
+      
   // Public variables
   string mcSample;
   bool cfg_AddL1Tks;  
@@ -82,11 +82,12 @@ class TkEG : public TreeAnalyserMC{
   void WriteHistos_(void);
   void InitObjects(void);
   void InitVars_(void);
+  //void SortL1TkEGs();
   float DeltaPhi(float phi1, float phi2);
   float deltaR(float eta1, float eta2, float phi1, float phi2);
   float CorrectedEta(float eta, float zTrack);
   bool IsWithinEtaRegion(string etaRegion, double eta);
-    vector<L1TkEGParticle> GetMcMatchedL1TkEGs(vector<L1TkEGParticle> L1TkEGs);
+  vector<L1TkEGParticle> GetMcMatchedL1TkEGs(vector<L1TkEGParticle> L1TkEGs);
   double GetMatchingGenParticle(TTTrack track, GenParticle *genParticlePtr);
 
   void FillTurnOn_Numerator_(vector<L1TkEGParticle> L1TkEGs,
@@ -329,8 +330,13 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_NHF;
   TH1D* h_TkEG_CHF_withNeutrals;
   TH1D* h_TkEG_NHF_withNeutrals;
+
   TH1D* h_TkEG_isoTracks_InvMass;
   TH1D* h_TkEG_isoTracks_Multiplicity;
+  TH1D* h_TkEG_isoTracks_PtSum;
+  TH1D* h_TkEG_isoTracks_NStubs;
+  TH1D* h_TkEG_isoTracks_Chi2;
+  //TH1D* h_TkEG_isoTracks_Eta;
 
   TH1D* h_TkEG_PtResolution;
   TH1D* h_TkEG_PtResolution_C;
@@ -532,13 +538,27 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_PhiResolution_1pr_F_noEGs_negEta;
   TH1D* h_TkEG_PhiResolution_3pr_F_noEGs_negEta;
 
-  // Bad Et resolution candidates 
-  TH1D* h_BadEtResolCand_InvMass;
-  TH1D* h_BadEtResolCand_RelIso;
-  TH1D* h_BadEtResolCand_VtxIso;
-  TH1D* h_BadEtResolCand_CHF;
-  TH1D* h_BadEtResolCand_IsoTracks_N;
-  TH1D* h_BadEtResolCand_dR_EG_Seed;
+  // pion0 Resolution
+  TH1D* h_TkEG_NeutralsResolution;
+  TH1D* h_TkEG_NeutralsResolution_noNeutrals;
+  TH1D* h_TkEG_NeutralsResolution_withNeutrals;
+  TH1D* h_TkEG_NeutralsResolution_1pr;
+  TH1D* h_TkEG_NeutralsResolution_3pr;
+
+  // Poor Et resolution candidates 
+  TH1D* h_PoorEtResolCand_InvMass;
+  TH1D* h_PoorEtResolCand_RelIso;
+  TH1D* h_PoorEtResolCand_VtxIso;
+  TH1D* h_PoorEtResolCand_CHF;
+  TH1D* h_PoorEtResolCand_IsoTracks_N;
+  TH1D* h_PoorEtResolCand_dR_EG_Seed;
+  // Good Et resolution candidates
+  TH1D* h_GoodEtResolCand_InvMass;
+  TH1D* h_GoodEtResolCand_RelIso;
+  TH1D* h_GoodEtResolCand_VtxIso;
+  TH1D* h_GoodEtResolCand_CHF;
+  TH1D* h_GoodEtResolCand_IsoTracks_N;
+  TH1D* h_GoodEtResolCand_dR_EG_Seed;
 
   TH1D* h_nonMCmatched_EGenergyOverTracksPt;
   TH1D* h_nonMCmatchedCandidates_decayMode;
