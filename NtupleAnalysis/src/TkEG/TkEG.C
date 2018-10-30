@@ -1235,7 +1235,11 @@ void TkEG::Loop()
       h_TkEG_PhiResolution->Fill(PhiResolution);
 
       // Pi0 Resolution (EGs-GenPi0)
-      double NeutralsResolution = (tkeg->GetEGs().size() - tkeg->GetMatchingGenParticle().finalDaughtersNeutral().size()); 
+      int NeutralsResolution = (tkeg->GetEGs().size() - tkeg->GetMatchingGenParticle().finalDaughtersNeutral().size()); 
+      if (NeutralsResolution > 4) {
+	cout <<tkeg->GetEGs().size()<< "------------------"<< tkeg->GetMatchingGenParticle().finalDaughtersNeutral().size()<<endl;
+	cout<< "==================== "<< NeutralsResolution<<endl;
+      }
       h_TkEG_NeutralsResolution->Fill(NeutralsResolution); 
       
       // Resolution in different eta regions
@@ -2584,11 +2588,11 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_TkEG_PhiResolution_3pr_F_noEGs_negEta, "TkEG_PhiResolution_3pr_F_noEGs_negEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
 
   // Pion0 Resolution
-  histoTools_.BookHisto_1D(h_TkEG_NeutralsResolution, "TkEG_NeutralsResolution", ";#pi^{0} resolution (GeV);Clusters / bin", 11, -5.5, +5.5);
-  histoTools_.BookHisto_1D(h_TkEG_NeutralsResolution_noNeutrals, "TkEG_NeutralsResolution_noNeutrals", ";#pi^{0} resolution (GeV);Clusters / bin", 11, -5.5, +5.5);
-  histoTools_.BookHisto_1D(h_TkEG_NeutralsResolution_withNeutrals, "TkEG_NeutralsResolution_withNeutrals", ";#pi^{0} resolution (GeV);Clusters / bin", 11, -5.5, +5.5);
-  histoTools_.BookHisto_1D(h_TkEG_NeutralsResolution_1pr, "TkEG_NeutralsResolution_1pr", ";#pi^{0} resolution (GeV);Clusters / bin", 11, -5.5, +5.5);
-  histoTools_.BookHisto_1D(h_TkEG_NeutralsResolution_3pr, "TkEG_NeutralsResolution_3pr", ";#pi^{0} resolution (GeV);Clusters / bin", 11, -5.5, +5.5);
+  histoTools_.BookHisto_1D(h_TkEG_NeutralsResolution, "TkEG_NeutralsResolution", ";#pi^{0} resolution (GeV);Clusters / bin", 21, -10.5, 10.5);
+  histoTools_.BookHisto_1D(h_TkEG_NeutralsResolution_noNeutrals, "TkEG_NeutralsResolution_noNeutrals", ";#pi^{0} resolution (GeV);Clusters / bin", 21, -10.5, 10.5);
+  histoTools_.BookHisto_1D(h_TkEG_NeutralsResolution_withNeutrals, "TkEG_NeutralsResolution_withNeutrals", ";#pi^{0} resolution (GeV);Clusters / bin", 21, -10.5, 10.5);
+  histoTools_.BookHisto_1D(h_TkEG_NeutralsResolution_1pr, "TkEG_NeutralsResolution_1pr", ";#pi^{0} resolution (GeV);Clusters / bin", 21, -10.5, 10.5);
+  histoTools_.BookHisto_1D(h_TkEG_NeutralsResolution_3pr, "TkEG_NeutralsResolution_3pr", ";#pi^{0} resolution (GeV);Clusters / bin", 21, -10.5, 10.5);
   
   // MC match counters 
   histoTools_.BookHisto_1D(h_MCmatch_counters, "MCmatch_counters", ";;Events", 7, 0, 7);

@@ -163,6 +163,7 @@ def main(opts):
             ["TkEG_EtResolution" , "TkEG_EtResolution_1pr" , "TkEG_EtResolution_3pr" , "TkEG_EtResolution_withNeutrals" , "TkEG_EtResolution_noNeutrals" ], 
             ["TkEG_EtaResolution", "TkEG_EtaResolution_1pr", "TkEG_EtaResolution_3pr", "TkEG_EtaResolution_withNeutrals", "TkEG_EtaResolution_noNeutrals"], 
             ["TkEG_PhiResolution", "TkEG_PhiResolution_1pr", "TkEG_PhiResolution_3pr", "TkEG_PhiResolution_withNeutrals", "TkEG_PhiResolution_noNeutrals"],
+            
             ["TkEG_EtResolution" , "TkEG_EtResolution_C"   , "TkEG_EtResolution_I"   , "TkEG_EtResolution_F" ],
             ["TkEG_EtaResolution", "TkEG_EtaResolution_C"  , "TkEG_EtaResolution_I"  , "TkEG_EtaResolution_F"],
             ["TkEG_PhiResolution", "TkEG_PhiResolution_C"  , "TkEG_PhiResolution_I"  , "TkEG_PhiResolution_F"],
@@ -191,6 +192,8 @@ def main(opts):
             ["TkEG_EtResolution_F_noEGs_negEta", "TkEG_EtResolution_1pr_F_noEGs_negEta", "TkEG_EtResolution_3pr_F_noEGs_negEta", "TkEG_EtResolution_withNeutrals_F_noEGs_negEta", "TkEG_EtResolution_noNeutrals_F_noEGs_negEta"],
             ["TkEG_EtaResolution_F_noEGs_negEta", "TkEG_EtaResolution_1pr_F_noEGs_negEta", "TkEG_EtaResolution_3pr_F_noEGs_negEta", "TkEG_EtaResolution_withNeutrals_F_noEGs_negEta", "TkEG_EtaResolution_noNeutrals_F_noEGs_negEta"],
             ["TkEG_PhiResolution_F_noEGs_negEta", "TkEG_PhiResolution_1pr_F_noEGs_negEta", "TkEG_PhiResolution_3pr_F_noEGs_negEta", "TkEG_PhiResolution_withNeutrals_F_noEGs_negEta", "TkEG_PhiResolution_noNeutrals_F_noEGs_negEta"],
+
+            ["TkEG_NeutralsResolution", "TkEG_NeutralsResolution_1pr", "TkEG_NeutralsResolution_3pr", "TkEG_NeutralsResolution_withNeutrals", "TkEG_NeutralsResolution_noNeutrals"],
 
             ]
                        
@@ -237,6 +240,8 @@ def main(opts):
             PlotHistos(datasetsMgr, resList[25], s, PU, "ResolutionEta_%s_all_F_noEGs_negEta" % (s) )
             PlotHistos(datasetsMgr, resList[26], s, PU, "ResolutionPhi_%s_all_F_noEGs_negEta" % (s) )
 
+            PlotHistos(datasetsMgr, resList[27], s, PU, "ResolutionNeutrals_%s_all" % (s) )
+           
         print
 
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
@@ -360,6 +365,16 @@ def GetHistoKwargs(h, opts):
         _kwargs["opts"]       = {"xmin": -0.1, "xmax": 0.1, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         #_kwargs["opts"]       = {"xmin": -2.2, "xmax": 2.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         #_kwargs["rebinX"]     = 1
+
+    if "resolutionneutrals_" in h.lower():
+        _kwargs["xlabel"]     = "#delta#pi^{0}"
+        _kwargs["opts"]       = {"xmin": -5, "xmax": 5, "ymin": 0, "ymaxfactor": yMaxF}
+        _kwargs["rebinX"]     = 1
+        
+        #if "_all_f" in h.lower() or "_cif" in h.lower():
+        #    _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
+        #    _kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0, "ymaxfactor": yMaxF}
+        #_kwargs["moveLegend"] = _mvLeg1
 
     if "cif" in h.lower():
         _kwargs["moveLegend"] = _mvLeg1

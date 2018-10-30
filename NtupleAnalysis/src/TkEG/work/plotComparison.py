@@ -301,7 +301,14 @@ def GetHistoKwargs(h, opts):
     if "dr_eg_seed" in h.lower():
         _kwargs["opts"]       = {"xmin": 0.0, "xmax": 0.15, "ymin": 0, "ymaxfactor": yMaxF}
 
-
+    if "reliso" in h.lower() or "badetresolcand_reliso" in h.lower():
+        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 1.2, "ymin": 0.001, "ymaxfactor": yMaxF}
+        _kwargs["log"]  = True
+        
+    if "vtxiso" in h.lower() or "badetresolcand_vtxiso" in h.lower():
+        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 4.0, "ymin": 0.0001, "ymaxfactor": yMaxF}
+        _kwargs["log"]  = True
+        
     if "cif" in h.lower():
         _kwargs["moveLegend"] = _mvLeg1
         #if "goodvspoor" in h.lower():
