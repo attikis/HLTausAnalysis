@@ -61,7 +61,7 @@ config.Data.inputDataset = dataset
 config.Data.inputDBS = 'global' #'phys03'
 config.Data.splitting = 'FileBased'
 #config.Data.totalUnits  = 10
-config.Data.unitsPerJob = 1
+config.Data.unitsPerJob = 2
 config.Data.publication = False
 config.Data.outLFNDirBase = '/store/user/%s/CRAB3_TransferData' % (getUsernameFromSiteDB())
 

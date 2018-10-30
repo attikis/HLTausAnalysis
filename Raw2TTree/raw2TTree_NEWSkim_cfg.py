@@ -23,7 +23,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('L1Trigger.TrackFindingTracklet.L1TrackletTracks_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(2)
+    input = cms.untracked.int32(10)
 )
 
 # Input source
@@ -117,6 +117,7 @@ process.l1TrackTree = cms.EDAnalyzer('L1TrackNtupleMaker',
 process.ana = cms.Path(process.l1TrackTree)
 
 
+
 process.l1GeneratorTree = cms.EDAnalyzer("L1CustomGenTreeProducer",
     genJetToken     = cms.untracked.InputTag("ak4GenJets"),
     genParticleToken = cms.untracked.InputTag("genParticles"),
@@ -142,11 +143,11 @@ associatePatAlgosToolsTask(process)
 
 # Automatic addition of the customisation function from L1Trigger.L1TNtuples.customiseL1Ntuple
 #from L1Trigger.L1TNtuples.customiseL1Ntuple import L1NtupleRAWEMUGEN_MC 
-from L1Trigger.L1TNtuples.customiseL1Ntuple import L1NtupleRAWEMU 
+from L1Trigger.L1TNtuples.customiseL1Ntuple import L1NtupleEMU 
 
 #call to customisation function L1NtupleEMU imported from L1Trigger.L1TNtuples.customiseL1Ntuple
 #process = L1NtupleRAWEMUGEN_MC(process)
-process = L1NtupleRAWEMU(process)
+process = L1NtupleEMU(process)
 
 # End of customisation functions
 
