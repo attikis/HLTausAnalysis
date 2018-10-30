@@ -89,11 +89,13 @@ def getDatasetInfo(opts):
     opts.dataVersion = None    
     opts.pileup = None    
 
-    # For-loop: All datasets objects 
-    for d in dgroup.GetDatasetList():
+    # For-loop: All datasets objects
+    for i,d in enumerate(dgroup.GetDatasetList(), 1):
+        Verbose("Attempting to find alias for dataset %s" % d.getName(), i==1)
 
         name  = opts.datasetName
         alias = d.getAlias()
+        Verbose("Dataset name = %s, alias = %s?" % (ls + name + ns, hs + alias + ns), True)
 
         # Stupid "hack" for special case (one-off!)
         if "RelVal" in name:
@@ -105,13 +107,14 @@ def getDatasetInfo(opts):
         if set(alias.split("_")).issubset(name.split("_")):
             opts.dataset = d
             opts.datasetAlias = alias
-            Verbose("Alias for dataset %s is %s" % (d.getName(), alias), True)
+            Verbose("Alias for dataset %s is alias = %s!" % (ls + name + ns, hs + alias + ns), i==1)
             break
         else:
+            Verbose("Alias for dataset %s is %s alias = %s. Keep looking .." % (ls + name + ns, es + "not" + ns, hs + alias + ns), i==1)
             pass
 
     if opts.datasetAlias == None:
-        raise Exception("%sCould not determine the alias of datasets \"%s\"%s. Check the file \"datasets.py\"" % (es, opts.datasetAlias, ns) )
+        raise Exception("%sCould not determine the alias of dataset \"%s\"%s. Check the file \"datasets.py\"" % (es, opts.dataset, ns) )
 
     # Get data-version, <PU>, and lumi
     opts.dataVersion = d.getDataVersion()
@@ -437,7 +440,7 @@ def CreateDatasetDir(dirName, dsetName):
         os.mkdir(datasetDir)
     return
 
-def CreateJob(opts, args):
+def CreatePseudoDir(opts, args):
     '''
     Create a pseudo-multicrab directory.
     '''    
@@ -510,7 +513,7 @@ if __name__ == "__main__":
     CMSSW        = "92X"
     ANALYSIS     = "HLTausAnalysis"
     ALGORITHM    = "CaloTk"
-    DATAERA      = "TDR2019" #"ID2017"
+    DATAERA      = "TDR2019"
     DATAVERSION  = None
     ROOTFILE     = None
     DATETIME     = datetime.datetime.now()
@@ -588,7 +591,7 @@ if __name__ == "__main__":
         opts.rootFile = f
         
         # Create directory and subdirectories
-        CreateJob(opts, args)
+        CreatePseudoDir(opts, args)
         aux.Print("%sFile %d/%d: %s%s" % (hs, i, nFiles, f, ns), i==1)
         
         Print("Created pseudo-multicrab directory %s!" % (ss + opts.dirName + ns), True)        
@@ -604,7 +607,7 @@ if __name__ == "__main__":
             opts.rootFile = f
             
             # Create directory and subdirectories
-            CreateJob(opts, args)
+            CreatePseudoDir(opts, args)
             aux.PrintFlushed("%sFile %d/%d: %s%s" % (hs, i, nFiles, f, ns), i==1)
         print
 

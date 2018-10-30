@@ -42,6 +42,16 @@ else
     MAXEVENTS=${2}
 fi
 
+# if [ -z "$3" ]
+#   then
+#     echo "=== OUTPUTDIR argument not found. Using default value of multicrab_CaloTkSkim_v92X_<time>"
+#     STIME=`date '+%Hh%Mm%Ss_%d%h%Y'`
+#     OUTPUTDIR="multicrab_CaloTkSkim_v92X_${STIME}"
+# else
+#     STIME=`date '+%Hh%Mm%Ss_%d%h%Y'`
+#     OUTPUTDIR="${3}_${STIME}"
+# fi
+
 #====================================================================================================
 # Define Variables
 #====================================================================================================
@@ -50,34 +60,25 @@ CWD=`pwd`
 
 # Save the submit/start time for future use
 if [ -d ${MCRABDIR} ]; then
-    echo "=== Multicrab directory ${MCRABDIR} found"
+    echo "=== Directory ${MCRABDIR} found"
+
+    # For-loop: All directories in multicrab dir
+    for d in "${MCRABDIR}"/*/; do
+	DATASET=`basename "${d}"`
+	root -l -b -q "run.cc(\"${MCRABDIR}\", \"${DATASET}\", \"\", ${MAXEVENTS})" &
+	# echo "${MCRABDIR} ${DATASET} ${MAXEVENTS}"
+	sleep 2
+    done
 else
     echo "=== Multicrab directory ${MCRABDIR} not found. EXIT"
     exit
 fi
 
-# Remove all histograms-*.root files first
-count=`ls -1 histograms-*.root 2>/dev/null | wc -l`
-if [ $count != 0 ]; then
-    echo "=== Found $count ROOT files in current directory! Deleting all of them.."
-    rm -f histograms-*.root
-fi 
-    echo "=== No ROOT files found in current directory. Proceeding to launching ROOT in batch mode"
-
-# For-loop: All directories in multicrab dir
-for d in "${MCRABDIR}"/*/; do
-    DATASET=`basename "${d}"`
-    # echo "${MCRABDIR} ${DATASET} ${MAXEVENTS}"
-
-    if [ "${DATASET}" == "GluGluHToTauTau_M125_14TeV_powheg_pythia8_PhaseIIFall17D_L1TnoPU_93X" ]; then
-	continue
-    fi
-
-    if echo "${DATASET}" | grep -q "SingleE"; then
-	continue
-    fi
-    
-    echo "=== Submiting ROOT batch job for dataset \"$DATASET\""
-    root -l -b -q "run.cc(\"${MCRABDIR}\", \"${DATASET}\", \"\", ${MAXEVENTS})" &
-    #sleep 3
-    done
+# echo "=== Creating pseudo-multicrab directory"
+# # For-loop: All root files!
+# for f in "${CWD}"/*.root; do
+#     FILE=`basename ${f}`
+#     echo "${FILE}"
+#     hltausPseudoMulticrab.py -f ${FILE} --dir ${OUTPUTDIR}
+#     sleep 1
+#     done
