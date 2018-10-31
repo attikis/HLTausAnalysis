@@ -105,25 +105,9 @@ def GetDatasetsFromDir(opts):
 def PlotHisto(datasetsMgr, h):
     dsetsMgr = datasetsMgr.deepCopy()
 
-    if "_eff" in h.lower():
+    if "_resolution" in h.lower():
         dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False) 
         dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False) 
-        opts.normalizeToOne = False
-    elif "_deltargenp" in h.lower():
-        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False) 
-        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False) 
-    elif "_resolution" in h.lower():
-        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False) 
-        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False) 
-    elif "_rate" in h.lower():
-        opts.normalizeToOne = False
-        for d in dsetsMgr.getAllDatasetNames():
-            if "SingleNeutrino" in d:
-                continue
-            else:
-                dsetsMgr.remove(d, close=False)
-    else:
-        pass
 
     # Create the plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
     kwargs = {}
@@ -155,16 +139,38 @@ def PlotHisto(datasetsMgr, h):
     p._setLegendLabels()
     p._setPlotStyles()
 
+    # Overwrite default settings
+    cNoPU  = ROOT.kAzure
+    cPU140 = ROOT.kRed
+    cPU200 = ROOT.kOrange #kYellow+2
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetFillColor(cNoPU) if "noPU" in h.getName() else h.getRootHisto().SetLineStyle(ROOT.kSolid) )
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetFillStyle(3002) if "noPU" in h.getName() else  h.getRootHisto().SetFillStyle(0) )
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetLineColor(cPU140) if "PU140" in h.getName() else(h.getRootHisto().SetLineColor(cPU200) if"PU200" in h.getName() else h.getRootHisto().SetLineColor(cNoPU) ) )
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerColor(cPU140) if "PU140" in h.getName() else(h.getRootHisto().SetMarkerColor(cPU200) if"PU200" in h.getName() else h.getRootHisto().SetMarkerColor(cNoPU) ) )
+
     # Customise legend
+    dsetName0 = dsetsMgr.getAllDatasetNames()[0].rsplit("_L1T")[0]
     for d in dsetsMgr.getAllDatasetNames():
-        if "SingleNeutrino" in d:
+        # Sanity check
+        dsetName = d.rsplit("_L1T")[0]
+        if dsetName0 != dsetName:
+            msg = "Different types of datasets detected (\"%s\" and \"%s\"). This script is designed for just one type of dataset for different PU" % (dsetName, dsetName0)
+            raise Exception(es + msg + ns)
+        else:
+            # print "*"*100
+            # print dsetName0
+            # print dsetName
+            # print "*"*100
+            pass
+
+        if "noPU" in d:
             p.histoMgr.setHistoLegendStyle(d, "F")
+            p.histoMgr.setHistoDrawStyle(d, "HIST9")
         else:
             p.histoMgr.setHistoLegendStyle(d, "L")
             p.histoMgr.setHistoDrawStyle(d, "HIST9")
 
-            #p.histoMgr.setHistoLegendStyle(d, "P") #"L"
-            #p.histoMgr.setHistoDrawStyle(d, "AP")
+            
 
     # Create legend
     if 0:
@@ -173,7 +179,9 @@ def PlotHisto(datasetsMgr, h):
         p.setLegend(histograms.createLegend(0.58, 0.86-0.04*len(dsetsMgr.getAllDatasetNames()), 0.92, 0.92))
 
     # Draw a customised plot
-    kwargs = GetHistoKwargs(h, opts) 
+    kwargs    = GetHistoKwargs(h, opts) 
+    saveName  = h.replace("L1TkIsoTau_", "")
+    #saveName += #iro
     plots.drawPlot(p, h, **kwargs)
 
     # Remove legend?
@@ -217,7 +225,7 @@ def GetHistoKwargs(h, opts):
     _xMin   = None
     _xMax   = None
     _rmLeg  = False
-    _mvLeg  = {"dx": -0.14, "dy": -0.00, "dh": -0.0}
+    _mvLeg  = {"dx": -0.14, "dy": -0.00, "dh": -0.1}
 
     # Default (tdrstyle.py)
     ROOT.gStyle.SetLabelSize(27, "XYZ")
@@ -318,7 +326,7 @@ def GetBinwidthDecimals(binWidth):
         dec =  " %0.7f"
     return dec
 
-def ReorderDatasets(datasets):
+def ReorderDatasets(datasets, bReverse=False):
     newOrder =  datasets
     
     for i, d in enumerate(datasets, 0):
@@ -334,31 +342,11 @@ def ReorderDatasets(datasets):
         if "noPU" in d:
             newOrder.remove(d)
             newOrder.insert(0, d)
-
-    # Use tau guns for ratio reference => put very first
-    if "SingleTau_L1TPU200" in datasets:
-        newOrder.remove("SingleTau_L1TPU200")
-        newOrder.insert(0,"SingleTau_L1TPU200")
-    if "SingleTau_L1TPU140" in datasets:
-        newOrder.remove("SingleTau_L1TPU140")
-        newOrder.insert(0,"SingleTau_L1TPU140")
-    
-    mb140 = "SingleNeutrino_L1TPU140"
-    mb200 = "SingleNeutrino_L1TPU200"
-    if mb140 in datasets:
-        newOrder.remove(mb140)
-        newOrder.insert(len(newOrder), mb140)
-    if mb200 in datasets:
-        newOrder.remove(mb200)
-        newOrder.insert(len(newOrder), mb200)
-
-#    if mb140 in datasets and mb200 in datasets:
-#        newOrder.remove(mb140)
-#        newOrder.insert(-1, mb140)
-#        newOrder.remove(mb200)
-#        newOrder.insert(-1, mb200)
-
-    return newOrder
+            
+    if bReverse:
+        return reversed(newOrder)
+    else:
+        return newOrder
 
 def main(opts):
     
@@ -403,7 +391,7 @@ def main(opts):
         intLumi = datasetsMgr.getDataset("Data").getLuminosity()
 
     # Apply new dataset order?
-    newOrder = ReorderDatasets(datasetsMgr.getAllDatasetNames())
+    newOrder = ReorderDatasets(datasetsMgr.getAllDatasetNames(), bReverse=False)
     datasetsMgr.selectAndReorder(newOrder)
 
     # Print dataset information (after merge)
