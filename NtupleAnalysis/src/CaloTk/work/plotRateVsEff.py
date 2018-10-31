@@ -160,7 +160,7 @@ def main(opts):
                 dsets_signal.append(d)
 
         # ROC curve ingredients (histograms)
-        effLists    = [["Calo_Ef", "Tk_Eff", "RelIso_Eff", "VtxIso_Eff", "VtxIsoLoose_Eff", "VtxIsoTight_Eff", "RelIsoaLoose_Eff", "RelIsoTight_Eff"], 
+        effLists    = [["Calo_Eff", "Tk_Eff", "RelIso_Eff", "VtxIso_Eff", "VtxIsoLoose_Eff", "VtxIsoTight_Eff", "RelIsoLoose_Eff", "RelIsoTight_Eff"], 
                        ["DiTau_Eff_Calo", "DiTau_Eff_Tk", "DiTau_Eff_RelIso", "DiTau_Eff_VtxIso", "DiTau_Eff_VtxIsoLoose", "DiTau_Eff_VtxIsoTight", "DiTau_Eff_RelIsoLoose", "DiTau_Eff_RelIsoTight", ]]
 
         rateLists   = [["Calo_Rate", "Tk_Rate", "RelIso_Rate", "VtxIso_Rate", "VtxIsoLoose_Rate", "VtxIsoTight_Rate", "RelIsoLoose_Rate", "RelIsoTight_Rate"], 
@@ -189,7 +189,7 @@ def main(opts):
             bPU = b.split("PU")[1]
 
             # Create rate plots (SingleTau, DiTau)
-            if 0:
+            if 1:
                 opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="Rates")
                 PlotRate(datasetsMgr, rateLists[0], b, bPU)
                 PlotRate(datasetsMgr, rateLists[1], b, bPU)
@@ -201,7 +201,7 @@ def main(opts):
                 # Create rate plots (SingleTau, DiTau)
                 if i == 1: # (since inside minBias loop)
                     opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="Efficiencies")
-                    if 0:
+                    if 1:
                         PlotEfficiency(datasetsMgr, effLists[0], s, sPU)
                         PlotEfficiency(datasetsMgr, effLists[1], s, sPU)
 
@@ -217,7 +217,7 @@ def main(opts):
                     eff  = effLists[k]
                     rate = rateLists[k]
                     Verbose("Bkg = %s, Signal = %s" % (b, s), False)
-                    if 0:
+                    if 1:
                         opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="ROC")
                         PlotRateVsEff(datasetsMgr, eff, rate, s, b, sPU, bPU)
 

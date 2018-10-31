@@ -288,7 +288,7 @@ def GetHistoKwargs(h, opts):
     if "resolutionet_" in h.lower():
         _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
         _kwargs["opts"]       = {"xmin": -1.0, "xmax": 3.0, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
-        _kwargs["rebinX"]     = 50
+        _kwargs["rebinX"]     = 10
         #_kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
         #_kwargs["moveLegend"] = _mvLeg1
         ROOT.gStyle.SetNdivisions(8, "X")
