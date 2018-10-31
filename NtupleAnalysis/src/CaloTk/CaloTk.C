@@ -1817,27 +1817,27 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEt_withNeutrals, "L1TkIsoTau_ResolutionEt_withNeutrals", ";#delta E_{T} / E_{T}^{vis};Events / %.0f GeV", 2000, -10.0, +10.0);
   histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEt_noNeutrals  , "L1TkIsoTau_ResolutionEt_noNeutrals"  , ";#delta E_{T} / E_{T}^{vis};Events / %.0f GeV", 2000, -10.0, +10.0);
 
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta    , "L1TkIsoTau_ResolutionEta"    , ";#delta #eta / #eta^{vis};Events / %.2f", 2000, -1.0, +1.0);
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta_1pr, "L1TkIsoTau_ResolutionEta_1pr", ";#delta #eta / #eta^{vis};Events / %.2f", 2000, -1.0, +1.0);
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta_3pr, "L1TkIsoTau_ResolutionEta_3pr", ";#delta #eta / #eta^{vis};Events / %.2f", 2000, -1.0, +1.0);
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta_withNeutrals, "L1TkIsoTau_ResolutionEta_withNeutrals", ";#delta #eta / #eta^{vis};Events / %.2f", 2000, -1.0, +1.0);
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta_noNeutrals  , "L1TkIsoTau_ResolutionEta_noNeutrals"  , ";#delta #eta / #eta^{vis};Events / %.2f", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta    , "L1TkIsoTau_ResolutionEta"    , ";#delta #eta / #eta^{vis};Events / %.2f", 2000, -10.0, +10.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta_1pr, "L1TkIsoTau_ResolutionEta_1pr", ";#delta #eta / #eta^{vis};Events / %.2f", 2000, -10.0, +10.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta_3pr, "L1TkIsoTau_ResolutionEta_3pr", ";#delta #eta / #eta^{vis};Events / %.2f", 2000, -10.0, +10.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta_withNeutrals, "L1TkIsoTau_ResolutionEta_withNeutrals", ";#delta #eta / #eta^{vis};Events / %.2f", 2000, -10.0, +10.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta_noNeutrals  , "L1TkIsoTau_ResolutionEta_noNeutrals"  , ";#delta #eta / #eta^{vis};Events / %.2f", 2000, -10.0, +10.0);
 
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi    , "L1TkIsoTau_ResolutionPhi"    , ";#delta #phi / #phi^{vis};Events / %.2f rads", 2000, -1.0, +1.0);
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi_1pr, "L1TkIsoTau_ResolutionPhi_1pr", ";#delta #phi / #phi^{vis};Events / %.2f rads", 2000, -1.0, +1.0);
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi_3pr, "L1TkIsoTau_ResolutionPhi_3pr", ";#delta #phi / #phi^{vis};Events / %.2f rads", 2000, -1.0, +1.0);
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi_withNeutrals, "L1TkIsoTau_ResolutionPhi_withNeutrals", ";#phi (rads);Events / %.2f rads", 2000, -1.0, +1.0);
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi_noNeutrals  , "L1TkIsoTau_ResolutionPhi_noNeutrals"  , ";#phi (rads);Events / %.2f rads", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi    , "L1TkIsoTau_ResolutionPhi"    , ";#delta #phi / #phi^{vis};Events / %.2f rads", 2000, -10.0, +10.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi_1pr, "L1TkIsoTau_ResolutionPhi_1pr", ";#delta #phi / #phi^{vis};Events / %.2f rads", 2000, -10.0, +10.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi_3pr, "L1TkIsoTau_ResolutionPhi_3pr", ";#delta #phi / #phi^{vis};Events / %.2f rads", 2000, -10.0, +10.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi_withNeutrals, "L1TkIsoTau_ResolutionPhi_withNeutrals", ";#phi (rads);Events / %.2f rads", 2000, -10.0, +10.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi_noNeutrals  , "L1TkIsoTau_ResolutionPhi_noNeutrals"  , ";#phi (rads);Events / %.2f rads", 2000, -10.0, +10.0);
 
   histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEt_C , "L1TkIsoTau_ResolutionEt_C" , ";E_{T} (GeV);Events / %.0f GeV" , 2000, -10.0, +10.0);
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta_C, "L1TkIsoTau_ResolutionEta_C", ";#eta;Events / %.2f"            , 2000, -1.0, +1.0);
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi_C, "L1TkIsoTau_ResolutionPhi_C", ";#phi (rads);Events / %.2f rads", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta_C, "L1TkIsoTau_ResolutionEta_C", ";#eta;Events / %.2f"            , 2000, -10.0, +10.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi_C, "L1TkIsoTau_ResolutionPhi_C", ";#phi (rads);Events / %.2f rads", 2000, -10.0, +10.0);
   histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEt_I , "L1TkIsoTau_ResolutionEt_I" , ";E_{T} (GeV);Events / %.0f GeV" , 2000, -10.0, +10.0);
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta_I, "L1TkIsoTau_ResolutionEta_I", ";#eta;Events / %.2f"            , 2000, -1.0, +1.0);
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi_I, "L1TkIsoTau_ResolutionPhi_I", ";#phi (rads);Events / %.2f rads", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta_I, "L1TkIsoTau_ResolutionEta_I", ";#eta;Events / %.2f"            , 2000, -10.0, +10.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi_I, "L1TkIsoTau_ResolutionPhi_I", ";#phi (rads);Events / %.2f rads", 2000, -10.0, +10.0);
   histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEt_F , "L1TkIsoTau_ResolutionEt_F" , ";E_{T} (GeV);Events / %.0f GeV" , 2000, -10.0, +10.0);
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta_F, "L1TkIsoTau_ResolutionEta_F", ";#eta;Events / %.2f"            , 2000, -1.0, +1.0);
-  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi_F, "L1TkIsoTau_ResolutionPhi_F", ";#phi (rads);Events / %.2f rads", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionEta_F, "L1TkIsoTau_ResolutionEta_F", ";#eta;Events / %.2f"            , 2000, -10.0, +10.0);
+  histoTools_.BookHisto_1D(hL1IsoTau_ResolutionPhi_F, "L1TkIsoTau_ResolutionPhi_F", ";#phi (rads);Events / %.2f rads", 2000, -10.0, +10.0);
 
   // SingleTau
   histoTools_.BookHisto_1D(hCalo_Rate    , "Calo_Rate"    , "", nEt , minEt , maxEt );
