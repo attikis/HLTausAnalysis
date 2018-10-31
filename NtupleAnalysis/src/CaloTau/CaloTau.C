@@ -177,24 +177,19 @@ void CaloTau::Loop()
 	PrintGenParticleCollection(GenTausTrigger);
       }
 
-    
-    std::cout << "\n=====> 1" << std::endl;
-    // Tau Collections
+        // Tau Collections
     vector<L1Tau> L1Taus = GetL1Taus(false);
     sort(L1Taus.begin(), L1Taus.end(), [](L1Tau& a, L1Tau& b) {return a.et()  > b.et();});
-    std::cout << "\n=====> 1a" << std::endl;
     vector<L1TkTauParticle> CaloTaus;
     vector<L1TkTauParticle> CaloTausIso;
     vector<L1TkTauParticle> CaloTaus_MC;
     vector<L1TkTauParticle> CaloTausIso_MC;
-    std::cout << "\n=====> 1b" << std::endl;
 
     // Ensure that all taus are found
     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
     if (bFoundAllTaus_) nEvtsWithMaxHTaus++;
     else if (!isMinBias) continue;
 
-    std::cout << "\n=====> 2" << std::endl;
     // ======================================================================================
     // For-loop: GenTausHadronic
     // ======================================================================================
@@ -249,7 +244,6 @@ void CaloTau::Loop()
 	  }// Ask for 3-prong or 5-prong decay
       }
 
-    std::cout << "\n=====> 3" << std::endl;    
     // ======================================================================================
     // CaloTaus
     // ======================================================================================
@@ -283,6 +277,13 @@ void CaloTau::Loop()
 			    dR_match_min  , dR_match_max,
 			    dR_isoCone_min, dR_isoCone_max);
 	
+	// Assign values to the L1TkTau
+	// std::cout << "calo->index() = " << calo->index() << std::endl;
+	//tau.SetCaloTau(calo->index());
+	tau.SetCaloTau(*calo);
+	// tau.SetMatchingTk(matchTk);
+	// tau.SetMatchTkDeltaRNew(matchTk_dR);
+
 	// Get the smatching gen-particle
 	GetMatchingGenParticle(tau, GenTausTrigger);
 
@@ -323,7 +324,6 @@ void CaloTau::Loop()
       }
     if (bFoundMC) nEvtsMcMatch++;
 
-    std::cout << "\n=====> 4" << std::endl;    
     // Sort CaloTaus by Et
     sort(CaloTaus.begin(), CaloTaus.end(), [](L1TkTauParticle&a, L1TkTauParticle& b) {return a.GetCaloTau().et()  > b.GetCaloTau().et();});
     sort(CaloTaus_MC.begin(), CaloTaus_MC.end(), [](L1TkTauParticle&a, L1TkTauParticle& b) {return a.GetCaloTau().et()  > b.GetCaloTau().et();});
@@ -333,16 +333,9 @@ void CaloTau::Loop()
     // Fill histos
     hCalo_Multiplicity       ->Fill( CaloTaus.size() );
     hCalo_Multiplicity_MC    ->Fill( CaloTaus_MC.size() );
-    std::cout << "\n===== CaloTaus.size() " << CaloTaus.size() << std::endl;
-    std::cout << "\n===== CaloTausIso.size() " << CaloTausIso.size() << std::endl;
-    std::cout << "\n===== CaloTaus_MC.size() " << CaloTaus_MC.size() << std::endl;
-    std::cout << "\n===== CaloTausIso_MC.size() " << CaloTausIso_MC.size() << std::endl;
-    std::cout << "\n=====> 4a" << std::endl;
     hCaloIso_Multiplicity    ->Fill( CaloTausIso.size() );
-    std::cout << "\n=====> 4b" << std::endl;
     hCaloIso_Multiplicity_MC ->Fill( CaloTausIso_MC.size() );
-
-    std::cout << "\n=====> 5" << std::endl;
+  
     ////////////////////////////////////////////////
     /// CaloTauIso Properties 
     ////////////////////////////////////////////////
@@ -468,7 +461,6 @@ void CaloTau::Loop()
       }// CaloTausIso
 
 
-    std::cout << "\n=====> 6" << std::endl;
     ////////////////////////////////////////////////
     // Fill Turn-On histograms
     ////////////////////////////////////////////////
@@ -494,7 +486,6 @@ void CaloTau::Loop()
 	  }
       }
 
-    std::cout << "\n=====> 7" << std::endl;
     ////////////////////////////////////////////////
     // Turn-Ons
     ////////////////////////////////////////////////
@@ -504,7 +495,6 @@ void CaloTau::Loop()
     FillTurnOn_Numerator_(CaloTausIso, 25.0, hCaloIso_TurnOn25, hCaloIso_TurnOn25_1pr, hCaloIso_TurnOn25_3pr, hCaloIso_TurnOn25_withNeutrals, hCaloIso_TurnOn25_noNeutrals);
     FillTurnOn_Numerator_(CaloTausIso, 50.0, hCaloIso_TurnOn25, hCaloIso_TurnOn25_1pr, hCaloIso_TurnOn25_3pr, hCaloIso_TurnOn25_withNeutrals, hCaloIso_TurnOn25_noNeutrals);
 
-    std::cout << "\n=====> 8" << std::endl;
     ////////////////////////////////////////////////
     // SingleTau
     ////////////////////////////////////////////////
@@ -518,7 +508,6 @@ void CaloTau::Loop()
     FillSingleTau_(CaloTausIso, hCaloIso_Rate_I, hCaloIso_Eff_I, 1.0, 1.6);
     FillSingleTau_(CaloTausIso, hCaloIso_Rate_F, hCaloIso_Eff_F, 1.6, 3.0); // 2.5 is max
 
-    std::cout << "\n=====> 9" << std::endl;
     ////////////////////////////////////////////////
     // DiTau
     ////////////////////////////////////////////////
@@ -532,7 +521,6 @@ void CaloTau::Loop()
     FillDiTau_(CaloTausIso, hCaloIso_Rate_DiTau_I, hCaloIso_Eff_DiTau_I, 1.0, 1.6);
     FillDiTau_(CaloTausIso, hCaloIso_Rate_DiTau_F, hCaloIso_Eff_DiTau_F, 1.6, 3.0);
 
-    std::cout << "\n=====> 10" << std::endl;
     // Progress bar
     if (!DEBUG) auxTools_.ProgressBar(jentry, nEntries, 100, 100);
     
@@ -571,7 +559,6 @@ void CaloTau::Loop()
   ////////////////////////////////////////////////
   // Convert/Finalise Histos
   ////////////////////////////////////////////////
-  std::cout << "\n=====> 11" << std::endl;
   double N = nEntries;
   if (isMinBias) // new: speed things up a bit (Rate plots only make sense for Neutrino gun!)
     {
@@ -623,42 +610,32 @@ void CaloTau::Loop()
       FinaliseEffHisto_( hCaloIso_Eff_DiTau_F, nEvtsWithMaxHTaus);
 
     }
-  std::cout << "\n=====> 12" << std::endl;
       
   ////////////////////////////////////////////////
   // Turn-Ons
   ////////////////////////////////////////////////
-  std::cout << "\n=====> 13" << std::endl;
   histoTools_.DivideHistos_1D(hCalo_TurnOn25             , hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hCalo_TurnOn25_1pr         , hMcHadronicTau_VisEt_1pr);
   histoTools_.DivideHistos_1D(hCalo_TurnOn25_3pr         , hMcHadronicTau_VisEt_3pr);
   histoTools_.DivideHistos_1D(hCalo_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
   histoTools_.DivideHistos_1D(hCalo_TurnOn25_noNeutrals  , hMcHadronicTau_VisEt_noNeutrals);
-  std::cout << "\n=====> 14" << std::endl;
   histoTools_.DivideHistos_1D(hCalo_TurnOn50             , hMcHadronicTau_VisEt);
-  std::cout << "\n=====> 14a" << std::endl;
   histoTools_.DivideHistos_1D(hCalo_TurnOn50_1pr         , hMcHadronicTau_VisEt_1pr);
-  std::cout << "\n=====> 14b" << std::endl;
   histoTools_.DivideHistos_1D(hCalo_TurnOn50_3pr         , hMcHadronicTau_VisEt_3pr);
-  std::cout << "\n=====> 14c" << std::endl;
   histoTools_.DivideHistos_1D(hCalo_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
-  std::cout << "\n=====> 14d" << std::endl;
   histoTools_.DivideHistos_1D(hCalo_TurnOn50_noNeutrals  , hMcHadronicTau_VisEt_noNeutrals);
   //
-  std::cout << "\n=====> 15" << std::endl;
   histoTools_.DivideHistos_1D(hCaloIso_TurnOn25             , hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hCaloIso_TurnOn25_1pr         , hMcHadronicTau_VisEt_1pr);
   histoTools_.DivideHistos_1D(hCaloIso_TurnOn25_3pr         , hMcHadronicTau_VisEt_3pr);
   histoTools_.DivideHistos_1D(hCaloIso_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
   histoTools_.DivideHistos_1D(hCaloIso_TurnOn25_noNeutrals  , hMcHadronicTau_VisEt_noNeutrals);
-  std::cout << "\n=====> 16" << std::endl;
   histoTools_.DivideHistos_1D(hCaloIso_TurnOn50             , hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hCaloIso_TurnOn50_1pr         , hMcHadronicTau_VisEt_1pr);
   histoTools_.DivideHistos_1D(hCaloIso_TurnOn50_3pr         , hMcHadronicTau_VisEt_3pr);
   histoTools_.DivideHistos_1D(hCaloIso_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
   histoTools_.DivideHistos_1D(hCaloIso_TurnOn50_noNeutrals  , hMcHadronicTau_VisEt_noNeutrals);
 
-  std::cout << "\n=====> 17" << std::endl;
   ////////////////////////////////////////////////
   // Write the histograms to the file
   ////////////////////////////////////////////////
@@ -1490,7 +1467,7 @@ void CaloTau::FillTurnOn_Numerator_(vector<L1TkTauParticle> L1Taus,
 
 //============================================================================
 void CaloTau::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
-				    vector<GenParticle> hadGenTaus)					    
+				     vector<GenParticle> hadGenTaus)					    
 //============================================================================
 {
 
@@ -1498,7 +1475,8 @@ void CaloTau::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
   if (hadGenTaus.size() < 1 ) return;
 
   // Initialise
-  TTTrack matchTk  = L1TkTau.GetMatchingTk();
+  double caloEta   = L1TkTau.GetCaloTau().eta();
+  double caloPhi   = L1TkTau.GetCaloTau().phi();
   double match_dR  = 9999.9;
   GenParticle match_GenParticle;
   
@@ -1511,7 +1489,9 @@ void CaloTau::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
       if (0) tau->PrintFinalDaughtersCharged();
 
       TLorentzVector p4charged = tau->p4charged(false);
-      double deltaR = auxTools_.DeltaR( p4charged.Eta(), p4charged.Phi(), matchTk.getEta(), matchTk.getPhi() ); //fixme: why not the signalTks p4?
+
+      double deltaR = auxTools_.DeltaR( p4charged.Eta(), p4charged.Phi(), caloEta, caloPhi ); 
+      // std::cout << "dR = " << deltaR << ", caloEta = " << caloEta << ", caloPhi = " << caloPhi << ", p4charged.Eta() = "<< p4charged.Eta() << ", p4charged.Phi() = " << p4charged.Phi() << std::endl;
       if (deltaR > mcMatching_dRMax) continue;
       if (deltaR < match_dR)
 	{
