@@ -73,7 +73,7 @@ void TkTaus::InitVars_()
   // Isolation cone
   isoCone_Constant = +2.5;          // 2.3 by fit on fit on ldg pT (Fotis)
   isoCone_dRMin    = sigCone_dRMax; // 0.4
-  isoCone_dRMax    = +0.50;         // 0.30
+  isoCone_dRMax    = +0.30;         // 0.30
   isoCone_useCone  = false; // instead of annulus
 
   // Tau object
