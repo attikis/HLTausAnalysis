@@ -85,7 +85,7 @@ void CaloTk::InitVars_()
   diTau_deltaPOCAz = +1.00; // cm
 
   // MC matching
-  mcMatching_dRMax  = +0.05; // was 0.1 but I wanted to decrease because i think it caused the turn-on eff to be > 1.0 in some bins (double-matching?)
+  mcMatching_dRMax  = +0.1; // was 0.1 but I wanted to decrease because i think it caused the turn-on eff to be > 1.0 in some bins (double-matching?)
   mcMatching_unique = true;
 
   // Eta Regions
@@ -415,8 +415,10 @@ void CaloTk::Loop()
 	if(DEBUG) cout << "\tGetting the GenParticles" << endl;
 	if (0) GenParticles = GetGenParticles(false); // time-consuming
 	GenTaus             = GetGenParticles(15, true);
-	GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 1.479); // CaloTaus currently eta-restricted
-	GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 1.479); // CaloTaus currently eta-restricted
+	// GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 1.479); // CaloTaus currently eta-restricted
+	// GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 1.479); // CaloTaus currently eta-restricted
+	GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 1.3); // CaloTaus currently eta-restricted
+	GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 1.3); // CaloTaus currently eta-restricted
       }
 
     if (DEBUG)

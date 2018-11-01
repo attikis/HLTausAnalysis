@@ -225,18 +225,24 @@ def main(opts):
             # Create rate plots (SingleTau, DiTau) 
             if 1: 
                 opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="TurnOns")
-                PlotTurnOns(datasetsMgr, turnOnLists[0], s, PU, "TurnOns_25GeV_%s_Inclusive" % (s) )
+
+                PlotTurnOns(datasetsMgr, turnOnLists[0], s, PU, "TurnOns_25GeV_%s_Inclusive" % (s), prefix)
                 PlotTurnOns(datasetsMgr, turnOnLists[1], s, PU, "TurnOns_50GeV_%s_Inclusive" % (s) )
+
                 PlotTurnOns(datasetsMgr, turnOnLists_noNeutrals[0], s, PU, "TurnOns_25GeV_%s_noNeutrals" % (s) )
                 PlotTurnOns(datasetsMgr, turnOnLists_noNeutrals[1], s, PU, "TurnOns_50GeV_%s_noNeutrals" % (s) )
+
                 PlotTurnOns(datasetsMgr, turnOnLists_withNeutrals[0], s, PU, "TurnOns_25GeV_%s_withNeutrals" % (s) )
                 PlotTurnOns(datasetsMgr, turnOnLists_withNeutrals[1], s, PU, "TurnOns_50GeV_%s_withNeutrals" % (s) )
+
                 PlotTurnOns(datasetsMgr, turnOnLists_1pr[0], s, PU, "TurnOns_25GeV_%s_1pr" % (s) )
                 PlotTurnOns(datasetsMgr, turnOnLists_1pr[1], s, PU, "TurnOns_50GeV_%s_1pr" % (s) )
+
                 PlotTurnOns(datasetsMgr, turnOnLists_3pr[0], s, PU, "TurnOns_25GeV_%s_3pr" % (s) )
                 PlotTurnOns(datasetsMgr, turnOnLists_3pr[1], s, PU, "TurnOns_50GeV_%s_3pr" % (s) )
-                PlotTurnOns(datasetsMgr, turnOnLists_all[0], s, PU, "TurnOns_25GeV_%s_all" % (s) )
-                PlotTurnOns(datasetsMgr, turnOnLists_all[1], s, PU, "TurnOns_50GeV_%s_all" % (s) )
+
+                PlotTurnOns(datasetsMgr, turnOnLists_all[0], s, PU, "TurnOns_25GeV_%s_VtxIso_allModes" % (s) )
+                PlotTurnOns(datasetsMgr, turnOnLists_all[1], s, PU, "TurnOns_50GeV_%s_VtxIso_allModes" % (s) )
         print
 
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)

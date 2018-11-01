@@ -422,6 +422,15 @@ def GetHistoKwargs(h, opts):
         _xMax   = 1.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
+    if "_iso" in hName:
+        _units  = ""
+        _format = "%0.f " + _units
+        _xLabel = "is Isolated"
+        _rebinX = 1
+        _xMin   = 0.0
+        _xMax   = 1.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = False
     if "ismerged" in hName:
         _units  = ""
         _format = "%0.f " + _units
