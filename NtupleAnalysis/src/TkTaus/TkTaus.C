@@ -74,7 +74,7 @@ void TkTaus::InitVars_()
   isoCone_Constant = +2.5;          // 2.3 by fit on fit on ldg pT (Fotis)
   isoCone_dRMin    = sigCone_dRMax; // 0.4
   isoCone_dRMax    = +0.30;         // 0.30
-  isoCone_useCone  = false; // instead of annulus
+  isoCone_useCone  = true;          // instead of annulus
 
   // Tau object
   tau_jetWidth  = +0.50;  // considers both sigTks and isoTks

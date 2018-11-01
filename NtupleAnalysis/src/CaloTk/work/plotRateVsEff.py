@@ -191,8 +191,8 @@ def main(opts):
             # Create rate plots (SingleTau, DiTau)
             if 1:
                 opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="Rates")
-                PlotRate(datasetsMgr, rateLists[0], b, bPU)
-                PlotRate(datasetsMgr, rateLists[1], b, bPU)
+                PlotRate(datasetsMgr, rateLists[0], b, bPU, "SingleTau")
+                PlotRate(datasetsMgr, rateLists[1], b, bPU, "DiTau")
             
             # For-loop: All signal histos
             for j, s in enumerate(dsets_signal, 1):
@@ -202,8 +202,8 @@ def main(opts):
                 if i == 1: # (since inside minBias loop)
                     opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="Efficiencies")
                     if 1:
-                        PlotEfficiency(datasetsMgr, effLists[0], s, sPU)
-                        PlotEfficiency(datasetsMgr, effLists[1], s, sPU)
+                        PlotEfficiency(datasetsMgr, effLists[0], s, sPU, "SingleTau")
+                        PlotEfficiency(datasetsMgr, effLists[1], s, sPU, "DiTau")
 
                 # Skip non-matching signal and bkg PU pairs?
                 if sPU != bPU and sPU != "":
@@ -246,10 +246,9 @@ def main(opts):
     return
 
 
-def PlotRate(datasetsMgr, histoList, bkg, PU):
+def PlotRate(datasetsMgr, histoList, bkg, PU, taus):
 
     # Get Histogram name and its kwargs
-    taus     = "SingleTau"
     saveName = "Rate_%s_PU%s" % (taus, PU)
     kwargs   = GetHistoKwargs(saveName, opts)
     hList    = []
@@ -259,8 +258,7 @@ def PlotRate(datasetsMgr, histoList, bkg, PU):
     # For-loop: All tau algorithms
     for i, hName in enumerate(histoList, 0):
         algo = hName.split("_")[0]
-        if algo == "DiTau":
-            taus = "DiTau"
+        if taus == "DiTau":
             algo = hName.split("_")[-1]
         
         aux.PrintFlushed("Plotting rate (%s-%s)" % (algo, taus), False)
@@ -286,7 +284,7 @@ def PlotRate(datasetsMgr, histoList, bkg, PU):
     p.histoMgr.setHistoLegendLabelMany(legDict)
 
     # Draw and save the plot
-    saveName = "Rate_%s_PU%s" % (taus, PU)
+    saveName = saveName.replace("Rate_", "")
     plots.drawPlot(p, saveName, **kwargs)
 
     # Add additional canvas text
@@ -298,10 +296,9 @@ def PlotRate(datasetsMgr, histoList, bkg, PU):
     #print
     return
 
-def PlotEfficiency(datasetsMgr, histoList, signal, PU):
+def PlotEfficiency(datasetsMgr, histoList, signal, PU, taus):
 
     # Get Histogram name and its kwargs
-    taus     = "SingleTau"
     saveName = "Efficiency_%s_%s" % (taus, signal)
     kwargs   = GetHistoKwargs(saveName, opts)
     hList    = []
@@ -312,7 +309,7 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
     count = -1
     for i, hName in enumerate(histoList, 0):
         algo = hName.split("_")[0]
-        if algo == "DiTau":
+        if taus == "DiTau":
 
             if "TT_" in signal or "GluGlu" in signal:
                 pass
@@ -323,7 +320,6 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
             algo = hName.split("_")[-1]
         count+=1  
         aux.PrintFlushed("Plotting efficiency (%s-%s-%s)" % (algo, taus, signal), False) #count==0)
-        #aux.Print("Plotting efficiency (%s-%s-%s)" % (algo, taus, signal), False) #count==0)
         h = datasetsMgr.getDataset(signal).getDatasetRootHisto(hName).getHistogram()
         h.SetName(hName)
         legDict[hName] = algos[i]
@@ -336,7 +332,7 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
     for h in p.histoMgr.getHistos():
         hName = h.getName()
         algo  = h.getName().split("_")[0]
-        if algo == "DiTau":
+        if taus == "DiTau":
             algo = hName.split("_")[-1]
         p.histoMgr.forHisto(hName, styles.getTauAlgoStyle(algo))
         p.histoMgr.setHistoDrawStyle(hName, "HIST")
@@ -346,7 +342,8 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
     p.histoMgr.setHistoLegendLabelMany(legDict)
 
     # Draw and save the plot
-    saveName = "Efficiency_%s_%s_%s" % (taus, algo, signal)
+    saveName = "%s_%s" % (taus, signal)
+    saveName = saveName.replace("Efficiency_", "")
     plots.drawPlot(p, saveName, **kwargs)
 
     # Add additional canvas text
@@ -407,6 +404,7 @@ def PlotTurnOns(datasetsMgr, histoList, signal, PU, saveName=None):
     p.histoMgr.setHistoLegendLabelMany(legDict)
 
     # Draw and save the plot
+    saveName = saveName.replace("TurnOns_", "")
     plots.drawPlot(p, saveName, **kwargs)
 
     # Add additional canvas text
@@ -438,28 +436,31 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, sPU, bP
     for i in range (0, len(effHistoList)):
         if (i==0):
             g1 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
-            g1.SetName("Tk")
+            g1.SetName("Calo")
         elif (i==1):
             g2 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
-            g2.SetName("RelIso")
+            g2.SetName("Tk")
         elif (i==2):
             g3 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
-            g3.SetName("VtxIso")
+            g3.SetName("RelIso")
         elif (i==3):
             g4 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
-            g4.SetName("VtxIsoLoose")
+            g4.SetName("VtxIso")
         elif (i==4):
             g5 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
-            g5.SetName("VtxIsoTight")
+            g5.SetName("VtxIsoLoose")
         elif (i==5):
             g6 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
-            g6.SetName("RelIsoLoose")
+            g6.SetName("VtxIsoTight")
         elif (i==6):
             g7 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
-            g7.SetName("RelIsoTight")
+            g7.SetName("RelIsoLoose")
+        elif (i==7):
+            g8 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
+            g8.SetName("RelIsoTight")
 
     # Create the Rate Vs Efficiency TGraphs
-    p = plots.ComparisonManyPlot(g1, [g2, g3, g4, g5, g6, g7], saveFormats=[])
+    p = plots.ComparisonManyPlot(g1, [g2, g3, g4, g5, g6, g7, g8], saveFormats=[])
     algos = getAlgos()
 
     # Set individual styles
@@ -683,7 +684,7 @@ def GetHistoKwargs(h, opts):
         _kwargs["xlabel"]     = "E_{T} (%s)" % (units)
         _kwargs["ylabel"]     = "Efficiency / %0.0f " + units
         _kwargs["log"]        = False
-        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 100.0, "ymin": 0.0, "ymax": 1.0, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 200.0, "ymin": 0.0, "ymax": 1.0, "ymaxfactor": yMaxF}
         _kwargs["moveLegend"] = _mvLeg2 #_mvLeg3
         _kwargs["cutBoxY"]    = {"cutValue": 50, "fillColor": 16, "box": False, "line": False, "cutGreaterThan": False}
         _kwargs["cutBoxX"]    = {"cutValue": 10, "fillColor": 16, "box": True, "line": True, "cutGreaterThan": False}

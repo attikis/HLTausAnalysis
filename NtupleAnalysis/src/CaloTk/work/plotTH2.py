@@ -261,7 +261,7 @@ def GetHistoKwargs(h, opts):
 
     if "VisEt_Vs_dRMax" in h:
         _kwargs["opts"]    = {"xmin": 0.0, "xmax": 0.3, "ymin": 0.0, "ymax": 120.0}
-        _kwargs["cutBox"]  = {"cutValue":  0.17, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _kwargs["cutBox"]  = {"cutValue":  0.25, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         _kwargs["cutBoxY"] = {"cutValue": 20.00, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if "PtLdg_Vs_dRMax" in h:
@@ -412,7 +412,7 @@ def Plot2dHistograms(datasetsMgr, dsetName, histoName, index):
     xmin = 0
     xmax = 0
     if "GenP_VisEt_Vs" in histoName:
-        const=   3.5
+        const=   5.0 #3.5
         coeff=   1.0        
         step =   100    
         xmin =   0

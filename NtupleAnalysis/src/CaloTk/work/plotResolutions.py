@@ -296,13 +296,13 @@ def GetHistoKwargs(h, opts):
     if "resolutioneta_" in h.lower():
         _kwargs["xlabel"]     = "#delta#eta / #eta^{vis}"
         _kwargs["opts"]       = {"xmin": -0.2, "xmax": 0.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
-        _kwargs["rebinX"]     = 5
+        _kwargs["rebinX"]     = 1
         ROOT.gStyle.SetNdivisions(8, "X")
 
     if "resolutionphi_" in h.lower():
         _kwargs["xlabel"]     = "#delta#phi / #phi^{vis}"
         _kwargs["opts"]       = {"xmin": -0.20, "xmax": 0.20, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
-        _kwargs["rebinX"]     = 5
+        _kwargs["rebinX"]     = 1
         ROOT.gStyle.SetNdivisions(8, "X")
 
     if "cif" in h.lower():
