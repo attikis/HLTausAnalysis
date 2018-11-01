@@ -533,7 +533,7 @@ def getRegionStyle(region):
 
 def getTauAlgoStyle(algo):
 
-    allowedAlgos = ["Calo", "Tk", "VtxIso", "RelIso", "TkCalo", "PFTau", "TkEG",
+    allowedAlgos = ["Calo", "CaloIso", "Tk", "VtxIso", "RelIso", "TkCalo", "PFTau", "TkEG",
                     "VtxIsoLoose", "VtxIsoTight", "RelIsoLoose", "RelIsoTight"]
 
     if algo not in allowedAlgos:
@@ -541,6 +541,8 @@ def getTauAlgoStyle(algo):
 
     if algo == "Calo"or algo == "TkEG":
         return getCaloStyle(0)
+    elif algo == "CaloIso":
+        return getCaloStyle(8)
     elif algo == "Tk": 
         return getCaloStyle(1)
     elif algo == "VtxIso":

@@ -70,7 +70,7 @@ void CaloTk::InitVars_()
   sigCone_cutoffDeltaR    = sigCone_dRMax; // ??? do i need this? (0.15)
 
   // Isolation cone
-  isoCone_Constant = +3.5;          // 3.5 by fit on fit on ldg pT (Fotis)
+  isoCone_Constant = +5.0;          // 3.5 by fit on fit on ldg pT (Fotis)
   isoCone_dRMin    = sigCone_dRMax; // 0.4
   isoCone_dRMax    = +0.40;         // 0.30
   isoCone_useCone  = true; // instead of annulus
