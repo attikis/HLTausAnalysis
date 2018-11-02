@@ -73,8 +73,8 @@ void TkTaus::InitVars_()
   // Isolation cone
   isoCone_Constant = +2.5;          // 2.3 by fit on fit on ldg pT (Fotis)
   isoCone_dRMin    = sigCone_dRMax; // 0.4
-  isoCone_dRMax    = +0.40;         // 0.30
-  isoCone_useCone  = true; // instead of annulus
+  isoCone_dRMax    = +0.30;         // 0.30
+  isoCone_useCone  = true;          // instead of annulus
 
   // Tau object
   tau_jetWidth  = +0.50;  // considers both sigTks and isoTks
@@ -86,7 +86,7 @@ void TkTaus::InitVars_()
   diTau_deltaPOCAz = +1.00; // cm
 
   // MC matching
-  mcMatching_dRMax  = +0.10; //increase to 0.15 ? (i.e. as I had before 15 Oct 2018)
+  mcMatching_dRMax  = +0.05; // was 0.1 but I wanted to decrease because i think it caused the turn-on eff to be > 1.0 in some bins (double-matching?)
   mcMatching_unique = true;
 
   // Eta Regions
@@ -571,7 +571,7 @@ void TkTaus::Loop()
 	double vtxIso = L1TkTauCandidate.CalculateVtxIso(true, isoCone_useCone);
 
 	// Get the matching gen-particle
-	GetMatchingGenParticle(L1TkTauCandidate, GenTausTrigger); // GenTausHadronic
+	GetMatchingGenParticle(L1TkTauCandidate, GenTausTrigger); // GenTausHadronic ?
 	if ( L1TkTauCandidate.HasMatchingGenParticle() ) bFoundMC = true;
 	      
 	// Print information on L1TkTauCandidate ??
@@ -659,7 +659,8 @@ void TkTaus::Loop()
 	    if (bPassVtxIso) L1TkTaus_VtxIso.push_back(*L1TkTau);
 	    if (bPassRelIso) L1TkTaus_RelIso.push_back(*L1TkTau);
 	    if (bPassVtxIsoLoose) L1TkTaus_VtxIsoLoose.push_back(*L1TkTau);
-	    if (bPassVtxIsoTight*bPassJetWidth) L1TkTaus_VtxIsoTight.push_back(*L1TkTau); // fixme: new-testing!
+	    //if (bPassVtxIsoTight*bPassJetWidth) L1TkTaus_VtxIsoTight.push_back(*L1TkTau); // fixme: new-testing!
+	    if (bPassVtxIsoTight*bPassVtxIsoLoose) L1TkTaus_VtxIsoTight.push_back(*L1TkTau); // fixme: new-testing!
 	    if (bPassRelIsoLoose) L1TkTaus_RelIsoLoose.push_back(*L1TkTau);
 	    if (bPassRelIsoTight) L1TkTaus_RelIsoTight.push_back(*L1TkTau);
 	  }
@@ -2584,7 +2585,7 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus1,
     {
       if (L1TkTaus2.size() < 2) return;
       if (0) std::cout << "8) iSubldg1 = " << iSubldg1 << ", L1TkTaus2.size() = " << L1TkTaus2.size() << std::endl;
-      ldgEt2 = L1TkTaus2.at(iSubldg2).GetCaloTau().et(); //fixme! better clean-up needed
+      ldgEt2 = L1TkTaus2.at(iSubldg2).GetSigConeTTTracksP4().Et(); //fixme: better clean-up needed
     }
 
   // Make x-axis the ldgEt axis
@@ -2612,7 +2613,7 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus1,
   if (dR < 0.4)
     {
       if (L1TkTaus2_mcMatched.size() < 2) return;
-      ldgEt2_mcMatched = L1TkTaus2_mcMatched.at(iSubldg2MC).GetCaloTau().et(); //fixme! double-check this
+      ldgEt2_mcMatched = L1TkTaus2_mcMatched.at(iSubldg2MC).GetSigConeTTTracksP4().Et(); //fixme: better clean-up needed
     }
   
   // Check that all taus were found

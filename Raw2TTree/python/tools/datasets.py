@@ -144,7 +144,12 @@ PhaseIIFall17D.extend(datasetsSingleTau)
 #PhaseIIFall17D.extend(datasetsSingleE)
 
 AllDatasets = []
-AllDatasets += PhaseIIFall17D
+AllDatasets.extend(datasetsSingleNu)
+AllDatasets.extend(datasetsTT)
+AllDatasets.extend(datasetsH2tautau)
+AllDatasets.extend(datasetsHPlus)
+AllDatasets.extend(datasetsSingleTau)
+AllDatasets.extend(datasetsSingleE)
 
 #================================================================================================ 
 # Class Definition
@@ -207,6 +212,14 @@ class DatasetGroup:
         Uses pre-defined dictionary mapping: analysis->dataset list
         '''
         return self.GroupDict[self.analysis]
+
+
+    def GetFullDatasetList(self):
+        '''
+        Return the dataset list according to the analysis name. 
+        Uses pre-defined dictionary mapping: analysis->dataset list
+        '''
+        return self.GroupDict["All"]
 
     def GetDatasetListAlt(self):
         '''

@@ -90,7 +90,7 @@ def getDatasetInfo(opts):
     opts.pileup = None    
 
     # For-loop: All datasets objects
-    for i,d in enumerate(dgroup.GetDatasetList(), 1):
+    for i,d in enumerate(dgroup.GetFullDatasetList(), 1):
         Verbose("Attempting to find alias for dataset %s" % d.getName(), i==1)
 
         name  = opts.datasetName
@@ -114,7 +114,7 @@ def getDatasetInfo(opts):
             pass
 
     if opts.datasetAlias == None:
-        raise Exception("%sCould not determine the alias of dataset \"%s\"%s. Check the file \"datasets.py\"" % (es, opts.dataset, ns) )
+        raise Exception("%sCould not determine the alias of dataset \"%s\"%s. Check the file \"datasets.py\"" % (es, opts.datasetName, ns) )
 
     # Get data-version, <PU>, and lumi
     opts.dataVersion = d.getDataVersion()

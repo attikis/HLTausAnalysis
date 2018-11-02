@@ -5,16 +5,17 @@ Basic plotting script for making plots for CaloTk analyzer.
 
 
 USAGE:
-./plotTkTau.py -m <multicrab_directory> [opts]
-./plotTkTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU" -n
-./plotTkTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU|TT_TuneCUETP8M2T4_14TeV_L1TPU140" -n
-./plotTkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|SingleTau|Higgs1000|Higgs500" -n
-./plotTkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|SingleTau|Higgs" -n 
-./plotTkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|Higgs" -n
-./plotTkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p3_VtxIso0p5_RelIso0p2_14h29m15s_23Aug2018 -e "TT|SingleTau|Higgs|SingleE" -n
+./plotTau.py -m <multicrab_directory> [opts]
+./plotTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU" -n
+./plotTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU|TT_TuneCUETP8M2T4_14TeV_L1TPU140" -n
+./plotTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|SingleTau|Higgs1000|Higgs500" -n
+./plotTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|SingleTau|Higgs" -n 
+./plotTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|Higgs" -n
+./plotTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p3_VtxIso0p5_RelIso0p2_14h29m15s_23Aug2018 -e "TT|SingleTau|Higgs|SingleE" -n
+
 
 LAST USED:
-./plotTkTau.py -n -e "SingleE|Charged|TT|GluGlu" -m 
+./plotTau.py -n -e "SingleE|Charged|TT|GluGlu" -m 
 
 
 '''
@@ -1053,4 +1054,4 @@ if __name__ == "__main__":
     main(opts)
 
     if not opts.batchMode:
-        raw_input("=== plotTkTau.py: Press any key to quit ROOT ...")
+        raw_input("=== plotTau.py: Press any key to quit ROOT ...")

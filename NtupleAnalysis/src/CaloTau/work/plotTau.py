@@ -5,16 +5,16 @@ Basic plotting script for making plots for CaloTk analyzer.
 
 
 USAGE:
-./plotTkTau.py -m <multicrab_directory> [opts]
-./plotTkTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU" -n
-./plotTkTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU|TT_TuneCUETP8M2T4_14TeV_L1TPU140" -n
-./plotTkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|SingleTau|Higgs1000|Higgs500" -n
-./plotTkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|SingleTau|Higgs" -n 
-./plotTkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|Higgs" -n
-./plotTkTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p3_VtxIso0p5_RelIso0p2_14h29m15s_23Aug2018 -e "TT|SingleTau|Higgs|SingleE" -n
+./plotTau.py -m <multicrab_directory> [opts]
+./plotTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU" -n
+./plotTau.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU|TT_TuneCUETP8M2T4_14TeV_L1TPU140" -n
+./plotTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|SingleTau|Higgs1000|Higgs500" -n
+./plotTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|SingleTau|Higgs" -n 
+./plotTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|Higgs" -n
+./plotTau.py -m multicrab_CaloTk_v92X_IsoConeRMax0p3_VtxIso0p5_RelIso0p2_14h29m15s_23Aug2018 -e "TT|SingleTau|Higgs|SingleE" -n
 
 LAST USED:
-./plotTkTau.py -n -e "SingleE|Charged|TT|GluGlu" -m 
+./plotTau.py -n -e "SingleE|Charged|TT|GluGlu" -m 
 
 
 '''
@@ -110,25 +110,25 @@ def GetDatasetsFromDir(opts):
 def PlotHisto(datasetsMgr, h):
     dsetsMgr = datasetsMgr.deepCopy()
 
-    if "_eff" in h.lower():
-        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False) 
-        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False) 
-        opts.normalizeToOne = False
-    elif "_deltargenp" in h.lower():
-        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False) 
-        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False) 
-    elif "_resolution" in h.lower():
-        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False) 
-        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False) 
-    elif "_rate" in h.lower():
-        opts.normalizeToOne = False
-        for d in dsetsMgr.getAllDatasetNames():
-            if "SingleNeutrino" in d:
-                continue
-            else:
-                dsetsMgr.remove(d, close=False)
-    else:
-        pass
+#    if "_eff" in h.lower():
+#        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False) 
+#        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False) 
+#        opts.normalizeToOne = False
+#    elif "_deltargenp" in h.lower():
+#        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False) 
+#        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False) 
+#    elif "_resolution" in h.lower():
+#        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False) 
+#        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False) 
+#    elif "_rate" in h.lower():
+#        opts.normalizeToOne = False
+#        for d in dsetsMgr.getAllDatasetNames():
+#            if "SingleNeutrino" in d:
+#                continue
+#            else:
+#                dsetsMgr.remove(d, close=False)
+#    else:
+#        pass
 
     # Create the plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
     kwargs = {}
@@ -449,12 +449,13 @@ def GetHistoKwargs(h, opts):
         _xMax   = 400.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
+        _mvLeg  = {"dx": -0.55, "dy": -0.00, "dh": -0.0}
     if "et" in hName or  "iet" in hName or "_caloisoet" in hName or "_calorawet" in hName:
         _units  = "GeV"
         _format = "%0.f " + _units
         _xLabel = "E_{T} (%s)" % (_units)
         _xMin   =   0.0
-        _xMax   = 200.0
+        _xMax   = 300.0
         if "_caloiet" in hName: 
             _xLabel = "iE_{T} (%s)" % (_units)
         if  "_caloisoet" in hName:
@@ -634,7 +635,10 @@ def GetHistoKwargs(h, opts):
         _format = "%0.0f " + _units
         _xLabel = "tau candidate multiplicity"
         _rebinX = 1
-        _xMax   = 20.0 #+10.0
+        if "calo_mu" in hName:
+            _xMax   = 15.0
+        else:
+            _xMax   = 8.0
         _yLabel = _yNorm + " / " + _format
         _log    = False
     if "_nisotks" in hName:
@@ -684,39 +688,7 @@ def GetHistoKwargs(h, opts):
         _xMax   = +200.0
         _yLabel = _yNorm + " / " + _format
         _log    = True
-    if "_resolution" in hName:
-        _ratio = False
-    if "_resolutionet" in hName:
-        _units  = ""
-        _format = "%0.2f " + _units
-        #_xLabel = "(E_{T}^{calo} - p_{T}^{vis}) / p_{T}^{vis}"
-        _xLabel = "#deltaE_{T} / E_{T}^{vis}"
-        _rebinX = 1
-        _xMin   = -2.0 #-5.5
-        _xMax   = +2.0 #+5.5
-        _yLabel = _yNorm + " / " + _format
-        _log    = True
-        if "_resolutioneta" in hName:
-            #_xLabel = "(#eta^{calo} - #eta^{vis}) / #eta^{vis}"
-            _xLabel = "#delta#eta / #eta^{vis}"
-            _xMin   = -4.0 #-5.5
-            _xMax   = +4.0 #+5.5
-            _yLabel = _yNorm + " / " + _format
-            _log    = True
-            _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-    if "_resolutionphi" in hName:
-        _units  = ""
-        _format = "%0.2f " + _units
-        #_xLabel = "#phi^{calo} - #phi^{vis} / #phi^{vis}"
-        _xLabel = "#delta#phi / #phi^{vis}"
-        _rebinX = 1
-        _xMin   = -2.0 #-5.0
-        _xMax   = +2.0 #+5.0
-        _yLabel = _yNorm + " / " + _format
-        _log    = True
-        _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-    else:
-        ROOT.gStyle.SetNdivisions(8, "X")
+        # ROOT.gStyle.SetNdivisions(8, "X")
     if "_jetwidth" in hName:
         _units  = ""
         _format = "%0.2f " + _units
@@ -917,26 +889,17 @@ def main(opts):
     histoPaths = [os.path.join(opts.folder, h) for h in histoList]
     histoType  = type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram())
     plotCount  = 0
-    skipList   = ["L1TkTau_MatchTk_d0", "L1TkTau_MatchTk_d0Abs", "L1TkTau_SigTks_d0", 
-                  "L1TkTau_SigTks_d0Abs", "L1TkTau_SigTks_d0Sig", "L1TkTau_SigTks_d0SigAbs",
-                  "L1TkTau_IsoTks_d0", "L1TkTau_IsoTks_d0Abs", "L1TkTau_IsoTks_d0Sig", "L1TkTau_IsoTks_d0SigAbs"]#,
-                  #"L1TkIsoTau_IsoTksEt", "L1TkIsoTau_IsoTksEta", "L1TkIsoTau_IsoTks_Pt", "L1TkIsoTau_IsoTks_PtRel", 
-                  #"L1TkIsoTau_IsoTks_DeltaPOCAz", "L1TkIsoTau_IsoTks_DeltaR", "L1TkIsoTau_IsoTks_ChiSquared", 
-                  #"L1TkIsoTau_IsoTks_RedChiSquared", "L1TkIsoTau_IsoTksEtError"]
+    iList      = ["_eff", "_rate", "mchadronic", "turnon", "resolution", "counters"]
 
-    inList = ["_eff", "_rate", "mchadronic", "turnon", "resolution", "counters"]
     # For-loop: All# histos in opts.folder
     for i, h in enumerate(histoPaths, 1):
 
-        # Obsolete quantity
-        if h in skipList:
-            continue
-        
-        # Rate and/or Efficiency histos have not been useful (thus far)
+        # Histos to ignore
         bSkip = False
-        for s in inList:
+        for s in iList:
             if s in h.lower():
                 bSkip = True
+                break
         if bSkip:
             continue                
 
@@ -1028,7 +991,7 @@ if __name__ == "__main__":
     
     # Determine path for saving plots
     if opts.saveDir == None:
-        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="L1TkTau")
+        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="L1Tau")
     else:
         print "opts.saveDir = ", opts.saveDir
 
@@ -1053,4 +1016,4 @@ if __name__ == "__main__":
     main(opts)
 
     if not opts.batchMode:
-        raw_input("=== plotTkTau.py: Press any key to quit ROOT ...")
+        raw_input("=== plotTau.py: Press any key to quit ROOT ...")

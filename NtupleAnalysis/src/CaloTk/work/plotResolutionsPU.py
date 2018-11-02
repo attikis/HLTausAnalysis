@@ -5,17 +5,11 @@ Basic plotting script for making plots for CaloTk analyzer.
 
 
 USAGE:
-./plotCounters.py -m <multicrab_directory> [opts]
-./plotCounters.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU" -n
-./plotCounters.py -m multicrab_CaloTkSkim_v92X_20180801T1203/ -i "SingleNeutrino_L1TPU140|TT_TuneCUETP8M2T4_14TeV_L1TnoPU|TT_TuneCUETP8M2T4_14TeV_L1TPU140" -n
-./plotCounters.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|SingleTau|Higgs1000|Higgs500" -n
-./plotCounters.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|SingleTau|Higgs" -n 
-./plotCounters.py -m multicrab_CaloTk_v92X_IsoConeRMax0p4_VtxIso1p0_08h09m41s_23Aug2018 -e "TT|Glu|Higgs" -n
-./plotCounters.py -m multicrab_CaloTk_v92X_IsoConeRMax0p3_VtxIso0p5_RelIso0p2_14h29m15s_23Aug2018 -e "TT|SingleTau|Higgs|SingleE" -n
+./plotResolutionPU.py -m <multicrab_directory> [opts]
 
 
 LAST USED:
-./plotCounters.py -n -e "SingleE|Charged|TT|GluGlu" -m 
+./plotResolutionsPU.py -i "ChargedHiggs200" -m multicrab_CaloTk_v92X_TEST3_16h49m31s_30Oct2018
 
 
 '''
@@ -109,30 +103,35 @@ def GetDatasetsFromDir(opts):
     
     
 def PlotHisto(datasetsMgr, h):
-    Verbose("Plotting histogram %s" % (h), True)
-
     dsetsMgr = datasetsMgr.deepCopy()
 
-    # Create the plot with selected normalization
+    if "_resolution" in h.lower():
+        dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False) 
+        dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False) 
+
+    # Create the plot with selected normalization ("normalizeToOne", "normalizeByCrossSection", "normalizeToLumi")
     kwargs = {}
     hList  = getHistoList(dsetsMgr, h)
 
     if opts.normalizeToOne:
-        p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[], **kwargs)
-        
-        # For-loop: All histograms in manager
-        normValue = 1.0
-        for hist in p.histoMgr.getHistos():
-            # print "hist.getRootHisto().GetName() = ", hist.getRootHisto().GetName()
-            # print "histo.getRootHistos().GetBinContent(1) = ", hist.getRootHisto().GetBinContent(1)
-            normValue = hist.getRootHisto().GetBinContent(1)
-            hist.getRootHisto().Scale(1.0/normValue)
-            
-        # Normalise wrt bin #1
-        #p.histoMgr.forEachHisto(lambda h: h.getRootHisto().Scale(1.0/normValue) )
+        if 1:
+            p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[], **kwargs)
+            norm = True
+            for hist in p.histoMgr.getHistos():
+                if hist.getRootHisto().Integral() == 0:
+                    norm = False
+                    break
+            if (norm):
+                p.histoMgr.forEachHisto(lambda h: h.getRootHisto().Scale(1.0/h.getRootHisto().Integral()) )
+        else:
+            # p = plots.MCPlot(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
+            p = plots.PlotSameBase(dsetsMgr, h, normalizeToOne=True, saveFormats=[], **kwargs)
     else:
-        p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[], **kwargs)
-        #p = plots.PlotSameBase(dsetsMgr, h, saveFormats=[], **kwargs)
+        if 1:
+            p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[], **kwargs) #FIXME
+        else:
+            # p = plots.MCPlot(dsetsMgr, h, normalizeToLumi=opts.intLumi, saveFormats=[], **kwargs)
+            p = plots.PlotSameBase(dsetsMgr, h, saveFormats=[], **kwargs)
             
     
     # Set default styles (Called by default in MCPlot)
@@ -140,13 +139,38 @@ def PlotHisto(datasetsMgr, h):
     p._setLegendLabels()
     p._setPlotStyles()
 
+    # Overwrite default settings
+    cNoPU  = ROOT.kAzure
+    cPU140 = ROOT.kRed
+    cPU200 = ROOT.kOrange #kYellow+2
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetFillColor(cNoPU) if "noPU" in h.getName() else h.getRootHisto().SetLineStyle(ROOT.kSolid) )
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetFillStyle(3002) if "noPU" in h.getName() else  h.getRootHisto().SetFillStyle(0) )
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetLineColor(cPU140) if "PU140" in h.getName() else(h.getRootHisto().SetLineColor(cPU200) if"PU200" in h.getName() else h.getRootHisto().SetLineColor(cNoPU) ) )
+    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().SetMarkerColor(cPU140) if "PU140" in h.getName() else(h.getRootHisto().SetMarkerColor(cPU200) if"PU200" in h.getName() else h.getRootHisto().SetMarkerColor(cNoPU) ) )
+
     # Customise legend
+    dsetName0 = dsetsMgr.getAllDatasetNames()[0].rsplit("_L1T")[0]
     for d in dsetsMgr.getAllDatasetNames():
-        if "SingleNeutrino" in d:
+        # Sanity check
+        dsetName = d.rsplit("_L1T")[0]
+        if dsetName0 != dsetName:
+            msg = "Different types of datasets detected (\"%s\" and \"%s\"). This script is designed for just one type of dataset for different PU" % (dsetName, dsetName0)
+            raise Exception(es + msg + ns)
+        else:
+            # print "*"*100
+            # print dsetName0
+            # print dsetName
+            # print "*"*100
+            pass
+
+        if "noPU" in d:
             p.histoMgr.setHistoLegendStyle(d, "F")
+            p.histoMgr.setHistoDrawStyle(d, "HIST9")
         else:
             p.histoMgr.setHistoLegendStyle(d, "L")
             p.histoMgr.setHistoDrawStyle(d, "HIST9")
+
+            
 
     # Create legend
     if 0:
@@ -155,7 +179,9 @@ def PlotHisto(datasetsMgr, h):
         p.setLegend(histograms.createLegend(0.58, 0.86-0.04*len(dsetsMgr.getAllDatasetNames()), 0.92, 0.92))
 
     # Draw a customised plot
-    kwargs = GetHistoKwargs(h, opts) 
+    kwargs    = GetHistoKwargs(h, opts) 
+    saveName  = h.replace("L1TkIsoTau_", "")
+    #saveName += #iro
     plots.drawPlot(p, h, **kwargs)
 
     # Remove legend?
@@ -179,7 +205,7 @@ def GetHistoKwargs(h, opts):
     hName   = h.lower()
     _xLabel = ""
     if opts.normalizeToOne:
-        _yNorm = "Arbitrary Units"
+        _yNorm = "a.u." #"Arbitrary Units"
     else:
         _yNorm = "Events"
     _yLabel = _yNorm + " / %.2f "
@@ -195,28 +221,47 @@ def GetHistoKwargs(h, opts):
     _log    = False
     _yMin   = 0.0
     _yMax   = None
-    _yMaxF  = 1.15
+    _yMaxF  = 1.25 #1.2
     _xMin   = None
     _xMax   = None
     _rmLeg  = False
-    _mvLeg  = {"dx": -0.50, "dy": -0.50, "dh": -0.0}
+    _mvLeg  = {"dx": -0.14, "dy": -0.00, "dh": -0.1}
 
     # Default (tdrstyle.py)
     ROOT.gStyle.SetLabelSize(27, "XYZ")
 
-    if "counters" in hName:
+    if "_resolutionet" in hName:
         _units  = ""
-        _format = "%0.0f " + _units
-        _xLabel = "" #"counters"
-        _xMin   = 1 #don't show Loose/Tight WPs
-        _xMax   = 8 #don't show Loose/Tight WPs
+        _format = "%0.2f " + _units
+        _xLabel = "#deltaE_{T} / E_{T}^{vis}"
+        _rebinX = +10
+        _xMin   = -1.0
+        _xMax   = +3.0
         _yLabel = _yNorm + " / " + _format
-        #_log    = True
-        #_rmLeg  = True
-        #_ratio  = False
-        _cutBox = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
-        ROOT.gStyle.SetLabelSize(13, "X") #"XY"
-                
+        _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _log    = False
+        if "_resolutioneta" in hName:
+            #_xLabel = "(#eta^{calo} - #eta^{vis}) / #eta^{vis}"
+            _xLabel = "#delta#eta / #eta^{vis}"
+            _xMin   = -4.0 #-5.5
+            _xMax   = +4.0 #+5.5
+            _yLabel = _yNorm + " / " + _format
+            _log    = True
+            _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+    if "_resolutionphi" in hName:
+        _units  = ""
+        _format = "%0.2f " + _units
+        #_xLabel = "#phi^{calo} - #phi^{vis} / #phi^{vis}"
+        _xLabel = "#delta#phi / #phi^{vis}"
+        _rebinX = 1
+        _xMin   = -2.0 #-5.0
+        _xMax   = +2.0 #+5.0
+        _yLabel = _yNorm + " / " + _format
+        _log    = True
+        _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+    else:
+        ROOT.gStyle.SetNdivisions(8, "X")
+
     if _log:
         if _yMin == 0.0:
             if opts.normalizeToOne:
@@ -281,7 +326,7 @@ def GetBinwidthDecimals(binWidth):
         dec =  " %0.7f"
     return dec
 
-def ReorderDatasets(datasets):
+def ReorderDatasets(datasets, bReverse=False):
     newOrder =  datasets
     
     for i, d in enumerate(datasets, 0):
@@ -297,31 +342,11 @@ def ReorderDatasets(datasets):
         if "noPU" in d:
             newOrder.remove(d)
             newOrder.insert(0, d)
-
-    # Use tau guns for ratio reference => put very first
-    if "SingleTau_L1TPU200" in datasets:
-        newOrder.remove("SingleTau_L1TPU200")
-        newOrder.insert(0,"SingleTau_L1TPU200")
-    if "SingleTau_L1TPU140" in datasets:
-        newOrder.remove("SingleTau_L1TPU140")
-        newOrder.insert(0,"SingleTau_L1TPU140")
-    
-    mb140 = "SingleNeutrino_L1TPU140"
-    mb200 = "SingleNeutrino_L1TPU200"
-    if mb140 in datasets:
-        newOrder.remove(mb140)
-        newOrder.insert(len(newOrder), mb140)
-    if mb200 in datasets:
-        newOrder.remove(mb200)
-        newOrder.insert(len(newOrder), mb200)
-
-#    if mb140 in datasets and mb200 in datasets:
-#        newOrder.remove(mb140)
-#        newOrder.insert(-1, mb140)
-#        newOrder.remove(mb200)
-#        newOrder.insert(-1, mb200)
-
-    return newOrder
+            
+    if bReverse:
+        return reversed(newOrder)
+    else:
+        return newOrder
 
 def main(opts):
     
@@ -366,7 +391,7 @@ def main(opts):
         intLumi = datasetsMgr.getDataset("Data").getLuminosity()
 
     # Apply new dataset order?
-    newOrder = ReorderDatasets(datasetsMgr.getAllDatasetNames())
+    newOrder = ReorderDatasets(datasetsMgr.getAllDatasetNames(), bReverse=False)
     datasetsMgr.selectAndReorder(newOrder)
 
     # Print dataset information (after merge)
@@ -375,25 +400,36 @@ def main(opts):
 
     # Plot Histograms
     histoList  = datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDirectoryContent(opts.folder)
-    histoPaths = [os.path.join(opts.folder, h) for h in histoList if "Counters" in h]
+    histoPaths = [os.path.join(opts.folder, h) for h in histoList]
     histoType  = type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram())
-    done       = []
     plotCount  = 0
+    inList     = ["resolutionEt"]
 
-    # For-loop: All histos in opts.folder    
+    # For-loop: All# histos in opts.folder
     for i, h in enumerate(histoPaths, 1):
-        histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))
 
+        # Only do Et (don't expect dependence on PU for eta, phi
+        if "resolutionet_" not in h.lower():
+            continue        
+
+        # Forwards region not yet available for Calos
+        if "_F" in h:
+            continue
+        
+        bSkip = True
+        for s in inList:
+            bSkip = False
+        if bSkip:
+            continue                
+
+        histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))
         if "TH1" not in histoType:
             continue
-
-        if h in done:
-            continue
-
+        
         aux.PrintFlushed(h, plotCount==0)
         plotCount += 1
+        
         PlotHisto(datasetsMgr, h)
-        done.append(h)
 
     print
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
@@ -412,7 +448,7 @@ if __name__ == "__main__":
     GRIDX       = False
     GRIDY       = False    
     INTLUMI     = 1.0
-    NORMTOONE   = False
+    NORMTOONE   = True
     SAVEDIR     = None
     SAVEFORMATS = [".C", ".png", ".pdf"]
     VERBOSE     = False
@@ -474,7 +510,7 @@ if __name__ == "__main__":
     
     # Determine path for saving plots
     if opts.saveDir == None:
-        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="Counters")
+        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="ResolutionVsPU")
     else:
         print "opts.saveDir = ", opts.saveDir
 
@@ -499,4 +535,4 @@ if __name__ == "__main__":
     main(opts)
 
     if not opts.batchMode:
-        raw_input("=== plotCounters.py: Press any key to quit ROOT ...")
+        raw_input("=== plotResolutionPU.py: Press any key to quit ROOT ...")

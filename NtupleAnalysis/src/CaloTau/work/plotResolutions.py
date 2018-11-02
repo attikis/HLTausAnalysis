@@ -160,12 +160,12 @@ def main(opts):
 
         # ROC curve ingredients (histograms)
         resList = [
-            ["L1TkIsoTau_ResolutionEt" , "L1TkIsoTau_ResolutionEt_1pr" , "L1TkIsoTau_ResolutionEt_3pr" , "L1TkIsoTau_ResolutionEt_withNeutrals" , "L1TkIsoTau_ResolutionEt_noNeutrals" ], 
-            ["L1TkIsoTau_ResolutionEta", "L1TkIsoTau_ResolutionEta_1pr", "L1TkIsoTau_ResolutionEta_3pr", "L1TkIsoTau_ResolutionEta_withNeutrals", "L1TkIsoTau_ResolutionEta_noNeutrals"], 
-            ["L1TkIsoTau_ResolutionPhi", "L1TkIsoTau_ResolutionPhi_1pr", "L1TkIsoTau_ResolutionPhi_3pr", "L1TkIsoTau_ResolutionPhi_withNeutrals", "L1TkIsoTau_ResolutionPhi_noNeutrals"],
-            ["L1TkIsoTau_ResolutionEt" , "L1TkIsoTau_ResolutionEt_C"   , "L1TkIsoTau_ResolutionEt_I"], #  , "L1TkIsoTau_ResolutionEt_F" ],
-            ["L1TkIsoTau_ResolutionEta", "L1TkIsoTau_ResolutionEta_C"  , "L1TkIsoTau_ResolutionEta_I"],#  , "L1TkIsoTau_ResolutionEta_F"],
-            ["L1TkIsoTau_ResolutionPhi", "L1TkIsoTau_ResolutionPhi_C"  , "L1TkIsoTau_ResolutionPhi_I"],#  , "L1TkIsoTau_ResolutionPhi_F"],
+            ["Calo_ResolutionEt" , "Calo_ResolutionEt_1pr" , "Calo_ResolutionEt_3pr" , "Calo_ResolutionEt_withNeutrals" , "Calo_ResolutionEt_noNeutrals" ], 
+            ["Calo_ResolutionEta", "Calo_ResolutionEta_1pr", "Calo_ResolutionEta_3pr", "Calo_ResolutionEta_withNeutrals", "Calo_ResolutionEta_noNeutrals"], 
+            ["Calo_ResolutionPhi", "Calo_ResolutionPhi_1pr", "Calo_ResolutionPhi_3pr", "Calo_ResolutionPhi_withNeutrals", "Calo_ResolutionPhi_noNeutrals"],
+            ["Calo_ResolutionEt" , "Calo_ResolutionEt_C"   , "Calo_ResolutionEt_I"], #  , "Calo_ResolutionEt_F" ],
+            ["Calo_ResolutionEta", "Calo_ResolutionEta_C"  , "Calo_ResolutionEta_I"],#  , "Calo_ResolutionEta_F"],
+            ["Calo_ResolutionPhi", "Calo_ResolutionPhi_C"  , "Calo_ResolutionPhi_I"],#  , "CaloIso_ResolutionPhi_F"],
             ]
                        
     
@@ -262,9 +262,9 @@ def GetHistoKwargs(h, opts):
         yMaxF = 1.2
 
     if opts.normalizeToOne:
-        _yLabel = "Arbitrary Units / %.3f"
+        _yLabel = "Arbitrary Units / %.2f"
     else:
-        _yLabel = "Events / %.3f"
+        _yLabel = "Events / %.2f"
         
     _kwargs = {
         "xlabel"           : "#delta x / x",
