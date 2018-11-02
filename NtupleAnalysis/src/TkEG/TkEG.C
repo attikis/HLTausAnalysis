@@ -45,6 +45,11 @@ void TkEG::InitVars_()
   cfg_tk_maxChiSq    = 50.0;         // Default: 1e6
   cfg_tk_minStubs    =   5;         // Default: 0
 
+  // EGs parameters
+  cfg_eg_minEt       = 2.00;        // Default: 2.0
+  cfg_eg_minEta      = 0.0;         // Default: 0.0
+  cfg_eg_maxEta      = 1.5;//2.5;        // Default: 1e6   
+
   // TkEG algorithm parameters
   minStubs_trk      = 5; 
   maxChi2_trk       = 50.0; // GeV
@@ -171,11 +176,6 @@ void TkEG::Loop()
 
   // Clustering Counters 
   unsigned int counter_allTrkTauCand = 0;
-  unsigned int counter_1trk =0;
-  unsigned int counter_2trk =0;
-  unsigned int counter_3trk =0;
-  unsigned int counter_4trk =0;
-  unsigned int counter_5trk =0;
   unsigned int counter_1eg =0;
   unsigned int counter_2eg =0;
   unsigned int counter_3eg =0;
@@ -225,7 +225,7 @@ void TkEG::Loop()
     
     // EGs
     if (cfg_AddEGs) {
-      L1EGs = GetEGs(false);
+      L1EGs = GetEGs(cfg_eg_minEt, cfg_eg_minEta, cfg_eg_maxEta, false);
       sort( L1EGs.begin(), L1EGs.end() ); // Sort from highest Et to lowest Et (should be already done by default)
       if (DEBUG) cout << "\n=== L1EGs (" << L1EGs.size() << ")" << endl;
 //      if (DEBUG*0) PrintL1EGCollection(L1EGs);
@@ -686,41 +686,21 @@ void TkEG::Loop()
 	if (deltaR < minDeltaR_leadtrk) continue;
 	trkcounter_passDRmin += 1;
 
-	// Calculate invariant mass and pT of already clustered tracks
-	//p4sum.SetPtEtaPhiM(0., 0., 0., 0.);
-	//for(size_t j=0; j < trackTauCandidates[i].size(); j++){
-	//p4sum += trackTauCandidates[i][j].p4();
-	//}
-	//invMass = p4sum.M();
-	//pT = p4sum.Pt();
-
 	// Add the p4 of the new track
 	p4sum += trackIter->p4();
 	trackTauCandidates[i].push_back(*trackIter);
-	//trkcounter_passInvMass += 1;
-	
-	/*
-	// Fill histos for clustered tracks
-	h_clustTrks_Pt->Fill( trackIter->getPt() );
-	h_clustTrks_Eta->Fill( trackIter->getEta() );
-	h_clustTrks_Phi->Fill( trackIter->getPhi() );
-	h_clustTrks_Phi_Eta->Fill( trackIter->getPhi(),trackIter->getEta() );
-	
 
-	// Remove clustered track from TTTrack's collction so that it will not be used for another tau candidate
-	trackIter = TTTracks.erase(trackIter);
-	trackIter--; //WARNING!
-	} 
-	else {
-	// Stop clustering
-	stopClustering = true;
-	}
-	*/
+	// Fill histos for clustered tracks
+	// h_clustTrks_Pt->Fill( trackIter->getPt() );
+	// h_clustTrks_Eta->Fill( trackIter->getEta() );
+	// h_clustTrks_Phi->Fill( trackIter->getPhi() );
+	// h_clustTrks_Phi_Eta->Fill( trackIter->getPhi(),trackIter->getEta() );
+
       }
       
       h_trkClusters_M_beforeCut->Fill(p4sum.M());
-
-      // Cluster the track if the total invariant mass is below the maximum  
+      
+      // Keep the trackCandidate if the total invariant mass is below the maximum  
       if (p4sum.M() > maxInvMass_trk) {
 
 	trackTauCandidates.erase(trackTauCandidates.begin()+i);
@@ -745,14 +725,6 @@ void TkEG::Loop()
 	h_trkClusters_MultiplicityPerCluster->Fill( Ntrks );
 	h_trkClusters_Pt->Fill( pT );
 	h_trkClusters_M->Fill( invMass );
-	
-	//PrintTTTrackCollection(trackTauCandidates[i]);
-	counter_allTrkTauCand ++; 
-	if (trackTauCandidates[i].size()==1) counter_1trk++;
-	if (trackTauCandidates[i].size()==2) counter_2trk++;
-	if (trackTauCandidates[i].size()==3) counter_3trk++;
-	if (trackTauCandidates[i].size()==4) counter_4trk++;
-	if (trackTauCandidates[i].size()==5) counter_5trk++;
 	
       }
     }

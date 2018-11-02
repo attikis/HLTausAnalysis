@@ -74,6 +74,10 @@ class TkEG : public TreeAnalyserMC{
   double cfg_tk_maxEta;
   double cfg_tk_maxChiSq;
   double cfg_tk_minStubs;
+  double cfg_eg_minEt;
+  double cfg_eg_minEta;
+  double cfg_eg_maxEta;
+
   bool DEBUG;  
     
  private:
