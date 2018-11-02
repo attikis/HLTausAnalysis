@@ -88,6 +88,11 @@ class TkEG : public TreeAnalyserMC{
   float CorrectedEta(float eta, float zTrack);
   bool IsWithinEtaRegion(string etaRegion, double eta);
   vector<L1TkEGParticle> GetMcMatchedL1TkEGs(vector<L1TkEGParticle> L1TkEGs);
+
+  double GetDonutRatio(L1TkEGParticle &L1TkEG, 
+		       vector<TTTrack> isoTTTracks,
+		       bool bUseCone);
+  
   double GetMatchingGenParticle(TTTrack track, GenParticle *genParticlePtr);
 
   void FillTurnOn_Numerator_(vector<L1TkEGParticle> L1TkEGs,
@@ -271,6 +276,7 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_EGs_Phi;
   TH1D* h_EGs_IEta;
   TH1D* h_EGs_IPhi;
+  TH2D* h_EGs_EtaVsEt;
 
   TH1D* h_leadTrk_EG_dR;
   TH1D* h_leadTrk_EG_dR_beforecorrection;
@@ -333,10 +339,14 @@ class TkEG : public TreeAnalyserMC{
 
   TH1D* h_TkEG_isoTracks_InvMass;
   TH1D* h_TkEG_isoTracks_Multiplicity;
-  TH1D* h_TkEG_isoTracks_PtSum;
-  TH1D* h_TkEG_isoTracks_NStubs;
-  TH1D* h_TkEG_isoTracks_Chi2;
-  //TH1D* h_TkEG_isoTracks_Eta;
+  //TH1D* h_TkEG_isoTracks_PtSum;
+  //TH1D* h_TkEG_isoTracks_NStubs;
+  //TH1D* h_TkEG_isoTracks_Chi2;
+  TH1D* h_TkEG_isoTracks_Et;
+  TH1D* h_TkEG_isoTracks_Eta;
+  TH1D* h_TkEG_DonutRatio;
+  TH1D* h_TkEG_signalEGs_Multiplicity;
+  TH1D* h_TkEG_isoEGs_Multiplicity;
 
   TH1D* h_TkEG_PtResolution;
   TH1D* h_TkEG_PtResolution_C;
@@ -538,7 +548,14 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_PhiResolution_1pr_F_noEGs_negEta;
   TH1D* h_TkEG_PhiResolution_3pr_F_noEGs_negEta;
 
-  // pion0 Resolution
+  // Charged Resolution
+  TH1D* h_TkEG_ChargedResolution;
+  TH1D* h_TkEG_ChargedResolution_noNeutrals;
+  TH1D* h_TkEG_ChargedResolution_withNeutrals;
+  TH1D* h_TkEG_ChargedResolution_1pr;
+  TH1D* h_TkEG_ChargedResolution_3pr;
+
+  // Neutrals Resolution
   TH1D* h_TkEG_NeutralsResolution;
   TH1D* h_TkEG_NeutralsResolution_noNeutrals;
   TH1D* h_TkEG_NeutralsResolution_withNeutrals;
@@ -559,6 +576,13 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_GoodEtResolCand_CHF;
   TH1D* h_GoodEtResolCand_IsoTracks_N;
   TH1D* h_GoodEtResolCand_dR_EG_Seed;
+
+  // Poor Neutral Resolution candidates
+  TH1D* h_TkEG_PoorNeuResol_NeuMultiplicity;
+  TH1D* h_TkEG_PoorNeuResol_dR_Pi0_visTau;
+  TH1D* h_TkEG_PoorNeuResol_dEta_Pi0_visTau;
+  TH1D* h_TkEG_PoorNeuResol_dPhi_Pi0_visTau;
+  TH1D* h_TkEG_PoorNeuResol_Pi0_ET;
 
   TH1D* h_nonMCmatched_EGenergyOverTracksPt;
   TH1D* h_nonMCmatchedCandidates_decayMode;

@@ -41,7 +41,7 @@ void TkEG::InitVars_()
   cfg_tk_nFitParams  = 4;           // Default: 4
   cfg_tk_minPt       = 2.00;        // Default: 2.0
   cfg_tk_minEta      = 0.0;         // Default: 0.0
-  cfg_tk_maxEta      = 2.5;        // Default: 1e6
+  cfg_tk_maxEta      = 1.5;//2.5;        // Default: 1e6
   cfg_tk_maxChiSq    = 50.0;         // Default: 1e6
   cfg_tk_minStubs    =   5;         // Default: 0
 
@@ -49,13 +49,13 @@ void TkEG::InitVars_()
   minStubs_trk      = 5; 
   maxChi2_trk       = 50.0; // GeV
   minPt_leadtrk     = 5.0; // GeV
-  maxEta_leadtrk    = 2.5;
+  maxEta_leadtrk    = 1.5;//2.5;
   minDeltaR_leadtrk = 0.0;
   maxDeltaR_leadtrk = 0.15;//0.3;
   maxDeltaR_const   = 2.0;
   maxDeltaZ_trk     = 0.8;  // cm
   maxInvMass_trk    = 1.4; // GeV 
-  minEt_EG          = 2.0;  // GeV
+  minEt_EG          = 1.5;  // GeV
   minDeltaR_EG      = 0.0;
   maxDeltaR_EG      = 0.15;//0.3;
   maxInvMass_EG     = 1.77; // GeV
@@ -246,7 +246,7 @@ void TkEG::Loop()
     
     // Triggred GenTaus (skip for MinBias samples)
     vector<GenParticle> GenTausTrigger;  
-    if (!isMinBias) GenTausTrigger = GetHadronicGenTaus(GenTaus, 20.0, 2.3);  
+    if (!isMinBias) GenTausTrigger = GetHadronicGenTaus(GenTaus, 20.0, 1.5);//2.3);  
     
     // Ensure that all taus are found, needed by the current efficiency definition 
     // E.g. for ttbar, only events with two taus within trigger acceptance are considered for efficiency calculation)
@@ -767,10 +767,16 @@ void TkEG::Loop()
     // For-loop: All the EGs in the event                                                                                                                               
     for (auto eg = L1EGs.begin(); eg != L1EGs.end() ; eg++) {
 
-      h_EGs_Et  -> Fill( eg->getEt() );
-      h_EGs_Eta -> Fill( eg->getEta() );
-      h_EGs_Phi -> Fill( eg->getPhi() );
-      
+      if  (abs(eg->getEta()) < 1.5){
+	h_EGs_Et      -> Fill( eg->getEt() );
+	h_EGs_Eta     -> Fill( eg->getEta() );
+	h_EGs_Phi     -> Fill( eg->getPhi() );
+	h_EGs_EtaVsEt -> Fill ( eg->getEta(), eg->getEt() ); 
+	
+      }
+      else
+	{ cout <<"ETA>1.5"<<endl;} // FIXME
+
     }// For-loop: All the EGs in the event
     
 
@@ -1060,7 +1066,9 @@ void TkEG::Loop()
       newTauCandidate.SetShrinkingConeConst(maxDeltaR_const);
       newTauCandidate.SetSigConeMaxOpen(maxDeltaR_leadtrk);
       newTauCandidate.FindIsoConeTracks(TTTracks);
-
+      newTauCandidate.FindSignalConeEGs(L1EGs);
+      newTauCandidate.FindIsoConeEGs(L1EGs);
+      
       L1TkEGTauCandidates.push_back(newTauCandidate);
       
     }
@@ -1153,8 +1161,13 @@ void TkEG::Loop()
     for (auto tkeg = L1TkEGTauCandidates.begin(); tkeg != L1TkEGTauCandidates.end(); tkeg++) {
       
       vector<TTTrack> isoTracks = tkeg->GetIsoConeTracks();
+      vector<EG>      signalEGs = tkeg->GetSignalConeEGs();
+      vector<EG>      isoEGs    = tkeg->GetIsoConeEGs();
 
       h_TkEG_isoTracks_Multiplicity -> Fill( isoTracks.size() );
+      h_TkEG_signalEGs_Multiplicity -> Fill( signalEGs.size() );
+      h_TkEG_isoEGs_Multiplicity    -> Fill( isoEGs.size() );
+
 
       TLorentzVector p4sum;
       // For-loop: All isoTracks
@@ -1164,6 +1177,9 @@ void TkEG::Loop()
 
       if (isoTracks.size() > 0) {
         h_TkEG_isoTracks_InvMass -> Fill( p4sum.M() );
+	h_TkEG_isoTracks_Et      -> Fill( p4sum.Et());
+	h_TkEG_isoTracks_Eta     -> Fill( p4sum.Eta());
+	h_TkEG_DonutRatio        -> Fill( GetDonutRatio(*tkeg, isoTracks, false) );
       }
 
 
@@ -1174,8 +1190,8 @@ void TkEG::Loop()
 
     // Tau Candidates Properties & Resolution
     TTTrack leadingTrack;
-    for (auto tkeg = L1TkEGTauCandidates.begin(); tkeg != L1TkEGTauCandidates.end(); tkeg++) {
-    //for (auto tkeg = L1TkEGTaus_VtxIsoTight.begin(); tkeg != L1TkEGTaus_VtxIsoTight.end(); tkeg++) {
+    //for (auto tkeg = L1TkEGTauCandidates.begin(); tkeg != L1TkEGTauCandidates.end(); tkeg++) {
+    for (auto tkeg = L1TkEGTaus_VtxIsoTight.begin(); tkeg != L1TkEGTaus_VtxIsoTight.end(); tkeg++) {
       
       if (!tkeg->HasMatchingGenParticle() && (isMinBias == false) ) continue;
       
@@ -1234,10 +1250,41 @@ void TkEG::Loop()
       double PhiResolution = ( tkeg->GetTotalP4().Phi() - tkeg->GetMatchingGenParticle().phi() ) / tkeg->GetMatchingGenParticle().phi();
       h_TkEG_PhiResolution->Fill(PhiResolution);
 
-      // Pi0 Resolution (EGs-GenPi0)
+      // Charged Resolution
+      int ChargedResolution = (tkeg->GetTracks().size() - tkeg->GetMatchingGenParticle().finalDaughtersCharged().size());
+      h_TkEG_ChargedResolution->Fill(ChargedResolution);
+
+      // Neutrals Resolution (EGs-GenPi0)
       int NeutralsResolution = (tkeg->GetEGs().size() - tkeg->GetMatchingGenParticle().finalDaughtersNeutral().size()); 
       h_TkEG_NeutralsResolution->Fill(NeutralsResolution); 
       
+
+      // Studies for underestimating neutrals multiplicity
+      if (NeutralsResolution == -1) {
+
+	GenParticle        matchGenP = tkeg->GetMatchingGenParticle();
+	vector<GenParticle> neuDaugh = matchGenP.finalDaughtersNeutral();
+
+	h_TkEG_PoorNeuResol_NeuMultiplicity -> Fill( neuDaugh.size() );
+
+
+	for (vector<GenParticle>::iterator daugh = neuDaugh.begin() ; daugh != neuDaugh.end() ; daugh ++){
+
+	  float dR = auxTools_.DeltaR(daugh->eta(), daugh->phi(), matchGenP.p4vis().Eta(), matchGenP.p4vis().Phi());
+	  float dEta = auxTools_.DeltaEta( daugh->eta(), matchGenP.p4vis().Eta() );
+	  float dPhi = auxTools_.DeltaPhi( daugh->phi(), matchGenP.p4vis().Phi() );
+	  
+	  h_TkEG_PoorNeuResol_dR_Pi0_visTau   -> Fill ( dR );
+	  h_TkEG_PoorNeuResol_dEta_Pi0_visTau -> Fill ( dEta);
+	  h_TkEG_PoorNeuResol_dPhi_Pi0_visTau -> Fill ( dPhi);
+	  
+	  h_TkEG_PoorNeuResol_Pi0_ET -> Fill ( daugh->et() );
+  
+	}
+	
+	
+      }
+
       // Resolution in different eta regions
       if ( IsWithinEtaRegion("Central", tkeg_eta) ) {
 	h_TkEG_PtResolution_C  -> Fill(pTresolution);
@@ -1344,8 +1391,9 @@ void TkEG::Loop()
 	h_TkEG_EtResolution_noNeutrals  -> Fill(ETresolution);
 	h_TkEG_EtaResolution_noNeutrals -> Fill(EtaResolution);
 	h_TkEG_PhiResolution_noNeutrals -> Fill(PhiResolution);
+	h_TkEG_ChargedResolution_noNeutrals -> Fill(ChargedResolution);
 	h_TkEG_NeutralsResolution_noNeutrals -> Fill(NeutralsResolution);
-	
+		
 	if ( IsWithinEtaRegion("Forward", tkeg_eta) ){
 	  h_TkEG_PtResolution_noNeutrals_F  -> Fill(pTresolution);
 	  h_TkEG_EtResolution_noNeutrals_F  -> Fill(ETresolution);
@@ -1397,6 +1445,7 @@ void TkEG::Loop()
 	h_TkEG_EtResolution_withNeutrals  -> Fill(ETresolution);
 	h_TkEG_EtaResolution_withNeutrals -> Fill(EtaResolution);
 	h_TkEG_PhiResolution_withNeutrals -> Fill(PhiResolution);
+	h_TkEG_ChargedResolution_withNeutrals -> Fill(ChargedResolution);
 	h_TkEG_NeutralsResolution_withNeutrals -> Fill(NeutralsResolution);
 	
 	if ( IsWithinEtaRegion("Forward", tkeg_eta) ) {
@@ -1456,6 +1505,7 @@ void TkEG::Loop()
 	h_TkEG_EtResolution_1pr  -> Fill(ETresolution);
 	h_TkEG_EtaResolution_1pr -> Fill(EtaResolution);
 	h_TkEG_PhiResolution_1pr -> Fill(PhiResolution);
+	h_TkEG_ChargedResolution_1pr -> Fill(ChargedResolution);
 	h_TkEG_NeutralsResolution_1pr -> Fill(NeutralsResolution);
 
 	if ( IsWithinEtaRegion("Forward", tkeg_eta) ) {
@@ -1511,6 +1561,7 @@ void TkEG::Loop()
 	h_TkEG_EtResolution_3pr  -> Fill(ETresolution);
 	h_TkEG_EtaResolution_3pr -> Fill(EtaResolution);
 	h_TkEG_PhiResolution_3pr -> Fill(PhiResolution);
+	h_TkEG_ChargedResolution_3pr -> Fill(ChargedResolution);
 	h_TkEG_NeutralsResolution_3pr -> Fill(NeutralsResolution);
 	
 	if ( IsWithinEtaRegion("Forward", tkeg_eta) ) {
@@ -2010,6 +2061,55 @@ bool TkEG::IsWithinEtaRegion(string etaRegion,
 }
 
 
+//============================================================================
+double TkEG::GetDonutRatio(L1TkEGParticle &L1TkEG,
+			     vector<TTTrack> isoTTTracks, 
+			     bool bUseCone)
+//============================================================================
+{
+  /*
+    Check ratio of sum of pT of tracks in isolation annulus 
+    wrt the sum of pT of tracks in another outer annulus 
+    which has the same area as the isolation annulus. The idea
+    is that if both are only populated by PU then the ratio should be 
+    close to 1 (assumption is that PU energy distribution is isotropic in phi
+    for a given eta ring)
+   */
+
+  TTTrack seedTk = L1TkEG.GetLeadingTrack();  
+  vector<TTTrack> isoConeTks; 
+  isoConeTks = L1TkEG.GetIsoConeTracks();
+  double sumPt_smallRAnnulus = 0.0;
+  double sumPt_largeRAnnulus = 0.0;
+  double smallR = L1TkEG.GetIsoConeMax();
+  double largeR = sqrt(2)*smallR;
+  double sumPt_ratio = 0.0;
+
+  // For-loop: Isolation annulus Tracks
+  for (vector<TTTrack>::iterator tk = isoConeTks.begin(); tk != isoConeTks.end(); tk++)
+    {
+      double pT = tk->getPt();
+      sumPt_smallRAnnulus += pT;
+    }
+
+  // For-loop: Isolation-annulus-quality tracks
+  for (vector<TTTrack>::iterator tk = isoTTTracks.begin(); tk != isoTTTracks.end(); tk++)
+    {
+      double pT = tk->getPt();
+      double dR = auxTools_.DeltaR(seedTk.getEta(), seedTk.getPhi(), tk->getEta(), tk->getPhi());
+
+      // Ensure track is inside the large annulus
+      if (dR < smallR) continue;
+      if (dR > largeR) continue;
+
+      sumPt_largeRAnnulus += pT;
+    }
+  
+  if (sumPt_smallRAnnulus > 0.0) sumPt_ratio = (sumPt_largeRAnnulus/sumPt_smallRAnnulus);
+  // std::cout << "=== sumPt_ratio = (" << sumPt_largeRAnnulus << "/" << sumPt_smallRAnnulus << ") = " << sumPt_ratio << std::endl;
+  return sumPt_ratio;
+}
+
 
 //============================================================================
 void TkEG::BookHistos_(void)
@@ -2020,6 +2120,19 @@ void TkEG::BookHistos_(void)
   const unsigned int nEt = 300;
   const float minEt = 0.0;
   const float maxEt = +300.0;
+
+  const unsigned int nEta = 60;
+  const float minEta = -3.0;
+  const float maxEta = +3.0;
+
+  const unsigned int nG = 1000;
+  const float minG      =    0.0;
+  const float maxG      =   10.0;
+
+
+  const char* tEt   = ";E_{T} (GeV); Entries / %.0f GeV";
+  const char* tEta  = ";#eta;Entries / %.2f";
+  const char* tG    = ";#gamma;Entries / %.2f";
 
 
   // Event-Type Histograms
@@ -2039,8 +2152,6 @@ void TkEG::BookHistos_(void)
   h_Counters->GetXaxis()->SetBinLabel(13, "RelIso (T)");
 
   //h_Counters->GetXaxis()->SetBinLabel(10, "Matched");
-
-
   histoTools_.BookHisto_1D(h_Counters_events_EGs, "Counters_events_EGs", ";;Entries", 4, 0, 4);
   h_Counters_events_EGs->GetXaxis()->SetBinLabel(1, "All events");
   h_Counters_events_EGs->GetXaxis()->SetBinLabel(2, "Events with EG");
@@ -2214,7 +2325,7 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_trkClusters_M, "trkClusters_M", ";Invariant mass;Clusters / bin", 40, 0.0, +4.0);
 
   // Number of EGs                                                                                                                                                       
-  histoTools_.BookHisto_1D(h_EGs_N, "EGs_Multiplicity", ";Number of EGs in the event ; entries / bin", 21, -0.5, +20.5);
+  histoTools_.BookHisto_1D(h_EGs_N, "EGs_Multiplicity", ";Number of EGs in the event ; entries / bin", 201, -0.5, +200.5);
 
   // Number of EGs when there is only 1 hadronic tau
   histoTools_.BookHisto_1D(h_EGs_N_OneHadTau, "EGs_Multiplicity_OneHadTau", ";Number of EGs in the event ; entries / bin", 21, -0.5, +20.5);
@@ -2226,11 +2337,12 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_EGs_Et, "EGs_Et", ";E_{T} (GeV) ;EGs / bin", 200, 0.0, +100.0);
 
   // EGs Eta 
-  histoTools_.BookHisto_1D(h_EGs_Eta, "EGs_Eta", ";#eta ;EGs / bin", 100, -2.5, +2.5);
+  histoTools_.BookHisto_1D(h_EGs_Eta, "EGs_Eta", tEta  , nEta  , minEta  , maxEta  );
 
   // EGs Phi
   histoTools_.BookHisto_1D(h_EGs_Phi, "EGs_Phi", ";#phi (rads);EGs / bin", 36,  -3.15,  +3.15);
 
+  histoTools_.BookHisto_2D(h_EGs_EtaVsEt, "EGs_EtaVsEt", ";#eta ;E_{T} (GeV); Entries/bin"  , nEta  , minEta  , maxEta, nEt  , minEt  , maxEt);
   // EGs IEta
 //  histoTools_.BookHisto_1D(h_EGs_IEta, "EGs_IEta", ";i#eta;EGs / bin", 70, -35, +35); 
 
@@ -2352,7 +2464,12 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_TkEG_CHF_withNeutrals, "TkEG_CHF_withNeutrals", ";CHF; Entries / bin", 100,  0.0,   +1.0);
   histoTools_.BookHisto_1D(h_TkEG_NHF_withNeutrals, "TkEG_NHF_withNeutrals", ";NHF; Entries / bin", 100,  0.0,   +1.0);
   histoTools_.BookHisto_1D(h_TkEG_isoTracks_InvMass, "TkEG_isoTracks_InvMass", ";Invariant mass (iso-cone); Entries / bin", 5000, +0.0, +5.0);
-  histoTools_.BookHisto_1D(h_TkEG_isoTracks_Multiplicity, "TkEG_isoTracks_Multiplicity", ";N_{iso-tks}; Entries / bin",10, 0, 10.0);
+  histoTools_.BookHisto_1D(h_TkEG_isoTracks_Multiplicity, "TkEG_isoTracks_Multiplicity", ";N_{iso-tks}; Entries / bin",11, -0.5, 10.5);
+  histoTools_.BookHisto_1D(h_TkEG_isoTracks_Et, "TkEG_isoTracks_Et", tEt  , nEt  , minEt  , maxEt  );
+  histoTools_.BookHisto_1D(h_TkEG_isoTracks_Eta, "TkEG_isoTracks_Eta", tEta  , nEta  , minEta  , maxEta  );
+  histoTools_.BookHisto_1D(h_TkEG_DonutRatio, "TkEG_DonutRatio", tG   , nG   , minG   , maxG   );
+  histoTools_.BookHisto_1D(h_TkEG_signalEGs_Multiplicity, "TkEG_signalEGs_Multiplicity", ";N_{signal-EGs}; Entries / bin",11, -0.5, 10.5);
+  histoTools_.BookHisto_1D(h_TkEG_isoEGs_Multiplicity, "TkEG_isoEGs_Multiplicity", ";N_{iso-EGs}; Entries / bin",11, -0.5, 10.5);
 
   // Poor Et Resolution Candidates Properties
   histoTools_.BookHisto_1D(h_PoorEtResolCand_InvMass, "PoorEtResolCand_InvMass", ";Mass (GeV); Entries / bin", 40, 0.0, +4.0);
@@ -2369,6 +2486,13 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_GoodEtResolCand_IsoTracks_N, "GoodEtResolCand_IsoTracks_N", ";N_{iso-tks}; Entries / bin",11, -0.5, 10.5);
   histoTools_.BookHisto_1D(h_GoodEtResolCand_dR_EG_Seed, "GoodEtResolCand_dR_EG_Seed", ";#DeltaR(#tau-seed, EG); Entries / bin",30,  0.0,   +0.3);
 
+  // Poor Neutral Resolution candidates 
+  histoTools_.BookHisto_1D(h_TkEG_PoorNeuResol_NeuMultiplicity, "TkEG_PoorNeuResol_NeuMultiplicity", ";N_{#pi^{0}}; Entries / bin", 11, -0.5, 10.5);
+  histoTools_.BookHisto_1D(h_TkEG_PoorNeuResol_dR_Pi0_visTau, "TkEG_PoorNeuResol_dR_Pi0_visTau", ";#DeltaR (#pi^{0}, #tau_{vis})", 50, 0.0, 0.5);
+  histoTools_.BookHisto_1D(h_TkEG_PoorNeuResol_dEta_Pi0_visTau, "TkEG_PoorNeuResol_dEta_Pi0_visTau", ";#Delta#eta (#pi^{0}, #tau_{vis})", 100,  -10.0,  10.0);
+  histoTools_.BookHisto_1D(h_TkEG_PoorNeuResol_dPhi_Pi0_visTau, "TkEG_PoorNeuResol_dPhi_Pi0_visTau", ";#Delta#phi (#pi^{0}, #tau_{vis})",  21,  -3.15,  +3.15);
+  histoTools_.BookHisto_1D(h_TkEG_PoorNeuResol_Pi0_ET, "TkEG_PoorNeuResol_Pi0_ET", tEt, nEt, minEt, maxEt);
+  
   // Pt resolution of TkEG candidate
   histoTools_.BookHisto_1D(h_TkEG_PtResolution, "TkEG_PtResolution", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
   histoTools_.BookHisto_1D(h_TkEG_PtResolution_C, "TkEG_PtResolution_C", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
@@ -2583,7 +2707,14 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_TkEG_PhiResolution_1pr_F_noEGs_negEta, "TkEG_PhiResolution_1pr_F_noEGs_negEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
   histoTools_.BookHisto_1D(h_TkEG_PhiResolution_3pr_F_noEGs_negEta, "TkEG_PhiResolution_3pr_F_noEGs_negEta", ";#phi resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
 
-  // Pion0 Resolution
+  // Charged Resolution
+  histoTools_.BookHisto_1D(h_TkEG_ChargedResolution, "TkEG_ChargedResolution", ";#pi^{0} resolution (GeV);Clusters / bin", 21, -10.5, 10.5);
+  histoTools_.BookHisto_1D(h_TkEG_ChargedResolution_noNeutrals, "TkEG_ChargedResolution_noNeutrals", ";#pi^{0} resolution (GeV);Clusters / bin", 21, -10.5, 10.5);
+  histoTools_.BookHisto_1D(h_TkEG_ChargedResolution_withNeutrals, "TkEG_ChargedResolution_withNeutrals", ";#pi^{0} resolution (GeV);Clusters / bin", 21, -10.5, 10.5);
+  histoTools_.BookHisto_1D(h_TkEG_ChargedResolution_1pr, "TkEG_ChargedResolution_1pr", ";#pi^{0} resolution (GeV);Clusters / bin", 21, -10.5, 10.5);
+  histoTools_.BookHisto_1D(h_TkEG_ChargedResolution_3pr, "TkEG_ChargedResolution_3pr", ";#pi^{0} resolution (GeV);Clusters / bin", 21, -10.5, 10.5);
+
+  // Neutrals Resolution
   histoTools_.BookHisto_1D(h_TkEG_NeutralsResolution, "TkEG_NeutralsResolution", ";#pi^{0} resolution (GeV);Clusters / bin", 21, -10.5, 10.5);
   histoTools_.BookHisto_1D(h_TkEG_NeutralsResolution_noNeutrals, "TkEG_NeutralsResolution_noNeutrals", ";#pi^{0} resolution (GeV);Clusters / bin", 21, -10.5, 10.5);
   histoTools_.BookHisto_1D(h_TkEG_NeutralsResolution_withNeutrals, "TkEG_NeutralsResolution_withNeutrals", ";#pi^{0} resolution (GeV);Clusters / bin", 21, -10.5, 10.5);
@@ -2883,6 +3014,7 @@ void TkEG::WriteHistos_(void)
   h_EGs_Phi->Write();
 //  h_EGs_IEta->Write();
 //  h_EGs_IPhi->Write();
+  h_EGs_EtaVsEt->Write();
 
   h_clustEGs_allEGs      -> Write();
   h_clustEGs_passEt      -> Write();
@@ -2929,7 +3061,12 @@ void TkEG::WriteHistos_(void)
   h_TkEG_NHF_withNeutrals->Write();
   h_TkEG_isoTracks_InvMass->Write();
   h_TkEG_isoTracks_Multiplicity->Write();
-  
+  h_TkEG_isoTracks_Et->Write();
+  h_TkEG_isoTracks_Eta->Write();
+  h_TkEG_DonutRatio->Write();
+  h_TkEG_signalEGs_Multiplicity->Write();
+  h_TkEG_isoEGs_Multiplicity->Write();
+
   // Poor Et Resolution Candidates Properties
   h_PoorEtResolCand_InvMass->Write();
   h_PoorEtResolCand_RelIso->Write();
@@ -2944,6 +3081,14 @@ void TkEG::WriteHistos_(void)
   h_GoodEtResolCand_CHF->Write();
   h_GoodEtResolCand_IsoTracks_N->Write();
   h_GoodEtResolCand_dR_EG_Seed->Write();
+
+  // Poor Neutral Resolution candidates
+  h_TkEG_PoorNeuResol_NeuMultiplicity->Write();
+  h_TkEG_PoorNeuResol_dR_Pi0_visTau->Write();
+  h_TkEG_PoorNeuResol_dEta_Pi0_visTau->Write();
+  h_TkEG_PoorNeuResol_dPhi_Pi0_visTau->Write();
+  h_TkEG_PoorNeuResol_Pi0_ET->Write();
+
 
   h_TkEG_PtResolution->Write();
   h_TkEG_PtResolution_C->Write();
@@ -3144,7 +3289,14 @@ void TkEG::WriteHistos_(void)
   h_TkEG_PhiResolution_1pr_F_noEGs_negEta->Write();
   h_TkEG_PhiResolution_3pr_F_noEGs_negEta->Write();
 
-  // Pion0 Resolution
+  // Charged Resolution
+  h_TkEG_ChargedResolution->Write();
+  h_TkEG_ChargedResolution_noNeutrals->Write();
+  h_TkEG_ChargedResolution_withNeutrals->Write();
+  h_TkEG_ChargedResolution_1pr->Write();
+  h_TkEG_ChargedResolution_3pr->Write();
+
+  // Neutrals Resolution
   h_TkEG_NeutralsResolution->Write();
   h_TkEG_NeutralsResolution_noNeutrals->Write();
   h_TkEG_NeutralsResolution_withNeutrals->Write();
