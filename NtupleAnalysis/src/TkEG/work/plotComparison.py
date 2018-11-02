@@ -233,9 +233,14 @@ def PlotHistos(datasetsMgr, histoList, signal, PU, saveName=None):
     for i, h in enumerate(p.histoMgr.getHistos(), 0):
         hName = h.getName()
         p.histoMgr.forHisto(hName, styles.getCaloStyle(i))
-        p.histoMgr.setHistoDrawStyle(hName, "AP")
-        p.histoMgr.setHistoLegendStyle(hName, "P")
-    
+
+        if "TkEG_NEGs" in hName: 
+            p.histoMgr.setHistoDrawStyle(hName, "HIST")
+            p.histoMgr.setHistoLegendStyle(hName, "L")
+        else:
+            p.histoMgr.setHistoDrawStyle(hName, "AP")
+            p.histoMgr.setHistoLegendStyle(hName, "P")
+            
     # Set legend labels
     p.histoMgr.setHistoLegendLabelMany(legDict)
 
@@ -302,7 +307,7 @@ def GetHistoKwargs(h, opts):
         _kwargs["opts"]       = {"xmin": 0.0, "xmax": 0.15, "ymin": 0, "ymaxfactor": yMaxF}
 
     if "reliso" in h.lower() or "badetresolcand_reliso" in h.lower():
-        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 1.2, "ymin": 0.001, "ymaxfactor": yMaxF}
+        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 1.2, "ymin": 0.0001, "ymaxfactor": yMaxF}
         _kwargs["log"]  = True
         
     if "vtxiso" in h.lower() or "badetresolcand_vtxiso" in h.lower():

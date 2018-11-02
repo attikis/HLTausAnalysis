@@ -193,6 +193,7 @@ def main(opts):
             ["TkEG_EtaResolution_F_noEGs_negEta", "TkEG_EtaResolution_1pr_F_noEGs_negEta", "TkEG_EtaResolution_3pr_F_noEGs_negEta", "TkEG_EtaResolution_withNeutrals_F_noEGs_negEta", "TkEG_EtaResolution_noNeutrals_F_noEGs_negEta"],
             ["TkEG_PhiResolution_F_noEGs_negEta", "TkEG_PhiResolution_1pr_F_noEGs_negEta", "TkEG_PhiResolution_3pr_F_noEGs_negEta", "TkEG_PhiResolution_withNeutrals_F_noEGs_negEta", "TkEG_PhiResolution_noNeutrals_F_noEGs_negEta"],
 
+            ["TkEG_ChargedResolution", "TkEG_ChargedResolution_1pr", "TkEG_ChargedResolution_3pr", "TkEG_ChargedResolution_withNeutrals", "TkEG_ChargedResolution_noNeutrals"],
             ["TkEG_NeutralsResolution", "TkEG_NeutralsResolution_1pr", "TkEG_NeutralsResolution_3pr", "TkEG_NeutralsResolution_withNeutrals", "TkEG_NeutralsResolution_noNeutrals"],
 
             ]
@@ -240,8 +241,9 @@ def main(opts):
             PlotHistos(datasetsMgr, resList[25], s, PU, "ResolutionEta_%s_all_F_noEGs_negEta" % (s) )
             PlotHistos(datasetsMgr, resList[26], s, PU, "ResolutionPhi_%s_all_F_noEGs_negEta" % (s) )
 
-            PlotHistos(datasetsMgr, resList[27], s, PU, "ResolutionNeutrals_%s_all" % (s) )
-           
+            PlotHistos(datasetsMgr, resList[27], s, PU, "ResolutionCharged_%s_all" % (s) )
+            PlotHistos(datasetsMgr, resList[28], s, PU, "ResolutionNeutrals_%s_all" % (s) )
+
         print
 
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
@@ -293,9 +295,14 @@ def PlotHistos(datasetsMgr, histoList, signal, PU, saveName=None):
     for i, h in enumerate(p.histoMgr.getHistos(), 0):
         hName = h.getName()
         p.histoMgr.forHisto(hName, styles.getCaloStyle(i))
-        p.histoMgr.setHistoDrawStyle(hName, "AP")
-        p.histoMgr.setHistoLegendStyle(hName, "P")
-    
+
+        if "chargedresolution" in hName.lower() or "neutralsresolution" in hName.lower():
+            p.histoMgr.setHistoDrawStyle(hName, "HIST")
+            p.histoMgr.setHistoLegendStyle(hName, "L")
+        else:
+            p.histoMgr.setHistoDrawStyle(hName, "AP")
+            p.histoMgr.setHistoLegendStyle(hName, "P")
+            
     # Set legend labels
     p.histoMgr.setHistoLegendLabelMany(legDict)
 
@@ -348,12 +355,12 @@ def GetHistoKwargs(h, opts):
         }
 
     if "resolutionet_" in h.lower():
-        _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
-        _kwargs["opts"]       = {"xmin": -0.2, "xmax": 0.2, "ymin": 0, "ymaxfactor": yMaxF}
+        #_kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
+        #_kwargs["opts"]       = {"xmin": -0.2, "xmax": 0.2, "ymin": 0, "ymaxfactor": yMaxF}
         #if "_all_f" in h.lower() or "_cif" in h.lower():
-        #    _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
-        #    _kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0, "ymaxfactor": yMaxF}
-        #    _kwargs["rebinX"]     = 50
+        _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
+        _kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0, "ymaxfactor": yMaxF}
+        _kwargs["rebinX"]     = 50
         #_kwargs["moveLegend"] = _mvLeg1
     if "resolutioneta_" in h.lower():
         _kwargs["xlabel"]     = "#delta#eta / #eta^{vis}"
@@ -370,7 +377,13 @@ def GetHistoKwargs(h, opts):
         _kwargs["xlabel"]     = "#delta#pi^{0}"
         _kwargs["opts"]       = {"xmin": -5, "xmax": 5, "ymin": 0, "ymaxfactor": yMaxF}
         _kwargs["rebinX"]     = 1
+
+    if "resolutioncharged_" in h.lower():
+        _kwargs["xlabel"]     = "#delta#pi^{#pm}"
+        _kwargs["opts"]       = {"xmin": -5, "xmax": 5, "ymin": 0, "ymaxfactor": yMaxF}
+        _kwargs["rebinX"]     = 1
         
+
         #if "_all_f" in h.lower() or "_cif" in h.lower():
         #    _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
         #    _kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0, "ymaxfactor": yMaxF}
