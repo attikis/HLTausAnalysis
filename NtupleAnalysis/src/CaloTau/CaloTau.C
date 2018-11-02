@@ -339,9 +339,10 @@ void CaloTau::Loop()
     hCaloIso_Multiplicity_MC ->Fill( CaloTausIso_MC.size() );
   
     ////////////////////////////////////////////////
-    /// CaloTauIso Properties 
+    /// CaloTau Properties 
     ////////////////////////////////////////////////
-    for (vector<L1TkTauParticle>::iterator tau = CaloTausIso.begin(); tau != CaloTausIso.end(); tau++)
+    // for (vector<L1TkTauParticle>::iterator tau = CaloTausIso.begin(); tau != CaloTausIso.end(); tau++)
+    for (vector<L1TkTauParticle>::iterator tau = CaloTaus.begin(); tau != CaloTaus.end(); tau++)
       {
 	
 	if (DEBUG) tau->PrintProperties(true, true, true, true);
@@ -351,9 +352,15 @@ void CaloTau::Loop()
 	
 	// Get matching gen particle
 	GenParticle p = tau->GetMatchingGenParticle();
-	double etRes  = (tau->GetCaloTau().et()-p.p4vis().Et() )/p.p4vis().Et();
-	double etaRes = (tau->GetCaloTau().eta()-p.p4vis().Eta())/p.p4vis().Eta();
-	double phiRes = (tau->GetCaloTau().phi()-p.p4vis().Phi())/p.p4vis().Phi();
+	double tauEt  = tau->GetCaloTau().et();
+	double tauEta = tau->GetCaloTau().eta();
+	double tauPhi = tau->GetCaloTau().phi();
+	double visEt  = p.p4vis().Et();
+	double visEta = p.p4vis().Eta();
+	double visPhi = p.p4vis().Phi();
+	double etRes  = (tauEt - visEt)/(visEt);
+	double etaRes = (tauEta - visEta)/(visEta);
+	double phiRes = (tauPhi - visPhi)/(visPhi);
 
 	// Resolution
 	hCalo_ResolutionEt ->Fill( etRes  );
@@ -365,7 +372,6 @@ void CaloTau::Loop()
 	    hCaloIso_ResolutionEta->Fill( etaRes );
 	    hCaloIso_ResolutionPhi->Fill( phiRes );
 	  }
-
 
 	if (p.finalDaughtersNeutral().size() > 0)
 	  {
@@ -416,7 +422,6 @@ void CaloTau::Loop()
 	      }
 	  }
 
-	double tauEta = tau->GetCaloTau().eta();
 
 	if ( IsWithinEtaRegion("Central", tauEta) )
 	  {
@@ -460,7 +465,47 @@ void CaloTau::Loop()
 	  exit(1);
 	}
 	
-      }// CaloTausIso
+	// Calibrations
+	hCaloEta_Vs_CaloEtOverVisEt->Fill(visEta, tauEt / visEt );
+	if ( tauEt >= 20.0 && tauEt <  40.0)
+	  {
+	    hCaloEta_Vs_CaloEtOverVisEt_Pt20to40->Fill(visEta, tauEt / visEt );
+	    //pCaloEta_Vs_CaloEtOverVisEt_Pt20to40->Fill(visEta, tauEt / visEt, 1);
+	  }
+	
+	if ( tauEt >= 40.0 && tauEt <  60.0) 
+	  {
+	    hCaloEta_Vs_CaloEtOverVisEt_Pt40to60->Fill(visEta, tauEt / visEt );
+	    // pCaloEta_Vs_CaloEtOverVisEt_Pt40to60->Fill(visEta, tauEt / visEt, 1);
+	  }
+	if ( tauEt >= 60.0 && tauEt <  80.0)
+	  {
+	    hCaloEta_Vs_CaloEtOverVisEt_Pt60to80  ->Fill(visEta, tauEt / visEt );
+	    //pCaloEta_Vs_CaloEtOverVisEt_Pt60to80  ->Fill(visEta, tauEt / visEt, 1);
+	  }
+	if ( tauEt >= 80.0 && tauEt < 100.0)
+	  {
+	    hCaloEta_Vs_CaloEtOverVisEt_Pt80to100 ->Fill(visEta, tauEt / visEt );
+	    //pCaloEta_Vs_CaloEtOverVisEt_Pt80to100 ->Fill(visEta, tauEt / visEt, 1);	   
+	  }
+	if ( tauEt >= 100.0 && tauEt < 150.0) 
+	  {
+	    hCaloEta_Vs_CaloEtOverVisEt_Pt100to150->Fill(visEta, tauEt / visEt );
+	    //pCaloEta_Vs_CaloEtOverVisEt_Pt100to150->Fill(visEta, tauEt / visEt, 1);
+	  }
+	if ( tauEt >= 150.0 && tauEt < 200.0)
+	  {
+	    hCaloEta_Vs_CaloEtOverVisEt_Pt150to200->Fill(visEta, tauEt / visEt );
+	    //pCaloEta_Vs_CaloEtOverVisEt_Pt150to200->Fill(visEta, tauEt / visEt, 1);
+	  }
+
+	if (tauEt >= 200.0)
+	  {
+	    hCaloEta_Vs_CaloEtOverVisEt_PtGE200   ->Fill(visEta, tauEt / visEt );
+	    //pCaloEta_Vs_CaloEtOverVisEt_PtGE200   ->Fill(visEta, tauEt / visEt, 1);
+	  }
+
+      }// CaloTaus
 
 
     ////////////////////////////////////////////////
@@ -639,6 +684,18 @@ void CaloTau::Loop()
   histoTools_.DivideHistos_1D(hCaloIso_TurnOn50_noNeutrals  , hMcHadronicTau_VisEt_noNeutrals);
 
   ////////////////////////////////////////////////
+  // Profile Histograms
+  ////////////////////////////////////////////////
+  pCaloEta_Vs_CaloEtOverVisEt            = hCaloEta_Vs_CaloEtOverVisEt           ->ProfileX("pCaloEta_Vs_CaloEtOverVisEt");
+  pCaloEta_Vs_CaloEtOverVisEt_Pt20to40   = hCaloEta_Vs_CaloEtOverVisEt_Pt20to40  ->ProfileX("pCaloEta_Vs_CaloEtOverVisEt_Pt20to40");
+  pCaloEta_Vs_CaloEtOverVisEt_Pt40to60   = hCaloEta_Vs_CaloEtOverVisEt_Pt40to60  ->ProfileX("pCaloEta_Vs_CaloEtOverVisEt_Pt40to60");
+  pCaloEta_Vs_CaloEtOverVisEt_Pt60to80   = hCaloEta_Vs_CaloEtOverVisEt_Pt60to80  ->ProfileX("pCaloEta_Vs_CaloEtOverVisEt_Pt60to80");
+  pCaloEta_Vs_CaloEtOverVisEt_Pt80to100  = hCaloEta_Vs_CaloEtOverVisEt_Pt80to100 ->ProfileX("pCaloEta_Vs_CaloEtOverVisEt_Pt80to100");
+  pCaloEta_Vs_CaloEtOverVisEt_Pt100to150 = hCaloEta_Vs_CaloEtOverVisEt_Pt100to150->ProfileX("pCaloEta_Vs_CaloEtOverVisEt_Pt100to150");
+  pCaloEta_Vs_CaloEtOverVisEt_Pt150to200 = hCaloEta_Vs_CaloEtOverVisEt_Pt150to200->ProfileX("pCaloEta_Vs_CaloEtOverVisEt_Pt150to200");
+  pCaloEta_Vs_CaloEtOverVisEt_PtGE200    = hCaloEta_Vs_CaloEtOverVisEt_PtGE200   ->ProfileX("pCaloEta_Vs_CaloEtOverVisEt_PtGE200");
+
+  ////////////////////////////////////////////////
   // Write the histograms to the file
   ////////////////////////////////////////////////
   WriteHistos_();
@@ -750,6 +807,34 @@ void CaloTau::BookHistos_(void)
   // GenParticles Histograms
   histoTools_.BookHisto_2D(hGenP_VisEt_Vs_dRMaxLdgPion, "GenP_VisEt_Vs_dRMaxLdgPion", ";#DeltaR_{max}(#pi_{ldg}^{#pm},#pi^{#pm});E_{T}^{vis}",  50,  0.0, +0.25, 100, 0.0, +200.0);
   histoTools_.BookHisto_2D(hGenP_PtLdg_Vs_dRMaxLdgPion, "GenP_PtLdg_Vs_dRMaxLdgPion", ";#DeltaR_{max}(#pi_{ldg}^{#pm},#pi^{#pm});p_{T}^{#pi_{ldg}^{#pm}}",  50,  0.0, +0.25, 100, 0.0, +200.0);
+
+  // Calibration (Binning according to EB granularity at L1: i.e. 17 iEta for range 0.0 < eta < 1.479
+  histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt           , "CaloEta_Vs_CaloEtOverVisEt"           , ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", 17*2,  -1.479, +1.479, 100, 0.0, +5.0);
+  histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt_Pt20to40  , "CaloEta_Vs_CaloEtOverVisEt_Pt20to40"  , ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", 17*2,  -1.479, +1.479, 100, 0.0, +5.0);
+  histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt_Pt40to60  , "CaloEta_Vs_CaloEtOverVisEt_Pt40to60"  , ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", 17*2,  -1.479, +1.479, 100, 0.0, +5.0);
+  histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt_Pt60to80  , "CaloEta_Vs_CaloEtOverVisEt_Pt60to80"  , ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", 17*2,  -1.479, +1.479, 100, 0.0, +5.0);
+  histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt_Pt80to100 , "CaloEta_Vs_CaloEtOverVisEt_Pt80to100" , ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", 17*2,  -1.479, +1.479, 100, 0.0, +5.0);
+  histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt_Pt100to150, "CaloEta_Vs_CaloEtOverVisEt_Pt100to150", ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", 17*2,  -1.479, +1.479, 100, 0.0, +5.0);
+  histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt_Pt150to200, "CaloEta_Vs_CaloEtOverVisEt_Pt150to200", ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", 17*2,  -1.479, +1.479, 100, 0.0, +5.0);
+  histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt_PtGE200   , "CaloEta_Vs_CaloEtOverVisEt_PtGE200"   , ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", 17*2,  -1.479, +1.479, 100, 0.0, +5.0);
+  //
+  // (const char* name, const char* title, Int_t nbinsx, Double_t xlow, Double_t xup, Double_t ylow, Double_t yup, Option_t* option = "")
+  pCaloEta_Vs_CaloEtOverVisEt            = new TProfile("pCaloEta_Vs_CaloEtOverVisEt"           , ";<#eta^{L1}>; <E_{T}^{L1} / E_{T}^{vis}>", 17*2,  -1.479, +1.479, 0.0, +5.0, "");
+  pCaloEta_Vs_CaloEtOverVisEt_Pt20to40   = new TProfile("pCaloEta_Vs_CaloEtOverVisEt_Pt20to40"  , ";<#eta^{L1}>; <E_{T}^{L1} / E_{T}^{vis}>", 17*2,  -1.479, +1.479, 0.0, +5.0, "");
+  pCaloEta_Vs_CaloEtOverVisEt_Pt40to60   = new TProfile("pCaloEta_Vs_CaloEtOverVisEt_Pt40to60"  , ";<#eta^{L1}>; <E_{T}^{L1} / E_{T}^{vis}>", 17*2,  -1.479, +1.479, 0.0, +5.0, "");
+  pCaloEta_Vs_CaloEtOverVisEt_Pt60to80   = new TProfile("pCaloEta_Vs_CaloEtOverVisEt_Pt60to80"  , ";<#eta^{L1}>; <E_{T}^{L1} / E_{T}^{vis}>", 17*2,  -1.479, +1.479, 0.0, +5.0, "");
+  pCaloEta_Vs_CaloEtOverVisEt_Pt80to100  = new TProfile("pCaloEta_Vs_CaloEtOverVisEt_Pt80to100" , ";<#eta^{L1}>; <E_{T}^{L1} / E_{T}^{vis}>", 17*2,  -1.479, +1.479, 0.0, +5.0, "");
+  pCaloEta_Vs_CaloEtOverVisEt_Pt100to150 = new TProfile("pCaloEta_Vs_CaloEtOverVisEt_Pt100to150", ";<#eta^{L1}>; <E_{T}^{L1} / E_{T}^{vis}>", 17*2,  -1.479, +1.479, 0.0, +5.0, "");
+  pCaloEta_Vs_CaloEtOverVisEt_Pt150to200 = new TProfile("pCaloEta_Vs_CaloEtOverVisEt_Pt150to200", ";<#eta^{L1}>; <E_{T}^{L1} / E_{T}^{vis}>", 17*2,  -1.479, +1.479, 0.0, +5.0, "");
+  pCaloEta_Vs_CaloEtOverVisEt_PtGE200    = new TProfile("pCaloEta_Vs_CaloEtOverVisEt_PtGE200"   , ";<#eta^{L1}>; <E_{T}^{L1} / E_{T}^{vis}>", 17*2,  -1.479, +1.479, 0.0, +5.0, "");
+  // histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt             , "hCaloEta_Vs_CaloEtOverVisEt"           , ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", nEta,  minEta, maxEta, 100, 0.0, +5.0);
+  // histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt_Pt20to40    , "hCaloEta_Vs_CaloEtOverVisEt_Pt20to40"  , ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", nEta,  minEta, maxEta, 100, 0.0, +5.0);
+  // histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt_Pt40to60    , "hCaloEta_Vs_CaloEtOverVisEt_Pt40to60"  , ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", nEta,  minEta, maxEta, 100, 0.0, +5.0);
+  // histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt_Pt60to80    , "hCaloEta_Vs_CaloEtOverVisEt_Pt60to80"  , ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", nEta,  minEta, maxEta, 100, 0.0, +5.0);
+  // histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt_Pt80to100   , "hCaloEta_Vs_CaloEtOverVisEt_Pt80to100" , ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", nEta,  minEta, maxEta, 100, 0.0, +5.0);
+  // histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt_PtGE100to150, "hCaloEta_Vs_CaloEtOverVisEt_Pt100to150", ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", nEta,  minEta, maxEta, 100, 0.0, +5.0);
+  // histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt_PtGE150to200, "hCaloEta_Vs_CaloEtOverVisEt_Pt150to200", ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", nEta,  minEta, maxEta, 100, 0.0, +5.0);
+  // histoTools_.BookHisto_2D(hCaloEta_Vs_CaloEtOverVisEt_PtGE200     , "hCaloEta_Vs_CaloEtOverVisEt_PtGE200"   , ";#eta^{L1}; E_{T}^{L1} / E_{T}^{vis}", nEta,  minEta, maxEta, 100, 0.0, +5.0);
 
   // Counters
   histoTools_.BookHisto_1D(hCounters, "Counters",  "", 15, 0.0, +15.0);
@@ -950,6 +1035,25 @@ void CaloTau::WriteHistos_(void)
   // GenParticles Histograms
   hGenP_VisEt_Vs_dRMaxLdgPion->Write();
   hGenP_PtLdg_Vs_dRMaxLdgPion->Write();
+
+  // Calibration
+  hCaloEta_Vs_CaloEtOverVisEt->Write();
+  hCaloEta_Vs_CaloEtOverVisEt_Pt20to40  ->Write();
+  hCaloEta_Vs_CaloEtOverVisEt_Pt40to60  ->Write();
+  hCaloEta_Vs_CaloEtOverVisEt_Pt60to80  ->Write();
+  hCaloEta_Vs_CaloEtOverVisEt_Pt80to100 ->Write();
+  hCaloEta_Vs_CaloEtOverVisEt_Pt100to150->Write();
+  hCaloEta_Vs_CaloEtOverVisEt_Pt150to200->Write();
+  hCaloEta_Vs_CaloEtOverVisEt_PtGE200  ->Write();
+  //
+  pCaloEta_Vs_CaloEtOverVisEt->Write();
+  pCaloEta_Vs_CaloEtOverVisEt_Pt20to40  ->Write();
+  pCaloEta_Vs_CaloEtOverVisEt_Pt40to60  ->Write();
+  pCaloEta_Vs_CaloEtOverVisEt_Pt60to80  ->Write();
+  pCaloEta_Vs_CaloEtOverVisEt_Pt80to100 ->Write();
+  pCaloEta_Vs_CaloEtOverVisEt_Pt100to150->Write();
+  pCaloEta_Vs_CaloEtOverVisEt_Pt150to200->Write();
+  pCaloEta_Vs_CaloEtOverVisEt_PtGE200  ->Write();
 
   // Counters
   hCounters->Write();
