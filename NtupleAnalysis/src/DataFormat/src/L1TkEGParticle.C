@@ -34,7 +34,9 @@ L1TkEGParticle::L1TkEGParticle(double vtxIso,
 			       double NHF,
 			       double shrinkConeConst,
 			       double sigConeMaxOpen,
-			       vector<TTTrack> isoTracks)
+			       vector<TTTrack> isoTracks, 
+			       vector<EG> signalEGs,
+			       vector<EG> isoEGs)
   
 //****************************************************************************
 {
@@ -45,6 +47,8 @@ L1TkEGParticle::L1TkEGParticle(double vtxIso,
   SetShrinkingConeConst(shrinkConeConst);
   SetSigConeMaxOpen(sigConeMaxOpen);
   SetIsoConeTracks(isoTracks);
+  SetIsoConeEGs(isoEGs);
+  SetSignalConeEGs(signalEGs);
 }
 
 
@@ -55,6 +59,40 @@ void L1TkEGParticle::InitVars_(void)
 {
   // theMatchingGenParticle_dR = 999.9;
   // return;
+}
+
+//============================================================================ 
+float L1TkEGParticle::CorrectedEta(float eta, float zTrack)  {
+//============================================================================ 
+  // Correct the eta of the L1EG object once we know the zTrack 
+  // (normaly we use the zvertex but since we care about the dR of the EG and the track it is not needed)
+  
+  bool IsBarrel = ( fabs(eta) < 1.479 );
+  float REcal = 129. ;
+  float ZEcal = 315.4 ;
+
+  float theta = 2. * TMath::ATan( TMath::Exp( - eta ) );
+  if (theta < 0) theta = theta + TMath::Pi();
+  float tantheta = TMath::Tan( theta );
+
+  float delta;
+  if (IsBarrel) {
+    delta = REcal / tantheta ;
+  }
+  else {
+    if (theta > 0) delta =  ZEcal;
+    if (theta < 0) delta = -ZEcal;
+  }
+
+  float tanthetaprime = delta * tantheta / (delta - zTrack );
+
+  float thetaprime = TMath::ATan( tanthetaprime );
+  if (thetaprime < 0) thetaprime = thetaprime + TMath::Pi();
+
+  float etaprime = -TMath::Log( TMath::Tan( thetaprime / 2.) );
+
+  return etaprime;
+
 }
 
 
@@ -125,6 +163,70 @@ void L1TkEGParticle::FindIsoConeTracks(vector<TTTrack> TTTracks, bool useIsoCone
   } // For-loop: All TTTracks
   
   SetIsoConeTracks(isoTracks);
+
+  return;
+
+}
+
+//****************************************************************************
+void L1TkEGParticle::FindSignalConeEGs(vector<EG> EGs)
+//****************************************************************************
+{
+  vector<EG> signalEGs;
+  TTTrack leadingTrack = theTracks[0];
+  vector<EG> clustEGs  = theEGs;
+  double deltaR;
+
+  // For-loop: All TTTracks
+  for (auto eg = EGs.begin(); eg != EGs.end(); eg++) {
+  
+    // Check if the eg is in the signal-cone
+    deltaR = auxTools.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), CorrectedEta(eg->getEta(), leadingTrack.getZ0()), eg->getPhi());
+
+    if (deltaR > GetSigConeMin() && deltaR < GetSigConeMax()) {
+      signalEGs.push_back(*eg);
+    }
+    
+  } // For-loop: All EGs
+
+  SetSignalConeEGs(signalEGs);
+  
+  return;
+}
+
+
+//****************************************************************************
+void L1TkEGParticle::FindIsoConeEGs(vector<EG> EGs, bool useIsoCone)
+//****************************************************************************
+{
+  vector<EG> isoEGs;
+  TTTrack leadingTrack = theTracks[0];
+  vector<EG> clustEGs  = theEGs;
+  double deltaR;
+
+  // For-loop: All EGs
+  for (auto eg = EGs.begin(); eg != EGs.end(); eg++) {
+  
+    if (useIsoCone) {
+      // Check if the eg is clustered in the tau candidate
+      bool clustered = false;
+      
+      for (auto clusteg = clustEGs.begin(); clusteg != clustEGs.end(); clusteg++){
+	if (clusteg->index() == eg->index()) clustered = true;
+      }
+      if (clustered) continue;	
+    }
+    
+    // Check if the eg is in the iso-cone
+    deltaR = auxTools.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), CorrectedEta(eg->getEta(), leadingTrack.getZ0()), eg->getPhi());
+
+    if (deltaR > GetIsoConeMin() && deltaR < GetIsoConeMax()) {
+      isoEGs.push_back(*eg);
+    }
+    
+  } // For-loop: All EGs
+  
+  SetIsoConeEGs(isoEGs);
 
   return;
 

@@ -33,7 +33,9 @@ class L1TkEGParticle{
 		 //double sigConeMax, 
 		 //double isoConeMin, 
 		 //double isoConeMax,
-		 vector<TTTrack> isoTracks);
+		 vector<TTTrack> isoTracks,
+		 vector<EG> signalEGs,
+		 vector<EG> isoEGs);
   
   // Destructor
   ~L1TkEGParticle() {};
@@ -41,6 +43,7 @@ class L1TkEGParticle{
   // Function declarations
   void InitVars_(void);
   void PrintTTTracks();
+  float CorrectedEta(float eta, float zTrack);
   void AddTrack(TTTrack trk) { theTracks.push_back(trk); }
   TTTrack GetLeadingTrack() const { return theTracks[0]; } 
   vector<TTTrack> GetTracks() const {return theTracks; }
@@ -62,6 +65,14 @@ class L1TkEGParticle{
   void FindIsoConeTracks(vector<TTTrack> TTTracks, bool useIsoCone=false);
   void SetIsoConeTracks(vector<TTTrack> isoTracks) {isoTracks_ = isoTracks;}
   vector<TTTrack> GetIsoConeTracks() const {return isoTracks_;}
+
+  void FindSignalConeEGs(vector<EG> EGs);
+  void SetSignalConeEGs(vector<EG> signalEGs) {signalEGs_ = signalEGs;}
+  vector<EG> GetSignalConeEGs() const {return signalEGs_;}
+
+  void FindIsoConeEGs(vector<EG> EGs, bool useIsoCone=false);
+  void SetIsoConeEGs(vector<EG> isoEGs) {isoEGs_ = isoEGs;}
+  vector<EG> GetIsoConeEGs() const {return isoEGs_;}
   
   double CalculateVtxIso(vector<TTTrack> TTTracks, bool useIsoCone=false); 
   double CalculateRelIso(vector<TTTrack> TTTracks, double deltaZ0_max=999.9, bool useIsoCone=false);
@@ -81,6 +92,8 @@ class L1TkEGParticle{
   double shrinkConeCons_;
   double sigConeMaxOpen_;
   vector<TTTrack> isoTracks_;
+  vector<EG> signalEGs_;
+  vector<EG> isoEGs_;
 
   double GetTrackBasedPt();  
   double GetTotalPt();
