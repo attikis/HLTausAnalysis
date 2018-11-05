@@ -206,7 +206,6 @@ class TkEG : public TreeAnalyserMC{
 
   // Event-Type Histograms                                                                                                                                     
   TH1D* h_Counters;
-  TH1D* h_Counters_events_EGs;
 
   TH1D* h_genTausAll_N;
   TH1D* h_genTausAll_Pt;
@@ -273,7 +272,6 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_trkClusters_M_beforeCut;
 
   TH1D* h_EGs_N;
-  TH1D* h_EGs_N_OneHadTau;
   TH1D* h_EGs_MCmatched_Et;
   TH1D* h_EGs_Et;
   TH1D* h_EGs_Eta;
@@ -304,6 +302,7 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_clustEGs_M;
 
   TH1D* h_clustEGs_counter;
+  TH1D* h_TkEGClusters_M_beforeCut;
   TH1D* h_EGClusters_MultiplicityPerCluster;
   TH1D* h_EGClusters_Et;
   TH1D* h_EGClusters_M;
@@ -588,10 +587,8 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_PoorNeuResol_dPhi_Pi0_visTau;
   TH1D* h_TkEG_PoorNeuResol_Pi0_ET;
 
-  TH1D* h_nonMCmatched_EGenergyOverTracksPt;
   TH1D* h_nonMCmatchedCandidates_decayMode;
 
-  TH1D* h_MCmatch_counters;
   TH1D* h_MCmatch_dR;
   TH1D* h_leadTrk_MCmatch;
   TH1D* h_leadTrk4stubs_MCmatch;
