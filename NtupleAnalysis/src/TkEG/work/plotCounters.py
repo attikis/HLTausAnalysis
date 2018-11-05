@@ -185,6 +185,7 @@ def GetHistoKwargs(h, opts):
         "rebinY"           : _rebinY,
         "ratioYlabel"      : "Ratio",
         #"ratio"            : _ratio,
+        "moveLegend"       : {"dx": -0.10, "dy": -0.00, "dh": -0.0},
         "stackMCHistograms": False,
         "ratioInvert"      : False,
         "addMCUncertainty" : True,

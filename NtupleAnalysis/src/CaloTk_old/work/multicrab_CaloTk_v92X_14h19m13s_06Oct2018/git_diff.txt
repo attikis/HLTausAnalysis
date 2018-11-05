@@ -1,0 +1,814 @@
+diff --git a/NtupleAnalysis/src/CaloTk/work/results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/opt1/CaloTk_Histograms_MinBias.txt b/NtupleAnalysis/src/CaloTk/work/results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/opt1/CaloTk_Histograms_MinBias.txt
+deleted file mode 100644
+index 4fc964c..0000000
+--- a/NtupleAnalysis/src/CaloTk/work/results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/opt1/CaloTk_Histograms_MinBias.txt
++++ /dev/null
+@@ -1,58 +0,0 @@
+-=== FileOpener::OpenFile()
+-	Adding file /Users/attikis/hltaus/rootFiles/TTrees/CMSSW_6_2_0_SLHC12_patch1/TkTauFromCaloAnalyzer_v7/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/Neutrino_Pt2to20_gun_TTI2023Upg14D-PU140bx25/res/output-Neutrino_Pt2to20_gun_TTI2023Upg14D-PU140bx25.root to the chain
+-=== TreeDefinitionReco::InitReco()
+-	Setting branch addresses and branch pointers.
+-	Setting L1 Tracks addresses.
+-	Setting L1 Pixel Tracks addresses.
+-	Setting L1 Calo Tau addresses.
+-	Setting L1 Jet addresses.
+-=== TreeDefinitionGenP::InitGenP()
+-	Setting HepMC addresses.
+-	Setting GenP addresses.
+-	Setting TP addresses.
+-=== CaloTk:
+-	Analyzing: 100000/100000 events
+-======================================================================================================
+- Variable                           | Cut | Value    | TP 2015                          | Units      
+-======================================================================================================
+- MC Sample                          | ==  | MinBias  |                                  |            
+- Matching Tracks: Collection        | ==  | TTTracks | TTTracks                         |            
+- Matching Tracks: Fit Parameters    | ==  | 5        | 5                                |            
+- Matching Tracks: Pt                | >=  | 5        | 2                                | GeV/c      
+- Matching Tracks: |Eta|             | <=  | 1e+03    | 1e+03                            |            
+- Matching Tracks: ChiSqRed          | <=  | 2        | 200/DOF                          |            
+- Matching Tracks: Stubs             | >=  | 4        | 4                                |            
+- Matching Tracks: PS-Stubs (min)    | >=  | 0        | 0                                |            
+- Matching Tracks: PS-Stubs (max)    | <=  | 999      | N/A                              |            
+- Matching Tracks: DeltaR            | <=  | 0.1      | 0.10                             |            
+- Signal Cone Tks: Collection        | ==  | TTTracks | TTTracks                         |            
+- Signal Cone Tks: Fit Parameters    | ==  | 5        | 5                                |            
+- Signal Cone Tks: Pt                | >=  | 2        | 2                                | GeV/c      
+- Signal Cone Tks: |Eta|             | <=  | 1e+03    | 1e+03                            |            
+- Signal Cone Tks: ChiSqRed          | <=  | 200      | 200 (but on ChiSq, not ChiSqRed) |            
+- Signal Cone Tks: Stubs             | >=  | 0        | 4                                |            
+- Signal Cone Tks: PS-Stubs (min)    | >=  | 0        | 0                                |            
+- Signal Cone Tks: PS-Stubs (max)    | <=  | 999      | N/A                              |            
+- Isolation Cone Tks: Collection     | ==  | TTTracks | TTTracks                         |            
+- Isolation Cone Tks: Fit Parameters | ==  | 5        | 5                                |            
+- Isolation Cone Tks: Pt             | >=  | 2        | 2                                | GeV/c      
+- Isolation Cone Tks: |Eta|          | <=  | 1e+03    | 1e+03                            |            
+- Isolation Cone Tks: ChiSqRed       | <=  | 200      | 200 (but on ChiSq, not ChiSqRed) |            
+- Isolation Cone Tks: Stubs          | >=  | 0        | 4                                |            
+- Isolation Cone Tks: PS-Stubs (min) | >=  | 0        | 0                                |            
+- Isolation Cone Tks: PS-Stubs (max) | <=  | 999      | N/A                              |            
+- Signal Cone: Shrink Constant       | ==  | 0        | 0                                | GeV        
+- Signal Cone: DeltaR                | >=  | 0        | 0.0                              |            
+- Signal Cone: DeltaR                | <=  | 0.12     | 0.15                             |            
+- Signal Cone:-3pr InvMass           | <=  | 1.77     | N/A                              | GeV/c^{-2} 
+- Signal Cone:-3pr maxTkDeltaPOCAz   | <=  | 0.2      | N/A                              | cm         
+- Isolation Cone: Shrink Constant    | ==  | 5        | 3.5                              | GeV        
+- Isolation Cone: DeltaR             | >=  | 0.12     | 0.15                             |            
+- Isolation Cone: DeltaR             | =<  | 0.3      | 0.30                             |            
+- Isolation Cone: VtxIso             | <=  | 0.5      | 1.0                              | cm         
+- Di-Tau |Delta z0|                  | <   | 0.5      | 1.0                              | cm         
+- MC-Matching DeltaR                 | <=  | 0.1      | 0.05                             |            
+- MC-Matching IsUnique               | ==  | 1        | 1                                |            
+- MC-Taus: Mom PdgId                 | ==  | 0        | N/A                              |            
+- MC-Taus: Number Expected           | >=  | 0        | N/A                              |            
+-                                    |     |          |                                  |      
+diff --git a/NtupleAnalysis/src/CaloTk/work/results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/opt1/CaloTk_Histograms_VBF.txt b/NtupleAnalysis/src/CaloTk/work/results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/opt1/CaloTk_Histograms_VBF.txt
+deleted file mode 100644
+index b82f0f5..0000000
+--- a/NtupleAnalysis/src/CaloTk/work/results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/opt1/CaloTk_Histograms_VBF.txt
++++ /dev/null
+@@ -1,59 +0,0 @@
+-=== FileOpener::OpenFile()
+-	Adding file /Users/attikis/hltaus/rootFiles/TTrees/CMSSW_6_2_0_SLHC12_patch1/TkTauFromCaloAnalyzer_v7/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/VBF_HToTauTau_125_14TeV_powheg_pythia6_TTI2023Upg14D-PU140bx25/res/output-VBF_HToTauTau_125_14TeV_powheg_pythia6_TTI2023Upg14D-PU140bx25.root to the chain
+-=== TreeDefinitionReco::InitReco()
+-	Setting branch addresses and branch pointers.
+-	Setting L1 Tracks addresses.
+-	Setting L1 Pixel Tracks addresses.
+-	Setting L1 Calo Tau addresses.
+-	Setting L1 Jet addresses.
+-=== TreeDefinitionGenP::InitGenP()
+-	Setting HepMC addresses.
+-	Setting GenP addresses.
+-	Setting TP addresses.
+-=== CaloTk:
+-	Analyzing: 24977/24977 events
+-======================================================================================================
+- Variable                           | Cut | Value    | TP 2015                          | Units      
+-======================================================================================================
+- MC Sample                          | ==  | VBF      |                                  |            
+- Matching Tracks: Collection        | ==  | TTTracks | TTTracks                         |            
+- Matching Tracks: Fit Parameters    | ==  | 5        | 5                                |            
+- Matching Tracks: Pt                | >=  | 5        | 2                                | GeV/c      
+- Matching Tracks: |Eta|             | <=  | 1e+03    | 1e+03                            |            
+- Matching Tracks: ChiSqRed          | <=  | 2        | 200/DOF                          |            
+- Matching Tracks: Stubs             | >=  | 4        | 4                                |            
+- Matching Tracks: PS-Stubs (min)    | >=  | 0        | 0                                |            
+- Matching Tracks: PS-Stubs (max)    | <=  | 999      | N/A                              |            
+- Matching Tracks: DeltaR            | <=  | 0.1      | 0.10                             |            
+- Signal Cone Tks: Collection        | ==  | TTTracks | TTTracks                         |            
+- Signal Cone Tks: Fit Parameters    | ==  | 5        | 5                                |            
+- Signal Cone Tks: Pt                | >=  | 2        | 2                                | GeV/c      
+- Signal Cone Tks: |Eta|             | <=  | 1e+03    | 1e+03                            |            
+- Signal Cone Tks: ChiSqRed          | <=  | 200      | 200 (but on ChiSq, not ChiSqRed) |            
+- Signal Cone Tks: Stubs             | >=  | 0        | 4                                |            
+- Signal Cone Tks: PS-Stubs (min)    | >=  | 0        | 0                                |            
+- Signal Cone Tks: PS-Stubs (max)    | <=  | 999      | N/A                              |            
+- Isolation Cone Tks: Collection     | ==  | TTTracks | TTTracks                         |            
+- Isolation Cone Tks: Fit Parameters | ==  | 5        | 5                                |            
+- Isolation Cone Tks: Pt             | >=  | 2        | 2                                | GeV/c      
+- Isolation Cone Tks: |Eta|          | <=  | 1e+03    | 1e+03                            |            
+- Isolation Cone Tks: ChiSqRed       | <=  | 200      | 200 (but on ChiSq, not ChiSqRed) |            
+- Isolation Cone Tks: Stubs          | >=  | 0        | 4                                |            
+- Isolation Cone Tks: PS-Stubs (min) | >=  | 0        | 0                                |            
+- Isolation Cone Tks: PS-Stubs (max) | <=  | 999      | N/A                              |            
+- Signal Cone: Shrink Constant       | ==  | 0        | 0                                | GeV        
+- Signal Cone: DeltaR                | >=  | 0        | 0.0                              |            
+- Signal Cone: DeltaR                | <=  | 0.12     | 0.15                             |            
+- Signal Cone:-3pr InvMass           | <=  | 1.77     | N/A                              | GeV/c^{-2} 
+- Signal Cone:-3pr maxTkDeltaPOCAz   | <=  | 0.2      | N/A                              | cm         
+- Isolation Cone: Shrink Constant    | ==  | 5        | 3.5                              | GeV        
+- Isolation Cone: DeltaR             | >=  | 0.12     | 0.15                             |            
+- Isolation Cone: DeltaR             | =<  | 0.3      | 0.30                             |            
+- Isolation Cone: VtxIso             | <=  | 0.5      | 1.0                              | cm         
+- Di-Tau |Delta z0|                  | <   | 0.5      | 1.0                              | cm         
+- MC-Matching DeltaR                 | <=  | 0.1      | 0.05                             |            
+- MC-Matching IsUnique               | ==  | 1        | 1                                |            
+- MC-Taus: Mom PdgId                 | ==  | 25       | N/A                              |            
+- MC-Taus: Number Expected           | >=  | 2        | N/A                              |            
+-                                    |     |          |                                  |            
+-Progress: 1.99 %  (498/24977)                                                                                                     
+diff --git a/NtupleAnalysis/src/CaloTk/work/results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/opt2/settings.txt b/NtupleAnalysis/src/CaloTk/work/results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/opt2/settings.txt
+deleted file mode 100644
+index 88f9ca6..0000000
+--- a/NtupleAnalysis/src/CaloTk/work/results/L1CaloTaus_CaloCorr_TTTracks_Stubs_TTPixelTracks_CandPixHits_TPs_GenPs_v620SLHC12p1_07Nov2016/opt2/settings.txt
++++ /dev/null
+@@ -1,52 +0,0 @@
+-// Matching tracks
+-  matchTk_Collection  =  "TTTracks"; // TP: "TTTracks" (not "TTPixelTracks")
+-  matchTk_nFitParams  =   5;         // TP:   5
+-  matchTk_minPt       =   5.00;      // TP:   5.0
+-  matchTk_minEta      =   0.0;       // TP:   N/A
+-  matchTk_maxEta      = 999.9;       // TP: 999.9  
+-  matchTk_maxChiSqRed =   2.0;       // TP: 200.0
+-  matchTk_minStubs    =   4;         // TP:   0
+-  matchTk_minStubsPS  =   0;         // TP:   0
+-  matchTk_maxStubsPS  =   4;         // TP:   N/A
+-  matchTk_caloDeltaR  =   0.10;      // TP: 0.10
+-
+-  // Signal cone tracks
+-  sigConeTks_Collection  = matchTk_Collection; // TP: "TTTracks" (not "TTPixelTracks")
+-  sigConeTks_nFitParams  = matchTk_nFitParams; // TP:   5
+-  sigConeTks_minPt       =   2.0;              // TP:   2.0
+-  sigConeTks_minEta      =   0.0;              // TP:   N/A
+-  sigConeTks_maxEta      = 999.9;              // TP: 999.9
+-  sigConeTks_maxChiSqRed = 200.0;              // TP: 200.0
+-  sigConeTks_minStubs    =   0;                // TP:   0
+-  sigConeTks_minStubsPS  =   0;                // TP:   0
+-  sigConeTks_maxStubsPS  = 999;                // TP:   N/A
+-
+-  // Isolation cone tracks
+-  isoConeTks_Collection  = matchTk_Collection;    // TP: "TTTracks" (not "TTPixelTracks")
+-  isoConeTks_nFitParams  = matchTk_nFitParams;    // TP:   5
+-  isoConeTks_minPt       =   2.0;                 // TP:   2.0
+-  isoConeTks_minEta      =   0.0;                 // TP:   N/A
+-  isoConeTks_maxEta      = 999.9;                 // TP: 999.9
+-  isoConeTks_maxChiSqRed = 200.0;                 // TP: 200.0
+-  isoConeTks_minStubs    =   0;                   // TP:   0
+-  isoConeTks_minStubsPS  =   0;                   // TP:   0
+-  isoConeTks_maxStubsPS  = 999;                   // TP:   N/A
+-  
+-  // Signal cone parameters
+-  sigCone_Constant        = +0.00; // TP: 0.00
+-  sigCone_dRMin           = +0.00; // WARNING! If > 0 the matching Track will NOT be added in sigCone_TTTracks.
+-  sigCone_dRMax           = +0.12; // TP: 0.15
+-  sigCone_cutoffDeltaR    = +0.12; // TP: 0.15
+-  sigCone_maxTkInvMass    = +1.77; // TP: Unused (3-pr)
+-  sigCone_maxTkDeltaPOCAz = +0.20; // TP: Unused (3-pr)
+-
+-  // Isolation cone
+-  isoCone_Constant = +5.00;         // TP: 3.50 GeV
+-  isoCone_VtxIsoWP = +0.50;         // TP: 1.0cm
+-  isoCone_dRMin    = sigCone_dRMax; // TP: 0.4cm
+-  isoCone_dRMax    = +0.30;         // TP: 0.4cm
+-  diTau_deltaPOCAz = +0.50;         // TP: 1.0cm
+-
+-  // MC matching
+-  mcMatching_dRMax  = +0.10;        // TP: 0.05
+-  mcMatching_unique = true;
+diff --git a/NtupleAnalysis/src/TkTaus/TkTaus.C b/NtupleAnalysis/src/TkTaus/TkTaus.C
+index 2eb2322..e57c422 100644
+--- a/NtupleAnalysis/src/TkTaus/TkTaus.C
++++ b/NtupleAnalysis/src/TkTaus/TkTaus.C
+@@ -38,21 +38,21 @@ void TkTaus::InitVars_()
+   // Matching tracks
+   seedTk_Collection  =  "TTTracks"; // "TTTracks"
+   seedTk_nFitParams  =   4;         // 4
+-  seedTk_minPt       =   5.00;      // ?
++  seedTk_minPt       =  15.00;      //   5.0
+   seedTk_minEta      =   0.0;       //   0.0
+   seedTk_maxEta      =  999.9;      // 999.9
+-  seedTk_maxChiSq    =  100.0;      // 100
+-  seedTk_minStubs    =    4;        //   4
++  seedTk_maxChiSq    =   25.0;      // 100
++  seedTk_minStubs    =    5;        //   4
+   seedTk_caloDeltaR  =    0.1;      // 0.1
+ 
+   // Signal cone tracks
+   sigConeTks_Collection  = seedTk_Collection;
+   sigConeTks_nFitParams  = seedTk_nFitParams;
+-  sigConeTks_minPt       =   2.0; //   2.0
++  sigConeTks_minPt       =   5.0; //   2.0
+   sigConeTks_minEta      =   0.0; //   0.0
+   sigConeTks_maxEta      = 999.9; // 999.9
+-  sigConeTks_maxChiSq    = 100.0; // 100.0
+-  sigConeTks_minStubs    =   4;   //   4
++  sigConeTks_maxChiSq    =  25.0; // 100.0
++  sigConeTks_minStubs    =   5;   //   4
+ 
+   // Isolation cone tracks
+   isoConeTks_Collection  = seedTk_Collection;
+@@ -66,8 +66,8 @@ void TkTaus::InitVars_()
+   // Signal cone parameters
+   sigCone_Constant        = +0.00; // 0.0
+   sigCone_dRMin           = +0.00; // WARNING! If > 0 the matching Track will NOT be added in sigCone_TTTracks
+-  sigCone_dRMax           = +0.15; // 0.15
+-  sigCone_cutoffDeltaR    = +0.15; // 0.15
++  sigCone_dRMax           = +0.12; // 0.15
++  sigCone_cutoffDeltaR    = +0.12; // 0.15
+   sigCone_maxTkInvMass    = +1.77; // ?
+   sigCone_maxTkDeltaPOCAz = +0.20; // ?
+ 
+@@ -450,7 +450,7 @@ void TkTaus::Loop()
+ 	vector<unsigned short> chargedPionsIndices;
+ 	vector<GenParticle>    chargedPions;
+ 
+-	//if (tau->HasMatchingGenParticle()) 
++	// Get the charged pions
+ 	GetHadronicTauChargedPions(tau->index(), chargedPionsIndices);
+ 
+ 	// Ask for 3-prong or 5-prong decay
+@@ -478,25 +478,26 @@ void TkTaus::Loop()
+ 		
+ 	      }// For-loop: All charged pions
+ 	    
++	    // For-loop: All charged pions (3pr or 5pr)
+ 	    for (vector<GenParticle>::iterator chPion = chargedPions.begin(); chPion != chargedPions.end(); chPion++)
+ 	      {
+ 		if (chPion->index() == ldgPionIndx) continue;
+ 		double pions_dR = auxTools_.DeltaR(ldgPion.eta(), ldgPion.phi(), chPion->eta(), chPion->phi() );
+-
++		
+ 		if ( pions_dR > pions_dRMax) pions_dRMax = pions_dR;
+ 	      }
+ 	    
+ 	    // Fill histo
+ 	    h_GenP_VisET_dRMaxLdgPion -> Fill(pions_dRMax, tau->p4vis().Et());
+ 	    h_GenP_PtLdg_dRMaxLdgPion -> Fill(pions_dRMax, ldgPionPt);
+-
++	    
+ 	  }// Ask for 3-prong or 5-prong decay
+ 
+       }
+ 
+ 
+     // ======================================================================================
+-    // For-loop: ?
++    // For-loop: Seed Tracks
+     // ======================================================================================
+     for (size_t i = 0; i < seedTracks.size(); i++)
+       {
+@@ -562,6 +563,8 @@ void TkTaus::Loop()
+     ////////////////////////////////////////////////
+     vector<L1TkTauParticle> myL1TkTaus = L1TkTaus_Tk;
+     hL1TkTau_Multiplicity ->Fill( myL1TkTaus.size() );
++
++    // For-loop: TkTaus
+     for (vector<L1TkTauParticle>::iterator tau = myL1TkTaus.begin(); tau != myL1TkTaus.end(); tau++)
+       {
+ 	if (DEBUG) tau->PrintProperties(true, true, true, true);
+@@ -1712,11 +1715,13 @@ void TkTaus::FillSingleTau_(vector<L1TkTauParticle> L1TkTaus,
+   if( L1TkTaus.size() < 1 ) return;
+   
+   // Fill rate
+-  double ldgEt = L1TkTaus.at(0).GetCaloTau().et(); //fixme
++  TLorentzVector sigTks_p4 = L1TkTaus.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
++  double ldgEt  = sigTks_p4.Et();  
++  double ldgEta = sigTks_p4.Eta();
+   
+   // Inclusive or Eta slice in Central/Intermedieate/Forward Tracker region?
+-  if ( abs(L1TkTaus.at(0).GetCaloTau().eta()) < minEta) return; // fixme
+-  if ( abs(L1TkTaus.at(0).GetCaloTau().eta()) > maxEta) return; // fixme
++  if ( abs(ldgEta) < minEta) return;
++  if ( abs(ldgEta) > maxEta) return;
+     
+   FillRate_(hRate, ldgEt);
+   
+@@ -1728,7 +1733,8 @@ void TkTaus::FillSingleTau_(vector<L1TkTauParticle> L1TkTaus,
+   if(!bFoundAllTaus_) return;
+   
+   // Fill efficiency
+-  double ldgEt_mcMatched = L1TkTaus_mcMatched.at(0).GetCaloTau().et(); // fixme
++  TLorentzVector sigTks_p4_mc = L1TkTaus_mcMatched.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
++  double ldgEt_mcMatched = sigTks_p4_mc.Et();
+   FillEfficiency_(hEfficiency, ldgEt_mcMatched);
+ 
+   return;
+@@ -1749,13 +1755,15 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus,
+ 
+   // Fill rate
+   L1TkTauParticle L1TkTau = L1TkTaus.at(1);
+-  double subLdgEt = L1TkTau.GetCaloTau().et(); //fixme
+-  
++  TLorentzVector sigTks_p4 = L1TkTaus.at(1).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
++  double subLdgEt  = sigTks_p4.Et();  
++  double subLdgEta = sigTks_p4.Eta();  
++
+   // Inclusive or Eta slice in Central/Intermedieate/Forward Tracker region?
+-  if ( abs(L1TkTaus.at(0).GetCaloTau().eta()) < minEta) return; //fixme
+-  if ( abs(L1TkTaus.at(0).GetCaloTau().eta()) > maxEta) return;
+-  if ( abs(L1TkTaus.at(1).GetCaloTau().eta()) < minEta) return;
+-  if ( abs(L1TkTaus.at(1).GetCaloTau().eta()) > maxEta) return;
++  if ( abs(subLdgEta) < minEta) return;
++  if ( abs(subLdgEta) > maxEta) return;
++  if ( abs(subLdgEta) < minEta) return;
++  if ( abs(subLdgEta) > maxEta) return;
+ 
+   FillRate_(hRate, subLdgEt);
+ 
+@@ -1767,7 +1775,8 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus,
+   if(!bFoundAllTaus_) return;
+ 
+   // Fill efficiency
+-  double subLdgEt_mcMatched = L1TkTaus_mcMatched.at(1).GetCaloTau().et(); //fixme
++  TLorentzVector sigTks_p4_mc = L1TkTaus_mcMatched.at(1).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
++  double subLdgEt_mcMatched  = sigTks_p4_mc.Et();  
+   FillEfficiency_(hEfficiency, subLdgEt_mcMatched);
+ 
+   return;
+@@ -1791,16 +1800,21 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus1,
+   vector<L1TkTauParticle> L1TkTaus2_mcMatched = GetMcMatchedL1TkTaus(L1TkTaus2);
+ 
+   // Fill rate 
+-  double ldgEt1 = L1TkTaus1.at(0).GetCaloTau().et(); // fixme
+-  double ldgEt2 = L1TkTaus2.at(0).GetCaloTau().et();
++  TLorentzVector sigTks1_p4 = L1TkTaus1.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
++  TLorentzVector sigTks2_p4 = L1TkTaus2.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
++  double ldgEt1 = sigTks1_p4.Et();
++  double ldgEt2 = sigTks2_p4.Et();
+ 
+   // Ensure that different calo objects are used
+-  unsigned int index1 = L1TkTaus1.at(0).GetCaloTau().index(); //fixme
+-  unsigned int index2 = L1TkTaus2.at(0).GetCaloTau().index();
+-  if (index1==index2)
++  double eta1 = L1TkTaus1.at(0).GetMatchingTk().getEta();
++  double phi1 = L1TkTaus1.at(0).GetMatchingTk().getPhi();
++  double eta2 = L1TkTaus2.at(0).GetMatchingTk().getEta();
++  double phi2 = L1TkTaus2.at(0).GetMatchingTk().getPhi();
++  double dR = auxTools_.DeltaR(eta1, phi1, eta2, phi2);
++  if (dR < 0.4)
+     {
+       if (L1TkTaus2.size() < 2) return;
+-      index2 = L1TkTaus2.at(1).GetCaloTau().index();
++      ldgEt2 = L1TkTaus2.at(1).GetCaloTau().et(); //fixme! better clean-up needed
+     }
+ 
+   // Make x-axis the ldgEt axis
+@@ -1813,19 +1827,23 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus1,
+   if (L1TkTaus2_mcMatched.size() < 1) return;
+ 
+   // Get MC-matched Et
+-  double ldgEt1_mcMatched = L1TkTaus1_mcMatched.at(0).GetCaloTau().et(); //fixme
+-  double ldgEt2_mcMatched = L1TkTaus2_mcMatched.at(0).GetCaloTau().et();
++  TLorentzVector sigTks1_p4_mc = L1TkTaus1_mcMatched.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
++  TLorentzVector sigTks2_p4_mc = L1TkTaus2_mcMatched.at(0).GetSigConeTTTracksP4(); // fixme (filter before or sort with pT)?
++  double ldgEt1_mcMatched = sigTks1_p4_mc.Et();
++  double ldgEt2_mcMatched = sigTks2_p4_mc.Et();
+ 
+-  
+   // Ensure that different calo objects are used
+-  index1 = L1TkTaus1_mcMatched.at(0).GetCaloTau().index();
+-  index2 = L1TkTaus2_mcMatched.at(0).GetCaloTau().index();
+-  if (index1==index2)
++  eta1 = L1TkTaus1_mcMatched.at(0).GetMatchingTk().getEta();
++  phi1 = L1TkTaus1_mcMatched.at(0).GetMatchingTk().getPhi();
++  eta2 = L1TkTaus2_mcMatched.at(0).GetMatchingTk().getEta();
++  phi2 = L1TkTaus2_mcMatched.at(0).GetMatchingTk().getPhi();
++  dR    = auxTools_.DeltaR(eta1, phi1, eta2, phi2);
++  if (dR < 0.4)
+     {
+       if (L1TkTaus2_mcMatched.size() < 2) return;
+-      index2 = L1TkTaus2_mcMatched.at(1).GetCaloTau().index();
++      ldgEt2_mcMatched = L1TkTaus2_mcMatched.at(1).GetCaloTau().et(); //fixme! better clean-up needed
+     }
+-
++  
+   // Check that all taus were found
+   if(!bFoundAllTaus_) return;
+ 
+@@ -1894,7 +1912,9 @@ void TkTaus::FillTurnOn_Numerator_(vector<L1TkTauParticle> L1TkTaus,
+       if (!L1TkTau->HasMatchingGenParticle()) continue;	 
+       
+       // Skip if trigger object has eT < minEt
+-      if ( L1TkTau->GetCaloTau().et() < minEt) continue; // fixme
++      TLorentzVector sigTks2_p4 = L1TkTau->GetSigConeTTTracksP4();
++      double tkTau_et = sigTks2_p4.Et();
++      if ( tkTau_et < minEt) continue;
+       
+       // Get MC-match
+       GenParticle p = L1TkTau->GetMatchingGenParticle();
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afs00CE b/NtupleAnalysis/src/TkTaus/work/.__afs00CE
+deleted file mode 100644
+index 003ebeb..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afs00CE and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afs10C7 b/NtupleAnalysis/src/TkTaus/work/.__afs10C7
+deleted file mode 100644
+index 31b7422..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afs10C7 and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afs20E8 b/NtupleAnalysis/src/TkTaus/work/.__afs20E8
+deleted file mode 100644
+index 841e469..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afs20E8 and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afs39D1 b/NtupleAnalysis/src/TkTaus/work/.__afs39D1
+deleted file mode 100644
+index 80416bf..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afs39D1 and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afs4623 b/NtupleAnalysis/src/TkTaus/work/.__afs4623
+deleted file mode 100644
+index 36ee2eb..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afs4623 and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afs4B82 b/NtupleAnalysis/src/TkTaus/work/.__afs4B82
+deleted file mode 100644
+index a0ffacc..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afs4B82 and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afs593B b/NtupleAnalysis/src/TkTaus/work/.__afs593B
+deleted file mode 100644
+index 43ce443..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afs593B and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afs5AFD b/NtupleAnalysis/src/TkTaus/work/.__afs5AFD
+deleted file mode 100644
+index 9424a06..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afs5AFD and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afs6C61 b/NtupleAnalysis/src/TkTaus/work/.__afs6C61
+deleted file mode 100644
+index a9115eb..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afs6C61 and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afs716A b/NtupleAnalysis/src/TkTaus/work/.__afs716A
+deleted file mode 100644
+index d88f706..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afs716A and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afs8D44 b/NtupleAnalysis/src/TkTaus/work/.__afs8D44
+deleted file mode 100644
+index 51a46c2..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afs8D44 and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afs9F92 b/NtupleAnalysis/src/TkTaus/work/.__afs9F92
+deleted file mode 100644
+index a0c997f..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afs9F92 and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afsA11D b/NtupleAnalysis/src/TkTaus/work/.__afsA11D
+deleted file mode 100644
+index ffff88d..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afsA11D and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afsB52C b/NtupleAnalysis/src/TkTaus/work/.__afsB52C
+deleted file mode 100644
+index cf772c3..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afsB52C and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afsC0CD b/NtupleAnalysis/src/TkTaus/work/.__afsC0CD
+deleted file mode 100644
+index 424bc24..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afsC0CD and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afsD167 b/NtupleAnalysis/src/TkTaus/work/.__afsD167
+deleted file mode 100644
+index 2f3a1e0..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afsD167 and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afsE22B b/NtupleAnalysis/src/TkTaus/work/.__afsE22B
+deleted file mode 100644
+index bc5d5dc..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afsE22B and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/.__afsFC4E b/NtupleAnalysis/src/TkTaus/work/.__afsFC4E
+deleted file mode 100644
+index 29c8b34..0000000
+Binary files a/NtupleAnalysis/src/TkTaus/work/.__afsFC4E and /dev/null differ
+diff --git a/NtupleAnalysis/src/TkTaus/work/lxplus_04Oct2018.txt b/NtupleAnalysis/src/TkTaus/work/lxplus_04Oct2018.txt
+deleted file mode 100644
+index 8b445ae..0000000
+--- a/NtupleAnalysis/src/TkTaus/work/lxplus_04Oct2018.txt
++++ /dev/null
+@@ -1,42 +0,0 @@
+-=== Directory /eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650 found
+-
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "GluGluHToTauTau_M125_14TeV_powheg_pythia8_PhaseIIFall17D_L1TnoPU_93X", "", -1)...
+-
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "GluGluHToTauTau_M125_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU140_93X", "", -1)...
+-
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "GluGluHToTauTau_M125_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU200_93X", "", -1)...
+-
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PhaseIIFall17D_L1TnoPU_93X", "", -1)...
+-
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PhaseIIFall17D_L1TPU140_93X", "", -1)...
+-
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "PYTHIA_Tauola_TB_ChargedHiggs1000_14TeV_PhaseIIFall17D_L1TPU200_93X", "", -1)...
+-
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "PYTHIA_Tauola_TB_ChargedHiggs200_14TeV_PhaseIIFall17D_L1TnoPU_93X", "", -1)...
+-
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "PYTHIA_Tauola_TB_ChargedHiggs200_14TeV_PhaseIIFall17D_L1TPU140_93X", "", -1)...
+-=== AuxTools::ProgressBar() 1 %                                                                                                    
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "PYTHIA_Tauola_TB_ChargedHiggs200_14TeV_PhaseIIFall17D_L1TPU200_93X", "", -1)...
+-
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "PYTHIA_Tauola_TB_ChargedHiggs500_14TeV_PhaseIIFall17D_L1TnoPU_93X", "", -1)...
+-=== AuxTools::ProgressBar() 2 %                                                                                                   
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "PYTHIA_Tauola_TB_ChargedHiggs500_14TeV_PhaseIIFall17D_L1TPU140_93X", "", -1)...
+-=== AuxTools::ProgressBar() 1 %                                                                                                    
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "PYTHIA_Tauola_TB_ChargedHiggs500_14TeV_PhaseIIFall17D_L1TPU200_93X", "", -1)...
+-=== AuxTools::ProgressBar() 3 %                                                                                                  
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "RelValSingleTauFlatPt2To100_pythia8_93X_upgrade2023_realistic_v5_2023D17noPU_93X", "", -1)...
+-
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "RelValSingleTauFlatPt2To100_pythia8_PU25ns_93X_upgrade2023_realistic_v5_2023D17PU200_93X", "", -1)...
+-=== AuxTools::ProgressBar() 4 %                                                                                                 === AuxTools::ProgressBar() 2 %                                                                                                   === AuxTools::ProgressBar() 5 %                                                                                                === AuxTools::ProgressBar() 1 %                                                                                                    
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "SingleE_FlatPt_2to100_PhaseIIFall17D_L1TnoPU_93X", "", -1)...
+-
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "SingleNeutrino_PhaseIIFall17D_L1TPU140_93X", "", -1)...
+-
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "SingleNeutrino_PhaseIIFall17D_L1TPU200_93X", "", -1)...
+-=== AuxTools::ProgressBar() 1 %                                                                                                    === AuxTools::ProgressBar() 2 %                                                                                                   === AuxTools::ProgressBar() 3 %                                                                                                  === AuxTools::ProgressBar() 4 %                                                                                                 === AuxTools::ProgressBar() 5 %                                                                                                === AuxTools::ProgressBar() 6 %                                                                                               === AuxTools::ProgressBar() 7 %                                                                                              === AuxTools::ProgressBar() 8 %                                                                                             === AuxTools::ProgressBar() 9 %                                                                                            === AuxTools::ProgressBar() 10 %                                                                                           === AuxTools::ProgressBar() 11 %                                                                                          === AuxTools::ProgressBar() 12 %                                                                                         === AuxTools::ProgressBar() 13 %                                                                                        === AuxTools::ProgressBar() 6 %                                                                                               === AuxTools::ProgressBar() 14 %                                                                                       === AuxTools::ProgressBar() 15 %                                                                                      === AuxTools::ProgressBar() 1 %                                                                                                    === AuxTools::ProgressBar() 16 %                                                                                     
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TnoPU_93X", "", -1)...
+-=== AuxTools::ProgressBar() 17 %                                                                                    === AuxTools::ProgressBar() 2 %                                                                                                   === AuxTools::ProgressBar() 18 %                                                                                   
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU140_93X", "", -1)...
+-=== AuxTools::ProgressBar() 19 %                                                                                  === AuxTools::ProgressBar() 20 %                                                                                 === AuxTools::ProgressBar() 21 %                                                                                === AuxTools::ProgressBar() 22 %                                                                               === AuxTools::ProgressBar() 23 %                                                                              === AuxTools::ProgressBar() 24 %                                                                             === AuxTools::ProgressBar() 25 %                                                                            === AuxTools::ProgressBar() 26 %                                                                           === AuxTools::ProgressBar() 27 %                                                                          === AuxTools::ProgressBar() 28 %                                                                         === AuxTools::ProgressBar() 29 %                                                                         === AuxTools::ProgressBar() 30 %                                                                       === AuxTools::ProgressBar() 31 %                                                                      
+-Processing run.cc("/eos/user/m/mtoumazo/multicrab_HLTaus_v1015_20180710T1650", "TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU200_93X", "", -1)...
+-=== AuxTools::ProgressBar() 32 %                                                                     === AuxTools::ProgressBar() 33 %                                                                    === AuxTools::ProgressBar() 34 %                                                                   === AuxTools::ProgressBar() 35 %                                                                  === AuxTools::ProgressBar() 36 %                                                                 === AuxTools::ProgressBar() 7 %                                                                                              === AuxTools::ProgressBar() 1 %                                                                                                    === AuxTools::ProgressBar() 37 %                                                                === AuxTools::ProgressBar() 38 %                                                               === AuxTools::ProgressBar() 39 %                                                              === AuxTools::ProgressBar() 40 %                                                             === AuxTools::ProgressBar() 41 %                                                            === AuxTools::ProgressBar() 3 %                                                                                                  === AuxTools::ProgressBar() 42 %                                                           === AuxTools::ProgressBar() 43 %                                                          === AuxTools::ProgressBar() 44 %                                                         === AuxTools::ProgressBar() 45 %                                                        === AuxTools::ProgressBar() 46 %                                                       === AuxTools::ProgressBar() 47 %                                                      === AuxTools::ProgressBar() 48 %                                                     === AuxTools::ProgressBar() 49 %                                                    === AuxTools::ProgressBar() 50 %                                                   === AuxTools::ProgressBar() 51 %                                                  === AuxTools::ProgressBar() 52 %                                                 === AuxTools::ProgressBar() 3 %                                                                                                  === AuxTools::ProgressBar() 53 %                                                === AuxTools::ProgressBar() 54 %                                               === AuxTools::ProgressBar() 55 %                                              === AuxTools::ProgressBar() 56 %                                             === AuxTools::ProgressBar() 2 %                                                                                                   === AuxTools::ProgressBar() 57 %                                             === AuxTools::ProgressBar() 58 %                                            === AuxTools::ProgressBar() 59 %                                          === AuxTools::ProgressBar() 60 %                                         === AuxTools::ProgressBar() 61 %                                        === AuxTools::ProgressBar() 2 %                                                                                                   === AuxTools::ProgressBar() 1 %                                                                                                    === AuxTools::ProgressBar() 62 %                                       === AuxTools::ProgressBar() 63 %                                      === AuxTools::ProgressBar() 64 %                                     === AuxTools::ProgressBar() 65 %                                    === AuxTools::ProgressBar() 66 %                                   === AuxTools::ProgressBar() 67 %                                  === AuxTools::ProgressBar() 68 %                                 === AuxTools::ProgressBar() 4 %                                                                                                 === AuxTools::ProgressBar() 69 %                                === AuxTools::ProgressBar() 70 %                               === AuxTools::ProgressBar() 71 %                              === AuxTools::ProgressBar() 72 %                             === AuxTools::ProgressBar() 8 %                                                                                             === AuxTools::ProgressBar() 73 %                            === AuxTools::ProgressBar() 4 %                                                                                                 === AuxTools::ProgressBar() 74 %                           === AuxTools::ProgressBar() 75 %                          === AuxTools::ProgressBar() 76 %                         === AuxTools::ProgressBar() 77 %                        === AuxTools::ProgressBar() 78 %                       === AuxTools::ProgressBar() 79 %                      === AuxTools::ProgressBar() 80 %                     === AuxTools::ProgressBar() 81 %                    === AuxTools::ProgressBar() 82 %                   === AuxTools::ProgressBar() 83 %                  === AuxTools::ProgressBar() 84 %                 === AuxTools::ProgressBar() 85 %                === AuxTools::ProgressBar() 86 %               === AuxTools::ProgressBar() 87 %              === AuxTools::ProgressBar() 88 %             === AuxTools::ProgressBar() 89 %            === AuxTools::ProgressBar() 90 %           === AuxTools::ProgressBar() 91 %          === AuxTools::ProgressBar() 92 %         === AuxTools::ProgressBar() 93 %        === AuxTools::ProgressBar() 94 %       === AuxTools::ProgressBar() 95 %      === AuxTools::ProgressBar() 96 %     === AuxTools::ProgressBar() 9 %                                                                                            === AuxTools::ProgressBar() 97 %    === AuxTools::ProgressBar() 98 %   === AuxTools::ProgressBar() 99 %  === AuxTools::ProgressBar() 100 % === AuxTools::ProgressBar() 5 %                                                                                                === AuxTools::ProgressBar() 1 %                                                                                                    === AuxTools::ProgressBar() 5 %                                                                                                === AuxTools::ProgressBar() 1 %                                                                                                    === AuxTools::ProgressBar() 2 %                                                                                                   === AuxTools::ProgressBar() 1 %                                                                                                    === AuxTools::ProgressBar() 10 %                                                                                           === AuxTools::ProgressBar() 3 %                                                                                                  === AuxTools::ProgressBar() 1 %                                                                                                     === AuxTools::ProgressBar() 4 %                                                                                                 === AuxTools::ProgressBar() 2 %                                                                                                   === AuxTools::ProgressBar() 1 %                                                                                                    === AuxTools::ProgressBar() 5 %                                                                                                === AuxTools::ProgressBar() 6 %                                                                                               === AuxTools::ProgressBar() 6 %                                                                                               === AuxTools::ProgressBar() 3 %                                                                                                  === AuxTools::ProgressBar() 1 %                                                                                                    === AuxTools::ProgressBar() 6 %                                                                                               === AuxTools::ProgressBar() 3 %                                                                                                  === AuxTools::ProgressBar() 2 %                                                                                                    === AuxTools::ProgressBar() 7 %                                                                                              === AuxTools::ProgressBar() 1 %                                                                                                     === AuxTools::ProgressBar() 8 %                                                                                             === AuxTools::ProgressBar() 3 %                                                                                                   === AuxTools::ProgressBar() 9 %                                                                                            === AuxTools::ProgressBar() 10 %                                                                                           === AuxTools::ProgressBar() 11 %                                                                                          === AuxTools::ProgressBar() 11 %                                                                                          === AuxTools::ProgressBar() 7 %                                                                                              === AuxTools::ProgressBar() 12 %                                                                                         === AuxTools::ProgressBar() 4 %                                                                                                  === AuxTools::ProgressBar() 2 %                                                                                                    === AuxTools::ProgressBar() 7 %                                                                                              === AuxTools::ProgressBar() 12 %                                                                                         === AuxTools::ProgressBar() 13 %                                                                                        === AuxTools::ProgressBar() 5 %                                                                                                 === AuxTools::ProgressBar() 3 %                                                                                                  === AuxTools::ProgressBar() 3 %                                                                                                   === AuxTools::ProgressBar() 1 %                                                                                                    === AuxTools::ProgressBar() 14 %                                                                                       === AuxTools::ProgressBar() 4 %                                                                                                 === AuxTools::ProgressBar() 2 %                                                                                                   === AuxTools::ProgressBar() 2 %                                                                                                   === AuxTools::ProgressBar() 4 %                                                                                                 === AuxTools::ProgressBar() 2 %                                                                                                   === AuxTools::ProgressBar() 13 %                                                                                        === AuxTools::ProgressBar() 15 %                                                                                      === AuxTools::ProgressBar() 8 %                                                                                             === AuxTools::ProgressBar() 8 %                                                                                             === AuxTools::ProgressBar() 2 %                                                                                                   === AuxTools::ProgressBar() 16 %                                                                                     === AuxTools::ProgressBar() 6 %                                                                                                === AuxTools::ProgressBar() 17 %                                                                                    === AuxTools::ProgressBar() 7 %                                                                                               === AuxTools::ProgressBar() 5 %                                                                                                === AuxTools::ProgressBar() 18 %                                                                                   === AuxTools::ProgressBar() 14 %                                                                                       === AuxTools::ProgressBar() 19 %                                                                                  === AuxTools::ProgressBar() 9 %                                                                                            === AuxTools::ProgressBar() 4 %                                                                                                  === AuxTools::ProgressBar() 1 %                                                                                                    === AuxTools::ProgressBar() 9 %                                                                                            === AuxTools::ProgressBar() 20 %                                                                                 === AuxTools::ProgressBar() 15 %                                                                                      === AuxTools::ProgressBar() 21 %                                                                                === AuxTools::ProgressBar() 4 %                                                                                                 === AuxTools::ProgressBar() 6 %                                                                                               === AuxTools::ProgressBar() 22 %                                                                               === AuxTools::ProgressBar() 5 %                                                                                                === AuxTools::ProgressBar() 8 %                                                                                              === AuxTools::ProgressBar() 16 %                                                                                     === AuxTools::ProgressBar() 9 %                                                                                             === AuxTools::ProgressBar() 23 %                                                                              === AuxTools::ProgressBar() 24 %                                                                             === AuxTools::ProgressBar() 25 %                                                                            === AuxTools::ProgressBar() 10 %                                                                                            === AuxTools::ProgressBar() 26 %                                                                           === AuxTools::ProgressBar() 27 %                                                                          === AuxTools::ProgressBar() 1 %                                                                                                     === AuxTools::ProgressBar() 28 %                                                                         === AuxTools::ProgressBar() 17 %                                                                                    === AuxTools::ProgressBar() 29 %                                                                         === AuxTools::ProgressBar() 30 %                                                                       === AuxTools::ProgressBar() 10 %                                                                                           === AuxTools::ProgressBar() 31 %                                                                      === AuxTools::ProgressBar() 11 %                                                                                           === AuxTools::ProgressBar() 32 %                                                                     === AuxTools::ProgressBar() 33 %                                                                    === AuxTools::ProgressBar() 12 %                                                                                          === AuxTools::ProgressBar() 18 %                                                                                   === AuxTools::ProgressBar() 34 %                                                                   === AuxTools::ProgressBar() 19 %                                                                                  === AuxTools::ProgressBar() 35 %                                                                  === AuxTools::ProgressBar() 36 %                                                                 === AuxTools::ProgressBar() 11 %                                                                                          === AuxTools::ProgressBar() 7 %                                                                                              === AuxTools::ProgressBar() 37 %                                                                === AuxTools::ProgressBar() 38 %                                                               === AuxTools::ProgressBar() 39 %                                                              === AuxTools::ProgressBar() 40 %                                                             === AuxTools::ProgressBar() 41 %                                                            === AuxTools::ProgressBar() 13 %                                                                                         === AuxTools::ProgressBar() 42 %                                                           === AuxTools::ProgressBar() 20 %                                                                                 === AuxTools::ProgressBar() 43 %                                                          === AuxTools::ProgressBar() 44 %                                                         === AuxTools::ProgressBar() 14 %                                                                                        === AuxTools::ProgressBar() 45 %                                                        === AuxTools::ProgressBar() 3 %                                                                                                  === AuxTools::ProgressBar() 3 %                                                                                                  === AuxTools::ProgressBar() 46 %                                                       === AuxTools::ProgressBar() 3 %                                                                                                  === AuxTools::ProgressBar() 47 %                                                      === AuxTools::ProgressBar() 48 %                                                     === AuxTools::ProgressBar() 15 %                                                                                       === AuxTools::ProgressBar() 49 %                                                    === AuxTools::ProgressBar() 50 %                                                   === AuxTools::ProgressBar() 21 %                                                                                === AuxTools::ProgressBar() 16 %                                                                                      === AuxTools::ProgressBar() 17 %                                                                                     === AuxTools::ProgressBar() 6 %                                                                                               === AuxTools::ProgressBar() 51 %                                                  === AuxTools::ProgressBar() 22 %                                                                               === AuxTools::ProgressBar() 52 %                                                 === AuxTools::ProgressBar() 53 %                                                === AuxTools::ProgressBar() 54 %                                               === AuxTools::ProgressBar() 18 %                                                                                    === AuxTools::ProgressBar() 55 %                                              === AuxTools::ProgressBar() 56 %                                             === AuxTools::ProgressBar() 57 %                                             === AuxTools::ProgressBar() 58 %                                            === AuxTools::ProgressBar() 59 %                                          === AuxTools::ProgressBar() 60 %                                         === AuxTools::ProgressBar() 61 %                                        === AuxTools::ProgressBar() 8 %                                                                                             === AuxTools::ProgressBar() 62 %                                       === AuxTools::ProgressBar() 63 %                                      === AuxTools::ProgressBar() 64 %                                     === AuxTools::ProgressBar() 65 %                                    === AuxTools::ProgressBar() 66 %                                   === AuxTools::ProgressBar() 9 %                                                                                            === AuxTools::ProgressBar() 67 %                                  === AuxTools::ProgressBar() 68 %                                 === AuxTools::ProgressBar() 69 %                                === AuxTools::ProgressBar() 70 %                               === AuxTools::ProgressBar() 71 %                              === AuxTools::ProgressBar() 72 %                             === AuxTools::ProgressBar() 73 %                            === AuxTools::ProgressBar() 74 %                           === AuxTools::ProgressBar() 5 %                                                                                                 === AuxTools::ProgressBar() 75 %                          === AuxTools::ProgressBar() 76 %                         === AuxTools::ProgressBar() 77 %                        === AuxTools::ProgressBar() 10 %                                                                                           === AuxTools::ProgressBar() 3 %                                                                                                  === AuxTools::ProgressBar() 12 %                                                                                         === AuxTools::ProgressBar() 78 %                       === AuxTools::ProgressBar() 79 %                      === AuxTools::ProgressBar() 80 %                     === AuxTools::ProgressBar() 81 %                    === AuxTools::ProgressBar() 82 %                   === AuxTools::ProgressBar() 83 %                  === AuxTools::ProgressBar() 23 %                                                                              === AuxTools::ProgressBar() 84 %                 === AuxTools::ProgressBar() 85 %                === AuxTools::ProgressBar() 6 %                                                                                                === AuxTools::ProgressBar() 86 %               === AuxTools::ProgressBar() 87 %              === AuxTools::ProgressBar() 88 %             === AuxTools::ProgressBar() 11 %                                                                                          === AuxTools::ProgressBar() 10 %                                                                                           === AuxTools::ProgressBar() 89 %            === AuxTools::ProgressBar() 4 %                                                                                                 === AuxTools::ProgressBar() 90 %           === AuxTools::ProgressBar() 19 %                                                                                   === AuxTools::ProgressBar() 91 %          === AuxTools::ProgressBar() 92 %         === AuxTools::ProgressBar() 24 %                                                                             === AuxTools::ProgressBar() 93 %        === AuxTools::ProgressBar() 7 %                                                                                               === AuxTools::ProgressBar() 94 %       === AuxTools::ProgressBar() 95 %      === AuxTools::ProgressBar() 96 %     === AuxTools::ProgressBar() 12 %                                                                                         === AuxTools::ProgressBar() 97 %    === AuxTools::ProgressBar() 98 %   === AuxTools::ProgressBar() 99 %  === AuxTools::ProgressBar() 13 %                                                                                        === AuxTools::ProgressBar() 100 % === AuxTools::ProgressBar() 4 %                                                                                                 === AuxTools::ProgressBar() 4 %                                                                                                 === AuxTools::ProgressBar() 8 %                                                                                              === AuxTools::ProgressBar() 25 %                                                                            === AuxTools::ProgressBar() 5 %                                                                                                === AuxTools::ProgressBar() 13 %                                                                                        === AuxTools::ProgressBar() 9 %                                                                                             === AuxTools::ProgressBar() 2 %                                                                                                   === AuxTools::ProgressBar() 14 %                                                                                       === AuxTools::ProgressBar() 2 %                                                                                                    === AuxTools::ProgressBar() 10 %                                                                                            === AuxTools::ProgressBar() 26 %                                                                           === AuxTools::ProgressBar() 2 %                                                                                                   === AuxTools::ProgressBar() 14 %                                                                                       === AuxTools::ProgressBar() 7 %                                                                                              === AuxTools::ProgressBar() 5 %                                                                                                === AuxTools::ProgressBar() 5 %                                                                                                === AuxTools::ProgressBar() 11 %                                                                                           === AuxTools::ProgressBar() 15 %                                                                                      === AuxTools::ProgressBar() 27 %                                                                          === AuxTools::ProgressBar() 6 %                                                                                               === AuxTools::ProgressBar() 15 %                                                                                      === AuxTools::ProgressBar() 16 %                                                                                     === AuxTools::ProgressBar() 5 %                                                                                                === AuxTools::ProgressBar() 20 %                                                                                  === AuxTools::ProgressBar() 11 %                                                                                          === AuxTools::ProgressBar() 12 %                                                                                          === AuxTools::ProgressBar() 16 %                                                                                     === AuxTools::ProgressBar() 6 %                                                                                               === AuxTools::ProgressBar() 28 %                                                                         === AuxTools::ProgressBar() 13 %                                                                                         === AuxTools::ProgressBar() 17 %                                                                                    === AuxTools::ProgressBar() 14 %                                                                                        === AuxTools::ProgressBar() 18 %                                                                                   === AuxTools::ProgressBar() 15 %                                                                                       === AuxTools::ProgressBar() 29 %                                                                         === AuxTools::ProgressBar() 17 %                                                                                    === AuxTools::ProgressBar() 16 %                                                                                      === AuxTools::ProgressBar() 18 %                                                                                   === AuxTools::ProgressBar() 19 %                                                                                  === AuxTools::ProgressBar() 21 %                                                                                 === AuxTools::ProgressBar() 4 %                                                                                                 === AuxTools::ProgressBar() 30 %                                                                       === AuxTools::ProgressBar() 17 %                                                                                     === AuxTools::ProgressBar() 6 %                                                                                               === AuxTools::ProgressBar() 22 %                                                                                === AuxTools::ProgressBar() 19 %                                                                                  === AuxTools::ProgressBar() 12 %                                                                                         === AuxTools::ProgressBar() 23 %                                                                               === AuxTools::ProgressBar() 18 %                                                                                    === AuxTools::ProgressBar() 8 %                                                                                             === AuxTools::ProgressBar() 24 %                                                                              
+\ No newline at end of file
+diff --git a/NtupleAnalysis/src/TkTaus/work/plotL1TkTau.py b/NtupleAnalysis/src/TkTaus/work/plotL1TkTau.py
+index 7b99b49..bfb3ef8 100755
+--- a/NtupleAnalysis/src/TkTaus/work/plotL1TkTau.py
++++ b/NtupleAnalysis/src/TkTaus/work/plotL1TkTau.py
+@@ -341,7 +341,7 @@ def GetHistoKwargs(h, opts):
+         _rebinX = 2
+         _yLabel = _yNorm + " / " + _format
+         _log    = True
+-        _xMax   = 400.0
++        _xMax   = 110.0 #400.0
+     if "_redchisquared" in hName:
+         _units  = ""
+         _format = "%0.1f " + _units
+@@ -351,7 +351,7 @@ def GetHistoKwargs(h, opts):
+         _rebinX = 2
+         _yLabel = _yNorm + " / " + _format
+         _log    = True
+-        _xMax   = 100.0
++        _xMax   = 50.0 #100.0
+     if "_deltapocaz" in hName:
+         _units  = "cm"
+         _format = "%0.2f " + _units
+@@ -435,16 +435,19 @@ def GetHistoKwargs(h, opts):
+         _units  = "GeV"
+         _format = "%0.f " + _units
+         _xLabel = "E_{T} (%s)" % (_units)
++        _xMin   =   0.0
++        _xMax   = 300.0
+         if "_caloiet" in hName: 
+             _xLabel = "iE_{T} (%s)" % (_units)
+         if  "_caloisoet" in hName:
+             _xLabel = "E_{T}^{iso} (%s)" % (_units)
+         if  "rawet" in hName:
+             _xLabel = "E_{T}^{raw} (%s)" % (_units)
++        if  "isotkset" in hName:
++            _xLabel = "E_{T}^{raw} (%s)" % (_units)
++            _xMax   = 100.0
+         _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+         _rebinX = 5 
+-        _xMin   =   0.0
+-        _xMax   = 300.0
+         _yLabel = _yNorm + " / " + _format
+         _log    = False
+         #ROOT.gStyle.SetNdivisions(6, "X")
+@@ -653,7 +656,7 @@ def GetHistoKwargs(h, opts):
+         _xMax   = +200.0
+         _yLabel = _yNorm + " / " + _format
+         _log    = True
+-    if "_resolutioncaloet" in hName:
++    if "_resolutionet" in hName:
+         _units  = ""
+         _format = "%0.2f " + _units
+         #_xLabel = "(E_{T}^{calo} - p_{T}^{vis}) / p_{T}^{vis}"
+@@ -663,7 +666,7 @@ def GetHistoKwargs(h, opts):
+         _xMax   = +4.0 #+5.5
+         _yLabel = _yNorm + " / " + _format
+         _log    = True
+-        if "_resolutioncaloeta" in hName:
++        if "_resolutioneta" in hName:
+             #_xLabel = "(#eta^{calo} - #eta^{vis}) / #eta^{vis}"
+             _xLabel = "#delta#eta / #eta^{vis}"
+             _xMin   = -4.0 #-5.5
+@@ -671,7 +674,7 @@ def GetHistoKwargs(h, opts):
+             _yLabel = _yNorm + " / " + _format
+             _log    = True
+             _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+-    if "_resolutioncalophi" in hName:
++    if "_resolutionphi" in hName:
+         _units  = ""
+         _format = "%0.2f " + _units
+         #_xLabel = "#phi^{calo} - #phi^{vis} / #phi^{vis}"
+@@ -684,7 +687,16 @@ def GetHistoKwargs(h, opts):
+         _cutBox = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+     else:
+         ROOT.gStyle.SetNdivisions(8, "X")
+-
++    if "_jetwidth" in hName:
++        _units  = ""
++        _format = "%0.2f " + _units
++        _xLabel = "w_{#tau}"
++        _cutBox = {"cutValue": 0.05, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
++        _rebinX = 1
++        _yLabel = "Efficiency / %.0f " + _units
++        _xMax   = 3.0
++        _log    = True
++        
+     if _log:
+         if _yMin == 0.0:
+             if opts.normalizeToOne:
+@@ -827,8 +839,8 @@ def main(opts):
+     skipList   = ["L1TkTau_MatchTk_d0", "L1TkTau_MatchTk_d0Abs", "L1TkTau_SigTks_d0", 
+                   "L1TkTau_SigTks_d0Abs", "L1TkTau_SigTks_d0Sig", "L1TkTau_SigTks_d0SigAbs",
+                   "L1TkTau_IsoTks_d0", "L1TkTau_IsoTks_d0Abs", "L1TkTau_IsoTks_d0Sig", "L1TkTau_IsoTks_d0SigAbs",
+-                  "L1TkTau_ResolutionCaloEt_F", "L1TkTau_ResolutionCaloEta_F", "L1TkTau_ResolutionCaloPhi_F", 
+-                  "L1TkIsoTau_ResolutionCaloEt_F", "L1TkIsoTau_ResolutionCaloEta_F", "L1TkIsoTau_ResolutionCaloPhi_F", 
++                  "L1TkTau_ResolutionEt_F", "L1TkTau_ResolutionEta_F", "L1TkTau_ResolutionPhi_F", 
++                  "L1TkIsoTau_ResolutionEt_F", "L1TkIsoTau_ResolutionEta_F", "L1TkIsoTau_ResolutionPhi_F", 
+                   "DiTau_Rate_Calo_F", "DiTau_Rate_Tk_F", "DiTau_Rate_VtxIso_F", "DiTau_Rate_RelIso_F",
+                   "Calo_Rate_F", "Tk_Rate_F", "VtxIso_Rate_F", "RelIso_Rate_F"]
+ 
+diff --git a/NtupleAnalysis/src/TkTaus/work/plotRateVsEff.py b/NtupleAnalysis/src/TkTaus/work/plotRateVsEff.py
+index bd9a873..c7646bb 100755
+--- a/NtupleAnalysis/src/TkTaus/work/plotRateVsEff.py
++++ b/NtupleAnalysis/src/TkTaus/work/plotRateVsEff.py
+@@ -151,14 +151,14 @@ def main(opts):
+                 dsets_signal.append(d)
+ 
+         # ROC curve ingredients (histograms)
+-        effLists    = [["Calo_Eff", "Tk_Eff", "VtxIso_Eff", "RelIso_Eff", "Iso_Eff"], 
+-                       ["DiTau_Eff_Calo", "DiTau_Eff_Tk", "DiTau_Eff_VtxIso", "DiTau_Eff_RelIso", "DiTau_Eff_Iso"]]
++        effLists    = [["Tk_Eff", "VtxIso_Eff", "RelIso_Eff"],#, "Iso_Eff"], 
++                       ["DiTau_Eff_Tk", "DiTau_Eff_VtxIso", "DiTau_Eff_RelIso"]]#, "DiTau_Eff_Iso"]]
+ 
+-        rateLists   = [["Calo_Rate", "Tk_Rate", "VtxIso_Rate", "RelIso_Rate", "Iso_Rate"], 
+-                       ["DiTau_Rate_Calo", "DiTau_Rate_Tk", "DiTau_Rate_VtxIso", "DiTau_Rate_RelIso", "DiTau_Rate_Iso"]]
++        rateLists   = [["Tk_Rate", "VtxIso_Rate", "RelIso_Rate"],#, "Iso_Rate"], 
++                       ["DiTau_Rate_Tk", "DiTau_Rate_VtxIso", "DiTau_Rate_RelIso"]]#, "DiTau_Rate_Iso"]]
+ 
+-        turnOnLists = [["Calo_TurnOn25", "Tk_TurnOn25", "RelIso_TurnOn25", "VtxIso_TurnOn25", "Iso_TurnOn25"], 
+-                       ["Calo_TurnOn50", "Tk_TurnOn50", "RelIso_TurnOn50", "VtxIso_TurnOn50", "Iso_TurnOn50"]]
++        turnOnLists = [["Tk_TurnOn25", "RelIso_TurnOn25", "VtxIso_TurnOn25"],#, "Iso_TurnOn25"], 
++                       ["Tk_TurnOn50", "RelIso_TurnOn50", "VtxIso_TurnOn50"]]#, "Iso_TurnOn50"]]
+         
+         # For-loop: All background histos (min bias)
+         for i, b in enumerate(dsets_minBias, 1):
+@@ -210,6 +210,7 @@ def PlotRate(datasetsMgr, histoList, bkg, PU):
+     kwargs   = GetHistoKwargs(saveName, opts)
+     hList    = []
+     legDict  = {}
++    algos    = ["TkTaus", "TkTaus (VtxIso)", "TkTaus (RelIso)"]
+ 
+     # For-loop: All tau algorithms
+     for i, hName in enumerate(histoList, 0):
+@@ -221,14 +222,14 @@ def PlotRate(datasetsMgr, histoList, bkg, PU):
+         aux.PrintFlushed("Plotting rate (%s-%s)" % (algo, taus), False)
+         h = datasetsMgr.getDataset(bkg).getDatasetRootHisto(hName).getHistogram()
+         h.SetName(hName)
+-        legDict[hName] = algo
++        legDict[hName] = algos[i] #algo
+         hList.append(h)
+         
+     # Create the rate histograms
+     p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[])
+ 
+     # Set legend labels
+-    for h in p.histoMgr.getHistos():
++    for i, h in enumerate(p.histoMgr.getHistos(), 0):
+         hName = h.getName()
+         algo  = h.getName().split("_")[0]
+         if algo == "DiTau":
+@@ -262,6 +263,7 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
+     kwargs   = GetHistoKwargs(saveName, opts)
+     hList    = []
+     legDict  = {}
++    algos    = ["TkTaus", "TkTaus (VtxIso)", "TkTaus (RelIso)"]
+ 
+     # For-loop: All tau algorithms
+     count = -1
+@@ -280,7 +282,7 @@ def PlotEfficiency(datasetsMgr, histoList, signal, PU):
+         aux.PrintFlushed("Plotting efficiency (%s-%s-%s)" % (algo, taus, signal), False) #count==0)
+         h = datasetsMgr.getDataset(signal).getDatasetRootHisto(hName).getHistogram()
+         h.SetName(hName)
+-        legDict[hName] = algo
++        legDict[hName] = algos[i] #algo
+         hList.append(h)
+ 
+     # Create the rate histograms
+@@ -324,6 +326,7 @@ def PlotTurnOns(datasetsMgr, histoList, signal, PU):
+     kwargs    = GetHistoKwargs(saveName, opts)
+     hList     = []
+     legDict   = {}
++    algos     = ["TkTaus", "TkTaus (VtxIso)", "TkTaus (RelIso)"]
+ 
+     # For-loop: All tau algorithms
+     for l, hName in enumerate(histoList, 0):
+@@ -332,7 +335,7 @@ def PlotTurnOns(datasetsMgr, histoList, signal, PU):
+         aux.PrintFlushed("Turn-on for \"%s\" algorithm (%s)" % (algo, signal), False) #l==0)
+         h = datasetsMgr.getDataset(signal).getDatasetRootHisto(hName).getHistogram()
+         h.SetName(hName)
+-        legDict[hName] = algo
++        legDict[hName] = algos[l] #algo
+         hList.append(h)
+ 
+     # Create the rate histograms
+@@ -368,7 +371,7 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
+ 
+     # Definitions
+     tgraphs = []
+-    legendDict = {}
++    legDict = {}
+     aux.PrintFlushed("Plotting ROC (%s-%s)" % (bkg, signal), False) #count==0)
+ 
+     # Get Histogram name and its kwargs
+@@ -383,41 +386,41 @@ def PlotRateVsEff(datasetsMgr, effHistoList, rateHistoList, signal, bkg, PU):
+     kwargs_  = GetHistoKwargs(saveName, opts)
+ 
+     for i in range (0, len(effHistoList)):
+-        if (i==0) :
+-            g0 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
+-            g0.SetName("Calo")
+-        elif (i==1):
++        if (i==0):
+             g1 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
+             g1.SetName("Tk")
+-        elif (i==2):
++        elif (i==1):
+             g2 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
+             g2.SetName("VtxIso")
+-        elif (i==3):
++        elif (i==2):
+             g3 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
+             g3.SetName("RelIso")
+-        elif (i==4):
+-            g4 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
+-            g4.SetName("Iso")
++        #elif (i==3):
++        #    g4 = convert2RateVsEffTGraph(datasetsMgr, effHistoList[i], rateHistoList[i], signal, bkg)
++        #    g4.SetName("Iso")
+ 
+     # Create the Rate Vs Efficiency TGraphs
+-    p = plots.ComparisonManyPlot(g0, [g1,g2, g3, g4], saveFormats=[])
+-    
++    #p = plots.ComparisonManyPlot(g1, [g2, g3, g4], saveFormats=[])
++    p = plots.ComparisonManyPlot(g1, [g2, g3], saveFormats=[])
++    algos = ["TkTaus", "TkTaus (VtxIso)", "TkTaus (RelIso)"]
++
+     # Set individual styles
+     for index, h in enumerate(p.histoMgr.getHistos()):
+         hName = h.getName()
+-        legendDict[hName] = styles.getCaloLegend(index)
++        legDict[hName] = algos[index] #styles.getCaloLegend(index)
+         p.histoMgr.forHisto(hName, styles.getCaloStyle(index))
+         p.histoMgr.setHistoDrawStyle(h.getName(), "LX") # "X" = Do not draw error bars
+         p.histoMgr.setHistoLegendStyle(h.getName(), "LP")
+ 
+     # Set legend labels
+-    p.histoMgr.setHistoLegendLabelMany(legendDict)
++    p.histoMgr.setHistoLegendLabelMany(legDict)
+ 
+     # Draw and save the plot
+     plots.drawPlot(p, saveName, **kwargs_) #the "**" unpacks the kwargs_ dictionary
+ 
+     # Draw Error bands
+-    for i, g in enumerate([g0, g1, g2, g3, g4]):
++    #for i, g in enumerate([g0, g1, g2, g3, g4]):
++    for i, g in enumerate([g1, g2, g3]):
+         shapes, min, max = DrawErrorBand(g) 
+         for shape in shapes:
+             shape.SetFillColor( p.histoMgr.getHistos()[i].getRootHisto().GetFillColor())
+@@ -513,7 +516,7 @@ def convert2RateVsEffTGraph(datasetsMgr, effHistoName, rateHistoName, signal, bk
+         table.append(row)
+     table.append(hLine)
+ 
+-    if 0:#printValues:
++    if 0:#printValues: #iro
+         for i, line in enumerate(table, 1):
+             Print(line, False) #i==1)        
+     return tgraph
+@@ -569,7 +572,7 @@ def DrawErrorBand(graph):
+     return shapes, min, max 
+ 
+ def GetHistoKwargs(h, opts):
+-    _mvLeg1 = {"dx": -0.15, "dy": -0.55, "dh": -0.15}
++    _mvLeg1 = {"dx": -0.20, "dy": -0.55, "dh": -0.15}
+     _mvLeg2 = {"dx": -0.00, "dy": -0.05, "dh": -0.15}
+     _mvLeg3 = {"dx": -0.15, "dy": -0.05, "dh": -0.15}
+     _mvLeg4 = {"dx": -0.15, "dy": -0.55, "dh": -0.15}
+@@ -601,6 +604,7 @@ def GetHistoKwargs(h, opts):
+     if "_RateVsEff_" in h:
+         if "ditau" in h.lower():
+             _kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.6, "ymin": yMin, "ymax":1000, "ymaxfactor": yMaxF}
++            _kwargs["moveLegend"] = _mvLeg1
+         return _kwargs
+     elif "Rate_" in h:
+         _kwargs["xlabel"]     = "E_{T} (GeV)"
+@@ -671,7 +675,7 @@ if __name__ == "__main__":
+     PRECISION    = 3
+     RATIO        = False
+     SAVEDIR      = None
+-    SAVEFORMATS = [".C", ".png", ".pdf"]
++    SAVEFORMATS = [".png"] #[".C", ".png", ".pdf"]
+     SEARCHMODE   = None
+     URL          = False
+     VERBOSE      = False
+

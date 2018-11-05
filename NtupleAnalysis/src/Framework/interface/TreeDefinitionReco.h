@@ -942,6 +942,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fChain -> AddFriend(fL1PhaseII);
     }
 
+  /*
   // Calo Towers
   if(doCaloTower)
     {
@@ -1109,7 +1110,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       // Add friend (HOTree)
       fChain -> AddFriend(fHO);
     }
-
+  */
   // Tracks and Tracking Particles
   if(doTracks)
     {
@@ -1161,7 +1162,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
     }
   
   // =========================================== EMULATOR TREES =============================================
-  
+  /*
   // Calo Towers Emulator
   if(doCaloTowerEmu)
     {
@@ -1223,7 +1224,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       // Add Friend (CaloTowerEmuTree) 
       fChain -> AddFriend(fCaloTowerEmu);
     }
-
+  */
   // Upgrade Emulator
   if(doUpgradeEmu)
     {
@@ -1311,7 +1312,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       // Add friend (UpgradeEmuTree)
       fChain -> AddFriend(fUpgradeEmu);
     }
-
+  /*
   // uGT Emulator
   if(douGTEmu)
     {
@@ -1329,7 +1330,7 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       // Add friend (uGTEmuTree) 
       fChain -> AddFriend(fuGTEmu);
     }
-
+  */
   // Set Make Class for all trees 
   fChain->SetMakeClass(1);
   

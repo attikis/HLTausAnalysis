@@ -18,6 +18,7 @@ void TkTaus::InitObjects(void)
 //============================================================================
 {
   // pvProducer = new L1TkPrimaryVertex(this->s);
+  // std::cout << "=== TkTaus::InitOBjects()" << std::endl;
   return; 
 }
 
@@ -36,12 +37,12 @@ void TkTaus::InitVars_()
 
   // Matching tracks
   seedTk_Collection  =  "TTTracks"; // "TTTracks"
-  seedTk_nFitParams  =   4;         // 4
-  seedTk_minPt       =   5.0;       //  10.0
-  seedTk_minEta      =   0.0;       //   0.0
-  seedTk_maxEta      =   2.5;       // 999.9
-  seedTk_maxChiSq    =  50.0;       //  50.0
-  seedTk_minStubs    =    5;        //   5
+  seedTk_nFitParams  =   4;         //  4
+  seedTk_minPt       =   5.0;       //  5.0
+  seedTk_minEta      =   0.0;       //  0.0
+  seedTk_maxEta      =   2.5;       //  2.5
+  seedTk_maxChiSq    =  50.0;       // 50.0
+  seedTk_minStubs    =    5;        //  5
 
   // Signal cone tracks
   sigConeTks_Collection  = seedTk_Collection;
@@ -59,9 +60,9 @@ void TkTaus::InitVars_()
   isoConeTks_nFitParams  = seedTk_nFitParams;
   isoConeTks_minPt       =   2.0; //   2.0
   isoConeTks_minEta      =   0.0; //   0.0
-  isoConeTks_maxEta      =   2.5; // 999.9
-  isoConeTks_maxChiSq    =  50.0; // 100.00
-  isoConeTks_minStubs    =   4;   //   4
+  isoConeTks_maxEta      =   2.5; //   2.5
+  isoConeTks_maxChiSq    =  50.0; //  50.00
+  isoConeTks_minStubs    =   5;   //   4
 
   // Signal cone parameters
   sigCone_Constant        = +0.00; // 0.0
@@ -73,25 +74,24 @@ void TkTaus::InitVars_()
   isoCone_Constant = +2.5;          // 2.3 by fit on fit on ldg pT (Fotis)
   isoCone_dRMin    = sigCone_dRMax; // 0.4
   isoCone_dRMax    = +0.30;         // 0.30
-  isoCone_useCone  = false; // instead of annulus
+  isoCone_useCone  = true;          // instead of annulus
 
-  // Isolation variables
-  vtxIso_WP  = +0.50;  // 0.5 cm
-  relIso_WP  = +0.20;  // 0.2
-  relIso_dZ0 = +0.50;  // 0.6 from A. Ryd
+  // Tau object
+  tau_jetWidth  = +0.50;  // considers both sigTks and isoTks
+  tau_vtxIsoWP  = +0.50;  // 0.5 cm
+  tau_relIsoWP  = +0.15;  // 0.2
+  tau_relIsodZ0 = +0.50;  // 0.6 from A. Ryd
 
   // Double-tau
   diTau_deltaPOCAz = +1.00; // cm
 
   // MC matching
-  mcMatching_dRMax  = +0.10; //increase to 0.15 ? (i.e. as I had before 15 Oct 2018)
+  mcMatching_dRMax  = +0.05; // was 0.1 but I wanted to decrease because i think it caused the turn-on eff to be > 1.0 in some bins (double-matching?)
   mcMatching_unique = true;
 
   // Eta Regions
   _eta_C = 0.8;
   _eta_F = 1.6;
-
-  PrintSettings();
 
   return;
 }
@@ -102,233 +102,239 @@ void TkTaus::PrintSettings(void)
 //============================================================================
 {
 
-  if (!DEBUG) return;
+  // if (!DEBUG) return;
 
   // Inform user of settings
   Table settings("Variable | Cut | Value | Default | Units", "Text");
   settings.AddRowColumn(0, "MC Sample");
   settings.AddRowColumn(0, "==" );
   settings.AddRowColumn(0, mcSample );
-
-  settings.AddRowColumn(1, "Matching Tracks: Collection");
-  settings.AddRowColumn(1, "==");
-  settings.AddRowColumn(1, seedTk_Collection);
-  settings.AddRowColumn(1, "TTTracks");
-  settings.AddRowColumn(1, "");
+ 
+  /////////////////////////////////////////////////////////////////
+  // Seed Tracks
+  /////////////////////////////////////////////////////////////////
+  settings.AddRowColumn(1, "Seed Tracks: Pt");
+  settings.AddRowColumn(1, ">=");
+  settings.AddRowColumn(1, auxTools_.ToString( seedTk_minPt) );
+  settings.AddRowColumn(1, "5" );
+  settings.AddRowColumn(1, "GeV/c" );
   
-  settings.AddRowColumn(2, "Matching Tracks: Fit Parameters");
-  settings.AddRowColumn(2, "==");
-  settings.AddRowColumn(2, auxTools_.ToString( seedTk_nFitParams) );
-  settings.AddRowColumn(2, "5");
-  settings.AddRowColumn(2, "");
+  settings.AddRowColumn(2, "Seed Tracks: |Eta|");
+  settings.AddRowColumn(2, ">=");
+  settings.AddRowColumn(2, auxTools_.ToString( seedTk_minEta) );
+  settings.AddRowColumn(2, "0.0" );
+  settings.AddRowColumn(2, "" );
 
-  settings.AddRowColumn(3, "Matching Tracks: Pt");
-  settings.AddRowColumn(3, ">=");
-  settings.AddRowColumn(3, auxTools_.ToString( seedTk_minPt) );
-  settings.AddRowColumn(3, "2" );
-  settings.AddRowColumn(3, "GeV/c" );
+  settings.AddRowColumn(3, "Seed Tracks: |Eta|");
+  settings.AddRowColumn(3, "<=");
+  settings.AddRowColumn(3, auxTools_.ToString( seedTk_maxEta) );
+  settings.AddRowColumn(3, "2.5" );
+  settings.AddRowColumn(3, "" );
   
-  settings.AddRowColumn(4, "Matching Tracks: |Eta|");
-  settings.AddRowColumn(4, ">=");
-  settings.AddRowColumn(4, auxTools_.ToString( seedTk_minEta) );
-  settings.AddRowColumn(4, "0.0" );
-  settings.AddRowColumn(4, "" );
+  settings.AddRowColumn(4, "Seed Tracks: ChiSq");
+  settings.AddRowColumn(4, "<=");
+  settings.AddRowColumn(4, auxTools_.ToString( seedTk_maxChiSq) );
+  settings.AddRowColumn(4, "50"); // Cut was on ChiSq, not ChiSqRed
+  settings.AddRowColumn(4, "");
 
-  settings.AddRowColumn(5, "Matching Tracks: |Eta|");
-  settings.AddRowColumn(5, "<=");
-  settings.AddRowColumn(5, auxTools_.ToString( seedTk_maxEta) );
-  settings.AddRowColumn(5, "1e+03" );
+  settings.AddRowColumn(5, "Seed Tracks: Stubs");
+  settings.AddRowColumn(5, ">=");
+  settings.AddRowColumn(5, auxTools_.ToString( seedTk_minStubs) );
+  settings.AddRowColumn(5, "5" );
   settings.AddRowColumn(5, "" );
-  
-  settings.AddRowColumn(6, "Matching Tracks: ChiSqRed");
-  settings.AddRowColumn(6, "<=");
-  settings.AddRowColumn(6, auxTools_.ToString( seedTk_maxChiSq) );
-  settings.AddRowColumn(6, "200/DOF"); // Cut was on ChiSq, not ChiSqRed
-  settings.AddRowColumn(6, "");
 
-  settings.AddRowColumn(7, "Matching Tracks: Stubs");
+  /////////////////////////////////////////////////////////////////
+  // Signal cone tracks
+  /////////////////////////////////////////////////////////////////
+  settings.AddRowColumn(6, "Signal Cone Tks: Pt");
+  settings.AddRowColumn(6, ">=");
+  settings.AddRowColumn(6, auxTools_.ToString( sigConeTks_minPt) );
+  settings.AddRowColumn(6, "2" );
+  settings.AddRowColumn(6, "GeV/c" );
+  
+  settings.AddRowColumn(7, "Signal Cone Tks: |Eta|");
   settings.AddRowColumn(7, ">=");
-  settings.AddRowColumn(7, auxTools_.ToString( seedTk_minStubs) );
-  settings.AddRowColumn(7, "0" );
+  settings.AddRowColumn(7, auxTools_.ToString( sigConeTks_minEta) );
+  settings.AddRowColumn(7, "0.0" );
   settings.AddRowColumn(7, "" );
 
-  settings.AddRowColumn(8, "Signal Cone Tks: Collection");
-  settings.AddRowColumn(8, "==");
-  settings.AddRowColumn(8, sigConeTks_Collection);
-  settings.AddRowColumn(8, "TTTracks");
-  settings.AddRowColumn(8, "");
+  settings.AddRowColumn(8, "Signal Cone Tks: |Eta|");
+  settings.AddRowColumn(8, "<=");
+  settings.AddRowColumn(8, auxTools_.ToString( sigConeTks_maxEta) );
+  settings.AddRowColumn(8, "2.5" );
+  settings.AddRowColumn(8, "" );
   
-  settings.AddRowColumn(9, "Signal Cone Tks: Fit Parameters");
-  settings.AddRowColumn(9, "==");
-  settings.AddRowColumn(9, auxTools_.ToString( sigConeTks_nFitParams) );
-  settings.AddRowColumn(9, "5");
+  settings.AddRowColumn(9, "Signal Cone Tks: ChiSq");
+  settings.AddRowColumn(9, "<=");
+  settings.AddRowColumn(9, auxTools_.ToString( sigConeTks_maxChiSq) );
+  settings.AddRowColumn(9, "50");
   settings.AddRowColumn(9, "");
 
-  settings.AddRowColumn(10, "Signal Cone Tks: Pt");
+  settings.AddRowColumn(10, "Signal Cone Tks: Stubs");
   settings.AddRowColumn(10, ">=");
-  settings.AddRowColumn(10, auxTools_.ToString( sigConeTks_minPt) );
-  settings.AddRowColumn(10, "2" );
-  settings.AddRowColumn(10, "GeV/c" );
-  
-  settings.AddRowColumn(11, "Signal Cone Tks: |Eta|");
-  settings.AddRowColumn(11, ">=");
-  settings.AddRowColumn(11, auxTools_.ToString( sigConeTks_minEta) );
-  settings.AddRowColumn(11, "0.0" );
-  settings.AddRowColumn(11, "" );
+  settings.AddRowColumn(10, auxTools_.ToString( sigConeTks_minStubs) );
+  settings.AddRowColumn(10, "5" );
+  settings.AddRowColumn(10, "" );
 
-  settings.AddRowColumn(12, "Signal Cone Tks: |Eta|");
-  settings.AddRowColumn(12, "<=");
-  settings.AddRowColumn(12, auxTools_.ToString( sigConeTks_maxEta) );
-  settings.AddRowColumn(12, "1e+03" );
-  settings.AddRowColumn(12, "" );
-  
-  settings.AddRowColumn(13, "Signal Cone Tks: ChiSqRed");
-  settings.AddRowColumn(13, "<=");
-  settings.AddRowColumn(13, auxTools_.ToString( sigConeTks_maxChiSq) );
-  settings.AddRowColumn(13, "200 (but on ChiSq, not ChiSqRed)");
-  settings.AddRowColumn(13, "");
+  settings.AddRowColumn(11, "Signal Cone Tks: dZ0");
+  settings.AddRowColumn(11, "<");
+  settings.AddRowColumn(11, auxTools_.ToString( sigConeTks_dPOCAz) );
+  settings.AddRowColumn(11, "1.0" );
+  settings.AddRowColumn(11, "cm" );
 
-  settings.AddRowColumn(14, "Signal Cone Tks: Stubs");
+  settings.AddRowColumn(12, "Signal Cone Tks: maxInvMass");
+  settings.AddRowColumn(12, "<");
+  settings.AddRowColumn(12, auxTools_.ToString( sigConeTks_maxInvMass) );
+  settings.AddRowColumn(12, "1.5" );
+  settings.AddRowColumn(12, "GeV/c^{2}" );
+
+  /////////////////////////////////////////////////////////////////
+  // Isolation cone/annulus tracks
+  /////////////////////////////////////////////////////////////////
+  settings.AddRowColumn(13, "Isolation Cone Tks: Pt");
+  settings.AddRowColumn(13, ">=");
+  settings.AddRowColumn(13, auxTools_.ToString( isoConeTks_minPt) );
+  settings.AddRowColumn(13, "2" );
+  settings.AddRowColumn(13, "GeV/c" );
+  
+  settings.AddRowColumn(14, "Isolation Cone Tks: |Eta|");
   settings.AddRowColumn(14, ">=");
-  settings.AddRowColumn(14, auxTools_.ToString( sigConeTks_minStubs) );
-  settings.AddRowColumn(14, "" );
+  settings.AddRowColumn(14, auxTools_.ToString( isoConeTks_minEta) );
+  settings.AddRowColumn(14, "0.0" );
   settings.AddRowColumn(14, "" );
 
-  settings.AddRowColumn(15, "Isolation Cone Tks: Collection");
-  settings.AddRowColumn(15, "==");
-  settings.AddRowColumn(15, isoConeTks_Collection);
-  settings.AddRowColumn(15, "TTTracks");
-  settings.AddRowColumn(15, "");
-  
-  settings.AddRowColumn(16, "Isolation Cone Tks: Fit Parameters");
-  settings.AddRowColumn(16, "==");
-  settings.AddRowColumn(16, auxTools_.ToString( isoConeTks_nFitParams) );
-  settings.AddRowColumn(16, "5");
+  settings.AddRowColumn(15, "Isolation Cone Tks: |Eta|");
+  settings.AddRowColumn(15, "<=");
+  settings.AddRowColumn(15, auxTools_.ToString( isoConeTks_maxEta) );
+  settings.AddRowColumn(15, "2.5" );
+  settings.AddRowColumn(15, "" );
+
+  settings.AddRowColumn(16, "Isolation Cone Tks: ChiSq");
+  settings.AddRowColumn(16, "<=");
+  settings.AddRowColumn(16, auxTools_.ToString( isoConeTks_maxChiSq) );
+  settings.AddRowColumn(16, "50");
   settings.AddRowColumn(16, "");
 
-  settings.AddRowColumn(17, "Isolation Cone Tks: Pt");
+  settings.AddRowColumn(17, "Isolation Cone Tks: Stubs");
   settings.AddRowColumn(17, ">=");
-  settings.AddRowColumn(17, auxTools_.ToString( isoConeTks_minPt) );
-  settings.AddRowColumn(17, "2" );
-  settings.AddRowColumn(17, "GeV/c" );
-  
-  settings.AddRowColumn(18, "Isolation Cone Tks: |Eta|");
-  settings.AddRowColumn(18, ">=");
-  settings.AddRowColumn(18, auxTools_.ToString( isoConeTks_minEta) );
-  settings.AddRowColumn(18, "0.0" );
-  settings.AddRowColumn(18, "" );
+  settings.AddRowColumn(17, auxTools_.ToString( isoConeTks_minStubs) );
+  settings.AddRowColumn(17, "5" );
+  settings.AddRowColumn(17, "" );
 
-  settings.AddRowColumn(19, "Isolation Cone Tks: |Eta|");
-  settings.AddRowColumn(19, "<=");
-  settings.AddRowColumn(19, auxTools_.ToString( isoConeTks_maxEta) );
-  settings.AddRowColumn(19, "1e+03" );
+  /////////////////////////////////////////////////////////////////
+  // Signal cone dimensions
+  /////////////////////////////////////////////////////////////////
+  settings.AddRowColumn(18, "Signal Cone: Constant");
+  settings.AddRowColumn(18, "==");
+  settings.AddRowColumn(18, auxTools_.ToString(sigCone_Constant) );
+  settings.AddRowColumn(18, "0" );
+  settings.AddRowColumn(18, "GeV");
+
+  settings.AddRowColumn(19, "Signal Cone: dRMin");
+  settings.AddRowColumn(19, ">=");
+  settings.AddRowColumn(19, auxTools_.ToString(sigCone_dRMin) );
+  settings.AddRowColumn(19, "0.0" );
   settings.AddRowColumn(19, "" );
 
-  settings.AddRowColumn(20, "Isolation Cone Tks: ChiSqRed");
+  settings.AddRowColumn(20, "Signal Cone: dRMax");
   settings.AddRowColumn(20, "<=");
-  settings.AddRowColumn(20, auxTools_.ToString( isoConeTks_maxChiSq) );
-  settings.AddRowColumn(20, "200 (but on ChiSq, not ChiSqRed)");
-  settings.AddRowColumn(20, "");
-
-  settings.AddRowColumn(21, "Isolation Cone Tks: Stubs");
-  settings.AddRowColumn(21, ">=");
-  settings.AddRowColumn(21, auxTools_.ToString( isoConeTks_minStubs) );
+  settings.AddRowColumn(20, auxTools_.ToString(sigCone_dRMax) );
+  settings.AddRowColumn(20, "0.15" );
+  settings.AddRowColumn(20, "" );
+  
+  settings.AddRowColumn(21, "Signal Cone: dR cut-off");
+  settings.AddRowColumn(21, "<=");
+  settings.AddRowColumn(21, auxTools_.ToString(sigCone_cutoffDeltaR) );
+  settings.AddRowColumn(21, "0.15" );
   settings.AddRowColumn(21, "" );
-  settings.AddRowColumn(21, "" );
 
-  settings.AddRowColumn(22, "Signal Cone: Shrink Constant");
+  /////////////////////////////////////////////////////////////////
+  // Isolation cone/annulus dimensions
+  /////////////////////////////////////////////////////////////////
+  settings.AddRowColumn(22, "Isolation Cone: Constant");
   settings.AddRowColumn(22, "==");
-  settings.AddRowColumn(22, auxTools_.ToString(sigCone_Constant) );
-  settings.AddRowColumn(22, "0" );
+  settings.AddRowColumn(22, auxTools_.ToString(isoCone_Constant) );
+  settings.AddRowColumn(22, "3.5");
   settings.AddRowColumn(22, "GeV");
 
-  settings.AddRowColumn(23, "Signal Cone: DeltaR");
+  settings.AddRowColumn(23, "Isolation Cone: dRMin");
   settings.AddRowColumn(23, ">=");
-  settings.AddRowColumn(23, auxTools_.ToString(sigCone_dRMin) );
-  settings.AddRowColumn(23, "0.0" );
+  settings.AddRowColumn(23, auxTools_.ToString(isoCone_dRMin) );
+  settings.AddRowColumn(23, "0.15" );
   settings.AddRowColumn(23, "" );
 
-  settings.AddRowColumn(24, "Signal Cone: DeltaR");
-  settings.AddRowColumn(24, "<=");
-  settings.AddRowColumn(24, auxTools_.ToString(sigCone_dRMax) );
-  settings.AddRowColumn(24, "0.15" );
-  settings.AddRowColumn(24, "" );
-  
-  settings.AddRowColumn(25, "Signal Cone:-3pr InvMass");
-  settings.AddRowColumn(25, "<=");
-  settings.AddRowColumn(25, auxTools_.ToString(sigConeTks_maxInvMass) );
-  settings.AddRowColumn(25, "N/A" );
-  settings.AddRowColumn(25, "GeV/c^{-2}");
+  settings.AddRowColumn(24, "Isolation Cone: dRMax");
+  settings.AddRowColumn(24, "=<");
+  settings.AddRowColumn(24, auxTools_.ToString(isoCone_dRMax) );
+  settings.AddRowColumn(24, "0.30");
+  settings.AddRowColumn(24, "");
 
-  settings.AddRowColumn(26, "Signal Cone:-3pr dPOCAz");
-  settings.AddRowColumn(26, "<=");
-  settings.AddRowColumn(26, auxTools_.ToString(sigConeTks_dPOCAz) );
-  settings.AddRowColumn(26, "N/A" );
+  settings.AddRowColumn(25, "Isolation Cone: Use cone"); // i.e. do not an isolation annulus
+  settings.AddRowColumn(25, "==");
+  settings.AddRowColumn(25, auxTools_.ToString(isoCone_useCone) );
+  settings.AddRowColumn(25, "0");
+  settings.AddRowColumn(25, "");
+
+  settings.AddRowColumn(26, "Isolation Cone: VtxIso WP" );
+  settings.AddRowColumn(26, "<=" );
+  settings.AddRowColumn(26, auxTools_.ToString(tau_vtxIsoWP) );
+  settings.AddRowColumn(26, "1.0");
   settings.AddRowColumn(26, "cm");
+  settings.AddRowColumn(26, "");
 
-  settings.AddRowColumn(27, "Isolation Cone: Shrink Constant");
-  settings.AddRowColumn(27, "==");
-  settings.AddRowColumn(27, auxTools_.ToString(isoCone_Constant) );
-  settings.AddRowColumn(27, "3.5");
-  settings.AddRowColumn(27, "GeV");
+  settings.AddRowColumn(27, "Isolation Cone: RelIso WP" );
+  settings.AddRowColumn(27, "<=" );
+  settings.AddRowColumn(27, auxTools_.ToString(tau_relIsoWP) );
+  settings.AddRowColumn(27, "0.2");
+  settings.AddRowColumn(27, "cm");
+  settings.AddRowColumn(27, "");
 
-  settings.AddRowColumn(28, "Isolation Cone: DeltaR");
-  settings.AddRowColumn(28, ">=");
-  settings.AddRowColumn(28, auxTools_.ToString(isoCone_dRMin) );
-  settings.AddRowColumn(28, "0.15" );
-  settings.AddRowColumn(28, "" );
+  settings.AddRowColumn(27, "Isolation Cone: RelIso dZ0" );
+  settings.AddRowColumn(27, "<=" );
+  settings.AddRowColumn(27, auxTools_.ToString(tau_relIsodZ0) );
+  settings.AddRowColumn(27, "0.5");
+  settings.AddRowColumn(27, "cm");
+  settings.AddRowColumn(27, "");
 
-  settings.AddRowColumn(29, "Isolation Cone: DeltaR");
-  settings.AddRowColumn(29, "=<");
-  settings.AddRowColumn(29, auxTools_.ToString(isoCone_dRMax) );
-  settings.AddRowColumn(29, "0.30");
-  settings.AddRowColumn(29, "");
+  /////////////////////////////////////////////////////////////////
+  // Other
+  /////////////////////////////////////////////////////////////////
+  settings.AddRowColumn(28, "Di-Tau |Delta z0|");
+  settings.AddRowColumn(28, "<");
+  settings.AddRowColumn(28, auxTools_.ToString(diTau_deltaPOCAz) );
+  settings.AddRowColumn(28, "1" );
+  settings.AddRowColumn(28, "cm");
 
-  settings.AddRowColumn(30, "Isolation Cone: VtxIso" );
-  settings.AddRowColumn(30, "<=" );
-  settings.AddRowColumn(30, auxTools_.ToString(vtxIso_WP) );
-  settings.AddRowColumn(30, "1.0");
-  settings.AddRowColumn(30, "cm");
-  settings.AddRowColumn(30, "");
+  settings.AddRowColumn(29, "MC-Matching DeltaR");
+  settings.AddRowColumn(29, "<=");
+  settings.AddRowColumn(29, auxTools_.ToString(mcMatching_dRMax) );
+  settings.AddRowColumn(29, "0.05" );
+  settings.AddRowColumn(29, "" );
 
-  settings.AddRowColumn(31, "Isolation Cone: RelIso" );
-  settings.AddRowColumn(31, "<=" );
-  settings.AddRowColumn(31, auxTools_.ToString(relIso_WP) );
-  settings.AddRowColumn(31, "--");
-  settings.AddRowColumn(31, "cm");
-  settings.AddRowColumn(31, "");
-
-  settings.AddRowColumn(32, "Di-Tau |Delta z0|");
-  settings.AddRowColumn(32, "<");
-  settings.AddRowColumn(32, auxTools_.ToString(diTau_deltaPOCAz) );
-  settings.AddRowColumn(32, "1.0" );
-  settings.AddRowColumn(32, "cm");
-
-  settings.AddRowColumn(33, "MC-Matching DeltaR");
-  settings.AddRowColumn(33, "<=");
-  settings.AddRowColumn(33, auxTools_.ToString(mcMatching_dRMax) );
-  settings.AddRowColumn(33, "0.05" );
-  settings.AddRowColumn(33, "" );
-
-  settings.AddRowColumn(34, "MC-Matching IsUnique");
-  settings.AddRowColumn(34, "==");
-  settings.AddRowColumn(34, auxTools_.ToString(mcMatching_unique) );
-  settings.AddRowColumn(34, "1" );
-  settings.AddRowColumn(34, "" );
+  settings.AddRowColumn(30, "MC-Matching IsUnique");
+  settings.AddRowColumn(30, "==");
+  settings.AddRowColumn(30, auxTools_.ToString(mcMatching_unique) );
+  settings.AddRowColumn(30, "1" );
+  settings.AddRowColumn(30, "" );
   
-  settings.AddRowColumn(35, "MC-Taus: Mom PdgId");
-  settings.AddRowColumn(35, "==");
-  settings.AddRowColumn(35, auxTools_.ToString(realTauMom));
-  settings.AddRowColumn(35, "N/A" );
-  settings.AddRowColumn(35, "" );
+  settings.AddRowColumn(31, "MC-Taus: Mom PdgId");
+  settings.AddRowColumn(31, "==");
+  settings.AddRowColumn(31, auxTools_.ToString(realTauMom));
+  settings.AddRowColumn(31, "N/A" );
+  settings.AddRowColumn(31, "" );
 
-  settings.AddRowColumn(36, "MC-Taus: Number Expected");
-  settings.AddRowColumn(36, ">=");
-  settings.AddRowColumn(36, auxTools_.ToString(nMaxNumOfHTausPossible));
-  settings.AddRowColumn(36, "N/A" );
-  settings.AddRowColumn(36, "" );
+  settings.AddRowColumn(32, "MC-Taus: Number Expected");
+  settings.AddRowColumn(32, ">=");
+  settings.AddRowColumn(32, auxTools_.ToString(nMaxNumOfHTausPossible));
+  settings.AddRowColumn(32, "N/A" );
+  settings.AddRowColumn(32, "" );
 
-  settings.AddRowColumn(37, "" );
+  settings.AddRowColumn(32, "L1Tau: Jet Width");
+  settings.AddRowColumn(32, "<=");
+  settings.AddRowColumn(32, auxTools_.ToString(tau_jetWidth));
+  settings.AddRowColumn(32, "N/A" );
+  settings.AddRowColumn(32, "" );
+  settings.AddRowColumn(33, "" );
   settings.Print();
   
   return;
@@ -380,6 +386,7 @@ void TkTaus::Loop()
       if (DEBUG) std::cout << "Not a Minimum Bias sample." << std::endl;
     }
   
+  if (isMinBias) PrintSettings();
   
   ////////////////////////////////////////////////
   // For-loop: Entries
@@ -472,6 +479,7 @@ void TkTaus::Loop()
     // Ensure that all taus are found
     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
     if (bFoundAllTaus_) nEvtsWithMaxHTaus++;
+    // else if (!isMinBias) continue; //iro-new-experimental! xenios
 
     // ======================================================================================
     // For-loop: GenTausHadronic
@@ -555,19 +563,19 @@ void TkTaus::Loop()
 	//  Get signal-cone tracks
 	GetSigConeTracks(L1TkTauCandidate, sigTTTracks, sigConeTks_dPOCAz, sigConeTks_maxInvMass);
 
-	//  Get isolation-annulus tracks
-	GetIsoConeTracks(L1TkTauCandidate, isoTTTracks, 999.99);
+	//  Set isolation cone and isolation annulus tracks (no dZ0 cut!)
+	GetIsolationTracks(L1TkTauCandidate, isoTTTracks, 999.99);
 
 	// Calculate isolation variables
-	L1TkTauCandidate.CalculateRelIso(relIso_dZ0, true, false, isoCone_useCone);
-	L1TkTauCandidate.CalculateVtxIso(true, isoCone_useCone);
+	double relIso = L1TkTauCandidate.CalculateRelIso(tau_relIsodZ0, true, false, isoCone_useCone);
+	double vtxIso = L1TkTauCandidate.CalculateVtxIso(true, isoCone_useCone);
 
 	// Get the matching gen-particle
-	GetMatchingGenParticle(L1TkTauCandidate, GenTausTrigger); // GenTausHadronic
+	GetMatchingGenParticle(L1TkTauCandidate, GenTausTrigger); // GenTausHadronic ?
 	if ( L1TkTauCandidate.HasMatchingGenParticle() ) bFoundMC = true;
 	      
 	// Print information on L1TkTauCandidate ??
-	if (0) L1TkTauCandidate.PrintProperties(false, false, true, true);
+	if (0) L1TkTauCandidate.PrintProperties(false, false, false, true, false);
 
 	// Save L1TkTau Candidate
 	L1TkTauCandidates.push_back(L1TkTauCandidate);
@@ -587,18 +595,21 @@ void TkTaus::Loop()
 	    bool bIsLdgTrack = true;
 	    vector<TTTrack> myTks;
 	    vector<TTTrack> sigTks = L1TkTau->GetSigConeTTTracks();
-	    vector<TTTrack> isoTks = L1TkTau->GetIsoConeTTTracks();
+	    vector<TTTrack> isoTks;
+	    if (isoCone_useCone) L1TkTau->GetIsoConeTTTracks(); 
+	    else L1TkTau->GetIsoAnnulusTTTracks();
+
 	    myTks.insert(myTks.end(), sigTks.begin(), sigTks.end());
 	    myTks.insert(myTks.end(), isoTks.begin(), isoTks.end());
 
-	    // For-loop: All signal tracks
+	    // For-loop: All signal tracks (inside isolation and signal cones)
 	    for (vector<TTTrack>::iterator tk = myTks.begin(); tk != myTks.end(); tk++)
 	      {
 		double eta_seed = L1TkTau->GetMatchingTk().getEta(); // matchingTk = seeTk
 		double phi_seed = L1TkTau->GetMatchingTk().getPhi();
 		double eta_tk   = tk->getEta();
 		double phi_tk   = tk->getPhi();
-		double deltaPt  = L1TkTau->GetMatchingTk().getPt() - tk->getPt(); 
+		double deltaPt  = L1TkTau->GetMatchingTk().getPt() - tk->getPt();
 
 		// Skip identical tracks
 		if ( (eta_seed == eta_tk) && (phi_seed == phi_tk) )
@@ -613,7 +624,8 @@ void TkTaus::Loop()
 		// Consider only tracks within enitre jet definition
 		if (dR > L1TkTau->GetIsoConeMax()) continue; //redundant but keep for safety
 		// if (dR > L1TkTau->GetSigConeMax()) continue;
-		
+		// std::cout << "FIXME! Ptochos says this should be smaller than the isolation cone edge. e.g. dR < 0,15" << std::endl; //fixme!
+
 		// Compare pT of seed track with all tracks within dR = 0 (NEW)
 		if (deltaPt < 0) 
 		  {
@@ -630,21 +642,25 @@ void TkTaus::Loop()
 	    L1TkTaus_Tk.push_back(*L1TkTau);
 
 	    // Calculate isolation variables
-	    const double vtxIso  = L1TkTau->GetVtxIsolation(); // L1TkTau->CalculateVtxIso(false);
-	    const double relIso  = L1TkTau->GetRelIsolation(); // L1TkTau->CalculateRelIso(0.5, false);
-	    bool bPassVtxIso      = (vtxIso > vtxIso_WP); // orthogona1 to RelIso
+	    double jetWidth = 0.0;
+	    if (isoCone_useCone) jetWidth = GetJetWidth(L1TkTau->GetSigConeTTTracks(), L1TkTau->GetIsoConeTTTracks(),  L1TkTau->GetSigConeTTTracksP4(), L1TkTau->GetIsoConeTTTracksP4());
+	    else jetWidth = GetJetWidth(L1TkTau->GetSigConeTTTracks(), L1TkTau->GetIsoAnnulusTTTracks(),  L1TkTau->GetSigConeTTTracksP4(), L1TkTau->GetIsoAnnulusTTTracksP4());
+	    double vtxIso         = L1TkTau->GetVtxIsolation(); // L1TkTau->CalculateVtxIso(false);
+	    double relIso         = L1TkTau->GetRelIsolation(); // L1TkTau->CalculateRelIso(0.5, false);
+	    bool bPassVtxIso      = (vtxIso > tau_vtxIsoWP); // orthogona1 to RelIso
 	    bool bPassVtxIsoLoose = (vtxIso > 0.2);
 	    bool bPassVtxIsoTight = (vtxIso > 1.0);
-	    // bool bPassVtxIsoTight = (vtxIso > 0.5) && (L1TkTau->CalculateRelIso(relIso_dZ0, false, true) < 0.30);
-	    bool bPassRelIso      = (relIso < relIso_WP); // orthogonal to VtxIso
-	    bool bPassRelIsoLoose = (relIso < 0.3);
-	    bool bPassRelIsoTight = (relIso < 0.15);
+	    bool bPassJetWidth    = (jetWidth  <= tau_jetWidth);
+	    bool bPassRelIso      = (relIso < tau_relIsoWP); // orthogonal to VtxIso
+	    bool bPassRelIsoLoose = (relIso < 0.20);
+	    bool bPassRelIsoTight = (relIso < 0.05);
 	      
 	    // Fill containers with TkTaus
 	    if (bPassVtxIso) L1TkTaus_VtxIso.push_back(*L1TkTau);
 	    if (bPassRelIso) L1TkTaus_RelIso.push_back(*L1TkTau);
 	    if (bPassVtxIsoLoose) L1TkTaus_VtxIsoLoose.push_back(*L1TkTau);
-	    if (bPassVtxIsoTight) L1TkTaus_VtxIsoTight.push_back(*L1TkTau);
+	    //if (bPassVtxIsoTight*bPassJetWidth) L1TkTaus_VtxIsoTight.push_back(*L1TkTau); // fixme: new-testing!
+	    if (bPassVtxIsoTight*bPassVtxIsoLoose) L1TkTaus_VtxIsoTight.push_back(*L1TkTau); // fixme: new-testing!
 	    if (bPassRelIsoLoose) L1TkTaus_RelIsoLoose.push_back(*L1TkTau);
 	    if (bPassRelIsoTight) L1TkTaus_RelIsoTight.push_back(*L1TkTau);
 	  }
@@ -679,7 +695,9 @@ void TkTaus::Loop()
 
 	// Variables
 	TLorentzVector sigTks_p4 = tau->GetSigConeTTTracksP4();
-	TLorentzVector isoTks_p4 = tau->GetIsoConeTTTracksP4();
+	TLorentzVector isoTks_p4;
+	if (isoCone_useCone) isoTks_p4 = tau->GetIsoConeTTTracksP4();
+	else isoTks_p4 = tau->GetIsoAnnulusTTTracksP4();
 
 	// Do not skip if using MinBias sample as no real taus exist!
 	if (DEBUG) std::cout << "=== Checking matching condition" << std::endl;
@@ -706,20 +724,39 @@ void TkTaus::Loop()
 	hL1TkTau_SeedTk_IsUnknown     ->Fill( matchTk.getIsUnknown() );
 	hL1TkTau_SeedTk_IsCombinatoric->Fill( matchTk.getIsCombinatoric() );
 
-	// Signal/Isolation Cone Variables
-	double jetWidth = GetJetWidth(tau->GetSigConeTTTracks(), tau->GetIsoConeTTTracks(), sigTks_p4, isoTks_p4);
-	hL1TkTau_JetWidth     ->Fill( jetWidth );
-	hL1TkTau_DonutRatio   ->Fill( GetDonutRatio(*tau, isoTTTracks) );
-	hL1TkTau_DonutRatio_Vs_JetWidth->Fill( GetDonutRatio(*tau, isoTTTracks) , jetWidth );
+	// Isolation cone/annulus mass
+	if (tau->GetIsoConeTTTracks().size() > 0)    hL1TkTau_IsoConeMass->Fill( tau->GetIsoConeTTTracksP4().M() ); 
+	if (tau->GetIsoAnnulusTTTracks().size() > 0) hL1TkTau_IsoAnnulusMass->Fill( tau->GetIsoAnnulusTTTracksP4().M() ); 
+
+	// Signal/Isolation cone variables
+	if (isoCone_useCone)
+	  {
+	    hL1TkTau_JetWidth->Fill(GetJetWidth(tau->GetSigConeTTTracks(), tau->GetIsoConeTTTracks(), sigTks_p4, isoTks_p4) );
+	    hL1TkTau_NIsoTks ->Fill( tau->GetIsoAnnulusTTTracks().size() );
+	    if (tau->GetIsoConeTTTracks().size() > 0) 
+	      {
+		hL1TkTau_IsoTksEt   ->Fill( tau->GetIsoConeTTTracksP4().Et() );
+		hL1TkTau_IsoTksEta  ->Fill( tau->GetIsoConeTTTracksP4().Eta() );
+		hL1TkTau_DonutRatio ->Fill( GetDonutRatio(*tau, isoTTTracks, true) );
+	      }
+	  }
+	else
+	  {
+	    hL1TkTau_JetWidth->Fill(GetJetWidth(tau->GetSigConeTTTracks(), tau->GetIsoAnnulusTTTracks(), sigTks_p4, isoTks_p4) );
+	    hL1TkTau_NIsoTks ->Fill( tau->GetIsoConeTTTracks().size() );
+
+	    if (tau->GetIsoAnnulusTTTracks().size() > 0) 
+	      {
+		hL1TkTau_IsoTksEt   ->Fill( tau->GetIsoAnnulusTTTracksP4().Et() );
+		hL1TkTau_IsoTksEta  ->Fill( tau->GetIsoAnnulusTTTracksP4().Eta() );
+		hL1TkTau_DonutRatio ->Fill( GetDonutRatio(*tau, isoTTTracks, false) );
+	      }
+	  }
+
+	// Signal cone histograms
 	hL1TkTau_NSigTks      ->Fill( tau->GetSigConeTTTracks().size() );
 	hL1TkTau_SigTksEt     ->Fill( tau->GetSigConeTTTracksP4().Et() );
 	hL1TkTau_SigTksEta    ->Fill( tau->GetSigConeTTTracksP4().Eta() );
-	hL1TkTau_NIsoTks      ->Fill( tau->GetIsoConeTTTracks().size() );
-	if (tau->GetIsoConeTTTracks().size() > 0) 
-	  {
-	    hL1TkTau_IsoTksEt    ->Fill( tau->GetIsoConeTTTracksP4().Et() );
-	    hL1TkTau_IsoTksEta   ->Fill( tau->GetIsoConeTTTracksP4().Eta() );
-	  }
 	hL1TkTau_InvMass     ->Fill( tau->GetSigConeTTTracksP4().M() ); 
 	hL1TkTau_SigConeRMin ->Fill( tau->GetSigConeMin() );
 	hL1TkTau_IsoConeRMin ->Fill( tau->GetIsoConeMin() );
@@ -728,15 +765,11 @@ void TkTaus::Loop()
 	hL1TkTau_DeltaRGenP  ->Fill( tau->GetMatchingGenParticleDeltaR() );
 	hL1TkTau_RelIso      ->Fill( tau->GetRelIsolation() );
 	hL1TkTau_VtxIso      ->Fill( tau->GetVtxIsolation() );
-	//if (  tau->GetIsoConeTTTracks().size() > 0 ) 
-	//{
-	// hL1TkTau_VtxIso_Vs_RelIso->Fill( tau->GetVtxIsolation(), tau->GetRelIsolation() ); // relIso shown only up to vtxIso = relIso_dZ0 => not very informative
-	hL1TkTau_VtxIso_Vs_RelIso->Fill( tau->GetVtxIsolation(), tau->CalculateRelIso(999.9, false) ); // shows entire range for relIso
-	//}
-	
-	// SigCone TTTracks
+	hL1TkTau_VtxIso_Vs_RelIso->Fill( tau->GetVtxIsolation(), tau->CalculateRelIso(999.9, false, false, isoCone_useCone) ); // xenios-iro:shows entire range for relIso
+
 	int sigTks_sumCharge   = 0;
 	vector<TTTrack> sigTks = tau->GetSigConeTTTracks();
+	// For-loop: All signal cone tracks
 	for (vector<TTTrack>::iterator sigTk = sigTks.begin(); sigTk != sigTks.end(); sigTk++)
 	  {
 	    // Print properties?
@@ -748,10 +781,11 @@ void TkTaus::Loop()
 	    double sigTk_dR    = auxTools_.DeltaR(tau->GetMatchingTk().getEta(), tau->GetMatchingTk().getPhi(), sigTk->getEta(), sigTk->getPhi());
 	    
 	    // Fill Histograms
-	    hL1TkTau_SigTks_Pt        ->Fill( sigTk->getPt()  );
-	    hL1TkTau_SigTks_PtRel     ->Fill( sigTk_PtRel );
-	    hL1TkTau_SigTks_Eta       ->Fill( sigTk->getEta() );
-	    hL1TkTau_SigTks_POCAz     ->Fill( sigTk->getZ0()  );
+	    hL1TkTau_SigTks_Pt    ->Fill( sigTk->getPt()  );
+	    hL1TkTau_SigTks_PtRel ->Fill( sigTk_PtRel );
+	    hL1TkTau_SigTks_Eta   ->Fill( sigTk->getEta() );
+	    hL1TkTau_SigTks_POCAz ->Fill( sigTk->getZ0()  );
+
 	    if (sigTks.size() > 1)
 	      {
 		hL1TkTau_SigTks_DeltaPOCAz->Fill( abs( sigTk->getZ0() - matchTk.getZ0() ) );
@@ -770,7 +804,11 @@ void TkTaus::Loop()
 	hL1TkTau_Charge->Fill( sigTks_sumCharge);
 
 	// IsoCone TTTracks
-	vector<TTTrack> isoTks = tau->GetIsoConeTTTracks();	
+	vector<TTTrack> isoTks;
+	if (isoCone_useCone) isoTks = tau->GetIsoConeTTTracks();
+	else isoTks = tau->GetIsoAnnulusTTTracks();
+
+	// For-loop: All signal cone/annulus tracks
 	for (vector<TTTrack>::iterator isoTk = isoTks.begin(); isoTk != isoTks.end(); isoTk++)
 	  {
 
@@ -814,7 +852,9 @@ void TkTaus::Loop()
 
 	// Variables
 	TLorentzVector sigTks_p4 = tau->GetSigConeTTTracksP4();
-	TLorentzVector isoTks_p4 = tau->GetIsoConeTTTracksP4();
+	TLorentzVector isoTks_p4;
+	if (isoCone_useCone) isoTks_p4 = tau->GetIsoConeTTTracksP4();
+	else isoTks_p4 = tau->GetIsoAnnulusTTTracksP4();
 
 	// Do not skip if using MinBias sample as no real taus exist!
 	if (!tau->HasMatchingGenParticle() && (isMinBias == false) ) continue;
@@ -899,21 +939,41 @@ void TkTaus::Loop()
 	hL1TkIsoTau_SeedTk_IsGenuine     ->Fill( matchTk.getIsGenuine() );
 	hL1TkIsoTau_SeedTk_IsUnknown     ->Fill( matchTk.getIsUnknown() );
 	hL1TkIsoTau_SeedTk_IsCombinatoric->Fill( matchTk.getIsCombinatoric() );
+	
+	// new - start
+	// Isolation cone/annulus mass
+	if (tau->GetIsoConeTTTracks().size() > 0)    hL1TkIsoTau_IsoConeMass->Fill( tau->GetIsoConeTTTracksP4().M() ); 
+	if (tau->GetIsoAnnulusTTTracks().size() > 0) hL1TkIsoTau_IsoAnnulusMass->Fill( tau->GetIsoAnnulusTTTracksP4().M() ); 
 
-	// Signal/Isolation Cone Variables
-	double jetWidth = GetJetWidth(tau->GetSigConeTTTracks(), tau->GetIsoConeTTTracks(), sigTks_p4, isoTks_p4);
-	hL1TkIsoTau_JetWidth     ->Fill( jetWidth );
-	hL1TkIsoTau_DonutRatio   ->Fill( GetDonutRatio(*tau, isoTTTracks) );
-	hL1TkIsoTau_DonutRatio_Vs_JetWidth->Fill( GetDonutRatio(*tau, isoTTTracks) , jetWidth );
+	// Signal/Isolation cone variables
+	if (isoCone_useCone)
+	  {
+	    hL1TkIsoTau_JetWidth->Fill(GetJetWidth(tau->GetSigConeTTTracks(), tau->GetIsoConeTTTracks(), sigTks_p4, isoTks_p4) );
+	    hL1TkIsoTau_NIsoTks ->Fill( tau->GetIsoAnnulusTTTracks().size() );
+	    if (tau->GetIsoConeTTTracks().size() > 0) 
+	      {
+		hL1TkIsoTau_IsoTksEt   ->Fill( tau->GetIsoConeTTTracksP4().Et() );
+		hL1TkIsoTau_IsoTksEta  ->Fill( tau->GetIsoConeTTTracksP4().Eta() );
+		hL1TkIsoTau_DonutRatio ->Fill( GetDonutRatio(*tau, isoTTTracks, true) );
+	      }
+	  }
+	else
+	  {
+	    hL1TkIsoTau_JetWidth->Fill(GetJetWidth(tau->GetSigConeTTTracks(), tau->GetIsoAnnulusTTTracks(), sigTks_p4, isoTks_p4) );
+	    hL1TkIsoTau_NIsoTks ->Fill( tau->GetIsoConeTTTracks().size() );
+
+	    if (tau->GetIsoAnnulusTTTracks().size() > 0) 
+	      {
+		hL1TkIsoTau_IsoTksEt   ->Fill( tau->GetIsoAnnulusTTTracksP4().Et() );
+		hL1TkIsoTau_IsoTksEta  ->Fill( tau->GetIsoAnnulusTTTracksP4().Eta() );
+		hL1TkIsoTau_DonutRatio ->Fill( GetDonutRatio(*tau, isoTTTracks, true) );
+	      }
+	  }
+
+	// Signal cone histograms
 	hL1TkIsoTau_NSigTks      ->Fill( tau->GetSigConeTTTracks().size() );
 	hL1TkIsoTau_SigTksEt     ->Fill( tau->GetSigConeTTTracksP4().Et() );
 	hL1TkIsoTau_SigTksEta    ->Fill( tau->GetSigConeTTTracksP4().Eta() );
-	hL1TkIsoTau_NIsoTks      ->Fill( tau->GetIsoConeTTTracks().size() );
-	if (tau->GetIsoConeTTTracks().size() > 0) 
-	  {
-	    hL1TkIsoTau_IsoTksEt    ->Fill( tau->GetIsoConeTTTracksP4().Et() );
-	    hL1TkIsoTau_IsoTksEta   ->Fill( tau->GetIsoConeTTTracksP4().Eta() );
-	  }
 	hL1TkIsoTau_InvMass     ->Fill( tau->GetSigConeTTTracksP4().M() ); 
 	hL1TkIsoTau_SigConeRMin ->Fill( tau->GetSigConeMin() );
 	hL1TkIsoTau_IsoConeRMin ->Fill( tau->GetIsoConeMin() );
@@ -922,14 +982,11 @@ void TkTaus::Loop()
 	hL1TkIsoTau_DeltaRGenP  ->Fill( tau->GetMatchingGenParticleDeltaR() );
 	hL1TkIsoTau_RelIso      ->Fill( tau->GetRelIsolation() );
 	hL1TkIsoTau_VtxIso      ->Fill( tau->GetVtxIsolation() );
-	if (  tau->GetIsoConeTTTracks().size() > 0 ) 
-	  {
-	    hL1TkIsoTau_VtxIso_Vs_RelIso->Fill( tau->GetVtxIsolation(), tau->GetRelIsolation() );
-	  }
+	hL1TkIsoTau_VtxIso_Vs_RelIso->Fill( tau->GetVtxIsolation(), tau->CalculateRelIso(999.9, false, false, isoCone_useCone) ); // xenios-iro:shows entire range for relIso
 
-	// SigCone TTTracks
 	int sigTks_sumCharge   = 0;
 	vector<TTTrack> sigTks = tau->GetSigConeTTTracks();
+	// For-loop: All signal cone tracks
 	for (vector<TTTrack>::iterator sigTk = sigTks.begin(); sigTk != sigTks.end(); sigTk++)
 	  {
 	    // Print properties?
@@ -962,8 +1019,10 @@ void TkTaus::Loop()
 	// Fill histos for other variables
 	hL1TkIsoTau_Charge->Fill( sigTks_sumCharge);
 
-	// IsoCone TTTracks
-	vector<TTTrack> isoTks = tau->GetIsoConeTTTracks();	
+	vector<TTTrack> isoTks;
+	if (isoCone_useCone) isoTks = tau->GetIsoConeTTTracks();
+	else isoTks = tau->GetIsoAnnulusTTTracks();
+	// For-loop: All isolation cone/annulus tracks
 	for (vector<TTTrack>::iterator isoTk = isoTks.begin(); isoTk != isoTks.end(); isoTk++)
 	  {
 
@@ -1036,10 +1095,10 @@ void TkTaus::Loop()
     ////////////////////////////////////////////////
     // SingleTau
     ////////////////////////////////////////////////
-    FillSingleTau_(L1TkTaus_Tk    , hTk_Rate  , hTk_Eff  );
-    FillSingleTau_(L1TkTaus_Tk    , hTk_Rate_C, hTk_Eff_C, 0.0, 1.0);
-    FillSingleTau_(L1TkTaus_Tk    , hTk_Rate_I, hTk_Eff_I, 1.0, 1.6);
-    FillSingleTau_(L1TkTaus_Tk    , hTk_Rate_F, hTk_Eff_F, 1.6, 3.0); // 2.5 is max
+    FillSingleTau_(L1TkTaus_Tk, hTk_Rate  , hTk_Eff  );
+    FillSingleTau_(L1TkTaus_Tk, hTk_Rate_C, hTk_Eff_C, 0.0, 1.0);
+    FillSingleTau_(L1TkTaus_Tk, hTk_Rate_I, hTk_Eff_I, 1.0, 1.6);
+    FillSingleTau_(L1TkTaus_Tk, hTk_Rate_F, hTk_Eff_F, 1.6, 3.0); // 2.5 is max
 
     FillSingleTau_(L1TkTaus_VtxIso, hVtxIso_Rate  , hVtxIso_Eff);
     FillSingleTau_(L1TkTaus_VtxIso, hVtxIso_Rate_C, hVtxIso_Eff_C, 0.0, 1.0);
@@ -1084,13 +1143,13 @@ void TkTaus::Loop()
     ////////////////////////////////////////////////
     // WARNING: Erases L1TkTaus from vector!
     ////////////////////////////////////////////////
-    ApplyDiTauZMatching(seedTk_Collection, L1TkTaus_Tk);
-    ApplyDiTauZMatching(seedTk_Collection, L1TkTaus_VtxIso); 
-    ApplyDiTauZMatching(seedTk_Collection, L1TkTaus_RelIso);
-    ApplyDiTauZMatching(seedTk_Collection, L1TkTaus_VtxIsoLoose);
-    ApplyDiTauZMatching(seedTk_Collection, L1TkTaus_VtxIsoTight);
-    ApplyDiTauZMatching(seedTk_Collection, L1TkTaus_RelIsoLoose);
-    ApplyDiTauZMatching(seedTk_Collection, L1TkTaus_RelIsoTight);
+    ApplyDiTauZMatching(L1TkTaus_Tk);
+    ApplyDiTauZMatching(L1TkTaus_VtxIso); 
+    ApplyDiTauZMatching(L1TkTaus_RelIso);
+    ApplyDiTauZMatching(L1TkTaus_VtxIsoLoose);
+    ApplyDiTauZMatching(L1TkTaus_VtxIsoTight);
+    ApplyDiTauZMatching(L1TkTaus_RelIsoLoose);
+    ApplyDiTauZMatching(L1TkTaus_RelIsoTight);
 
     FillDiTau_(L1TkTaus_Tk, hDiTau_Rate_Tk  , hDiTau_Eff_Tk);
     FillDiTau_(L1TkTaus_Tk, hDiTau_Rate_Tk_C, hDiTau_Eff_Tk_C, 0.0, 1.0);
@@ -1167,166 +1226,171 @@ void TkTaus::Loop()
   ////////////////////////////////////////////////
   // SingleTau
   double N = nEntries;
-  histoTools_.ConvertToRateHisto_1D(hTk_Rate  , N);
-  histoTools_.ConvertToRateHisto_1D(hTk_Rate_C, N);
-  histoTools_.ConvertToRateHisto_1D(hTk_Rate_I, N);
-  histoTools_.ConvertToRateHisto_1D(hTk_Rate_F, N);
+  if (isMinBias) // new: speed things up a bit (Rate plots only make sense for Neutrino gun!)
+    {
+      histoTools_.ConvertToRateHisto_1D(hTk_Rate  , N);
+      histoTools_.ConvertToRateHisto_1D(hTk_Rate_C, N);
+      histoTools_.ConvertToRateHisto_1D(hTk_Rate_I, N);
+      histoTools_.ConvertToRateHisto_1D(hTk_Rate_F, N);
       
-  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate  , N);
-  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_C, N);
-  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_I, N);
-  histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_F, N);
+      histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate  , N);
+      histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_C, N);
+      histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_I, N);
+      histoTools_.ConvertToRateHisto_1D(hVtxIso_Rate_F, N);
+      
+      histoTools_.ConvertToRateHisto_1D(hRelIso_Rate  , N);
+      histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_C, N);
+      histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_I, N);
+      histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_F, N);
+      
+      histoTools_.ConvertToRateHisto_1D(hVtxIsoLoose_Rate  , N);
+      histoTools_.ConvertToRateHisto_1D(hVtxIsoLoose_Rate_C, N);
+      histoTools_.ConvertToRateHisto_1D(hVtxIsoLoose_Rate_I, N);
+      histoTools_.ConvertToRateHisto_1D(hVtxIsoLoose_Rate_F, N);
+      
+      histoTools_.ConvertToRateHisto_1D(hVtxIsoTight_Rate  , N);
+      histoTools_.ConvertToRateHisto_1D(hVtxIsoTight_Rate_C, N);
+      histoTools_.ConvertToRateHisto_1D(hVtxIsoTight_Rate_I, N);
+      histoTools_.ConvertToRateHisto_1D(hVtxIsoTight_Rate_F, N);
+      
+      histoTools_.ConvertToRateHisto_1D(hRelIsoLoose_Rate  , N);
+      histoTools_.ConvertToRateHisto_1D(hRelIsoLoose_Rate_C, N);
+      histoTools_.ConvertToRateHisto_1D(hRelIsoLoose_Rate_I, N);
+      histoTools_.ConvertToRateHisto_1D(hRelIsoLoose_Rate_F, N);
+      
+      histoTools_.ConvertToRateHisto_1D(hRelIsoTight_Rate  , N);
+      histoTools_.ConvertToRateHisto_1D(hRelIsoTight_Rate_C, N);
+      histoTools_.ConvertToRateHisto_1D(hRelIsoTight_Rate_I, N);
+      histoTools_.ConvertToRateHisto_1D(hRelIsoTight_Rate_F, N);
 
-  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate  , N);
-  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_C, N);
-  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_I, N);
-  histoTools_.ConvertToRateHisto_1D(hRelIso_Rate_F, N);
+      // DiTau
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk  , N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk_C, N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk_I, N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk_F, N);
+      
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso  , N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso_C, N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso_I, N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso_F, N);
+      
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso  , N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso_C, N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso_I, N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso_F, N);
+      
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoLoose  , N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoLoose_C, N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoLoose_I, N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoLoose_F, N);
+      
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoTight  , N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoTight_C, N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoTight_I, N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoTight_F, N);
+      
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoLoose  , N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoLoose_C, N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoLoose_I, N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoLoose_F, N);
+      
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoTight  , N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoTight_C, N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoTight_I, N);
+      histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoTight_F, N);
+      
+      histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_VtxIso, N);
+      histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_RelIso, N);
+      histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_VtxIsoLoose, N);
+      histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_VtxIsoTight, N);
+      histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_RelIsoLoose, N);
+      histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_RelIsoTight, N);
 
-  histoTools_.ConvertToRateHisto_1D(hVtxIsoLoose_Rate  , N);
-  histoTools_.ConvertToRateHisto_1D(hVtxIsoLoose_Rate_C, N);
-  histoTools_.ConvertToRateHisto_1D(hVtxIsoLoose_Rate_I, N);
-  histoTools_.ConvertToRateHisto_1D(hVtxIsoLoose_Rate_F, N);
+    }
+  else // new: speed things up a bit
+    {
+      FinaliseEffHisto_( hTk_Eff  , nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hTk_Eff_C, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hTk_Eff_I, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hTk_Eff_F, nEvtsWithMaxHTaus);
+      
+      FinaliseEffHisto_( hVtxIso_Eff  , nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hVtxIso_Eff_C, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hVtxIso_Eff_I, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hVtxIso_Eff_F, nEvtsWithMaxHTaus);
+      
+      FinaliseEffHisto_( hRelIso_Eff  , nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hRelIso_Eff_C, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hRelIso_Eff_I, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hRelIso_Eff_F, nEvtsWithMaxHTaus);
+      
+      FinaliseEffHisto_( hVtxIsoLoose_Eff  , nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hVtxIsoLoose_Eff_C, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hVtxIsoLoose_Eff_I, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hVtxIsoLoose_Eff_F, nEvtsWithMaxHTaus);
+      
+      FinaliseEffHisto_( hVtxIsoTight_Eff  , nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hVtxIsoTight_Eff_C, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hVtxIsoTight_Eff_I, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hVtxIsoTight_Eff_F, nEvtsWithMaxHTaus);
+      
+      FinaliseEffHisto_( hRelIsoLoose_Eff  , nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hRelIsoLoose_Eff_C, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hRelIsoLoose_Eff_I, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hRelIsoLoose_Eff_F, nEvtsWithMaxHTaus);
+      
+      FinaliseEffHisto_( hRelIsoTight_Eff  , nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hRelIsoTight_Eff_C, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hRelIsoTight_Eff_I, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hRelIsoTight_Eff_F, nEvtsWithMaxHTaus);
+      
+      FinaliseEffHisto_( hDiTau_Eff_Tk  , nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_Tk_C, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_Tk_I, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_Tk_F, nEvtsWithMaxHTaus);
+      
+      FinaliseEffHisto_( hDiTau_Eff_VtxIso  , nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_VtxIso_C, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_VtxIso_I, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_VtxIso_F, nEvtsWithMaxHTaus);
+      
+      FinaliseEffHisto_( hDiTau_Eff_RelIso  , nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_RelIso_C, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_RelIso_I, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_RelIso_F, nEvtsWithMaxHTaus);
+      
+      FinaliseEffHisto_( hDiTau_Eff_VtxIsoLoose  , nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_VtxIsoLoose_C, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_VtxIsoLoose_I, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_VtxIsoLoose_F, nEvtsWithMaxHTaus);
+      
+      FinaliseEffHisto_( hDiTau_Eff_VtxIsoTight  , nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_VtxIsoTight_C, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_VtxIsoTight_I, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_VtxIsoTight_F, nEvtsWithMaxHTaus);
+      
+      FinaliseEffHisto_( hDiTau_Eff_RelIsoLoose  , nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_RelIsoLoose_C, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_RelIsoLoose_I, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_RelIsoLoose_F, nEvtsWithMaxHTaus);
+      
+      FinaliseEffHisto_( hDiTau_Eff_RelIsoTight  , nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_RelIsoTight_C, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_RelIsoTight_I, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_RelIsoTight_F, nEvtsWithMaxHTaus);
 
-  histoTools_.ConvertToRateHisto_1D(hVtxIsoTight_Rate  , N);
-  histoTools_.ConvertToRateHisto_1D(hVtxIsoTight_Rate_C, N);
-  histoTools_.ConvertToRateHisto_1D(hVtxIsoTight_Rate_I, N);
-  histoTools_.ConvertToRateHisto_1D(hVtxIsoTight_Rate_F, N);
-
-  histoTools_.ConvertToRateHisto_1D(hRelIsoLoose_Rate  , N);
-  histoTools_.ConvertToRateHisto_1D(hRelIsoLoose_Rate_C, N);
-  histoTools_.ConvertToRateHisto_1D(hRelIsoLoose_Rate_I, N);
-  histoTools_.ConvertToRateHisto_1D(hRelIsoLoose_Rate_F, N);
-
-  histoTools_.ConvertToRateHisto_1D(hRelIsoTight_Rate  , N);
-  histoTools_.ConvertToRateHisto_1D(hRelIsoTight_Rate_C, N);
-  histoTools_.ConvertToRateHisto_1D(hRelIsoTight_Rate_I, N);
-  histoTools_.ConvertToRateHisto_1D(hRelIsoTight_Rate_F, N);
-
-  FinaliseEffHisto_( hTk_Eff  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hTk_Eff_C, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hTk_Eff_I, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hTk_Eff_F, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hDiTau_Eff_Tk_VtxIso     , nEvtsWithMaxHTaus);;
+      FinaliseEffHisto_( hDiTau_Eff_Tk_RelIso     , nEvtsWithMaxHTaus);;
+      FinaliseEffHisto_( hDiTau_Eff_Tk_VtxIsoLoose, nEvtsWithMaxHTaus);;
+      FinaliseEffHisto_( hDiTau_Eff_Tk_VtxIsoTight, nEvtsWithMaxHTaus);;
+      FinaliseEffHisto_( hDiTau_Eff_Tk_RelIsoLoose, nEvtsWithMaxHTaus);;
+      FinaliseEffHisto_( hDiTau_Eff_Tk_RelIsoTight, nEvtsWithMaxHTaus);;
+    }
   
-  FinaliseEffHisto_( hVtxIso_Eff  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hVtxIso_Eff_C, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hVtxIso_Eff_I, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hVtxIso_Eff_F, nEvtsWithMaxHTaus);
-
-  FinaliseEffHisto_( hRelIso_Eff  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hRelIso_Eff_C, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hRelIso_Eff_I, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hRelIso_Eff_F, nEvtsWithMaxHTaus);
-
-  FinaliseEffHisto_( hVtxIsoLoose_Eff  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hVtxIsoLoose_Eff_C, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hVtxIsoLoose_Eff_I, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hVtxIsoLoose_Eff_F, nEvtsWithMaxHTaus);
-
-  FinaliseEffHisto_( hVtxIsoTight_Eff  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hVtxIsoTight_Eff_C, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hVtxIsoTight_Eff_I, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hVtxIsoTight_Eff_F, nEvtsWithMaxHTaus);
-
-  FinaliseEffHisto_( hRelIsoLoose_Eff  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hRelIsoLoose_Eff_C, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hRelIsoLoose_Eff_I, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hRelIsoLoose_Eff_F, nEvtsWithMaxHTaus);
-
-  FinaliseEffHisto_( hRelIsoTight_Eff  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hRelIsoTight_Eff_C, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hRelIsoTight_Eff_I, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hRelIsoTight_Eff_F, nEvtsWithMaxHTaus);
-
-  // DiTau
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk  , N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk_C, N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk_I, N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_Tk_F, N);
-  
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso  , N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso_C, N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso_I, N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIso_F, N);
-  
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso  , N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso_C, N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso_I, N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIso_F, N);
-
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoLoose  , N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoLoose_C, N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoLoose_I, N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoLoose_F, N);
-
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoTight  , N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoTight_C, N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoTight_I, N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_VtxIsoTight_F, N);
-
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoLoose  , N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoLoose_C, N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoLoose_I, N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoLoose_F, N);
-
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoTight  , N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoTight_C, N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoTight_I, N);
-  histoTools_.ConvertToRateHisto_1D(hDiTau_Rate_RelIsoTight_F, N);
-  
-  FinaliseEffHisto_( hDiTau_Eff_Tk  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_Tk_C, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_Tk_I, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_Tk_F, nEvtsWithMaxHTaus);
-
-  FinaliseEffHisto_( hDiTau_Eff_VtxIso  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_VtxIso_C, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_VtxIso_I, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_VtxIso_F, nEvtsWithMaxHTaus);
-
-  FinaliseEffHisto_( hDiTau_Eff_RelIso  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_RelIso_C, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_RelIso_I, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_RelIso_F, nEvtsWithMaxHTaus);
-
-  FinaliseEffHisto_( hDiTau_Eff_VtxIsoLoose  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_VtxIsoLoose_C, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_VtxIsoLoose_I, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_VtxIsoLoose_F, nEvtsWithMaxHTaus);
-
-  FinaliseEffHisto_( hDiTau_Eff_VtxIsoTight  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_VtxIsoTight_C, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_VtxIsoTight_I, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_VtxIsoTight_F, nEvtsWithMaxHTaus);
-
-  FinaliseEffHisto_( hDiTau_Eff_RelIsoLoose  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_RelIsoLoose_C, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_RelIsoLoose_I, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_RelIsoLoose_F, nEvtsWithMaxHTaus);
-
-  FinaliseEffHisto_( hDiTau_Eff_RelIsoTight  , nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_RelIsoTight_C, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_RelIsoTight_I, nEvtsWithMaxHTaus);
-  FinaliseEffHisto_( hDiTau_Eff_RelIsoTight_F, nEvtsWithMaxHTaus);
-
-  // DiTau (Tk-Other)
-  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_VtxIso, N);
-  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_RelIso, N);
-  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_VtxIsoLoose, N);
-  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_VtxIsoTight, N);
-  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_RelIsoLoose, N);
-  histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_RelIsoTight, N);
-
-  FinaliseEffHisto_( hDiTau_Eff_Tk_VtxIso, nEvtsWithMaxHTaus);;
-  FinaliseEffHisto_( hDiTau_Eff_Tk_RelIso, nEvtsWithMaxHTaus);;
-  FinaliseEffHisto_( hDiTau_Eff_Tk_VtxIsoLoose, nEvtsWithMaxHTaus);;
-  FinaliseEffHisto_( hDiTau_Eff_Tk_VtxIsoTight, nEvtsWithMaxHTaus);;
-  FinaliseEffHisto_( hDiTau_Eff_Tk_RelIsoLoose, nEvtsWithMaxHTaus);;
-  FinaliseEffHisto_( hDiTau_Eff_Tk_RelIsoTight, nEvtsWithMaxHTaus);;
-
   // Turn-Ons 
   // TEfficiency *pEff = 0;
-  // pEff = new TEfficiency(*hCalo_TurnOn50_passed, *hMcHadronicTau_VisEt);
-  // hCalo_TurnOn50 = (TH1D*) pEff->Clone();
+  // pEff = new TEfficiency(*hTk_TurnOn50_passed, *hMcHadronicTau_VisEt);
+  // hTk_TurnOn50 = (TH1D*) pEff->Clone();
   histoTools_.DivideHistos_1D(hTk_TurnOn25, hMcHadronicTau_VisEt);
   histoTools_.DivideHistos_1D(hTk_TurnOn25_1pr, hMcHadronicTau_VisEt_1pr);
   histoTools_.DivideHistos_1D(hTk_TurnOn25_3pr, hMcHadronicTau_VisEt_3pr);
@@ -1529,18 +1593,19 @@ void TkTaus::BookHistos_(void)
   histoTools_.BookHisto_1D(hCounters, "Counters",  "", 15, 0.0, +15.0);
 
   // L1TkTaus
-  histoTools_.BookHisto_1D(hL1TkTau_Multiplicity , "L1TkTau_Multiplicity" , tN   , nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(hL1TkTau_Multiplicity   , "L1TkTau_Multiplicity" , tN   , nN   , minN   , maxN   );
   histoTools_.BookHisto_1D(hL1TkTau_Multiplicity_MC, "L1TkTau_Multiplicity_MC", tN, nN, minN, maxN );
-  histoTools_.BookHisto_1D(hL1TkTau_JetWidth     , "L1TkTau_JetWidth"     , tW   , nM   , minM   , maxM   );
-  histoTools_.BookHisto_1D(hL1TkTau_DonutRatio   , "L1TkTau_DonutRatio"   , tG   , nG   , minG   , maxG   );
-  histoTools_.BookHisto_2D(hL1TkTau_DonutRatio_Vs_JetWidth, "L1TkTau_DonutRatio_Vs_JetWidth", tGW, nG, minG, maxG, nM, minM, maxM);
-  histoTools_.BookHisto_1D(hL1TkTau_NSigTks      , "L1TkTau_NSigTks"      , tN   , nN   , minN   , maxN   );
-  histoTools_.BookHisto_1D(hL1TkTau_SigTksEt     , "L1TkTau_SigTksEt"     , tEt  , nEt  , minEt  , maxEt  );
-  histoTools_.BookHisto_1D(hL1TkTau_SigTksEta    , "L1TkTau_SigTksEta"    , tEta , nEta , minEta , maxEta );
-  histoTools_.BookHisto_1D(hL1TkTau_NIsoTks      , "L1TkTau_NIsoTks"      , tN   , nN   , minN   , maxN   );
-  histoTools_.BookHisto_1D(hL1TkTau_IsoTksEt     , "L1TkTau_IsoTksEt"     , tEt  , nEt  , minEt  , maxEt  );
-  histoTools_.BookHisto_1D(hL1TkTau_IsoTksEta    , "L1TkTau_IsoTksEta"    , tEta , nEta , minEta , maxEta );
-  histoTools_.BookHisto_1D(hL1TkTau_InvMass      , "L1TkTau_InvMass"      , tM   , nM   , minM   , maxM   );
+  histoTools_.BookHisto_1D(hL1TkTau_JetWidth       , "L1TkTau_JetWidth"     , tW   , nM   , minM   , maxM   );
+  histoTools_.BookHisto_1D(hL1TkTau_DonutRatio     , "L1TkTau_DonutRatio"   , tG   , nG   , minG   , maxG   );
+  histoTools_.BookHisto_1D(hL1TkTau_NSigTks        , "L1TkTau_NSigTks"      , tN   , nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(hL1TkTau_SigTksEt       , "L1TkTau_SigTksEt"     , tEt  , nEt  , minEt  , maxEt  );
+  histoTools_.BookHisto_1D(hL1TkTau_SigTksEta      , "L1TkTau_SigTksEta"    , tEta , nEta , minEta , maxEta );
+  histoTools_.BookHisto_1D(hL1TkTau_NIsoTks        , "L1TkTau_NIsoTks"      , tN   , nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoTksEt       , "L1TkTau_IsoTksEt"     , tEt  , nEt  , minEt  , maxEt  );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoTksEta      , "L1TkTau_IsoTksEta"    , tEta , nEta , minEta , maxEta );
+  histoTools_.BookHisto_1D(hL1TkTau_InvMass        , "L1TkTau_InvMass"      , tM   , nM   , minM   , maxM   );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoConeMass    , "L1TkTau_IsoConeMass"   , tM  , nM   , minM   , maxM   );
+  histoTools_.BookHisto_1D(hL1TkTau_IsoAnnulusMass , "L1TkTau_IsoAnnulusMass", tM  , nM   , minM   , maxM   );
   histoTools_.BookHisto_1D(hL1TkTau_SigConeRMin  , "L1TkTau_SigConeRMin"  , tR   , nR   , minR   , maxR   );
   histoTools_.BookHisto_1D(hL1TkTau_SigConeRMax  , "L1TkTau_SigConeRMax"  , tR   , nR   , minR   , maxR   );
   histoTools_.BookHisto_1D(hL1TkTau_IsoConeRMin  , "L1TkTau_IsoConeRMin"  , tR   , nR   , minR   , maxR   );
@@ -1581,18 +1646,19 @@ void TkTaus::BookHistos_(void)
   histoTools_.BookHisto_1D(hL1TkTau_SeedTk_IsCombinatoric, "L1TkTau_SeedTk_IsCombinatoric",    "", nBool, minBool, maxBool);
 
   // L1TkIsoTaus
-  histoTools_.BookHisto_1D(hL1TkIsoTau_Multiplicity , "L1TkIsoTau_Multiplicity" , tN   , nN   , minN   , maxN   );
-  histoTools_.BookHisto_1D(hL1TkIsoTau_Multiplicity_MC , "L1TkIsoTau_Multiplicity_MC" , tN   , nN   , minN   , maxN   );
-  histoTools_.BookHisto_1D(hL1TkIsoTau_JetWidth     , "L1TkIsoTau_JetWidth"     , tW   , nM   , minM   , maxM   );
-  histoTools_.BookHisto_1D(hL1TkIsoTau_DonutRatio   , "L1TkIsoTau_DonutRatio"   , tG   , nG   , minG   , maxG   );
-  histoTools_.BookHisto_2D(hL1TkIsoTau_DonutRatio_Vs_JetWidth, "L1TkIsoTau_DonutRatio_Vs_JetWidth", tGW, nG, minG, maxG, nM, minM, maxM   );
-  histoTools_.BookHisto_1D(hL1TkIsoTau_NSigTks      , "L1TkIsoTau_NSigTks"      , tN   , nN   , minN   , maxN   );
-  histoTools_.BookHisto_1D(hL1TkIsoTau_SigTksEt     , "L1TkIsoTau_SigTksEt"     , tEt  , nEt  , minEt  , maxEt  );
-  histoTools_.BookHisto_1D(hL1TkIsoTau_SigTksEta    , "L1TkIsoTau_SigTksEta"    , tEta , nEta , minEta , maxEta );
-  histoTools_.BookHisto_1D(hL1TkIsoTau_NIsoTks      , "L1TkIsoTau_NIsoTks"      , tN   , nN   , minN   , maxN   );
-  histoTools_.BookHisto_1D(hL1TkIsoTau_IsoTksEt     , "L1TkIsoTau_IsoTksEt"     , tEt  , nEt  , minEt  , maxEt  );
-  histoTools_.BookHisto_1D(hL1TkIsoTau_IsoTksEta    , "L1TkIsoTau_IsoTksEta"    , tEta , nEta , minEta , maxEta );
-  histoTools_.BookHisto_1D(hL1TkIsoTau_InvMass      , "L1TkIsoTau_InvMass"      , tM   , nM   , minM   , maxM   );
+  histoTools_.BookHisto_1D(hL1TkIsoTau_Multiplicity   , "L1TkIsoTau_Multiplicity"   , tN   , nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(hL1TkIsoTau_Multiplicity_MC, "L1TkIsoTau_Multiplicity_MC", tN   , nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(hL1TkIsoTau_JetWidth       , "L1TkIsoTau_JetWidth"       , tW   , nM   , minM   , maxM   );
+  histoTools_.BookHisto_1D(hL1TkIsoTau_DonutRatio     , "L1TkIsoTau_DonutRatio"     , tG   , nG   , minG   , maxG   );
+  histoTools_.BookHisto_1D(hL1TkIsoTau_NSigTks        , "L1TkIsoTau_NSigTks"        , tN   , nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(hL1TkIsoTau_SigTksEt       , "L1TkIsoTau_SigTksEt"       , tEt  , nEt  , minEt  , maxEt  );
+  histoTools_.BookHisto_1D(hL1TkIsoTau_SigTksEta      , "L1TkIsoTau_SigTksEta"      , tEta , nEta , minEta , maxEta );
+  histoTools_.BookHisto_1D(hL1TkIsoTau_NIsoTks        , "L1TkIsoTau_NIsoTks"        , tN   , nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(hL1TkIsoTau_IsoTksEt       , "L1TkIsoTau_IsoTksEt"       , tEt  , nEt  , minEt  , maxEt  );
+  histoTools_.BookHisto_1D(hL1TkIsoTau_IsoTksEta      , "L1TkIsoTau_IsoTksEta"      , tEta , nEta , minEta , maxEta );
+  histoTools_.BookHisto_1D(hL1TkIsoTau_InvMass        , "L1TkIsoTau_InvMass"        , tM   , nM   , minM   , maxM   );
+  histoTools_.BookHisto_1D(hL1TkIsoTau_IsoConeMass    , "L1TkIsoTau_IsoConeMass"    , tM   , nM   , minM   , maxM   );
+  histoTools_.BookHisto_1D(hL1TkIsoTau_IsoAnnulusMass , "L1TkIsoTau_IsoAnnulusMass" , tM   , nM   , minM   , maxM   );
   histoTools_.BookHisto_1D(hL1TkIsoTau_SigConeRMin  , "L1TkIsoTau_SigConeRMin"  , tR   , nR   , minR   , maxR   );
   histoTools_.BookHisto_1D(hL1TkIsoTau_SigConeRMax  , "L1TkIsoTau_SigConeRMax"  , tR   , nR   , minR   , maxR   );
   histoTools_.BookHisto_1D(hL1TkIsoTau_IsoConeRMin  , "L1TkIsoTau_IsoConeRMin"  , tR   , nR   , minR   , maxR   );
@@ -1935,7 +2001,6 @@ void TkTaus::WriteHistos_(void)
   hL1TkTau_Multiplicity_MC->Write();
   hL1TkTau_JetWidth->Write();
   hL1TkTau_DonutRatio->Write();
-  hL1TkTau_DonutRatio_Vs_JetWidth->Write();
   hL1TkTau_NSigTks->Write();
   hL1TkTau_SigTksEt->Write();
   hL1TkTau_SigTksEta->Write();
@@ -1943,6 +2008,8 @@ void TkTaus::WriteHistos_(void)
   hL1TkTau_IsoTksEt->Write();
   hL1TkTau_IsoTksEta->Write();
   hL1TkTau_InvMass->Write();
+  hL1TkTau_IsoConeMass->Write();
+  hL1TkTau_IsoAnnulusMass->Write();
   hL1TkTau_SigConeRMin->Write();
   hL1TkTau_SigConeRMax->Write();
   hL1TkTau_IsoConeRMin->Write();
@@ -1987,7 +2054,6 @@ void TkTaus::WriteHistos_(void)
   hL1TkIsoTau_Multiplicity_MC->Write();
   hL1TkIsoTau_JetWidth->Write();
   hL1TkIsoTau_DonutRatio->Write();
-  hL1TkIsoTau_DonutRatio_Vs_JetWidth->Write();
   hL1TkIsoTau_SigTksEt->Write();
   hL1TkIsoTau_SigTksEta->Write();
   hL1TkIsoTau_NSigTks->Write();
@@ -1995,6 +2061,8 @@ void TkTaus::WriteHistos_(void)
   hL1TkIsoTau_IsoTksEt->Write();
   hL1TkIsoTau_IsoTksEta->Write();
   hL1TkIsoTau_InvMass->Write();
+  hL1TkIsoTau_IsoConeMass->Write();
+  hL1TkIsoTau_IsoAnnulusMass->Write();
   hL1TkIsoTau_SigConeRMin->Write();
   hL1TkIsoTau_SigConeRMax->Write();
   hL1TkIsoTau_IsoConeRMin->Write();
@@ -2330,38 +2398,37 @@ void TkTaus::FinaliseEffHisto_(TH2D *histo,
 
 
 //============================================================================
-void TkTaus::ApplyDiTauZMatching(string tkCollectionType, 
-					 vector<L1TkTauParticle> &L1TkTaus)
+void TkTaus::ApplyDiTauZMatching(vector<L1TkTauParticle> &L1TkTaus)
 //============================================================================
 {
   
+  //
+  // NOTE:
+  // Is this function needed? It was introduced to remove from the collection
+  // L1 Tau candidates that have a Z0 value which is more than X cm away from 
+  // the leading-in=ET L1 Tau candidate. The objects are permanently removedf
+  // rom the collection input, which is dangerous!
+  //
+
   // Sanity check
   if (L1TkTaus.size() < 2) return;
 
+  int iLdg = -1;
+  int iSubldg = -1;
+  GetLdgAndSubldgIndices(L1TkTaus, iLdg, iSubldg);
 
   // Initialise variables
   double deltaPOCAz = 9999.9;
-  TTTrack match_tk0 = L1TkTaus.at(0).GetMatchingTk();
-      
+
+  if (0) std::cout << "0) iLdg = " << iLdg << ", L1TkTaus.size() = " << L1TkTaus.size() << std::endl;
+   TTTrack match_tk0 = L1TkTaus.at(iLdg).GetMatchingTk(); 
+
   // For-loop: L1TkTaus
   for (size_t i = 1; i < L1TkTaus.size(); i++)
     {
 
       TTTrack match_tk = L1TkTaus.at(i).GetMatchingTk();
-
-      
-    if ( tkCollectionType.compare("TTPixelTracks") == 0 )
-      {
-	cout << "=== TkTaus::ApplyDiTauZMatching() - Unsupported track collection. Exit" << endl;
-	exit(1);
-      }
-    else if ( tkCollectionType.compare("TTTracks") == 0 ) {
       deltaPOCAz = abs( match_tk0.getZ0() - match_tk.getZ0() );
-    }
-    else{
-      cout << "=== TkTaus::ApplyDiTauZMatching() - Unknown sample \"" << mcSample << "\". EXIT" << endl;
-      exit(1);
-    }
     
     // If the Trigger objects is not within x-cm reject it
     if (deltaPOCAz > diTau_deltaPOCAz) L1TkTaus.erase ( L1TkTaus.begin()+i );
@@ -2381,11 +2448,16 @@ void TkTaus::FillSingleTau_(vector<L1TkTauParticle> L1TkTaus,
 //============================================================================
 {
 
+  int iLdg = -1;
+  int iSubldg = -1;
+  GetLdgAndSubldgIndices(L1TkTaus, iLdg, iSubldg);
+
   // Sanity check
   if( L1TkTaus.size() < 1 ) return;
   
   // Fill rate
-  TLorentzVector sigTks_p4 = L1TkTaus.at(0).GetSigConeTTTracksP4(); // fixme (sort with pT)?
+  if (0) std::cout << "1) iLdg = " << iLdg << ", L1TkTaus.size() = " << L1TkTaus.size() << std::endl;
+  TLorentzVector sigTks_p4 = L1TkTaus.at(iLdg).GetSigConeTTTracksP4();
   double ldgEt  = sigTks_p4.Et();  
   double ldgEta = sigTks_p4.Eta();
   
@@ -2401,9 +2473,15 @@ void TkTaus::FillSingleTau_(vector<L1TkTauParticle> L1TkTaus,
 
   // Check that all taus were found
   if(!bFoundAllTaus_) return;
-  
+
+  int iLdgMC = -1;
+  int iSubldgMC = -1;
+  GetLdgAndSubldgIndices(L1TkTaus_mcMatched, iLdgMC, iSubldgMC);  
+
   // Fill efficiency
-  TLorentzVector sigTks_p4_mc = L1TkTaus_mcMatched.at(0).GetSigConeTTTracksP4(); // fixme (sort with pT)?
+  if (0) std::cout << "3) iLdgMC = " << iLdgMC << ", L1TkTaus_mcMatched.size() = " << L1TkTaus_mcMatched.size() << std::endl;
+  TLorentzVector sigTks_p4_mc = L1TkTaus_mcMatched.at(iLdgMC).GetSigConeTTTracksP4();
+  if (0) L1TkTaus_mcMatched.at(iLdgMC).PrintProperties(false, true, false, false);
   double ldgEt_mcMatched = sigTks_p4_mc.Et();
   FillEfficiency_(hEfficiency, ldgEt_mcMatched);
 
@@ -2423,9 +2501,15 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus,
   // Sanity check
   if( L1TkTaus.size() < 2 ) return;  
 
+  // Get Ldg and Subldg object indices
+  int iLdg = -1;
+  int iSubldg = -1;
+  GetLdgAndSubldgIndices(L1TkTaus, iLdg, iSubldg);
+
   // Fill rate
-  L1TkTauParticle L1TkTau = L1TkTaus.at(1);
-  TLorentzVector sigTks_p4 = L1TkTaus.at(1).GetSigConeTTTracksP4(); // fixme (sort with pT)?
+  if (0) std::cout << "4) iSubldg = " << iSubldg << ", L1TkTaus.size() = " << L1TkTaus.size() << std::endl;
+  //L1TkTauParticle L1TkTau  = L1TkTaus.at(iSubldg);
+  TLorentzVector sigTks_p4 = L1TkTaus.at(iSubldg).GetSigConeTTTracksP4();
   double subLdgEt  = sigTks_p4.Et();  
   double subLdgEta = sigTks_p4.Eta();  
 
@@ -2444,9 +2528,15 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus,
   // Check that all taus were found
   if(!bFoundAllTaus_) return;
 
+  // Get Ldg and Subldg object indices
+  int iLdgMC = -1;
+  int iSubldgMC = -1;
+  GetLdgAndSubldgIndices(L1TkTaus_mcMatched, iLdgMC, iSubldgMC);
+
   // Fill efficiency
-  TLorentzVector sigTks_p4_mc = L1TkTaus_mcMatched.at(1).GetSigConeTTTracksP4(); // fixme (sort with pT)?
-  double subLdgEt_mcMatched  = sigTks_p4_mc.Et();  
+  if (0) std::cout << "5) iSubldgMC = " << iSubldgMC << ", L1TkTaus_mcMatched.size() = " << L1TkTaus_mcMatched.size() << std::endl;
+  TLorentzVector sigTks_p4_mc = L1TkTaus_mcMatched.at(iSubldgMC).GetSigConeTTTracksP4(); // fixme
+  double subLdgEt_mcMatched   = sigTks_p4_mc.Et();
   FillEfficiency_(hEfficiency, subLdgEt_mcMatched);
 
   return;
@@ -2469,49 +2559,61 @@ void TkTaus::FillDiTau_(vector<L1TkTauParticle> L1TkTaus1,
   vector<L1TkTauParticle> L1TkTaus1_mcMatched = GetMcMatchedL1TkTaus(L1TkTaus1);
   vector<L1TkTauParticle> L1TkTaus2_mcMatched = GetMcMatchedL1TkTaus(L1TkTaus2);
 
+  // Get Ldg and Subldg object indices
+  int iLdg1, iLdg2, iLdg1MC, iLdg2MC = -1;
+  int iSubldg1, iSubldg2, iSubldg1MC, iSubldg2MC = -1;
+  GetLdgAndSubldgIndices(L1TkTaus1, iLdg1, iSubldg1);
+  GetLdgAndSubldgIndices(L1TkTaus2, iLdg2, iSubldg2);
+  GetLdgAndSubldgIndices(L1TkTaus1_mcMatched, iLdg1MC, iSubldg1MC);
+  GetLdgAndSubldgIndices(L1TkTaus2_mcMatched, iLdg2MC, iSubldg2MC);
+
   // Fill rate 
-  TLorentzVector sigTks1_p4 = L1TkTaus1.at(0).GetSigConeTTTracksP4(); // fixme (sort with pT)?
-  TLorentzVector sigTks2_p4 = L1TkTaus2.at(0).GetSigConeTTTracksP4(); // fixme (sort with pT)?
+  if (0) std::cout << "6) iLdg1 = " << iLdg1 << ", L1TkTaus1.size() = " << L1TkTaus1.size() << std::endl;
+  if (0) std::cout << "7) iLdg2 = " << iLdg2 << ", L1TkTaus2.size() = " << L1TkTaus2.size() << std::endl;
+  TLorentzVector sigTks1_p4 = L1TkTaus1.at(iLdg1).GetSigConeTTTracksP4();
+  TLorentzVector sigTks2_p4 = L1TkTaus2.at(iLdg2).GetSigConeTTTracksP4();
   double ldgEt1 = sigTks1_p4.Et();
   double ldgEt2 = sigTks2_p4.Et();
 
   // Ensure that different calo objects are used
-  double eta1 = L1TkTaus1.at(0).GetMatchingTk().getEta();
-  double phi1 = L1TkTaus1.at(0).GetMatchingTk().getPhi();
-  double eta2 = L1TkTaus2.at(0).GetMatchingTk().getEta();
-  double phi2 = L1TkTaus2.at(0).GetMatchingTk().getPhi();
+  double eta1 = L1TkTaus1.at(iLdg1).GetMatchingTk().getEta();
+  double phi1 = L1TkTaus1.at(iLdg1).GetMatchingTk().getPhi();
+  double eta2 = L1TkTaus2.at(iLdg2).GetMatchingTk().getEta();
+  double phi2 = L1TkTaus2.at(iLdg2).GetMatchingTk().getPhi();
   double dR = auxTools_.DeltaR(eta1, phi1, eta2, phi2);
   if (dR < 0.4)
     {
       if (L1TkTaus2.size() < 2) return;
-      ldgEt2 = L1TkTaus2.at(1).GetCaloTau().et(); //fixme! better clean-up needed
+      if (0) std::cout << "8) iSubldg1 = " << iSubldg1 << ", L1TkTaus2.size() = " << L1TkTaus2.size() << std::endl;
+      ldgEt2 = L1TkTaus2.at(iSubldg2).GetSigConeTTTracksP4().Et(); //fixme: better clean-up needed
     }
 
   // Make x-axis the ldgEt axis
   if (ldgEt1 > ldgEt2) FillRate_(hRate, ldgEt1, ldgEt2); 
   else FillRate_(hRate, ldgEt2, ldgEt1);
-
   
   // Get MC-matched trigger objects
   if (L1TkTaus1_mcMatched.size() < 1) return;
   if (L1TkTaus2_mcMatched.size() < 1) return;
 
   // Get MC-matched Et
-  TLorentzVector sigTks1_p4_mc = L1TkTaus1_mcMatched.at(0).GetSigConeTTTracksP4(); // fixme (sort with pT)?
-  TLorentzVector sigTks2_p4_mc = L1TkTaus2_mcMatched.at(0).GetSigConeTTTracksP4(); // fixme (sort with pT)?
+  if (0) std::cout << "9) iSubldg1 = " << iLdg1MC << ", L1TkTaus1_mcMatched.size() = " << L1TkTaus1_mcMatched.size() << std::endl;
+  if (0) std::cout << "10) iSubldg2 = " << iLdg2MC << ", L1TkTaus2_mcMatched.size() = " << L1TkTaus2_mcMatched.size() << std::endl;
+  TLorentzVector sigTks1_p4_mc = L1TkTaus1_mcMatched.at(iLdg1MC).GetSigConeTTTracksP4();
+  TLorentzVector sigTks2_p4_mc = L1TkTaus2_mcMatched.at(iLdg2MC).GetSigConeTTTracksP4();
   double ldgEt1_mcMatched = sigTks1_p4_mc.Et();
   double ldgEt2_mcMatched = sigTks2_p4_mc.Et();
 
   // Ensure that different calo objects are used
-  eta1 = L1TkTaus1_mcMatched.at(0).GetMatchingTk().getEta();
-  phi1 = L1TkTaus1_mcMatched.at(0).GetMatchingTk().getPhi();
-  eta2 = L1TkTaus2_mcMatched.at(0).GetMatchingTk().getEta();
-  phi2 = L1TkTaus2_mcMatched.at(0).GetMatchingTk().getPhi();
+  eta1 = L1TkTaus1_mcMatched.at(iLdg1MC).GetMatchingTk().getEta();
+  phi1 = L1TkTaus1_mcMatched.at(iLdg1MC).GetMatchingTk().getPhi();
+  eta2 = L1TkTaus2_mcMatched.at(iLdg2MC).GetMatchingTk().getEta();
+  phi2 = L1TkTaus2_mcMatched.at(iLdg2MC).GetMatchingTk().getPhi();
   dR    = auxTools_.DeltaR(eta1, phi1, eta2, phi2);
   if (dR < 0.4)
     {
       if (L1TkTaus2_mcMatched.size() < 2) return;
-      ldgEt2_mcMatched = L1TkTaus2_mcMatched.at(1).GetCaloTau().et(); //fixme! better clean-up needed
+      ldgEt2_mcMatched = L1TkTaus2_mcMatched.at(iSubldg2MC).GetSigConeTTTracksP4().Et(); //fixme: better clean-up needed
     }
   
   // Check that all taus were found
@@ -2677,12 +2779,15 @@ void TkTaus::GetSigConeTracks(L1TkTauParticle &L1TkTau,
 
 
 //============================================================================
-void TkTaus::GetIsoConeTracks(L1TkTauParticle &L1TkTau,
-			      vector<TTTrack> isoTks,
-			      double isoConeTks_dPOCAz)
+void TkTaus::GetIsolationTracks(L1TkTauParticle &L1TkTau,
+				vector<TTTrack> isoTks,
+				double isoConeTks_dPOCAz)
 //============================================================================
 {
+  // Sanity check
   if (!L1TkTau.HasMatchingTk()) return; 
+
+  // Variable declaration
   vector<TTTrack> isoConeTks_tmp;
   vector<TTTrack> isoConeTks;
   vector<TTTrack> isoAnnulusTks;
@@ -2768,7 +2873,6 @@ double TkTaus::GetJetWidth(vector<TTTrack> sigTks,
   allTks.insert(allTks.end(), isoTks.begin(), isoTks.end());
 
   // For-loop: Signal Tracks
-  // std::cout << "allTks.size() = " << allTks.size() << std::endl;
   for (vector<TTTrack>::iterator tk = allTks.begin(); tk != allTks.end(); tk++)
     {
       if (0) tk->PrintProperties();
@@ -2787,7 +2891,8 @@ double TkTaus::GetJetWidth(vector<TTTrack> sigTks,
 
 //============================================================================
 double TkTaus::GetDonutRatio(L1TkTauParticle &L1TkTau,
-			     vector<TTTrack> isoTTTracks)
+			     vector<TTTrack> isoTTTracks, 
+			     bool bUseCone)
 //============================================================================
 {
   /*
@@ -2800,7 +2905,9 @@ double TkTaus::GetDonutRatio(L1TkTauParticle &L1TkTau,
    */
 
   TTTrack seedTk = L1TkTau.GetMatchingTk();  
-  vector<TTTrack> isoConeTks = L1TkTau.GetIsoConeTTTracks();
+  vector<TTTrack> isoConeTks; 
+  if (bUseCone) isoConeTks = L1TkTau.GetIsoConeTTTracks();
+  else isoConeTks = L1TkTau.GetIsoAnnulusTTTracks();
   double sumPt_smallRAnnulus = 0.0;
   double sumPt_largeRAnnulus = 0.0;
   double smallR = L1TkTau.GetIsoConeMax();
@@ -2863,7 +2970,7 @@ void TkTaus::GetShrinkingConeSizes(double tk_pt,
 
 
 //============================================================================
-void TkTaus::GetIsolationValues(L1TkTauParticle &L1TkTau)
+void TkTaus::GetIsolationValues(L1TkTauParticle &L1TkTau, bool bUseCone)
 //============================================================================
 {
 
@@ -2874,9 +2981,13 @@ void TkTaus::GetIsolationValues(L1TkTauParticle &L1TkTau)
   // Return not Tk-Confirmed
   if (!L1TkTau.HasMatchingTk()) return; 
 
-  // If no tracks found in the isoalation cone return
-  vector<TTTrack> isoConeTks = L1TkTau.GetIsoConeTTTracks();
-  if ( (isoConeTks.size() < 1) )  return;
+  // If no tracks found in the isoalation cone (hence also annulus) return 
+  vector<TTTrack> isoTks;
+  if (bUseCone) isoTks = L1TkTau.GetIsoConeTTTracks();
+  else isoTks = L1TkTau.GetIsoAnnulusTTTracks();
+
+  // Sanity
+  if ( (isoTks.size() < 1) )  return;
 
   // Initialise variables
   TTTrack seedTk = L1TkTau.GetMatchingTk();
@@ -2885,9 +2996,9 @@ void TkTaus::GetIsolationValues(L1TkTauParticle &L1TkTau)
   double relIso  = 0.0;
   
   // For-loop: All Tracks in isolation cone 
-  for (size_t i = 0; i < isoConeTks.size(); i++)
+  for (size_t i = 0; i < isoTks.size(); i++)
     {
-      TTTrack isoConeTk = isoConeTks.at(i);
+      TTTrack isoConeTk = isoTks.at(i);
       
       // Add-up the pT of alltracks in isolation cone/annulus
       isoTks_scalarSumPt += isoConeTk.getPt();
@@ -2933,7 +3044,7 @@ void TkTaus::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
       if (0) tau->PrintFinalDaughtersCharged();
 
       TLorentzVector p4charged = tau->p4charged(false);
-      double deltaR = auxTools_.DeltaR( p4charged.Eta(), p4charged.Phi(), matchTk.getEta(), matchTk.getPhi() );
+      double deltaR = auxTools_.DeltaR( p4charged.Eta(), p4charged.Phi(), matchTk.getEta(), matchTk.getPhi() ); //fixme: why not the signalTks p4?
       if (deltaR > mcMatching_dRMax) continue;
       if (deltaR < match_dR)
 	{
@@ -2979,4 +3090,68 @@ vector<L1TkTauParticle> TkTaus::GetMcMatchedL1TkTaus(vector<L1TkTauParticle> L1T
   return matchedL1TkTaus;
 }
 
+
+//============================================================================
+void TkTaus::GetLdgAndSubldgIndices(vector<L1TkTauParticle> myTaus,
+				    int &iLdg,
+				    int &iSubldg)
+{
+  //============================================================================
+  
+  // Declarations
+  iLdg = 0.0;
+  iSubldg = 0.0;
+  int index = -1;
+  double EtLdg = 0.0;
+  double EtSubldg = 0.0;
+  
+  // Skip if empty
+  if (myTaus.size() == 0) return;
+
+  // For-loop: All taus candidates
+  for (vector<L1TkTauParticle>::iterator tau = myTaus.begin(); tau != myTaus.end(); tau++)
+    {
+      index++;
+      
+      double Et = tau->GetSigConeTTTracksP4().Et();
+      if (0) std::cout << index << ") Et = " << Et << std::endl;
+      
+      if (Et > EtLdg)
+	{
+	  EtLdg = Et;
+	  iLdg  = index;
+	}
+      else if (Et > EtSubldg)
+	{
+	  EtSubldg = Et;
+	  iSubldg  = index;
+	}
+      else{}
+	
+      // std::cout << "EtLdg = " << EtLdg << ", EtSubldg = " << EtSubldg << std::endl;
+    }
+
+  if (0)
+    {
+      std::cout << "================================================" << std::endl;
+      std::cout << "EtLdg = " << EtLdg << ", EtSubldg = " << EtSubldg << std::endl;
+      std::cout << "iLDg = " << iLdg << ", iSubldg = " << iSubldg << std::endl;
+      std::cout << "================================================" << std::endl;
+    }
+
+  // Sanity check 
+  if (iLdg > int(myTaus.size()-1))
+    {
+      std::cout << "=== TkTaus::GetLdgAndSubldgIndices() ERROR!\n\tiLdg = " << iLdg << ", myTaus.size() = " << myTaus.size() << std::endl;
+    }
+
+  if (iSubldg > int(myTaus.size()-1))
+    {
+      std::cout << "=== TkTaus::GetLdgAndSubldgIndices() WARNING!\n\tiSubldg = " << iSubldg << ", myTaus.size() = " << myTaus.size() << std::endl;
+    }
+
+  return;
+}
+
 #endif
+

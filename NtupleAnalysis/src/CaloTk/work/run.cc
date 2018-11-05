@@ -20,11 +20,6 @@ void run(const std::string MulticrabDir = "",
 	 const int maxEvents = -1)
 {
 
-  // Files on LXPLUS (CERNBOX)
-  // const std::string absolutePath = "/eos/user/m/mtoumazo";
-  // const std::string absolutePath = "/eos/user/m/mlotti";
-  // CaloTk macro(absolutePath + "/" + MulticrabDir, SampleName, text, maxEvents);
-
   // Suppress ROOT warnings (https://root-forum.cern.ch/t/gerrorignorelevel-problem/13178/3)
   gErrorIgnoreLevel = kFatal; 
 

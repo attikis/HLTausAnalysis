@@ -18,13 +18,32 @@ class L1TkEGParticle{
  public:
   // Constructors
   L1TkEGParticle();
-  L1TkEGParticle(vector<TTTrack> tracks, vector<EG> EGs, GenParticle genTau, bool match);
+  L1TkEGParticle(vector<TTTrack> tracks,
+		 vector<EG> EGs,
+		 GenParticle genTau,
+		 bool match);
+
+  L1TkEGParticle(double vtxIso,
+		 double relIso,
+		 double CHF,
+		 double NHF, 
+		 double shrinkConeConst,
+		 double sigConeMaxOpen,
+		 //double sigConeMin, 
+		 //double sigConeMax, 
+		 //double isoConeMin, 
+		 //double isoConeMax,
+		 vector<TTTrack> isoTracks,
+		 vector<EG> signalEGs,
+		 vector<EG> isoEGs);
+  
   // Destructor
   ~L1TkEGParticle() {};
   
   // Function declarations
   void InitVars_(void);
   void PrintTTTracks();
+  float CorrectedEta(float eta, float zTrack);
   void AddTrack(TTTrack trk) { theTracks.push_back(trk); }
   TTTrack GetLeadingTrack() const { return theTracks[0]; } 
   vector<TTTrack> GetTracks() const {return theTracks; }
@@ -34,6 +53,48 @@ class L1TkEGParticle{
   GenParticle GetMatchingGenParticle() const {return theGenTau;}
   TLorentzVector GetTotalP4();
   
+  void SetShrinkingConeConst(double shrinkConeConst) {shrinkConeCons_ = shrinkConeConst;}
+  void SetSigConeMaxOpen(double sigConeMaxOpen) {sigConeMaxOpen_ = sigConeMaxOpen;}
+  double GetShrinkingConeConst() const {return shrinkConeCons_;}
+  double GetSigConeMaxOpen() const {return sigConeMaxOpen_;}
+  double GetSigConeMin() const {return 0.0;}  // FIX ME: from code
+  double GetSigConeMax();
+  double GetIsoConeMin();
+  double GetIsoConeMax() const{return 0.3;}  // FIX ME: from code
+  
+  void FindIsoConeTracks(vector<TTTrack> TTTracks, bool useIsoCone=false);
+  void SetIsoConeTracks(vector<TTTrack> isoTracks) {isoTracks_ = isoTracks;}
+  vector<TTTrack> GetIsoConeTracks() const {return isoTracks_;}
+
+  void FindSignalConeEGs(vector<EG> EGs);
+  void SetSignalConeEGs(vector<EG> signalEGs) {signalEGs_ = signalEGs;}
+  vector<EG> GetSignalConeEGs() const {return signalEGs_;}
+
+  void FindIsoConeEGs(vector<EG> EGs, bool useIsoCone=false);
+  void SetIsoConeEGs(vector<EG> isoEGs) {isoEGs_ = isoEGs;}
+  vector<EG> GetIsoConeEGs() const {return isoEGs_;}
+  
+  double CalculateVtxIso(vector<TTTrack> TTTracks, bool useIsoCone=false); 
+  double CalculateRelIso(vector<TTTrack> TTTracks, double deltaZ0_max=999.9, bool useIsoCone=false);
+  double GetVtxIso()  const { return vtxIso_;}
+  double GetRelIso()  const { return relIso_;}
+  void SetVtxIso(double vtxIso) { vtxIso_ = vtxIso;}
+  void SetRelIso(double relIso) { relIso_ = relIso;}
+  double GetCHF() const { return CHF_;}
+  void SetCHF(double CHF) { CHF_ = CHF;}
+  double GetNHF() const { return NHF_;}
+  void SetNHF(double NHF) { NHF_ = NHF;}
+
+  double vtxIso_;
+  double relIso_;
+  double CHF_;
+  double NHF_;
+  double shrinkConeCons_;
+  double sigConeMaxOpen_;
+  vector<TTTrack> isoTracks_;
+  vector<EG> signalEGs_;
+  vector<EG> isoEGs_;
+
   double GetTrackBasedPt();  
   double GetTotalPt();
   double GetTrackInvMass();

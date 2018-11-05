@@ -9,7 +9,14 @@
 L1TkTauParticle::L1TkTauParticle()
 //****************************************************************************
 {
-  
+
+  theVtxIsolation = 999.9;
+  theRelIsolation = 0.0;
+  theRelIsolationDeltaZ0 = 0.0;
+  theMatchingGenParticle_dR = 0.0;
+  theNProngs = 0;
+
+
 }
 
 //****************************************************************************
@@ -28,6 +35,9 @@ L1TkTauParticle::L1TkTauParticle(double matchCone_dRMin,
   theSigCone_dRMax    = sigCone_dRMax;
   theIsoCone_dRMin    = isoCone_dRMin;
   theIsoCone_dRMax    = isoCone_dRMax;
+  SetVtxIsolation(9999.9);
+  SetRelIsolation(0.0);
+  SetMatchGenp(-1.0, 9999.9);
 
   InitVars_();
 
@@ -63,8 +73,8 @@ L1TkTauParticle::L1TkTauParticle(int caloTau_Index,
   SetMatchTkDeltaR(matchTk_deltaR);
   SetSigConeTks(sigTks_Index);
   SetIsoConeTks(isoTks_Index);
-  SetVtxIso(vtxIso);
-  SetRelIso(relIso);
+  SetVtxIsolation(vtxIso);
+  SetRelIsolation(relIso);
   SetMatchGenp(-1.0, 9999.9);
   SetSignalConeSize(sigCone_minDeltaR,  sigCone_maxDeltaR);
   SetIsolationConeSize(isoCone_minDeltaR, isoCone_maxDeltaR);
@@ -97,28 +107,26 @@ void L1TkTauParticle::SetIsolationConeSize(double deltaR_min, double deltaR_max)
 
 
 //============================================================================
-double L1TkTauParticle::CalculateRelIso(const double deltaZ0_max,
+double L1TkTauParticle::CalculateRelIso(const double relIso_dZ0,
 					bool bStoreValue,
 					bool bInvert_deltaZ0,
 					bool bUseIsoCone)
 
 //============================================================================
 {
-
-  // Store default values
-  // SetRelIsolation(0.0);
   
+  // 
+  if (bStoreValue) SetRelIsolation(0.0);
+
   // Return not Tk-Confirmed
   if (!HasMatchingTk()) return 0.0; 
 
   // If no tracks found in the isoalation cone return
-  vector<TTTrack> isoTks; // = GetIsoConeTTTracks();
+  vector<TTTrack> isoTks;
   if (bUseIsoCone) isoTks = GetIsoConeTTTracks();
   else isoTks = GetIsoAnnulusTTTracks();
-  // std::cout << "GetIsoConeTTTracks(); = " << GetIsoConeTTTracks().size() << std::endl;
-  // std::cout << "GetIsoAnnulusTTTracks(); = " << GetIsoAnnulusTTTracks().size() << std::endl;
-  // std::cout << "isoTks.size() = " << isoTks.size() << std::endl;
 
+  // Sanity
   if ( (isoTks.size() < 1) )  return 0.0;
 
   // Initialise variables
@@ -132,14 +140,13 @@ double L1TkTauParticle::CalculateRelIso(const double deltaZ0_max,
     {
       TTTrack isoConeTk = isoTks.at(i);
       
-      
       // Find the track closest in Z0
       deltaZ0 = abs(matchTk.getZ0() - isoConeTk.getZ0());
 
       // Decide on type of calculation
       bool considerTk  = false;
-      bool considerTk_default = (deltaZ0 < deltaZ0_max);
-      bool considerTk_invert  = (deltaZ0 > deltaZ0_max);
+      bool considerTk_default = (deltaZ0 < relIso_dZ0);
+      bool considerTk_invert  = (deltaZ0 > relIso_dZ0);
       if (bInvert_deltaZ0) considerTk = considerTk_invert;
       else considerTk = considerTk_default;
       
@@ -149,7 +156,11 @@ double L1TkTauParticle::CalculateRelIso(const double deltaZ0_max,
 
   // Calculated + Assign value of relative isolation
   relIso = isoTks_scalarSumPt/matchTk.getPt();
-  if (bStoreValue) SetRelIsolation(relIso);
+  if (bStoreValue)
+    {
+      SetRelIsolationDeltaZ0(relIso_dZ0);
+      SetRelIsolation(relIso);
+    }
   
   return relIso;
 }
@@ -210,32 +221,6 @@ void L1TkTauParticle::SetMatchGenp(int matchGenp_Index, double matchGenp_deltaR)
   
   return;
 }
-
-
-
-// //****************************************************************************
-// void L1TkTauParticle::PrintProperties(void)
-// //****************************************************************************
-// {
-  
-//   Table general("iCalo | Match Tk | Match GenP | dR (Match GenP) | VtxIso (cm) | RelIso | Sig. Tks | Iso. Tks. | Sig_R (min) | Sig_R (max) | Iso_R (min) | Iso_R (max)", "Text");
-//   general.AddRowColumn(0, auxTools.ToString( caloTau_Index_    ) );
-//   general.AddRowColumn(0, auxTools.ToString( matchTk_Index_    ) );
-//   general.AddRowColumn(0, auxTools.ToString( matchGenp_Index_  ) );
-//   general.AddRowColumn(0, auxTools.ToString( matchGenp_deltaR_ ) );
-//   general.AddRowColumn(0, auxTools.ToString( vtxIso_           ) );
-//   general.AddRowColumn(0, auxTools.ToString( relIso_           ) );
-//   general.AddRowColumn(0, auxTools.ConvertIntVectorToString(sigTks_Index_) );
-//   general.AddRowColumn(0, auxTools.ConvertIntVectorToString(isoTks_Index_) );
-//   general.AddRowColumn(0, auxTools.ToString(sigCone_minDeltaR_ ) );
-//   general.AddRowColumn(0, auxTools.ToString(sigCone_maxDeltaR_ ) );
-//   general.AddRowColumn(0, auxTools.ToString(isoCone_minDeltaR_ ) );
-//   general.AddRowColumn(0, auxTools.ToString(isoCone_maxDeltaR_ ) );
-
-//   general.Print();
-
-//   return;
-//}
 
 
 //****************************************************************************
@@ -322,7 +307,7 @@ void L1TkTauParticle::PrintProperties(bool bPrintCaloTau,
 //****************************************************************************
 {
   
-  Table info("Match-Cone | Sig-Cone | Iso-Cone | Calo-Et | Calo-Eta | Tk-Pt | Tk-Eta | Tk-dR | Gen-Pt | Gen-Eta | Gen-dR | Sig-Tks | Iso-Tks | VtxIso | RelIso", "Text");
+  Table info("Match-Cone | Sig-Cone | Iso-Cone | Calo-Et | Calo-Eta | Tk-Pt | Tk-Eta | Tk-dR | Gen-Pt | Gen-Eta | Gen-dR | Sig-Tks | Iso-Tks (Cone) | Iso-Tks (Annulus) | VtxIso | RelIso dZ0 (cm) | RelIso (Cone) | RelIso (Annulus) | RelIso", "Text");
   info.AddRowColumn(0, auxTools.ToString( GetMatchConeMin(), 2) + " < dR < " + auxTools.ToString( GetMatchConeMax(), 2) );
   info.AddRowColumn(0, auxTools.ToString( GetSigConeMin()  , 2) + " < dR < " + auxTools.ToString( GetSigConeMax()  , 2) );
   info.AddRowColumn(0, auxTools.ToString( GetIsoConeMin()  , 2) + " < dR < " + auxTools.ToString( GetIsoConeMax()  , 2) ); 
@@ -336,8 +321,14 @@ void L1TkTauParticle::PrintProperties(bool bPrintCaloTau,
   info.AddRowColumn(0, auxTools.ToString( GetMatchingGenParticleDeltaR(), 3) );  
   info.AddRowColumn(0, auxTools.ToString( GetSigConeTTTracks().size() ) );
   info.AddRowColumn(0, auxTools.ToString( GetIsoConeTTTracks().size() ) );
+  info.AddRowColumn(0, auxTools.ToString( GetIsoAnnulusTTTracks().size() ) );
   info.AddRowColumn(0, auxTools.ToString( GetVtxIsolation(), 3) );
-  info.AddRowColumn(0, auxTools.ToString( GetRelIsolation(), 3) );
+  double relIso_cone    = CalculateRelIso(GetRelIsolationDeltaZ0(), false, false, true );
+  double relIso_annulus = CalculateRelIso(GetRelIsolationDeltaZ0(), false, false, false);
+  info.AddRowColumn(0, auxTools.ToString( GetRelIsolationDeltaZ0(), 3) );
+  info.AddRowColumn(0, auxTools.ToString( relIso_cone, 3) );
+  info.AddRowColumn(0, auxTools.ToString( relIso_annulus, 3) ); 
+  info.AddRowColumn(0, auxTools.ToString( GetRelIsolation(), 3) ); 
   info.Print();
   
   if (bPrintCaloTau) GetCaloTau().PrintProperties();
@@ -346,13 +337,13 @@ void L1TkTauParticle::PrintProperties(bool bPrintCaloTau,
   if (bPrintSigConeTks)
     {
       PrintTTTracks(GetSigConeTTTracks(), "Sig-Cone Tks");
-      PrintTTPixelTracks(GetSigConeTTPixelTracks(), "Sig-Cone Tks");
+      // PrintTTPixelTracks(GetSigConeTTPixelTracks(), "Sig-Cone Tks");
     }
   
   if (bPrintIsoConeTks)
     {
       PrintTTTracks(GetIsoConeTTTracks(), "Iso-Cone Tks");
-      PrintTTPixelTracks(GetIsoConeTTPixelTracks(), "Iso-Cone Tks");
+      PrintTTTracks(GetIsoAnnulusTTTracks(), "Iso-Annulus Tks");
     }
 
   if (bPrintMatchGenParticle) GetMatchingGenParticle().PrintProperties();
@@ -364,12 +355,11 @@ void L1TkTauParticle::PrintProperties(bool bPrintCaloTau,
 
 //****************************************************************************
 void L1TkTauParticle::PrintTTTracks(vector<TTTrack> theTracks,
-				      string theTrackType)
+				    string theTrackType)
 //****************************************************************************
 {
 
-// Table table(theTrackType + " # | Pt | Eta | Phi | x0 | y0 | z0 (cm) | d0 (cm) | Q | Chi2 | DOF | Chi2Red | Stubs (PS)", "Text");
-Table table(theTrackType + " # | Pt | Eta | Phi | z0 (cm) | d0 (cm) | Q | Chi2 | DOF | Chi2Red | Stubs (PS)", "Text");
+Table table(theTrackType + " # | Pt | Eta | Phi | z0 (cm) | dZ0 (cm) | d0 (cm) | Q | Chi2 | DOF | Chi2Red | Stubs (PS)", "Text");
 
 // For-loop: All Tracks
  for (size_t i = 0; i < theTracks.size(); i++)
@@ -383,8 +373,10 @@ Table table(theTrackType + " # | Pt | Eta | Phi | z0 (cm) | d0 (cm) | Q | Chi2 |
      table.AddRowColumn(i, auxTools.ToString( tk.getEta(), 3  ) );
      table.AddRowColumn(i, auxTools.ToString( tk.getPhi(), 3  ) );
      table.AddRowColumn(i, auxTools.ToString( tk.getZ0() , 3  ) );
+     table.AddRowColumn(i, auxTools.ToString( abs(GetMatchingTk().getZ0()- tk.getZ0()) , 3  ) );
      table.AddRowColumn(i, auxTools.ToString( tk.getD0() , 3  ) );
-     //table.AddRowColumn(i, auxTools.ToString( tk.getQ()  , 3  ) );
+     // table.AddRowColumn(i, auxTools.ToString( tk.getQ()  , 3  ) );
+     table.AddRowColumn(i, auxTools.ToString( "N/A", 3  ) );
      table.AddRowColumn(i, auxTools.ToString( tk.getChi2(),3  ) );
      table.AddRowColumn(i, auxTools.ToString( tk.getDOF()     ) );
      table.AddRowColumn(i, auxTools.ToString( tk.getChi2Red(), 3 ) );

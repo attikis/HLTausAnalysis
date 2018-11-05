@@ -65,8 +65,7 @@ class TkTaus : public TreeAnalyserMC{
 
   void PrintSettings(void);
 
-  void ApplyDiTauZMatching(string tkCollectionType,
-			   vector<L1TkTauParticle> &L1TkTaus);
+  void ApplyDiTauZMatching(vector<L1TkTauParticle> &L1TkTaus);
 
   void GetShrinkingConeSizes(double tk_pt,
 			     double sigCone_Constant,
@@ -77,7 +76,9 @@ class TkTaus : public TreeAnalyserMC{
 			     double &isoCone_dRMin,
 			     double &isoCone_dRMax);
 
-  double GetDonutRatio(L1TkTauParticle &L1TkTau, vector<TTTrack> isoTTTracks);
+  double GetDonutRatio(L1TkTauParticle &L1TkTau, 
+		       vector<TTTrack> isoTTTracks,
+		       bool bUseCone);
 
 
   double GetJetWidth(vector<TTTrack> sigTks, vector<TTTrack> isoTks,
@@ -88,15 +89,19 @@ class TkTaus : public TreeAnalyserMC{
 			double sigConeTks_dPOCAz,
 			double sigConeTks_invMass);
   
-  void GetIsoConeTracks(L1TkTauParticle &L1TkTau,
+  void GetIsolationTracks(L1TkTauParticle &L1TkTau,
 			vector<TTTrack> isoTTTracks,
 			double isoConeTks_dPOCAz);
 
-  void GetIsolationValues(L1TkTauParticle &L1TkTau);
+  void GetIsolationValues(L1TkTauParticle &L1TkTau, bool bUseCone);
   
   void GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
 			      vector<GenParticle> hadGenTaus);			    
 
+  void GetLdgAndSubldgIndices(vector<L1TkTauParticle> myTaus,
+			      int &iLdg,
+			      int &iSubldg);
+  
   // Public Variables
   bool DEBUG;
   bool mcMatching_unique;
@@ -148,9 +153,11 @@ class TkTaus : public TreeAnalyserMC{
   double isoCone_dRMax;
   double isoCone_dRMin;
   bool   isoCone_useCone; //instead of annulus
-  double vtxIso_WP;
-  double relIso_WP;
-  double relIso_dZ0;
+
+  double tau_jetWidth;
+  double tau_vtxIsoWP;
+  double tau_relIsoWP;
+  double tau_relIsodZ0;
   //
   int nMaxNumOfHTausPossible;
   int realTauMom;
@@ -280,7 +287,6 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hL1TkTau_Multiplicity_MC;
   TH1D* hL1TkTau_JetWidth;
   TH1D* hL1TkTau_DonutRatio;
-  TH2D* hL1TkTau_DonutRatio_Vs_JetWidth;
   TH1D* hL1TkTau_NSigTks;
   TH1D* hL1TkTau_SigTksEt;
   TH1D* hL1TkTau_SigTksEta;
@@ -288,6 +294,8 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hL1TkTau_IsoTksEt;
   TH1D* hL1TkTau_IsoTksEta;
   TH1D* hL1TkTau_InvMass;
+  TH1D* hL1TkTau_IsoConeMass;
+  TH1D* hL1TkTau_IsoAnnulusMass;
   TH1D* hL1TkTau_SigConeRMin;
   TH1D* hL1TkTau_SigConeRMax;
   TH1D* hL1TkTau_IsoConeRMin;
@@ -342,7 +350,6 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hL1TkIsoTau_Multiplicity_MC;
   TH1D* hL1TkIsoTau_JetWidth;
   TH1D* hL1TkIsoTau_DonutRatio;
-  TH2D* hL1TkIsoTau_DonutRatio_Vs_JetWidth;
   TH1D* hL1TkIsoTau_NSigTks;
   TH1D* hL1TkIsoTau_SigTksEt;
   TH1D* hL1TkIsoTau_SigTksEta;
@@ -350,6 +357,8 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hL1TkIsoTau_IsoTksEt;
   TH1D* hL1TkIsoTau_IsoTksEta;
   TH1D* hL1TkIsoTau_InvMass;
+  TH1D* hL1TkIsoTau_IsoConeMass;
+  TH1D* hL1TkIsoTau_IsoAnnulusMass;
   TH1D* hL1TkIsoTau_SigConeRMin;
   TH1D* hL1TkIsoTau_SigConeRMax;
   TH1D* hL1TkIsoTau_IsoConeRMin;
@@ -424,10 +433,6 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hRelIsoTight_Rate_F;
 
   // SingleTau: Efficiencies
-  TH1D* hCalo_Eff;  // Inclusive = C+I+F
-  TH1D* hCalo_Eff_C;
-  TH1D* hCalo_Eff_I;
-  TH1D* hCalo_Eff_F;
   TH1D* hTk_Eff;
   TH1D* hTk_Eff_C;
   TH1D* hTk_Eff_I;
@@ -458,10 +463,6 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hRelIsoTight_Eff_F;      
 
   // DiTau: Rates
-  TH1D* hDiTau_Rate_Calo; // Inclusive = C+I+F
-  TH1D* hDiTau_Rate_Calo_C;
-  TH1D* hDiTau_Rate_Calo_I;
-  TH1D* hDiTau_Rate_Calo_F;
   TH1D* hDiTau_Rate_Tk;
   TH1D* hDiTau_Rate_Tk_C;
   TH1D* hDiTau_Rate_Tk_I;
@@ -492,10 +493,6 @@ class TkTaus : public TreeAnalyserMC{
   TH1D* hDiTau_Rate_RelIsoTight_F;
 
   // DiTau: Efficiencies
-  TH1D* hDiTau_Eff_Calo; // Inclusive = C+I+F
-  TH1D* hDiTau_Eff_Calo_C;
-  TH1D* hDiTau_Eff_Calo_I;
-  TH1D* hDiTau_Eff_Calo_F;
   TH1D* hDiTau_Eff_Tk;
   TH1D* hDiTau_Eff_Tk_C;
   TH1D* hDiTau_Eff_Tk_I;

@@ -112,7 +112,10 @@ class TreeReaderMC : public TreeReaderReco, public virtual TREEDEFINITIONGENP
 
   EG GetEG(unsigned int Index);
   
-  vector<EG> GetEGs(bool bPrintList=false);
+  vector<EG> GetEGs(const double minEt = 0.0,
+		    const double minEta = 0.0,
+		    const double maxEta = 9999.9,
+		    bool bPrintList=false);
 
   void GetL1Muon(unsigned int Index);
   

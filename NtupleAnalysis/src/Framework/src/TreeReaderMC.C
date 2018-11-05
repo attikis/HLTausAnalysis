@@ -620,11 +620,11 @@ vector<L1Tau> TreeReaderMC::GetL1Taus(bool bPrintList)
   L1Tau theL1Tau;
 
   // For-loop: All L1Taus
-  // for (Size_t iCalo = 0; iCalo < L1TauEmu_Et.size(); iCalo++)
-  for (Size_t iCalo = 0; iCalo < L1Tau_Et.size(); iCalo++)
+  for (Size_t iCalo = 0; iCalo < L1TauEmu_Et.size(); iCalo++)
+  //for (Size_t iCalo = 0; iCalo < L1Tau_Et.size(); iCalo++)
     { 
       theL1Tau = GetL1Tau(iCalo);
-      //if (bPrintList) theL1Tau.PrintProperties(false);
+      if (bPrintList) theL1Tau.PrintProperties(false);
       theL1Taus.push_back( theL1Tau );
     }
   
@@ -813,7 +813,10 @@ L1TKEM TreeReaderMC::GetL1TKEM(unsigned int Index)
 }
 
 //============================================================================
-vector<EG> TreeReaderMC::GetEGs(bool bPrintList)
+vector<EG> TreeReaderMC::GetEGs(const double minEt,
+				const double minEta,
+				const double maxEta,
+				bool bPrintList)
 //============================================================================
 {
   vector<EG> theEGs;
@@ -823,7 +826,12 @@ vector<EG> TreeReaderMC::GetEGs(bool bPrintList)
   for (Size_t i = 0; i < EG_Et.size(); i++)
     {
       theEG = GetEG(i);
-      theEGs.push_back(theEG);
+      // Apply selection criteria
+      if (theEG.getEt() < minEt) continue;
+      if (abs(theEG.getEta()) > maxEta) continue;
+      if (abs(theEG.getEta()) < minEta) continue;
+
+      theEGs.push_back(theEG); // FIX ME: pass as parameter
     }
   
 //  if (bPrintList) PrintL1EGCollection(theL1EGs); 
