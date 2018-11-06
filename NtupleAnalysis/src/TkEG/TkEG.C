@@ -147,11 +147,6 @@ void TkEG::Loop()
   // Initialize Counters
   ////////////////////////////////////////////////////////////////////////////////////////////////
 
-  // Gen-Level Counters 
-  unsigned int counter_allHadGenTaus = 0;
-  unsigned int counter_ldgPtCut = 0; 
-  unsigned int counter_sumETcut =0;
-
   // Leading Tracks Counters
   unsigned int counter_allTracks           = 0;
   unsigned int counter_passChi2100         = 0;
@@ -180,7 +175,7 @@ void TkEG::Loop()
 
   for (int jentry = 0; jentry < nEntries; jentry++, nEvts++){
     
-    if (1) cout << "\t------------ Entry = " << jentry << endl;
+    if (DEBUG) cout << "\t------------ Entry = " << jentry << endl;
     
     // Init variables
     Long64_t ientry = LoadTree(jentry);
@@ -266,7 +261,7 @@ void TkEG::Loop()
 
     // For-loop: All hadronic gen-taus
     for (vector<GenParticle>::iterator genTau = GenTausHadronic.begin(); genTau != GenTausHadronic.end(); genTau++) {
-      counter_allHadGenTaus++;
+
       // Fill histo with the number of the decay products of hadronic taus
       h_genTausHad_Daughters_N-> Fill(genTau->finalDaughters().size());
       h_genTausHad_chargedDaugh_N-> Fill(genTau->finalDaughtersCharged().size());
@@ -407,13 +402,12 @@ void TkEG::Loop()
 
 	}
 	if (notLeading) continue;
-	counter_ldgPtCut++;
 
 	// Each neutral product should have ET > 10GeV (most of the times it is absorbed by one EG - EG ET threshold is 10 GeV)
 	//sumET =0;
 	//for (unsigned int i = 0; i < genTau->finalDaughtersNeutral().size(); i++) sumET += genTau->finalDaughtersNeutral().at(i).et();
 	//if (sumET >= 2.0) {
-	//counter_sumETcut++;
+
 	// For-loop: All neutral daughters
 	for (unsigned int i = 0; i < genTau->finalDaughtersNeutral().size(); i++) {
 	  GenParticle d_n      = genTau->finalDaughtersNeutral().at(i);
@@ -713,7 +707,6 @@ void TkEG::Loop()
     //====================================================
     if (DEBUG) std::cout << "\n=== EGs Clustering" << endl;
 
-
     // Build EG clusters and create tau candidates
     vector<EG> EGcluster;
     L1TkEGTauCandidates.clear();
@@ -722,18 +715,16 @@ void TkEG::Loop()
     float deltaRmin, deltaEtaMin, deltaPhiMin;
     float deltaR_beforecorrection;
     for (size_t i=0; i<trackTauCandidates.size(); i++) {
-      if (DEBUG) cout << "Clustering EGs around trackTauCandidates[" << i << "]" << endl;
 
       EGcluster.clear();
       leadTrackPtr = &(trackTauCandidates[i][0]);
-      //stopClustering = false;
+      stopClustering = false;
 
       // Shrinking cone size
       maxDeltaR = maxDeltaR_const/leadTrackPtr->getPt();
       if (maxDeltaR > maxDeltaR_EG) maxDeltaR = maxDeltaR_leadtrk;
       
       TLorentzVector p4sum; // initialized to (0,0,0,0)  //marina
-
       // EG clustering counters
       unsigned int counter_allEG = 0;
       unsigned int counter_passEt = 0;
@@ -753,33 +744,32 @@ void TkEG::Loop()
       deltaEtaMin = 1000000.0;
       deltaPhiMin = 1000000.0;
       // For-loop: All the EGs in the event
-      for (auto eg = L1EGs.begin(); eg != L1EGs.end(); eg++) {
+      for (auto eg = L1EGs.begin(); ( !stopClustering && (eg != L1EGs.end()) ); eg++) {
 	counter_allEG++;
 
 	// Skip small-Et EGs 
 	if (eg->getEt() < minEt_EG) continue;
 	counter_passEt++;
 
-	
 	// Skip EGs which do not match to lead track (in terms of DeltaR)
 	// Usage of CorrectedEta() of EG based on vertex position of the leading track
 	deltaR = auxTools_.DeltaR(leadTrackPtr->getEta(), leadTrackPtr->getPhi(), CorrectedEta(eg->getEta(), leadTrackPtr->getZ0()), eg->getPhi());
 	deltaR_beforecorrection = auxTools_.DeltaR(leadTrackPtr->getEta(), leadTrackPtr->getPhi(), eg->getEta(), eg->getPhi());
-	
-	// deltaPhi = auxTools_.DeltaPhi( leadTrackPtr->getPhi(), eg->getPhi());
-	// deltaEta = auxTools_.DeltaEta( leadTrackPtr->getEta(), CorrectedEta(eg->getEta(), leadTrackPtr->getZ0()));
 
-	// // Fill  dR, dEta, dPhi histograms
-	// h_leadTrk_EG_dR -> Fill (deltaR); 
-	// h_leadTrk_EG_dR_beforecorrection -> Fill(deltaR_beforecorrection);
+	deltaPhi = auxTools_.DeltaPhi( leadTrackPtr->getPhi(), eg->getPhi());
+	deltaEta = auxTools_.DeltaEta( leadTrackPtr->getEta(), CorrectedEta(eg->getEta(), leadTrackPtr->getZ0()));
+
+	// Fill  dR, dEta, dPhi histograms
+	h_leadTrk_EG_dR -> Fill (deltaR); 
+	h_leadTrk_EG_dR_beforecorrection -> Fill(deltaR_beforecorrection);
 	
-	// h_leadTrk_EG_dPhi -> Fill (deltaPhi);
-	// h_leadTrk_EG_dEta -> Fill (deltaEta);
+	h_leadTrk_EG_dPhi -> Fill (deltaPhi);
+	h_leadTrk_EG_dEta -> Fill (deltaEta);
 
 	// Find minimum dR, dEta, dPhi
-	// if (deltaR < deltaRmin) deltaRmin=deltaR;
-	// if (abs(deltaPhi) < abs(deltaPhiMin)) deltaPhiMin = deltaPhi;
-	// if (abs(deltaEta) < abs(deltaEtaMin)) deltaEtaMin = deltaEta;
+	if (deltaR < deltaRmin) deltaRmin=deltaR;
+	if (abs(deltaPhi) < abs(deltaPhiMin)) deltaPhiMin = deltaPhi;
+	if (abs(deltaEta) < abs(deltaEtaMin)) deltaEtaMin = deltaEta;
        
 	// Aply dR cuts
 	// Skip if EG is not within the signal cone 
@@ -792,125 +782,87 @@ void TkEG::Loop()
 	p4sum += eg->p4();
 	
 	// Cluster the EG if the total invariant mass is below the maximum (the mass of the tau)
-	//if (p4sum.M() < maxInvMass_EG){
-	EGcluster.push_back(*eg);
-	//counter_passInvMass++;
-	
-	// Fill EG histograms
-	// h_clustEGs_Et->Fill( eg->getEt() );
-	// h_clustEGs_Eta->Fill( eg->getEta() );
-	// h_clustEGs_Phi->Fill( eg->getPhi() );
-	// h_clustEGs_Et_Eta->Fill( eg->getEt(),eg->getEta() );
-	// h_clustEGs_Phi_Eta->Fill( eg->getPhi(),eg->getEta() );
-	// h_clustEGs_M->Fill( eg->p4().M() );
-	
-	// Update EG cluster variables
-	ET     += eg->getEt();//= p4sum.Et();
-	//invMass = p4sum.M();
-	
-	// Remove clustered EGs from L1EG's collction so that it will not be used for another tau candidate
-	//L1EGs.erase(eg);
-	//eg--;
-      }// For-loop: All the EGs in the event
-      
-      h_TkEGClusters_M_beforeCut->Fill(p4sum.M());
-      
-      // Keep the trackCandidate if the total invariant mass is below the maximum  
-      if (p4sum.M() > maxInvMass_EG) {
-	trackTauCandidates.erase(trackTauCandidates.begin()+i);
-	i--;
-	EGcluster.clear();
-	continue;
-      }
-      else {	
-	
-	// Fill EG cluster variables to histograms (if >=1 EG is clustered)
-	if (EGcluster.size() >=1) {
-	  h_EGClusters_Et->Fill( ET );            
-	  h_EGClusters_M->Fill( invMass );
-	  h_EGClusters_MultiplicityPerCluster->Fill( EGcluster.size() );
-      	}
-	
-	if (DEBUG) cout << "Invariant mass of cluster is " << invMass << " and ET is " << ET << endl; 
-	/*
-	//====================================================
-	// Build Tau Candidates
-	//====================================================
-	if (DEBUG) std::cout << "\n=== Build Tau Candidate" << endl;
-	
-	// Build a tau candidate from tracks and EGs
-	L1TkEGParticle newTauCandidate(trackTauCandidates[i], EGcluster, genTau, hasGenTau);
-	if (DEBUG) { //marina
-	cout << "Constructed a new tau candidate with a track invariant mass of " << newTauCandidate.GetTrackInvMass() 
-	<< ", an EG invariant mass of " << newTauCandidate.GetEGInvMass();
+	if (p4sum.M() < maxInvMass_EG){
+	  EGcluster.push_back(*eg);
+	  counter_passInvMass++;
+
+	  // Fill EG histograms
+	  h_clustEGs_Et->Fill( eg->getEt() );
+	  h_clustEGs_Eta->Fill( eg->getEta() );
+	  h_clustEGs_Phi->Fill( eg->getPhi() );
+	  h_clustEGs_Et_Eta->Fill( eg->getEt(),eg->getEta() );
+	  h_clustEGs_Phi_Eta->Fill( eg->getPhi(),eg->getEta() );
+	  h_clustEGs_M->Fill( eg->p4().M() );
+
+	  // Update EG cluster variables
+	  ET     += eg->getEt();//= p4sum.Et();
+	  invMass = p4sum.M();
+	  //cout<< "invMass =  "<<invMass<< "     ET = "<<endl;
+	  // Remove clustered EGs from L1EG's collction so that it will not be used for another tau candidate
+	  L1EGs.erase(eg);
+	  eg--;
+	}
+	else {
+	  stopClustering = true;
 	}
 	
-	newTauCandidate.SetShrinkingConeConst(maxDeltaR_const);
-	newTauCandidate.SetSigConeMaxOpen(maxDeltaR_leadtrk);
-	newTauCandidate.FindIsoConeTracks(TTTracks);
-	newTauCandidate.FindSignalConeEGs(L1EGs);
-	newTauCandidate.FindIsoConeEGs(L1EGs);
+	if (DEBUG) cout << "Invariant mass of cluster is " << invMass << " and ET is " << ET << endl; 
 	
-	L1TkEGTauCandidates.push_back(newTauCandidate);
-	*/
+      }// For-loop: All the EGs in the event
+      
+      // Fill EG cluster variables to histograms (if >=1 EG is clustered)
+      if (EGcluster.size() >=1) {
+	h_EGClusters_Et->Fill( ET );            
+	h_EGClusters_M->Fill( invMass );
       }
-    }
-    // h_leadTrk_EG_dRmin -> Fill (deltaRmin);
-    // h_leadTrk_EG_dPhiMin -> Fill (abs(deltaPhiMin));      
-    // h_leadTrk_EG_dEtaMin -> Fill (abs(deltaEtaMin));
-    
-    // // Fill EG clustering counter histogram
-    // h_clustEGs_allEGs      -> Fill(counter_allEG);
-    // h_clustEGs_passEt      -> Fill(counter_passEt);
-    // h_clustEGs_passDRmax   -> Fill(counter_passDRmax);
-    // h_clustEGs_passDRmin   -> Fill(counter_passDRmin);
-    // h_clustEGs_passInvMass -> Fill(counter_passInvMass);
-    
-    // Fill the number of EGs in cluster
-    
-    //====================================================
-    // MC Matching of Tau Candidates
-    //====================================================
-    if (DEBUG) std::cout << "\n=== MC Matching of Tau Candidates" << endl;
-    
-    cout << "candidates: "<<trackTauCandidates.size()<<endl; 
-    for (size_t i=0; i<trackTauCandidates.size(); i++) {
+      
+      h_leadTrk_EG_dRmin -> Fill (deltaRmin);
+      h_leadTrk_EG_dPhiMin -> Fill (abs(deltaPhiMin));      
+      h_leadTrk_EG_dEtaMin -> Fill (abs(deltaEtaMin));
+
+      // Fill EG clustering counter histogram
+      h_clustEGs_allEGs      -> Fill(counter_allEG);
+      h_clustEGs_passEt      -> Fill(counter_passEt);
+      h_clustEGs_passDRmax   -> Fill(counter_passDRmax);
+      h_clustEGs_passDRmin   -> Fill(counter_passDRmin);
+      h_clustEGs_passInvMass -> Fill(counter_passInvMass);
+      
+      // Fill the number of EGs in cluster
+      h_EGClusters_MultiplicityPerCluster->Fill( EGcluster.size() );
+      
+      //====================================================
+      // MC Matching of Tau Candidates
+      //====================================================
+      if (DEBUG) std::cout << "\n=== MC Matching of Tau Candidates" << endl;
+
+
       // Find the genTau matching to the lead track
       double deltaR_match = GetMatchingGenParticle(trackTauCandidates[i][0], &genTau);
       h_MCmatch_dR->Fill(deltaR_match);
-      
+
       bool hasGenTau = false;
       if (deltaR_match < maxDeltaR_MCmatch) hasGenTau = true;
-      
-      if (hasGenTau) {
-	cout<<"index = "<< trackTauCandidates[i][0].index() <<endl;
-	cout<<"eta = "<< trackTauCandidates[i][0].getEta()<<" --- phi = "<< trackTauCandidates[i][0].getPhi()<<endl;
-	
-      }
       h_leadTrk_MCmatch -> Fill (hasGenTau);
-      
+
       if (trackTauCandidates[i][0].getNumOfStubs() == 4) h_leadTrk4stubs_MCmatch -> Fill(hasGenTau);
       if ((trackTauCandidates[i][0].getNumOfStubs() == 4) && (hasGenTau)) h_leadTrk4stubs_MCmatched_Chi2 -> Fill (trackTauCandidates[i][0].getChi2());
       
       if (hasGenTau) {
 	//Increase counter for trackTauCandidates which have a genTau
 	counter_hasGenTau++;
-	
+
 	if (EGcluster.size() >=1) counter_hasEG++;
-	
-	// ET of TkEG when it has a matched genTau
-	hTkEG_matched_Et  -> Fill( ET );
 	
 	// Properties of the genTau
 	hTkEG_genVisEt    -> Fill( genTau.p4vis().Et() );
 	hTkEG_DeltaRmatch -> Fill( deltaR_match );
-	
-	
+
+
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// Tk+EG algorithm representation in Gen-Level (Charged and Neutral daughters multiplicity) 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	if (DEBUG) std::cout << "\n=== Tk+EG algorithm representation in Gen-Level" << endl;
-	
+
 	// Find the leading charged daughter
 	GenParticle d_ldg = genTau.finalDaughtersCharged().at(0);
 	// For-loop: All charged daughters
@@ -935,11 +887,13 @@ void TkEG::Loop()
 	  for (unsigned int i = 0; i < genTau.finalDaughtersNeutral().size(); i++) sumET += genTau.finalDaughtersNeutral().at(i).et();
 	  if (sumET > 2.0) h_MCmatch_neutralDaugh_N -> Fill(genTau.finalDaughtersNeutral().size());
 	}
-	
+
       }
-      
-      // Find how the non-hadronically decaying taus (the non MCmatched) are decaying (electron or muon)  
+
+      // Fill counters for number of mcmatched taus (only Tks, or TkEG particles) and non mcmatched Tk or TkEGs
       if (!hasGenTau) {
+	
+	// Find how the non-hadronically decaying taus (the non MCmatched) are decaying (electron or muon)  
 	
 	// Initialise the matching GenParticle
 	GenParticle match_GenTau;
@@ -950,50 +904,51 @@ void TkEG::Loop()
 	for (vector<GenParticle>::iterator tau = GenTaus.begin(); tau != GenTaus.end(); tau++) {
 	  // Skip gen-taus outside of our eta acceptance 
 	  if (tau->eta() > 2.4) continue;
-	  
+
 	  // Find the closest gen-tau to the leading track
 	  deltaR = auxTools_.DeltaR( trackTauCandidates[i][0].getEta(), trackTauCandidates[i][0].getPhi(), tau->eta(), tau->phi() );
 	  if (deltaR < match_dR) {
 	    match_dR = deltaR;
 	    match_GenTau = *tau;
 	  }
-	  
+
 	}// For-loop: All GenTaus
-	
+
 	// If it has a matching gen tau check to what it is decaying 
 	if (match_dR < maxDeltaR_MCmatch) {
-	  
+	  	  
 	  int decayMode = 2 ; // others (not e not muon)
 	  
 	  for (unsigned int i = 0; i < match_GenTau.daughters().size(); i++) {
 	    
 	    GenParticle d      = match_GenTau.daughters().at(i);
-	    
+
 	    if ((abs(d.pdgId()) == 11) || (abs(d.pdgId()) == 12)) decayMode = 0; // electron
 	    if ((abs(d.pdgId()) == 13) || (abs(d.pdgId()) == 14)) decayMode = 1; // muon
-	    
+	  
 	  }
 	  h_nonMCmatchedCandidates_decayMode -> Fill (decayMode);
 	  
-	}	  
+	}
+	
       }
-      
-      
+
+
       //====================================================
       // Build Tau Candidate
       //====================================================
       if (DEBUG) std::cout << "\n=== Build Tau Candidate" << endl;
-      
-      
+
+
       // Build a tau candidate from tracks and EGs
       L1TkEGParticle newTauCandidate(trackTauCandidates[i], EGcluster, genTau, hasGenTau);
       if (DEBUG) { //marina
 	cout << "Constructed a new tau candidate with a track invariant mass of " << newTauCandidate.GetTrackInvMass() 
 	     << ", an EG invariant mass of " << newTauCandidate.GetEGInvMass();
 	if (hasGenTau) cout  << " and a generator tau with visible pT " << newTauCandidate.GetGenTauPt() << endl;
-	  else cout << " and does not have a matching generator tau" << endl;
+	else cout << " and does not have a matching generator tau" << endl;
       }
-      
+
       newTauCandidate.SetShrinkingConeConst(maxDeltaR_const);
       newTauCandidate.SetSigConeMaxOpen(maxDeltaR_leadtrk);
       newTauCandidate.FindIsoConeTracks(TTTracks);
@@ -1153,6 +1108,8 @@ void TkEG::Loop()
       // h_TkEG_NHF     -> Fill ( (tkeg->GetTotalP4().Pt() - tkeg->GetTrackBasedPt() ) / tkeg->GetTotalP4().Pt());
       
       if (NEGs > 0) {
+	h_TkEG_NEGs_withEGs -> Fill (NEGs);
+
 	double CHF = tkeg->GetTrackBasedPt() / tkeg->GetTotalP4().Pt();
 	double NHF = (tkeg->GetTotalP4().Pt() - tkeg->GetTrackBasedPt() ) / tkeg->GetTotalP4().Pt();
 	
@@ -1212,8 +1169,14 @@ void TkEG::Loop()
 	  h_TkEG_PoorNeuResol_Pi0_ET -> Fill ( daugh->et() );
   
 	}
-	
-	
+      }
+
+      // Resolution with and without clustered EGs
+      if (tkeg->GetEGs().size() > 0) {
+	h_TkEG_EtResolution_withEGs  -> Fill(ETresolution);
+      }
+      else {
+	h_TkEG_EtResolution_noEGs  -> Fill(ETresolution);
       }
 
       // Resolution in different eta regions
@@ -1313,9 +1276,12 @@ void TkEG::Loop()
 	  }
 	}
       }
-      
-      // Resolution in case of zero or more than one neutral products 
+
+      // Daughters' multiplicity of matched GenParticle 
       int neuDaugh_N = tkeg->GetMatchingGenParticle().finalDaughtersNeutral().size();
+      int chargedDaugh_N = tkeg->GetMatchingGenParticle().finalDaughtersCharged().size();
+
+      // Resolution in case of zero or more than one neutral products 
       
       if (neuDaugh_N == 0) {
 	h_TkEG_PtResolution_noNeutrals  -> Fill(pTresolution);
@@ -1324,6 +1290,14 @@ void TkEG::Loop()
 	h_TkEG_PhiResolution_noNeutrals -> Fill(PhiResolution);
 	h_TkEG_ChargedResolution_noNeutrals -> Fill(ChargedResolution);
 	h_TkEG_NeutralsResolution_noNeutrals -> Fill(NeutralsResolution);
+
+	if (tkeg->GetEGs().size() > 0) {
+	  h_TkEG_EtResolution_noNeutrals_withEGs -> Fill(ETresolution);
+	}
+	else {
+	  h_TkEG_EtResolution_noNeutrals_noEGs   -> Fill(ETresolution);
+	}
+
 		
 	if ( IsWithinEtaRegion("Forward", tkeg_eta) ){
 	  h_TkEG_PtResolution_noNeutrals_F  -> Fill(pTresolution);
@@ -1378,7 +1352,37 @@ void TkEG::Loop()
 	h_TkEG_PhiResolution_withNeutrals -> Fill(PhiResolution);
 	h_TkEG_ChargedResolution_withNeutrals -> Fill(ChargedResolution);
 	h_TkEG_NeutralsResolution_withNeutrals -> Fill(NeutralsResolution);
+
+	if (chargedDaugh_N == 1) {
+	  h_TkEG_EtResolution_withNeutrals_1pr  -> Fill(ETresolution);
+	}
+	else if (chargedDaugh_N == 3) {
+	  h_TkEG_EtResolution_withNeutrals_3pr  -> Fill(ETresolution);
+	}
 	
+	if (tkeg->GetEGs().size() > 0) {
+	  h_TkEG_EtResolution_withNeutrals_withEGs -> Fill(ETresolution);
+	  if ( (tkeg->GetEGs().at(0).getEt() >= 0) && (tkeg->GetEGs().at(0).getEt() < 10) ) {
+	    h_TkEG_EtResolution_withNeutrals_withEGs_0to10GeV ->Fill(ETresolution);
+	    }
+	  else if ( (tkeg->GetEGs().at(0).getEt() >= 10) && (tkeg->GetEGs().at(0).getEt() < 20) ) {
+	    h_TkEG_EtResolution_withNeutrals_withEGs_10to20GeV ->Fill(ETresolution);
+	  }
+	  else if ( (tkeg->GetEGs().at(0).getEt() >= 20) && (tkeg->GetEGs().at(0).getEt() < 30) ) {
+	    h_TkEG_EtResolution_withNeutrals_withEGs_20to30GeV ->Fill(ETresolution);
+	  }
+	  else if ( (tkeg->GetEGs().at(0).getEt() >= 30) && (tkeg->GetEGs().at(0).getEt() < 40) ) {
+	    h_TkEG_EtResolution_withNeutrals_withEGs_30to40GeV ->Fill(ETresolution);
+	  }
+	  else if ( (tkeg->GetEGs().at(0).getEt() >= 40) && (tkeg->GetEGs().at(0).getEt() < 50) ) {
+	    h_TkEG_EtResolution_withNeutrals_withEGs_40to50GeV ->Fill(ETresolution);
+	  }
+
+	}
+	else {
+	  h_TkEG_EtResolution_withNeutrals_noEGs   -> Fill(ETresolution);
+	}
+
 	if ( IsWithinEtaRegion("Forward", tkeg_eta) ) {
 	  h_TkEG_PtResolution_withNeutrals_F  -> Fill(pTresolution);
 	  h_TkEG_EtResolution_withNeutrals_F  -> Fill(ETresolution);
@@ -1429,8 +1433,7 @@ void TkEG::Loop()
       }
 	
       // Resolution for 1- and 3-prong decays
-      int chargedDaugh_N = tkeg->GetMatchingGenParticle().finalDaughtersCharged().size();
-      
+ 
       if (chargedDaugh_N == 1) {
 	h_TkEG_PtResolution_1pr  -> Fill(pTresolution);
 	h_TkEG_EtResolution_1pr  -> Fill(ETresolution);
@@ -1438,6 +1441,13 @@ void TkEG::Loop()
 	h_TkEG_PhiResolution_1pr -> Fill(PhiResolution);
 	h_TkEG_ChargedResolution_1pr -> Fill(ChargedResolution);
 	h_TkEG_NeutralsResolution_1pr -> Fill(NeutralsResolution);
+	
+	if (tkeg->GetEGs().size() > 0) {
+	  h_TkEG_EtResolution_1pr_withEGs -> Fill(ETresolution);
+	}
+	else {
+	  h_TkEG_EtResolution_1pr_noEGs   -> Fill(ETresolution);
+	}
 
 	if ( IsWithinEtaRegion("Forward", tkeg_eta) ) {
 	  h_TkEG_PtResolution_1pr_F  -> Fill(pTresolution);
@@ -1495,6 +1505,13 @@ void TkEG::Loop()
 	h_TkEG_ChargedResolution_3pr -> Fill(ChargedResolution);
 	h_TkEG_NeutralsResolution_3pr -> Fill(NeutralsResolution);
 	
+	if (tkeg->GetEGs().size() > 0) {
+	  h_TkEG_EtResolution_3pr_withEGs -> Fill(ETresolution);
+	}
+	else {
+	  h_TkEG_EtResolution_3pr_noEGs   -> Fill(ETresolution);
+	}
+
 	if ( IsWithinEtaRegion("Forward", tkeg_eta) ) {
 	  h_TkEG_PtResolution_3pr_F  -> Fill(pTresolution);
 	  h_TkEG_EtResolution_3pr_F  -> Fill(ETresolution);
@@ -2332,9 +2349,6 @@ void TkEG::BookHistos_(void)
   // Track-based relative isolation of tau candidates
   histoTools_.BookHisto_1D(h_TkEG_vtxIso, "TkEG_vtxIso", ";Vertex isolation;Clusters / bin", 100, 0.0, +5.0);
   
-  // Et of the tkeg when it has a matched genTau
-  histoTools_.BookHisto_1D(hTkEG_matched_Et, "TkEG_matched_Et", ";E_{T} (GeV); TkEGs / bin", 40, 0.0,  +200.0);
-
   
   histoTools_.BookHisto_1D(h_ldgTkEG_ET, "TkEG_ldgET", ";E_{T} (GeV); TkEGs / bin", 300, 0.0,  +300.0); 
 
@@ -2366,6 +2380,7 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_TkEG_Phi, "TkEG_Phi", ";#phi (rads); Entries / bin", 21,  -3.15,  +3.15);
   histoTools_.BookHisto_1D(h_TkEG_InvMass, "TkEG_InvMass", ";Mass (GeV); Entries / bin", 40, 0.0, +4.0);
   histoTools_.BookHisto_1D(h_TkEG_NEGs, "TkEG_NEGs", ";N_{EGs};Entries / bin", 6,-0.5, 5.5);
+  histoTools_.BookHisto_1D(h_TkEG_NEGs_withEGs, "TkEG_NEGs_withEGs", ";N_{EGs};Entries / bin", 6,-0.5, 5.5);
   histoTools_.BookHisto_1D(h_TkEG_NTks, "TkEG_NTks", ";N_{Tks};Entries / bin", 6,-0.5, 5.5);
   histoTools_.BookHisto_1D(h_TkEG_NEGs_C, "TkEG_NEGs_C", ";N_{EGs};Entries / bin", 6,-0.5, 5.5);
   histoTools_.BookHisto_1D(h_TkEG_NEGs_I, "TkEG_NEGs_I", ";N_{EGs};Entries / bin", 6,-0.5, 5.5);
@@ -2467,6 +2482,28 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals, "TkEG_EtResolution_withNeutrals", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
   histoTools_.BookHisto_1D(h_TkEG_EtResolution_1pr, "TkEG_EtResolution_1pr", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
   histoTools_.BookHisto_1D(h_TkEG_EtResolution_3pr, "TkEG_EtResolution_3pr", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withEGs, "TkEG_EtResolution_withEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_noEGs, "TkEG_EtResolution_noEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_1pr, "TkEG_EtResolution_withNeutrals_1pr", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_3pr, "TkEG_EtResolution_withNeutrals_3pr", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+    
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_noNeutrals_withEGs, "TkEG_EtResolution_noNeutrals_withEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_withEGs, "TkEG_EtResolution_withNeutrals_withEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_1pr_withEGs, "TkEG_EtResolution_1pr_withEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_3pr_withEGs, "TkEG_EtResolution_3pr_withEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_withEGs_0to10GeV,  "TkEG_EtResolution_withNeutrals_withEGs_0to10GeV", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_withEGs_10to20GeV,  "TkEG_EtResolution_withNeutrals_withEGs_10to20GeV", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_withEGs_20to30GeV,  "TkEG_EtResolution_withNeutrals_withEGs_20to30GeV", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_withEGs_30to40GeV,  "TkEG_EtResolution_withNeutrals_withEGs_30to40GeV", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_withEGs_40to50GeV,  "TkEG_EtResolution_withNeutrals_withEGs_40to50GeV", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+
+
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_noNeutrals_noEGs, "TkEG_EtResolution_noNeutrals_noEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_noEGs, "TkEG_EtResolution_withNeutrals_noEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_1pr_noEGs, "TkEG_EtResolution_1pr_noEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_3pr_noEGs, "TkEG_EtResolution_3pr_noEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
 
   histoTools_.BookHisto_1D(h_TkEG_EtResolution_F_withEGs, "TkEG_EtResolution_F_withEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
   histoTools_.BookHisto_1D(h_TkEG_EtResolution_F_withEGs_posEta, "TkEG_EtResolution_F_withEGs_posEta", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
@@ -2947,6 +2984,7 @@ void TkEG::WriteHistos_(void)
   h_TkEG_Phi->Write();
   h_TkEG_InvMass->Write();
   h_TkEG_NEGs->Write();
+  h_TkEG_NEGs_withEGs->Write();
   h_TkEG_NTks->Write();
   h_TkEG_NEGs_C->Write();
   h_TkEG_NEGs_I->Write();
@@ -3043,6 +3081,26 @@ void TkEG::WriteHistos_(void)
   h_TkEG_EtResolution_withNeutrals->Write();
   h_TkEG_EtResolution_1pr->Write();
   h_TkEG_EtResolution_3pr->Write();
+  h_TkEG_EtResolution_noEGs->Write();
+  h_TkEG_EtResolution_withEGs->Write();
+
+  h_TkEG_EtResolution_withNeutrals_1pr->Write();
+  h_TkEG_EtResolution_withNeutrals_3pr->Write();
+    
+  h_TkEG_EtResolution_noNeutrals_withEGs->Write();
+  h_TkEG_EtResolution_withNeutrals_withEGs->Write();
+  h_TkEG_EtResolution_1pr_withEGs->Write();
+  h_TkEG_EtResolution_3pr_withEGs->Write();
+  h_TkEG_EtResolution_noNeutrals_noEGs->Write();
+  h_TkEG_EtResolution_withNeutrals_noEGs->Write();
+  h_TkEG_EtResolution_1pr_noEGs->Write();
+  h_TkEG_EtResolution_3pr_noEGs->Write();
+
+  h_TkEG_EtResolution_withNeutrals_withEGs_0to10GeV->Write();
+  h_TkEG_EtResolution_withNeutrals_withEGs_10to20GeV->Write();
+  h_TkEG_EtResolution_withNeutrals_withEGs_20to30GeV->Write();
+  h_TkEG_EtResolution_withNeutrals_withEGs_30to40GeV->Write();
+  h_TkEG_EtResolution_withNeutrals_withEGs_40to50GeV->Write();
 
   h_TkEG_EtResolution_F_withEGs->Write();
   h_TkEG_EtResolution_F_withEGs_posEta->Write();
@@ -3199,8 +3257,6 @@ void TkEG::WriteHistos_(void)
   h_TkEG_NeutralsResolution_1pr->Write();
   h_TkEG_NeutralsResolution_3pr->Write();
 
-
-  hTkEG_matched_Et->Write();
   h_ldgTkEG_ET->Write();
   hTkEG_DeltaRmatch->Write();
   hTkEG_genVisEt->Write();

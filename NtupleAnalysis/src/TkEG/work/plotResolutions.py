@@ -195,6 +195,10 @@ def main(opts):
 
             ["TkEG_ChargedResolution", "TkEG_ChargedResolution_1pr", "TkEG_ChargedResolution_3pr", "TkEG_ChargedResolution_withNeutrals", "TkEG_ChargedResolution_noNeutrals"],
             ["TkEG_NeutralsResolution", "TkEG_NeutralsResolution_1pr", "TkEG_NeutralsResolution_3pr", "TkEG_NeutralsResolution_withNeutrals", "TkEG_NeutralsResolution_noNeutrals"],
+            
+            ["TkEG_EtResolution_withEGs", "TkEG_EtResolution_1pr_withEGs", "TkEG_EtResolution_3pr_withEGs", "TkEG_EtResolution_withNeutrals_withEGs", "TkEG_EtResolution_noNeutrals_withEGs"],
+            ["TkEG_EtResolution_noEGs", "TkEG_EtResolution_1pr_noEGs", "TkEG_EtResolution_3pr_noEGs", "TkEG_EtResolution_withNeutrals_noEGs", "TkEG_EtResolution_noNeutrals_noEGs"],
+            ["TkEG_EtResolution_withNeutrals", "TkEG_EtResolution_withNeutrals_1pr", "TkEG_EtResolution_withNeutrals_3pr"],
 
             ]
                        
@@ -244,6 +248,10 @@ def main(opts):
             PlotHistos(datasetsMgr, resList[27], s, PU, "ResolutionCharged_%s_all" % (s) )
             PlotHistos(datasetsMgr, resList[28], s, PU, "ResolutionNeutrals_%s_all" % (s) )
 
+            PlotHistos(datasetsMgr, resList[29] , s, PU, "ResolutionEt_%s_all_withEGs" % (s) )
+            PlotHistos(datasetsMgr, resList[30] , s, PU, "ResolutionEt_%s_all_noEGs" % (s) )
+            PlotHistos(datasetsMgr, resList[31] , s, PU, "ResolutionEt_%s_withNeutrals" % (s) )
+
         print
 
     Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
@@ -264,6 +272,8 @@ def PlotHistos(datasetsMgr, histoList, signal, PU, saveName=None):
     if "_cif"  in saveName:
         #algos = ["Inclusive", "Central", "Intermediate", "Forward"]
         algos = ["Inclusive", "|#eta| < 0.8 (C)", "0.8 < |#eta| < 1.6 (I)", "|#eta| > 1.6 (F)"]
+    if "_withNeutrals" in saveName:
+        algos = ["#geq 1 #pi^{0}'s", "#geq 1 #pi^{0}'s (1-prong)", "#geq 1 #pi^{0}'s (3-prong)"]
 
     # For-loop: All tau algorithms
     for l, hName in enumerate(histoList, 0):
@@ -321,6 +331,8 @@ def GetHistoKwargs(h, opts):
     _mvLeg1 = {"dx": -0.15, "dy": -0.00, "dh": -0.0}
     _mvLeg2 = {"dx": -0.00, "dy": -0.00, "dh": -0.0}
     _mvLeg3 = {"dx": -0.05, "dy": -0.00, "dh": -0.0}
+    _mvLeg4 = {"dx": -0.55, "dy": -0.60, "dh": -0.15}
+    #_mvLeg4 = {"dx": -0.12, "dy": -0.00, "dh": -0.15}
 
     logY    = False
     yMin    = 0.0
@@ -359,8 +371,8 @@ def GetHistoKwargs(h, opts):
         #_kwargs["opts"]       = {"xmin": -0.2, "xmax": 0.2, "ymin": 0, "ymaxfactor": yMaxF}
         #if "_all_f" in h.lower() or "_cif" in h.lower():
         _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
-        _kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0, "ymaxfactor": yMaxF}
-        _kwargs["rebinX"]     = 50
+        _kwargs["opts"]       = {"xmin": -0.2, "xmax": 0.2, "ymin": 0, "ymaxfactor": yMaxF}
+        _kwargs["rebinX"]     = 5
         #_kwargs["moveLegend"] = _mvLeg1
     if "resolutioneta_" in h.lower():
         _kwargs["xlabel"]     = "#delta#eta / #eta^{vis}"
@@ -393,6 +405,10 @@ def GetHistoKwargs(h, opts):
         _kwargs["moveLegend"] = _mvLeg1
     if "all_f" in h.lower():
         _kwargs["moveLegend"] = _mvLeg3
+    if "withneutrals" in h.lower():
+        _kwargs["moveLegend"] = _mvLeg4
+
+
 
     return _kwargs
 
