@@ -174,7 +174,6 @@ void L1TkEGParticle::FindSignalConeEGs(vector<EG> EGs)
 {
   vector<EG> signalEGs;
   TTTrack leadingTrack = theTracks[0];
-  vector<EG> clustEGs  = theEGs;
   double deltaR;
 
   // For-loop: All TTTracks
