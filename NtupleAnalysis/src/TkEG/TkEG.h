@@ -745,8 +745,10 @@ class TkEG : public TreeAnalyserMC{
   TH1D* hRelIsoTight_Rate_C;
   TH1D* hRelIsoTight_Rate_I;
   TH1D* hRelIsoTight_Rate_F;
+  
+  TH1D* hL1TkEGTaus_SingleTau_Rate;
 
-    // DiTau: Rates
+  // DiTau: Rates
   TH1D* hDiTau_Rate_TkEG;
   TH1D* hDiTau_Rate_TkEG_C;
   TH1D* hDiTau_Rate_TkEG_I;
@@ -775,6 +777,8 @@ class TkEG : public TreeAnalyserMC{
   TH1D* hDiTau_Rate_RelIsoTight_C;
   TH1D* hDiTau_Rate_RelIsoTight_I;
   TH1D* hDiTau_Rate_RelIsoTight_F;
+
+  TH1D* hL1TkEGTaus_DiTau_Rate;
 
   // SingleTau: Efficiencies
   TH1D* hTkEG_Eff;
@@ -806,6 +810,8 @@ class TkEG : public TreeAnalyserMC{
   TH1D* hRelIsoTight_Eff_I;
   TH1D* hRelIsoTight_Eff_F;      
   
+  TH1D* hL1TkEGTaus_SingleTau_Eff;
+
   // DiTau: Efficiencies
   TH1D* hDiTau_Eff_TkEG;
   TH1D* hDiTau_Eff_TkEG_C;
@@ -836,6 +842,8 @@ class TkEG : public TreeAnalyserMC{
   TH1D* hDiTau_Eff_RelIsoTight_I;
   TH1D* hDiTau_Eff_RelIsoTight_F;
   
+  TH1D* hL1TkEGTaus_DiTau_Eff;
+
 };
 
 #endif

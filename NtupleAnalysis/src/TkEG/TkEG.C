@@ -1676,6 +1676,7 @@ void TkEG::Loop()
     FillSingleTau_(L1TkEGTauCandidates    , hTkEG_Rate_C, hTkEG_Eff_C, 0.0, 1.0);
     FillSingleTau_(L1TkEGTauCandidates    , hTkEG_Rate_I, hTkEG_Eff_I, 1.0, 1.6);
     FillSingleTau_(L1TkEGTauCandidates    , hTkEG_Rate_F, hTkEG_Eff_F, 1.6, 3.0); // 2.5 is max
+    
     FillSingleTau_(L1TkEGTaus_VtxIso, hVtxIso_Rate  , hVtxIso_Eff);
     FillSingleTau_(L1TkEGTaus_VtxIso, hVtxIso_Rate_C, hVtxIso_Eff_C, 0.0, 1.0);
     FillSingleTau_(L1TkEGTaus_VtxIso, hVtxIso_Rate_I, hVtxIso_Eff_I, 1.0, 1.6);
@@ -1756,6 +1757,19 @@ void TkEG::Loop()
     FillDiTau_(L1TkEGTaus_RelIsoTight, hDiTau_Rate_RelIsoTight_C, hDiTau_Eff_RelIsoTight_C, 0.0, 1.0);
     FillDiTau_(L1TkEGTaus_RelIsoTight, hDiTau_Rate_RelIsoTight_I, hDiTau_Eff_RelIsoTight_I, 1.0, 1.6);
     FillDiTau_(L1TkEGTaus_RelIsoTight, hDiTau_Rate_RelIsoTight_F, hDiTau_Eff_RelIsoTight_F, 1.6, 3.0);
+    
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Rates and efficiencies for the best performing WP
+    ////////////////////////////////////////////////////////////////////////////////////////////////    
+
+    // Single-Tau 
+    FillSingleTau_(L1TkEGTaus_VtxIsoTight, hL1TkEGTaus_SingleTau_Rate  , hL1TkEGTaus_SingleTau_Eff);
+    
+    // Di-Tau
+    FillDiTau_(L1TkEGTaus_VtxIsoTight, hL1TkEGTaus_DiTau_Rate  , hL1TkEGTaus_DiTau_Eff);
+
     
     // Progress bar
     if (!DEBUG) auxTools_.ProgressBar(jentry, nEntries, 100, 100);
@@ -2036,7 +2050,19 @@ void TkEG::Loop()
   FinaliseEffHisto_( hDiTau_Eff_RelIsoTight_C, nEvtsWithMaxHTaus);
   FinaliseEffHisto_( hDiTau_Eff_RelIsoTight_I, nEvtsWithMaxHTaus);
   FinaliseEffHisto_( hDiTau_Eff_RelIsoTight_F, nEvtsWithMaxHTaus);
+
+
+  // Best performing WP
+
+  // Single-Tau
+  histoTools_.ConvertToRateHisto_1D( hL1TkEGTaus_SingleTau_Rate, N );
+  FinaliseEffHisto_( hL1TkEGTaus_SingleTau_Eff, nEvtsWithMaxHTaus);
   
+  // Di-Tau
+  histoTools_.ConvertToRateHisto_1D( hL1TkEGTaus_DiTau_Rate, N );
+  FinaliseEffHisto_( hL1TkEGTaus_DiTau_Eff,nEvtsWithMaxHTaus);
+
+
   ////////////////////////////////////////////////////////////////////////////////////////////////
   // Write the histograms to the file
   ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2956,6 +2982,7 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(hRelIsoTight_Rate_I, "RelIsoTight_Rate_I", "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hRelIsoTight_Rate_F, "RelIsoTight_Rate_F", "", nEt , minEt , maxEt );
 
+  histoTools_.BookHisto_1D(hL1TkEGTaus_SingleTau_Rate, "L1TkEGTaus_SingleTau_Rate", "", nEt , minEt , maxEt );
 
   // Di-tau rates
     histoTools_.BookHisto_1D(hDiTau_Rate_TkEG      , "DiTau_Rate_TkEG"      , "", nEt , minEt , maxEt );
@@ -2987,6 +3014,8 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(hDiTau_Rate_RelIsoTight_I, "DiTau_Rate_RelIsoTight_I", "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hDiTau_Rate_RelIsoTight_F, "DiTau_Rate_RelIsoTight_F", "", nEt , minEt , maxEt );
 
+  histoTools_.BookHisto_1D(hL1TkEGTaus_DiTau_Rate, "L1TkEGTaus_DiTau_Rate", "", nEt , minEt , maxEt );
+
   // Single-tau efficiencies
   histoTools_.BookHisto_1D(hTkEG_Eff       , "TkEG_Eff"       , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hTkEG_Eff_C     , "TkEG_Eff_C"     , "", nEt , minEt , maxEt );
@@ -3016,6 +3045,8 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(hRelIsoTight_Eff_C, "RelIsoTight_Eff_C", "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hRelIsoTight_Eff_I, "RelIsoTight_Eff_I", "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hRelIsoTight_Eff_F, "RelIsoTight_Eff_F", "", nEt , minEt , maxEt );
+
+  histoTools_.BookHisto_1D(hL1TkEGTaus_SingleTau_Eff, "L1TkEGTaus_SingleTau_Eff", "", nEt , minEt , maxEt );
 
   // Di-tau efficiencies
   histoTools_.BookHisto_1D(hDiTau_Eff_TkEG       , "DiTau_Eff_TkEG"      , "", nEt , minEt , maxEt );
@@ -3047,7 +3078,8 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(hDiTau_Eff_RelIsoTight_I, "DiTau_Eff_RelIsoTight_I" , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hDiTau_Eff_RelIsoTight_F, "DiTau_Eff_RelIsoTight_F" , "", nEt , minEt , maxEt );
 
-  
+  histoTools_.BookHisto_1D(hL1TkEGTaus_DiTau_Eff, "L1TkEGTaus_DiTau_Eff", "", nEt , minEt , maxEt );
+
   return;
 }
 
@@ -3575,6 +3607,8 @@ void TkEG::WriteHistos_(void)
   hRelIsoTight_Rate_C->Write();
   hRelIsoTight_Rate_I->Write();
   hRelIsoTight_Rate_F->Write();
+  
+  hL1TkEGTaus_SingleTau_Rate->Write();
 
   // DiTau: Rates
   hDiTau_Rate_TkEG->Write();
@@ -3606,6 +3640,8 @@ void TkEG::WriteHistos_(void)
   hDiTau_Rate_RelIsoTight_I->Write();
   hDiTau_Rate_RelIsoTight_F->Write();
 
+  hL1TkEGTaus_DiTau_Rate->Write();
+
   // SingleTau: Efficiencies
   hTkEG_Eff->Write();
   hTkEG_Eff_C->Write();
@@ -3636,7 +3672,8 @@ void TkEG::WriteHistos_(void)
   hRelIsoTight_Eff_I->Write();
   hRelIsoTight_Eff_F->Write();
 
-  // DiTau: Efficiencies
+  hL1TkEGTaus_SingleTau_Eff->Write();
+
   // DiTau: Efficiencies
   hDiTau_Eff_TkEG->Write();
   hDiTau_Eff_TkEG_C->Write();
@@ -3666,6 +3703,8 @@ void TkEG::WriteHistos_(void)
   hDiTau_Eff_RelIsoTight_C->Write();
   hDiTau_Eff_RelIsoTight_I->Write();
   hDiTau_Eff_RelIsoTight_F->Write();
+
+  hL1TkEGTaus_DiTau_Eff->Write();
 
   // Write 2-D histograms
   h_leadTrks_Phi_Eta->Write();
