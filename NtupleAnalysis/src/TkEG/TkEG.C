@@ -59,7 +59,7 @@ void TkEG::InitVars_()
   maxDeltaR_leadtrk = 0.15;//0.3;
   maxDeltaR_const   = 2.0;
   maxDeltaZ_trk     = 0.8;  // cm
-  maxInvMass_trk    = 1.3; // GeV 
+  maxInvMass_trk    = 1.5; // GeV 
   minEt_EG          = 1.5;  // GeV
   minDeltaR_EG      = 0.0;
   maxDeltaR_EG      = 0.15;//0.3;
@@ -1651,21 +1651,26 @@ void TkEG::Loop()
       }
     
     FillTurnOn_Numerator_(L1TkEGTauCandidates     , 25.0, hTkEG_TurnOn25, hTkEG_TurnOn25_1pr, hTkEG_TurnOn25_3pr, hTkEG_TurnOn25_withNeutrals, hTkEG_TurnOn25_noNeutrals);
-    FillTurnOn_Numerator_(L1TkEGTaus_RelIso , 25.0, hVtxIso_TurnOn25, hVtxIso_TurnOn25_1pr, hVtxIso_TurnOn25_3pr, hVtxIso_TurnOn25_withNeutrals, hVtxIso_TurnOn25_noNeutrals); 
-    FillTurnOn_Numerator_(L1TkEGTaus_VtxIso , 25.0, hRelIso_TurnOn25, hRelIso_TurnOn25_1pr, hRelIso_TurnOn25_3pr, hRelIso_TurnOn25_withNeutrals, hRelIso_TurnOn25_noNeutrals);
-    FillTurnOn_Numerator_(L1TkEGTaus_RelIsoLoose , 25.0, hVtxIsoLoose_TurnOn25, hVtxIsoLoose_TurnOn25_1pr, hVtxIsoLoose_TurnOn25_3pr, hVtxIsoLoose_TurnOn25_withNeutrals, hVtxIsoLoose_TurnOn25_noNeutrals); 
-    FillTurnOn_Numerator_(L1TkEGTaus_VtxIsoLoose , 25.0, hRelIsoLoose_TurnOn25, hRelIsoLoose_TurnOn25_1pr, hRelIsoLoose_TurnOn25_3pr, hRelIsoLoose_TurnOn25_withNeutrals, hRelIsoLoose_TurnOn25_noNeutrals);
-    FillTurnOn_Numerator_(L1TkEGTaus_RelIsoTight , 25.0, hVtxIsoTight_TurnOn25, hVtxIsoTight_TurnOn25_1pr, hVtxIsoTight_TurnOn25_3pr, hVtxIsoTight_TurnOn25_withNeutrals, hVtxIsoTight_TurnOn25_noNeutrals); 
-    FillTurnOn_Numerator_(L1TkEGTaus_VtxIsoTight , 25.0, hRelIsoTight_TurnOn25, hRelIsoTight_TurnOn25_1pr, hRelIsoTight_TurnOn25_3pr, hRelIsoTight_TurnOn25_withNeutrals, hRelIsoTight_TurnOn25_noNeutrals);
+    FillTurnOn_Numerator_(L1TkEGTaus_VtxIso , 25.0, hVtxIso_TurnOn25, hVtxIso_TurnOn25_1pr, hVtxIso_TurnOn25_3pr, hVtxIso_TurnOn25_withNeutrals, hVtxIso_TurnOn25_noNeutrals); 
+    FillTurnOn_Numerator_(L1TkEGTaus_RelIso , 25.0, hRelIso_TurnOn25, hRelIso_TurnOn25_1pr, hRelIso_TurnOn25_3pr, hRelIso_TurnOn25_withNeutrals, hRelIso_TurnOn25_noNeutrals);
+    FillTurnOn_Numerator_(L1TkEGTaus_VtxIsoLoose , 25.0, hVtxIsoLoose_TurnOn25, hVtxIsoLoose_TurnOn25_1pr, hVtxIsoLoose_TurnOn25_3pr, hVtxIsoLoose_TurnOn25_withNeutrals, hVtxIsoLoose_TurnOn25_noNeutrals); 
+    FillTurnOn_Numerator_(L1TkEGTaus_RelIsoLoose , 25.0, hRelIsoLoose_TurnOn25, hRelIsoLoose_TurnOn25_1pr, hRelIsoLoose_TurnOn25_3pr, hRelIsoLoose_TurnOn25_withNeutrals, hRelIsoLoose_TurnOn25_noNeutrals);
+    FillTurnOn_Numerator_(L1TkEGTaus_VtxIsoTight , 25.0, hVtxIsoTight_TurnOn25, hVtxIsoTight_TurnOn25_1pr, hVtxIsoTight_TurnOn25_3pr, hVtxIsoTight_TurnOn25_withNeutrals, hVtxIsoTight_TurnOn25_noNeutrals); 
+    FillTurnOn_Numerator_(L1TkEGTaus_RelIsoTight , 25.0, hRelIsoTight_TurnOn25, hRelIsoTight_TurnOn25_1pr, hRelIsoTight_TurnOn25_3pr, hRelIsoTight_TurnOn25_withNeutrals, hRelIsoTight_TurnOn25_noNeutrals);
 
 
     FillTurnOn_Numerator_(L1TkEGTauCandidates     , 50.0, hTkEG_TurnOn50, hTkEG_TurnOn50_1pr, hTkEG_TurnOn50_3pr, hTkEG_TurnOn50_withNeutrals, hTkEG_TurnOn50_noNeutrals);
-    FillTurnOn_Numerator_(L1TkEGTaus_RelIso , 50.0, hVtxIso_TurnOn50, hVtxIso_TurnOn50_1pr, hVtxIso_TurnOn50_3pr, hVtxIso_TurnOn50_withNeutrals, hVtxIso_TurnOn50_noNeutrals); 
-    FillTurnOn_Numerator_(L1TkEGTaus_VtxIso , 50.0, hRelIso_TurnOn50, hRelIso_TurnOn50_1pr, hRelIso_TurnOn50_3pr, hRelIso_TurnOn50_withNeutrals, hRelIso_TurnOn50_noNeutrals);
-    FillTurnOn_Numerator_(L1TkEGTaus_RelIsoLoose , 50.0, hVtxIsoLoose_TurnOn50, hVtxIsoLoose_TurnOn50_1pr, hVtxIsoLoose_TurnOn50_3pr, hVtxIsoLoose_TurnOn50_withNeutrals, hVtxIsoLoose_TurnOn50_noNeutrals); 
-    FillTurnOn_Numerator_(L1TkEGTaus_VtxIsoLoose , 50.0, hRelIsoLoose_TurnOn50, hRelIsoLoose_TurnOn50_1pr, hRelIsoLoose_TurnOn50_3pr, hRelIsoLoose_TurnOn50_withNeutrals, hRelIsoLoose_TurnOn50_noNeutrals);
-    FillTurnOn_Numerator_(L1TkEGTaus_RelIsoTight , 50.0, hVtxIsoTight_TurnOn50, hVtxIsoTight_TurnOn50_1pr, hVtxIsoTight_TurnOn50_3pr, hVtxIsoTight_TurnOn50_withNeutrals, hVtxIsoTight_TurnOn50_noNeutrals); 
-    FillTurnOn_Numerator_(L1TkEGTaus_VtxIsoTight , 50.0, hRelIsoTight_TurnOn50, hRelIsoTight_TurnOn50_1pr, hRelIsoTight_TurnOn50_3pr, hRelIsoTight_TurnOn50_withNeutrals, hRelIsoTight_TurnOn50_noNeutrals);
+    FillTurnOn_Numerator_(L1TkEGTaus_VtxIso , 50.0, hVtxIso_TurnOn50, hVtxIso_TurnOn50_1pr, hVtxIso_TurnOn50_3pr, hVtxIso_TurnOn50_withNeutrals, hVtxIso_TurnOn50_noNeutrals); 
+    FillTurnOn_Numerator_(L1TkEGTaus_RelIso , 50.0, hRelIso_TurnOn50, hRelIso_TurnOn50_1pr, hRelIso_TurnOn50_3pr, hRelIso_TurnOn50_withNeutrals, hRelIso_TurnOn50_noNeutrals);
+    FillTurnOn_Numerator_(L1TkEGTaus_VtxIsoLoose , 50.0, hVtxIsoLoose_TurnOn50, hVtxIsoLoose_TurnOn50_1pr, hVtxIsoLoose_TurnOn50_3pr, hVtxIsoLoose_TurnOn50_withNeutrals, hVtxIsoLoose_TurnOn50_noNeutrals); 
+    FillTurnOn_Numerator_(L1TkEGTaus_RelIsoLoose , 50.0, hRelIsoLoose_TurnOn50, hRelIsoLoose_TurnOn50_1pr, hRelIsoLoose_TurnOn50_3pr, hRelIsoLoose_TurnOn50_withNeutrals, hRelIsoLoose_TurnOn50_noNeutrals);
+    FillTurnOn_Numerator_(L1TkEGTaus_VtxIsoTight , 50.0, hVtxIsoTight_TurnOn50, hVtxIsoTight_TurnOn50_1pr, hVtxIsoTight_TurnOn50_3pr, hVtxIsoTight_TurnOn50_withNeutrals, hVtxIsoTight_TurnOn50_noNeutrals); 
+    FillTurnOn_Numerator_(L1TkEGTaus_RelIsoTight , 50.0, hRelIsoTight_TurnOn50, hRelIsoTight_TurnOn50_1pr, hRelIsoTight_TurnOn50_3pr, hRelIsoTight_TurnOn50_withNeutrals, hRelIsoTight_TurnOn50_noNeutrals);
+
+    // Turn-ons for the best performing WP
+    FillTurnOn_Numerator_(L1TkEGTaus_VtxIsoTight , 25.0, hL1TkEGTaus_TurnOn25, hL1TkEGTaus_TurnOn25_1pr, hL1TkEGTaus_TurnOn25_3pr, hL1TkEGTaus_TurnOn25_withNeutrals, hL1TkEGTaus_TurnOn25_noNeutrals); 
+    FillTurnOn_Numerator_(L1TkEGTaus_VtxIsoTight , 50.0, hL1TkEGTaus_TurnOn50, hL1TkEGTaus_TurnOn50_1pr, hL1TkEGTaus_TurnOn50_3pr, hL1TkEGTaus_TurnOn50_withNeutrals, hL1TkEGTaus_TurnOn50_noNeutrals); 
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Rates and efficiencies for single tau
@@ -1907,6 +1912,19 @@ void TkEG::Loop()
   histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
   histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn50_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
 
+  // Turn-ons for the best performing WP
+  histoTools_.DivideHistos_1D(hL1TkEGTaus_TurnOn25, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hL1TkEGTaus_TurnOn25_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hL1TkEGTaus_TurnOn25_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hL1TkEGTaus_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hL1TkEGTaus_TurnOn25_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
+
+  histoTools_.DivideHistos_1D(hL1TkEGTaus_TurnOn50, hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hL1TkEGTaus_TurnOn50_1pr, hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hL1TkEGTaus_TurnOn50_3pr, hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hL1TkEGTaus_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hL1TkEGTaus_TurnOn50_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
+  
 
     // SingleTau
   double N = nEntries;
@@ -2885,7 +2903,7 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(hRelIso_TurnOn25_withNeutrals, "RelIso_TurnOn25_withNeutrals" , "", 60 , minEt , maxEt );
   histoTools_.BookHisto_1D(hRelIso_TurnOn25_noNeutrals, "RelIso_TurnOn25_noNeutrals" , "", 60 , minEt , maxEt );
 
-    histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn25, "VtxIsoLoose_TurnOn25", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn25, "VtxIsoLoose_TurnOn25", "", 60 , minEt , maxEt );
   histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn25_1pr, "VtxIsoLoose_TurnOn25_1pr" , "", 60 , minEt , maxEt );
   histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn25_3pr, "VtxIsoLoose_TurnOn25_3pr" , "", 60 , minEt , maxEt );
   histoTools_.BookHisto_1D(hVtxIsoLoose_TurnOn25_withNeutrals, "VtxIsoLoose_TurnOn25_withNeutrals" , "", 60 , minEt , maxEt );
@@ -2951,6 +2969,20 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(hRelIsoTight_TurnOn50_3pr, "RelIsoTight_TurnOn50_3pr" , "", 60 , minEt , maxEt );
   histoTools_.BookHisto_1D(hRelIsoTight_TurnOn50_withNeutrals, "RelIsoTight_TurnOn50_withNeutrals" , "", 60 , minEt , maxEt );
   histoTools_.BookHisto_1D(hRelIsoTight_TurnOn50_noNeutrals, "RelIsoTight_TurnOn50_noNeutrals" , "", 60 , minEt , maxEt );
+
+  // Turn-ons for the best performing WP
+  histoTools_.BookHisto_1D(hL1TkEGTaus_TurnOn25, "L1TkEGTaus_TurnOn25", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1TkEGTaus_TurnOn25_1pr, "L1TkEGTaus_TurnOn25_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1TkEGTaus_TurnOn25_3pr, "L1TkEGTaus_TurnOn25_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1TkEGTaus_TurnOn25_withNeutrals, "L1TkEGTaus_TurnOn25_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1TkEGTaus_TurnOn25_noNeutrals, "L1TkEGTaus_TurnOn25_noNeutrals" , "", 60 , minEt , maxEt );
+
+  histoTools_.BookHisto_1D(hL1TkEGTaus_TurnOn50, "L1TkEGTaus_TurnOn50", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1TkEGTaus_TurnOn50_1pr, "L1TkEGTaus_TurnOn50_1pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1TkEGTaus_TurnOn50_3pr, "L1TkEGTaus_TurnOn50_3pr" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1TkEGTaus_TurnOn50_withNeutrals, "L1TkEGTaus_TurnOn50_withNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1TkEGTaus_TurnOn50_noNeutrals, "L1TkEGTaus_TurnOn50_noNeutrals" , "", 60 , minEt , maxEt );
+
 
   // Single tau rates
   histoTools_.BookHisto_1D(hTkEG_Rate      , "TkEG_Rate"      , "", nEt , minEt , maxEt );
@@ -3577,6 +3609,19 @@ void TkEG::WriteHistos_(void)
   hRelIsoTight_TurnOn50_3pr->Write();
   hRelIsoTight_TurnOn50_withNeutrals->Write();
   hRelIsoTight_TurnOn50_noNeutrals->Write();
+
+  // Turn-ons for the best performing WP
+  hL1TkEGTaus_TurnOn25->Write();
+  hL1TkEGTaus_TurnOn25_1pr->Write();
+  hL1TkEGTaus_TurnOn25_3pr->Write();
+  hL1TkEGTaus_TurnOn25_withNeutrals->Write();
+  hL1TkEGTaus_TurnOn25_noNeutrals->Write();
+
+  hL1TkEGTaus_TurnOn50->Write();
+  hL1TkEGTaus_TurnOn50_1pr->Write();
+  hL1TkEGTaus_TurnOn50_3pr->Write();
+  hL1TkEGTaus_TurnOn50_withNeutrals->Write();
+  hL1TkEGTaus_TurnOn50_noNeutrals->Write();
 
   // SingleTau: Efficiencies
   hTkEG_Rate->Write();

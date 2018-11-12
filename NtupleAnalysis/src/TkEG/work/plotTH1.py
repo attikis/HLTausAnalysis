@@ -317,7 +317,7 @@ def GetHistoKwargs(h, opts):
     if "chargeddaugh_totalmass" in h.lower():
         kwargs["log"]  = True
         kwargs["opts"] = {"xmin": 0.0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
-        kwargs["cutBox"] = {"cutValue": 1.4, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if "neutraldaugh_totalmass" in h.lower():
         kwargs["log"]  = True
@@ -369,10 +369,10 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.5, "ymin": 0.0001, "ymaxfactor": _yMaxF}
         
     if "isotracks_n" in h.lower() or "isotracks_multiplicity" in h.lower():
-        kwargs["opts"]   = {"xmin": 0, "xmax": 10.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": -0.5, "xmax": 5.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
         
     if "signalegs_multiplicity" in h.lower() or "isoegs_multiplicity" in h.lower():
-        kwargs["opts"]   = {"xmin": 0, "xmax": 10.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": -0.5, "xmax": 5.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
         
     if "tkeg_reliso" in h.lower() or "badetresolcand_reliso" in h.lower():
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 1.2, "ymin": 0.001, "ymaxfactor": _yMaxF}
@@ -383,6 +383,12 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 4.0, "ymin": 0.0001, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["log"]  = True
+
+    if  "TkEG_PoorNeuResol_Pi0_ET" == h or "TkEG_PoorNeuResol_Pi0_closestEG_ET" == h :
+        kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+
+    if "TkEG_PoorNeuResol_dRmin_Pi0_EG" == h:
+        kwargs["opts"]   = {"xmin": 0, "xmax": 3.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "EGClusters_M" == h:
         kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": _yMin, "ymaxfactor": _yMaxF}

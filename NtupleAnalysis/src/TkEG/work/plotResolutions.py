@@ -200,6 +200,8 @@ def main(opts):
             ["TkEG_EtResolution_noEGs", "TkEG_EtResolution_1pr_noEGs", "TkEG_EtResolution_3pr_noEGs", "TkEG_EtResolution_withNeutrals_noEGs", "TkEG_EtResolution_noNeutrals_noEGs"],
             ["TkEG_EtResolution_withNeutrals", "TkEG_EtResolution_withNeutrals_1pr", "TkEG_EtResolution_withNeutrals_3pr"],
 
+            ["TkEG_EtResolution_withNeutrals", "TkEG_EtResolution_withNeutrals_1pion0", "TkEG_EtResolution_withNeutrals_2pion0", "TkEG_EtResolution_withNeutrals_3pion0"],#,"TkEG_EtResolution_withNeutrals_4pion0"],
+
             ["TkEG_EtResolution_withNeutrals_withEGs", "TkEG_EtResolution_withNeutrals_withEGs_0to10GeV", "TkEG_EtResolution_withNeutrals_withEGs_10to20GeV", "TkEG_EtResolution_withNeutrals_withEGs_20to30GeV", "TkEG_EtResolution_withNeutrals_withEGs_30to40GeV", "TkEG_EtResolution_withNeutrals_withEGs_40to50GeV"]
             ]
                        
@@ -252,7 +254,9 @@ def main(opts):
             PlotHistos(datasetsMgr, resList[29] , s, PU, "ResolutionEt_%s_all_withEGs" % (s) )
             PlotHistos(datasetsMgr, resList[30] , s, PU, "ResolutionEt_%s_all_noEGs" % (s) )
             PlotHistos(datasetsMgr, resList[31] , s, PU, "ResolutionEt_%s_withNeutrals" % (s) )
-            PlotHistos(datasetsMgr, resList[32] , s, PU, "ResolutionEt_%s_withNeutrals_withEGs_etSteps" % (s) )
+            PlotHistos(datasetsMgr, resList[32] , s, PU, "ResolutionEt_%s_withNeutrals_Npion0" % (s) )
+
+            PlotHistos(datasetsMgr, resList[33] , s, PU, "ResolutionEt_%s_withNeutrals_withEGs_etSteps" % (s) )
 
         print
 
@@ -276,6 +280,8 @@ def PlotHistos(datasetsMgr, histoList, signal, PU, saveName=None):
         algos = ["Inclusive", "|#eta| < 0.8 (C)", "0.8 < |#eta| < 1.6 (I)", "|#eta| > 1.6 (F)"]
     if "_withNeutrals" in saveName:
         algos = ["#geq 1 #pi^{0}'s", "#geq 1 #pi^{0}'s (1-prong)", "#geq 1 #pi^{0}'s (3-prong)"]        
+        if "Npion0" in saveName:
+            algos = ["#geq 1 #pi^{0}'s", "1 #pi^{0}", "2 #pi^{0}'s", "3 #pi^{0}'s"]#, "4 #pi^{0}'s"]
     if "etSteps" in saveName:
             algos = ["#geq 1 #pi^{0}'s", "0 #leq E_{T} < 10", "10 #leq E_{T} < 20", "20 #leq E_{T} < 30", "30 #leq E_{T} < 40", "40 #leq E_{T} < 50"]
 
@@ -411,6 +417,8 @@ def GetHistoKwargs(h, opts):
         _kwargs["moveLegend"] = _mvLeg3
     if "withneutrals" in h.lower():
         _kwargs["moveLegend"] = _mvLeg4
+        if "npion0" in h.lower():
+            _kwargs["moveLegend"] = _mvLeg2
     if "etsteps" in h.lower():
         _kwargs["moveLegend"] = _mvLeg5
    

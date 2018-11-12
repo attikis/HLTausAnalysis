@@ -715,6 +715,19 @@ class TkEG : public TreeAnalyserMC{
   TH1D* hRelIsoTight_TurnOn50_3pr;
   TH1D* hRelIsoTight_TurnOn50_withNeutrals;
   TH1D* hRelIsoTight_TurnOn50_noNeutrals;
+
+  // Turn-ons for the best performing WP
+  TH1D* hL1TkEGTaus_TurnOn25;
+  TH1D* hL1TkEGTaus_TurnOn25_1pr;
+  TH1D* hL1TkEGTaus_TurnOn25_3pr;
+  TH1D* hL1TkEGTaus_TurnOn25_withNeutrals;
+  TH1D* hL1TkEGTaus_TurnOn25_noNeutrals;
+
+  TH1D* hL1TkEGTaus_TurnOn50;
+  TH1D* hL1TkEGTaus_TurnOn50_1pr;
+  TH1D* hL1TkEGTaus_TurnOn50_3pr;
+  TH1D* hL1TkEGTaus_TurnOn50_withNeutrals;
+  TH1D* hL1TkEGTaus_TurnOn50_noNeutrals;
   
   // SingleTau: Rates
   TH1D* hTkEG_Rate;
