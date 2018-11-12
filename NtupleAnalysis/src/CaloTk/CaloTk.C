@@ -1128,8 +1128,8 @@ void CaloTk::Loop()
     
 
     // Turn-ons for the best performing WP
-    FillTurnOn_Numerator_(L1Taus_VtxIsoTight , 25.0, hL1CaloTkTaus_TurnOn25, hL1CaloTkTaus_TurnOn25_1pr, hL1CaloTkTaus_TurnOn25_3pr, hL1CaloTkTaus_TurnOn25_withNeutrals, hL1CaloTkTaus_TurnOn25_noNeutrals); 
-    FillTurnOn_Numerator_(L1Taus_VtxIsoTight , 50.0, hL1CaloTkTaus_TurnOn50, hL1CaloTkTaus_TurnOn50_1pr, hL1CaloTkTaus_TurnOn50_3pr, hL1CaloTkTaus_TurnOn50_withNeutrals, hL1CaloTkTaus_TurnOn50_noNeutrals); 
+    FillTurnOn_Numerator_(L1Taus_RelIsoTight , 25.0, hL1CaloTkTaus_TurnOn25, hL1CaloTkTaus_TurnOn25_1pr, hL1CaloTkTaus_TurnOn25_3pr, hL1CaloTkTaus_TurnOn25_withNeutrals, hL1CaloTkTaus_TurnOn25_noNeutrals); 
+    FillTurnOn_Numerator_(L1Taus_RelIsoTight , 50.0, hL1CaloTkTaus_TurnOn50, hL1CaloTkTaus_TurnOn50_1pr, hL1CaloTkTaus_TurnOn50_3pr, hL1CaloTkTaus_TurnOn50_withNeutrals, hL1CaloTkTaus_TurnOn50_noNeutrals); 
 
 
     ////////////////////////////////////////////////
