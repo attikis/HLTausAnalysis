@@ -571,7 +571,7 @@ void TkTaus::Loop()
 	double vtxIso = L1TkTauCandidate.CalculateVtxIso(true, isoCone_useCone);
 
 	// Get the matching gen-particle
-	GetMatchingGenParticle(L1TkTauCandidate, GenTausTrigger); // GenTausHadronic ?
+	GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic); // GenTausTrigger ?
 	if ( L1TkTauCandidate.HasMatchingGenParticle() ) bFoundMC = true;
 	      
 	// Print information on L1TkTauCandidate ??
@@ -593,17 +593,9 @@ void TkTaus::Loop()
 	  {
 	    
 	    bool bIsLdgTrack = true;
-	    vector<TTTrack> myTks;
-	    vector<TTTrack> sigTks = L1TkTau->GetSigConeTTTracks();
-	    vector<TTTrack> isoTks;
-	    if (isoCone_useCone) L1TkTau->GetIsoConeTTTracks(); 
-	    else L1TkTau->GetIsoAnnulusTTTracks();
-
-	    myTks.insert(myTks.end(), sigTks.begin(), sigTks.end());
-	    myTks.insert(myTks.end(), isoTks.begin(), isoTks.end());
 
 	    // For-loop: All signal tracks (inside isolation and signal cones)
-	    for (vector<TTTrack>::iterator tk = myTks.begin(); tk != myTks.end(); tk++)
+	    for (vector<TTTrack>::iterator tk = seedTTTracks.begin(); tk != seedTTTracks.end(); tk++)
 	      {
 		double eta_seed = L1TkTau->GetMatchingTk().getEta(); // matchingTk = seeTk
 		double phi_seed = L1TkTau->GetMatchingTk().getPhi();
