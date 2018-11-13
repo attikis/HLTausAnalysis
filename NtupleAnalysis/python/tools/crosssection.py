@@ -708,7 +708,7 @@ def setBackgroundCrossSectionForDataset(dataset, doWNJetsWeighting=True, quietMo
 ########################################
 # Signal cross section table
 
-import HLTausAnalysis.LimitCalc.BRdataInterface as br
+#import HLTausAnalysis.LimitCalc.BRdataInterface as br
 
 # Default value of MSSM mu parameter
 defaultMu = 200

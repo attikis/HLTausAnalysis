@@ -25,6 +25,7 @@
 
 // ROOT
 //#include "TEfficiency.h"
+#include "TProfile.h"
 #include "Math/GenVector/VectorUtil.h"
 #include "Math/Vector3D.h"
 #include "Math/Point3D.h"
@@ -154,6 +155,25 @@ class CaloTau : public TreeAnalyserMC{
   // GenParticles Histograms
   TH2D* hGenP_VisEt_Vs_dRMaxLdgPion;
   TH2D* hGenP_PtLdg_Vs_dRMaxLdgPion;
+
+  // Calibrations
+  TH2D* hCaloEta_Vs_CaloEtOverVisEt;
+  TH2D* hCaloEta_Vs_CaloEtOverVisEt_Pt20to40;
+  TH2D* hCaloEta_Vs_CaloEtOverVisEt_Pt40to60;
+  TH2D* hCaloEta_Vs_CaloEtOverVisEt_Pt60to80;
+  TH2D* hCaloEta_Vs_CaloEtOverVisEt_Pt80to100;
+  TH2D* hCaloEta_Vs_CaloEtOverVisEt_Pt100to150;
+  TH2D* hCaloEta_Vs_CaloEtOverVisEt_Pt150to200;
+  TH2D* hCaloEta_Vs_CaloEtOverVisEt_PtGE200;
+  //
+  TProfile* pCaloEta_Vs_CaloEtOverVisEt;
+  TProfile* pCaloEta_Vs_CaloEtOverVisEt_Pt20to40;
+  TProfile* pCaloEta_Vs_CaloEtOverVisEt_Pt40to60;
+  TProfile* pCaloEta_Vs_CaloEtOverVisEt_Pt60to80;
+  TProfile* pCaloEta_Vs_CaloEtOverVisEt_Pt80to100;
+  TProfile* pCaloEta_Vs_CaloEtOverVisEt_Pt100to150;
+  TProfile* pCaloEta_Vs_CaloEtOverVisEt_Pt150to200;
+  TProfile* pCaloEta_Vs_CaloEtOverVisEt_PtGE200;
 
   // Counters
   TH1D* hCounters;

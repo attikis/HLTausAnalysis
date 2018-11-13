@@ -391,6 +391,9 @@ tauStyle8   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kPink+
 tauStyle9   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kAzure-6, markerSizes=None, markerStyle=ROOT.kFullSquare),
                               StyleLine(lineColor=ROOT.kAzure-6, lineStyle=ROOT.kSolid, lineWidth=4), 
                               StyleFill(fillColor=ROOT.kAzure-6, fillStyle=0)])
+tauStyle10   = StyleCompound([StyleMarker(markerSize=1.0, markerColor=ROOT.kCyan-6, markerSizes=None, markerStyle=ROOT.kFullSquare),
+                              StyleLine(lineColor=ROOT.kCyan-6, lineStyle=ROOT.kSolid, lineWidth=4), 
+                              StyleFill(fillColor=ROOT.kCyan-6, fillStyle=0)])
 
 caloTkStyle  = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullCircle),
                               StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=4), 
@@ -542,8 +545,8 @@ def getTauAlgoStyle(algo):
     if algo == "Calo"or algo == "TkEG":
         return getCaloStyle(0)
     elif algo == "CaloIso":
-        return getCaloStyle(8)
-    elif algo == "Tk": 
+        return getCaloStyle(9)
+    elif algo == "Tk":
         return getCaloStyle(1)
     elif algo == "VtxIso":
         return getCaloStyle(2)
@@ -579,6 +582,8 @@ def getCaloStyle(i):
         return tauStyle8
     elif i==8:
         return tauStyle9
+    elif i==9:
+        return tauStyle10
     else:
         styles[index]
 
