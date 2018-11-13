@@ -122,7 +122,8 @@ class L1TkTauParticle{
 		       bool bPrintMatchTk=false,
 		       bool bPrintSigConeTks=false,
 		       bool bPrintIsoConeTks=false,
-		       bool bPrintMatchGenParticle=false);
+		       bool bPrintMatchGenParticle=false,
+		       bool bPrintHeaders=false);
   
   // Variable declaration
   int caloTau_Index_;

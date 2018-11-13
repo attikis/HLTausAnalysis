@@ -592,9 +592,10 @@ void TkTaus::Loop()
 	if (L1TkTau->HasMatchingTk() )
 	  {
 	    
+	    // Variable declaration
 	    bool bIsLdgTrack = true;
 
-	    // For-loop: All signal tracks (inside isolation and signal cones)
+	    // For-loop: All seed tracks
 	    for (vector<TTTrack>::iterator tk = seedTTTracks.begin(); tk != seedTTTracks.end(); tk++)
 	      {
 		double eta_seed = L1TkTau->GetMatchingTk().getEta(); // matchingTk = seeTk
@@ -614,9 +615,7 @@ void TkTaus::Loop()
 		double dR = auxTools_.DeltaR(eta_seed, phi_seed, eta_tk, phi_tk);
 
 		// Consider only tracks within enitre jet definition
-		if (dR > L1TkTau->GetIsoConeMax()) continue; //redundant but keep for safety
-		// if (dR > L1TkTau->GetSigConeMax()) continue;
-		// std::cout << "FIXME! Ptochos says this should be smaller than the isolation cone edge. e.g. dR < 0,15" << std::endl; //fixme!
+		if (dR > L1TkTau->GetIsoConeMax()) continue; // fixme! Ptochos says this should be smaller than the isolation cone edge. e.g. dR < 0,15
 
 		// Compare pT of seed track with all tracks within dR = 0 (NEW)
 		if (deltaPt < 0) 
@@ -2680,8 +2679,8 @@ void TkTaus::FillTurnOn_Numerator_(vector<L1TkTauParticle> L1TkTaus,
       if (!L1TkTau->HasMatchingGenParticle()) continue;	 
       
       // Skip if trigger object has eT < minEt
-      TLorentzVector sigTks2_p4 = L1TkTau->GetSigConeTTTracksP4();
-      double tkTau_et = sigTks2_p4.Et();
+      TLorentzVector sigTks_p4 = L1TkTau->GetSigConeTTTracksP4();
+      double tkTau_et = sigTks_p4.Et();
       if ( tkTau_et < minEt) continue;
       
       // Get MC-match

@@ -474,6 +474,7 @@ void CaloTk::Loop()
     vector<L1TkTauParticle> L1Taus_Tk;
     vector<L1TkTauParticle> L1Taus_VtxIso;    
     vector<L1TkTauParticle> L1Taus_RelIso;
+    vector<L1TkTauParticle> L1Taus_BestWP;
     vector<L1TkTauParticle> L1Taus_VtxIsoLoose;
     vector<L1TkTauParticle> L1Taus_VtxIsoTight;
     vector<L1TkTauParticle> L1Taus_RelIsoLoose;
@@ -599,7 +600,7 @@ void CaloTk::Loop()
 	double vtxIso = L1TkTauCandidate.CalculateVtxIso(true, isoCone_useCone);
 
 	// Get the matching gen-particle
-	GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic); // GenTausTrigger ?
+	GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic); // was: GenTausTrigger
 	if ( L1TkTauCandidate.HasMatchingGenParticle() ) bFoundMC = true;
 
 	if (DEBUG) L1TkTauCandidate.PrintProperties(false, false, true, true);
@@ -623,23 +624,13 @@ void CaloTk::Loop()
 	// +Tk
 	if (!tau->HasMatchingTk() ) continue;
 	
-	// std::cout << iCand << ") Et = " << tau->GetCaloTau().et() << std::endl;
-
+	// Variable declaration	
 	bool bIsLdgTrack = true;
-	// vector<TTTrack> myTks;
-	// vector<TTTrack> sigTks = tau->GetSigConeTTTracks();
-	// vector<TTTrack> isoTks;
-	// if (isoCone_useCone) tau->GetIsoConeTTTracks(); 
-	// else tau->GetIsoAnnulusTTTracks();
-	
-	// myTks.insert(myTks.end(), sigTks.begin(), sigTks.end());
-	// myTks.insert(myTks.end(), isoTks.begin(), isoTks.end());
-	
-	// For-loop: All signal tracks (inside isolation and signal cones)
-	// for (vector<TTTrack>::iterator tk = myTks.begin(); tk != myTks.end(); tk++)
+
+	// For-loop: All seed tracks (inside isolation and signal cones)
 	for (vector<TTTrack>::iterator tk = seedTTTracks.begin(); tk != seedTTTracks.end(); tk++)
 	{
-	    double eta_seed = tau->GetMatchingTk().getEta(); // matchingTk = seeTk
+	    double eta_seed = tau->GetMatchingTk().getEta(); // matchingTk = seedTk
 	    double phi_seed = tau->GetMatchingTk().getPhi();
 	    double eta_tk   = tk->getEta();
 	    double phi_tk   = tk->getPhi();
@@ -656,7 +647,7 @@ void CaloTk::Loop()
 	    double dR = auxTools_.DeltaR(eta_seed, phi_seed, eta_tk, phi_tk);
 	    
 	    // Consider only tracks within enitre jet definition
-	    if (dR > tau->GetIsoConeMax()) continue;
+	    if (dR > tau->GetIsoConeMax()) continue;  // fixme! use a smaller cone instead of isoCone?
 	    
 	    // Compare pT of seed track with all tracks within dR = 0 (NEW)
 	    if (deltaPt < 0) 
@@ -668,7 +659,7 @@ void CaloTk::Loop()
 	  }
 	
 	// No higher pT track within the entire jet (signal & isolation cone)
-	if (!bIsLdgTrack) continue; // fixme: does this make sense?
+	if (!bIsLdgTrack) continue;
 	
 	// Save the tau candidates
 	L1Taus_Tk.push_back(*tau);
@@ -691,12 +682,12 @@ void CaloTk::Loop()
 	if (bPassVtxIso) L1Taus_VtxIso.push_back(*tau);
 	if (bPassRelIso) L1Taus_RelIso.push_back(*tau);
 	if (bPassVtxIsoLoose) L1Taus_VtxIsoLoose.push_back(*tau);
-	if (bPassVtxIsoTight*bPassJetWidth) L1Taus_VtxIsoTight.push_back(*tau); // fixme: testing
+	if (bPassVtxIsoTight) L1Taus_VtxIsoTight.push_back(*tau);
 	if (bPassRelIsoLoose) L1Taus_RelIsoLoose.push_back(*tau);
 	if (bPassRelIsoTight) L1Taus_RelIsoTight.push_back(*tau);
 
       }// L1Taus_Calo
-    
+      
     // Counters
     if (L1Taus_VtxIso.size() > 0) nEvtsVtxIso++;
     if (L1Taus_RelIso.size() > 0) nEvtsRelIso++;
@@ -704,7 +695,7 @@ void CaloTk::Loop()
     if (L1Taus_VtxIsoTight.size() > 0) nEvtsVtxIsoTight++;
     if (L1Taus_RelIsoLoose.size() > 0) nEvtsRelIsoLoose++;
     if (L1Taus_RelIsoTight.size() > 0) nEvtsRelIsoTight++;
-
+  
     if (DEBUG)
       {
 	PrintL1TkTauParticleCollection(L1Taus_Tk);
@@ -876,9 +867,11 @@ void CaloTk::Loop()
     hL1IsoTau_Multiplicity ->Fill( myL1TkIsoTaus.size() );
 
     // For-loop: All isolated tau candidates
+    int count = -1;
     for (vector<L1TkTauParticle>::iterator tau = myL1TkIsoTaus.begin(); tau != myL1TkIsoTaus.end(); tau++)
       {
-	
+	count++;
+
 	if (DEBUG) tau->PrintProperties(true, true, true, true);
 
 	// Variables
@@ -1128,12 +1121,7 @@ void CaloTk::Loop()
     FillTurnOn_Numerator_(L1Taus_RelIsoLoose , 50.0, hRelIsoLoose_TurnOn50, hRelIsoLoose_TurnOn50_1pr, hRelIsoLoose_TurnOn50_3pr, hRelIsoLoose_TurnOn50_withNeutrals, hRelIsoLoose_TurnOn50_noNeutrals);
     FillTurnOn_Numerator_(L1Taus_RelIsoTight , 50.0, hRelIsoTight_TurnOn50, hRelIsoTight_TurnOn50_1pr, hRelIsoTight_TurnOn50_3pr, hRelIsoTight_TurnOn50_withNeutrals, hRelIsoTight_TurnOn50_noNeutrals);
     
-
-    // Turn-ons for the best performing WP
-    FillTurnOn_Numerator_(L1Taus_RelIsoTight , 25.0, hL1CaloTkTaus_TurnOn25, hL1CaloTkTaus_TurnOn25_1pr, hL1CaloTkTaus_TurnOn25_3pr, hL1CaloTkTaus_TurnOn25_withNeutrals, hL1CaloTkTaus_TurnOn25_noNeutrals); 
-    FillTurnOn_Numerator_(L1Taus_RelIsoTight , 50.0, hL1CaloTkTaus_TurnOn50, hL1CaloTkTaus_TurnOn50_1pr, hL1CaloTkTaus_TurnOn50_3pr, hL1CaloTkTaus_TurnOn50_withNeutrals, hL1CaloTkTaus_TurnOn50_noNeutrals); 
-
-
+  
     ////////////////////////////////////////////////
     // SingleTau
     ////////////////////////////////////////////////
@@ -1245,17 +1233,14 @@ void CaloTk::Loop()
     FillDiTau_(L1Taus_RelIsoTight, hDiTau_Rate_RelIsoTight_I, hDiTau_Eff_RelIsoTight_I, 1.0, 1.6);
     FillDiTau_(L1Taus_RelIsoTight, hDiTau_Rate_RelIsoTight_F, hDiTau_Eff_RelIsoTight_F, 1.6, 3.0);
 
-
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Rates and efficiencies for the best performing WP
+    // Best Performing WP
     ////////////////////////////////////////////////////////////////////////////////////////////////    
-
-    // Single-Tau 
-    FillSingleTau_(L1Taus_RelIsoTight, hL1CaloTkTaus_SingleTau_Rate  , hL1CaloTkTaus_SingleTau_Eff);
-    
-    // Di-Tau
-    FillDiTau_(L1Taus_RelIsoTight, hL1CaloTkTaus_DiTau_Rate  , hL1CaloTkTaus_DiTau_Eff);
+    L1Taus_BestWP = L1Taus_RelIsoTight;
+    FillTurnOn_Numerator_(L1Taus_BestWP, 25.0, hL1CaloTkTaus_TurnOn25, hL1CaloTkTaus_TurnOn25_1pr, hL1CaloTkTaus_TurnOn25_3pr, hL1CaloTkTaus_TurnOn25_withNeutrals, hL1CaloTkTaus_TurnOn25_noNeutrals); 
+    FillTurnOn_Numerator_(L1Taus_BestWP, 50.0, hL1CaloTkTaus_TurnOn50, hL1CaloTkTaus_TurnOn50_1pr, hL1CaloTkTaus_TurnOn50_3pr, hL1CaloTkTaus_TurnOn50_withNeutrals, hL1CaloTkTaus_TurnOn50_noNeutrals); 
+    FillSingleTau_(L1Taus_BestWP, hL1CaloTkTaus_SingleTau_Rate, hL1CaloTkTaus_SingleTau_Eff);
+    FillDiTau_(L1Taus_BestWP, hL1CaloTkTaus_DiTau_Rate, hL1CaloTkTaus_DiTau_Eff);
 
 
     // Progress bar
@@ -2844,7 +2829,6 @@ void CaloTk::FillDiTau_(vector<L1TkTauParticle> L1Taus,
 
   // Fill efficiency
   if (0) std::cout << "5) iSubldgMC = " << iSubldgMC << ", L1Taus_mcMatched.size() = " << L1Taus_mcMatched.size() << std::endl;
-  // TLorentzVector sigTks_p4_mc = L1Taus_mcMatched.at(iSubldgMC).GetSigConeTTTracksP4(); // fixme
   double subLdgEt_mcMatched  = L1Taus_mcMatched.at(iSubldg).GetCaloTau().et();
   FillEfficiency_(hEfficiency, subLdgEt_mcMatched);
 
@@ -2997,7 +2981,6 @@ void CaloTk::FillTurnOn_Numerator_(vector<L1TkTauParticle> L1Taus,
       if (!L1TkTau->HasMatchingGenParticle()) continue;	 
       
       // Skip if trigger object has eT < minEt
-      // TLorentzVector sigTks2_p4 = L1TkTau->GetSigConeTTTracksP4();
       double tkTau_et = L1TkTau->GetCaloTau().et();
       if ( tkTau_et < minEt) continue;
       
@@ -3005,6 +2988,8 @@ void CaloTk::FillTurnOn_Numerator_(vector<L1TkTauParticle> L1Taus,
       GenParticle p = L1TkTau->GetMatchingGenParticle();
       
       // Fill the turn-on
+      if (0) L1TkTau->PrintProperties(false, false, true, false, false, false);
+
       hTurnOn->Fill( p.p4vis().Et() );
 
 	
@@ -3081,7 +3066,8 @@ void CaloTk::GetSigConeTracks(L1TkTauParticle &L1TkTau,
   L1TkTau.SetSigConeTracks(sigConeTks);
 
   // Print properties
-  if (0) L1TkTau.PrintProperties(false, false, true, false);
+  if (0) L1TkTau.PrintProperties(false, false, true, false, false, true);
+
   
   return;
 }
@@ -3263,7 +3249,7 @@ void CaloTk::GetShrinkingConeSizes(double caloEt,
 
   double signalCone_min = (sigCone_Constant)/(caloEt);
   double signalCone_max = (isoCone_Constant)/(caloEt);
-  if (signalCone_max > sigCone_dRCutoff) signalCone_max = sigCone_dRCutoff; // fixme
+  if (signalCone_max > sigCone_dRCutoff) signalCone_max = sigCone_dRCutoff;
   else{}
   double isoCone_min    = signalCone_max;
   double isoCone_max    = (isoCone_dRMax/1.0);
@@ -3392,7 +3378,7 @@ void CaloTk::GetMatchingGenParticle(L1TkTauParticle &L1TkTau,
       if (0) tau->PrintFinalDaughtersCharged();
 
       TLorentzVector p4charged = tau->p4charged(false);
-      double deltaR = auxTools_.DeltaR( p4charged.Eta(), p4charged.Phi(), matchTk.getEta(), matchTk.getPhi() ); //fixme: why not the signalTks p4?
+      double deltaR = auxTools_.DeltaR( p4charged.Eta(), p4charged.Phi(), matchTk.getEta(), matchTk.getPhi() );
       if (deltaR > mcMatching_dRMax) continue;
       if (deltaR < match_dR)
 	{

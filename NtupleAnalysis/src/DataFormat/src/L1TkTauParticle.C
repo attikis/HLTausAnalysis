@@ -303,7 +303,8 @@ void L1TkTauParticle::PrintProperties(bool bPrintCaloTau,
 				      bool bPrintMatchTk,
 				      bool bPrintSigConeTks,
 				      bool bPrintIsoConeTks,
-				      bool bPrintMatchGenParticle)
+				      bool bPrintMatchGenParticle,
+				      bool bPrintHeaders)
 //****************************************************************************
 {
   
@@ -329,7 +330,7 @@ void L1TkTauParticle::PrintProperties(bool bPrintCaloTau,
   info.AddRowColumn(0, auxTools.ToString( relIso_cone, 3) );
   info.AddRowColumn(0, auxTools.ToString( relIso_annulus, 3) ); 
   info.AddRowColumn(0, auxTools.ToString( GetRelIsolation(), 3) ); 
-  info.Print();
+  info.Print(bPrintHeaders);
   
   if (bPrintCaloTau) GetCaloTau().PrintProperties();
   if (bPrintMatchTk && HasMatchingTk()) GetMatchingTk().PrintProperties();

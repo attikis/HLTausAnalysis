@@ -118,16 +118,12 @@ def PlotHisto(dsetsMgr, h, histoType):
     p._setLegendLabels()
     p._setPlotStyles()
 
-    # 
-    if "pCalo" in h:
-        h = getHisto(datasetsMgr, histoName)
-        print "=== h.GetName() = ", h.GetName()
-
     # Customise legend
     for d in dsetsMgr.getAllDatasetNames():
         if "TH2" not in histoType:
-            p.histoMgr.setHistoLegendStyle(d, "LP")
-            p.histoMgr.setHistoDrawStyle(d, "AP")
+            if "pCalo" in h:
+                p.histoMgr.setHistoLegendStyle(d, "LP")
+                p.histoMgr.setHistoDrawStyle(d, "AP")
 
     # Draw a customised plot
     kwargs = GetHistoKwargs(h, opts) 
