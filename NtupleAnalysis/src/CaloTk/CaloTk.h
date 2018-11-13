@@ -455,6 +455,8 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hRelIsoTight_Rate_C;
   TH1D* hRelIsoTight_Rate_I;
   TH1D* hRelIsoTight_Rate_F;
+  
+  TH1D* hL1CaloTkTaus_SingleTau_Rate;
 
   // SingleTau: Efficiencies
   TH1D* hCalo_Eff;
@@ -490,6 +492,8 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hRelIsoTight_Eff_I;
   TH1D* hRelIsoTight_Eff_F;      
 
+  TH1D* hL1CaloTkTaus_SingleTau_Eff;
+
   // DiTau: Rates
   TH1D* hDiTau_Rate_Calo;
   TH1D* hDiTau_Rate_Calo_C;
@@ -524,6 +528,8 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hDiTau_Rate_RelIsoTight_I;
   TH1D* hDiTau_Rate_RelIsoTight_F;
 
+  TH1D* hL1CaloTkTaus_DiTau_Rate;
+
   // DiTau: Efficiencies
   TH1D* hDiTau_Eff_Calo;
   TH1D* hDiTau_Eff_Calo_C;
@@ -557,6 +563,8 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hDiTau_Eff_RelIsoTight_C;
   TH1D* hDiTau_Eff_RelIsoTight_I;
   TH1D* hDiTau_Eff_RelIsoTight_F;
+
+  TH1D* hL1CaloTkTaus_DiTau_Eff;
 
   // DiTau (Tk-Other)
   TH2D* hDiTau_Rate_Calo_VtxIso;
@@ -690,6 +698,20 @@ class CaloTk : public TreeAnalyserMC{
   TH1D* hRelIsoTight_TurnOn50_3pr;
   TH1D* hRelIsoTight_TurnOn50_withNeutrals;
   TH1D* hRelIsoTight_TurnOn50_noNeutrals;
+
+  // Turn-ons for the best performing WP
+  TH1D* hL1CaloTkTaus_TurnOn25;
+  TH1D* hL1CaloTkTaus_TurnOn25_1pr;
+  TH1D* hL1CaloTkTaus_TurnOn25_3pr;
+  TH1D* hL1CaloTkTaus_TurnOn25_withNeutrals;
+  TH1D* hL1CaloTkTaus_TurnOn25_noNeutrals;
+
+  TH1D* hL1CaloTkTaus_TurnOn50;
+  TH1D* hL1CaloTkTaus_TurnOn50_1pr;
+  TH1D* hL1CaloTkTaus_TurnOn50_3pr;
+  TH1D* hL1CaloTkTaus_TurnOn50_withNeutrals;
+  TH1D* hL1CaloTkTaus_TurnOn50_noNeutrals;
+
 
 };
 

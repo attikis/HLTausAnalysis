@@ -48,17 +48,17 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
     // Creat a new TChain pointer with the TTree name
     TChain* fMainChain    = new TChain("l1EventTree/L1EventTree");
     fL1PhaseII            = new TChain("l1PhaseIITree/L1PhaseIITree");
-    fCaloTower            = new TChain("l1CaloTowerTree/L1CaloTowerTree");
-    fUpgradeTfMuon        = new TChain("l1UpgradeTfMuonTree/L1UpgradeTfMuonTree");
-    fUpgrade              = new TChain("l1UpgradeTree/L1UpgradeTree");
-    fuGT                  = new TChain("l1uGTTree/L1uGTTree");
-    fHO                   = new TChain("l1HOTree/L1HOTree");
-    fUpgradeTfMuonEmu     = new TChain("l1UpgradeTfMuonEmuTree/L1UpgradeTfMuonTree");
-    fCaloTowerEmu         = new TChain("l1CaloTowerEmuTree/L1CaloTowerTree");
+    //fCaloTower            = new TChain("l1CaloTowerTree/L1CaloTowerTree");
+    //fUpgradeTfMuon        = new TChain("l1UpgradeTfMuonTree/L1UpgradeTfMuonTree");
+    //fUpgrade              = new TChain("l1UpgradeTree/L1UpgradeTree");
+    //fuGT                  = new TChain("l1uGTTree/L1uGTTree");
+    //fHO                   = new TChain("l1HOTree/L1HOTree");
+    //fUpgradeTfMuonEmu     = new TChain("l1UpgradeTfMuonEmuTree/L1UpgradeTfMuonTree");
+    //fCaloTowerEmu         = new TChain("l1CaloTowerEmuTree/L1CaloTowerTree");
     fUpgradeEmu           = new TChain("l1UpgradeEmuTree/L1UpgradeTree");
-    fuGTEmu               = new TChain("l1uGTEmuTree/L1uGTTree");
+    //fuGTEmu               = new TChain("l1uGTEmuTree/L1uGTTree");
     fGenerator            = new TChain("l1GeneratorTree/L1GenTree");
-    fTracks               = new TChain("l1TrackTree/eventTree");//L1TrackTree");
+    fTracks               = new TChain("l1TrackTree/L1TrackTree");
     
     // Associated the ROOT files to the TChain
     if (0) std::cout << "\tGetting ROOT files for dataset " << SampleName << " and adding them to the chain." << std::endl;
@@ -68,15 +68,15 @@ TreeReaderReco::TreeReaderReco(const std::string SamplePath, const std::string S
     
     // Add files to chains (if exist)
     if (doL1PhaseII)           OpenFiles(SamplePath, SampleName, fL1PhaseII        );
-    if (doCaloTower)           OpenFiles(SamplePath, SampleName, fCaloTower        );
-    if (doUpgradeTfMuon)       OpenFiles(SamplePath, SampleName, fUpgradeTfMuon    );
-    if (doUpgrade)             OpenFiles(SamplePath, SampleName, fUpgrade          );
-    if (douGT)                 OpenFiles(SamplePath, SampleName, fuGT              );
-    if (doHO)                  OpenFiles(SamplePath, SampleName, fHO               );
-    if (doUpgradeTfMuonEmu)    OpenFiles(SamplePath, SampleName, fUpgradeTfMuonEmu );
-    if (doCaloTowerEmu)        OpenFiles(SamplePath, SampleName, fCaloTowerEmu     );
+    //if (doCaloTower)           OpenFiles(SamplePath, SampleName, fCaloTower        );
+    //if (doUpgradeTfMuon)       OpenFiles(SamplePath, SampleName, fUpgradeTfMuon    );
+    //if (doUpgrade)             OpenFiles(SamplePath, SampleName, fUpgrade          );
+    //if (douGT)                 OpenFiles(SamplePath, SampleName, fuGT              );
+    //if (doHO)                  OpenFiles(SamplePath, SampleName, fHO               );
+    //if (doUpgradeTfMuonEmu)    OpenFiles(SamplePath, SampleName, fUpgradeTfMuonEmu );
+    //if (doCaloTowerEmu)        OpenFiles(SamplePath, SampleName, fCaloTowerEmu     );
     if (doUpgradeEmu)          OpenFiles(SamplePath, SampleName, fUpgradeEmu       );
-    if (douGTEmu)              OpenFiles(SamplePath, SampleName, fuGTEmu           );
+    //if (douGTEmu)              OpenFiles(SamplePath, SampleName, fuGTEmu           );
     if (doGenerator)           OpenFiles(SamplePath, SampleName, fGenerator        );
     if (doTracks)              OpenFiles(SamplePath, SampleName, fTracks           );
 
@@ -135,15 +135,15 @@ bool TreeReaderReco::CheckTreesExistence(const std::string SamplePath, const std
   
   // 
   doL1PhaseII        = true;
-  doCaloTower        = true;
-  doUpgradeTfMuon    = true;
-  doUpgrade          = true;
-  douGT              = true;
-  doHO               = true;
-  doUpgradeTfMuonEmu = true;
-  doCaloTowerEmu     = true;
+  doCaloTower        = false;
+  doUpgradeTfMuon    = false;
+  doUpgrade          = false;
+  douGT              = false;
+  doHO               = false;
+  doUpgradeTfMuonEmu = false;
+  doCaloTowerEmu     = false;
   doUpgradeEmu       = true;
-  douGTEmu           = true;
+  douGTEmu           = false;
   doGenerator        = true;
   doTracks           = true;
   //
@@ -167,17 +167,17 @@ bool TreeReaderReco::CheckTreesExistence(const std::string SamplePath, const std
   // Take the trees
   TTree *treeEvent            = (TTree*)file->Get("l1EventTree/L1EventTree");
   TTree *treeL1PhaseII        = (TTree*)file->Get("l1PhaseIITree/L1PhaseIITree");
-  TTree *treeCaloTower        = (TTree*)file->Get("l1CaloTowerTree/L1CaloTowerTree");
-  TTree *treeUpgradeTfMuon    = (TTree*)file->Get("l1UpgradeTfMuonTree/L1UpgradeTfMuonTree");
-  TTree *treeUpgrade          = (TTree*)file->Get("l1UpgradeTree/L1UpgradeTree");
-  TTree *treeuGT              = (TTree*)file->Get("l1uGTTree/L1uGTTree");
-  TTree *treeHO               = (TTree*)file->Get("l1HOTree/L1HOTree");
-  TTree *treeUpgradeTfMuonEmu = (TTree*)file->Get("l1UpgradeTfMuonEmuTree/L1UpgradeTfMuonTree");
-  TTree *treeCaloTowerEmu     = (TTree*)file->Get("l1CaloTowerEmuTree/L1CaloTowerTree");
+  //TTree *treeCaloTower        = (TTree*)file->Get("l1CaloTowerTree/L1CaloTowerTree");
+  //TTree *treeUpgradeTfMuon    = (TTree*)file->Get("l1UpgradeTfMuonTree/L1UpgradeTfMuonTree");
+  //TTree *treeUpgrade          = (TTree*)file->Get("l1UpgradeTree/L1UpgradeTree");
+  //TTree *treeuGT              = (TTree*)file->Get("l1uGTTree/L1uGTTree");
+  //TTree *treeHO               = (TTree*)file->Get("l1HOTree/L1HOTree");
+  //TTree *treeUpgradeTfMuonEmu = (TTree*)file->Get("l1UpgradeTfMuonEmuTree/L1UpgradeTfMuonTree");
+  //TTree *treeCaloTowerEmu     = (TTree*)file->Get("l1CaloTowerEmuTree/L1CaloTowerTree");
   TTree *treeUpgradeEmu       = (TTree*)file->Get("l1UpgradeEmuTree/L1UpgradeTree");
-  TTree *treeuGTEmu           = (TTree*)file->Get("l1uGTEmuTree/L1uGTTree");
+  //TTree *treeuGTEmu           = (TTree*)file->Get("l1uGTEmuTree/L1uGTTree");
   TTree *treeGenerator        = (TTree*)file->Get("l1GeneratorTree/L1GenTree");
-  TTree *treeTracks           = (TTree*)file->Get("l1TrackTree/eventTree");//L1TrackTree");
+  TTree *treeTracks           = (TTree*)file->Get("l1TrackTree/L1TrackTree");
 
   // Check if the trees exist
   if (!treeEvent) {
@@ -189,7 +189,7 @@ bool TreeReaderReco::CheckTreesExistence(const std::string SamplePath, const std
     std::cout << treeL1PhaseII->GetName() << " not found!" << std::endl;
     return false;
   }
-
+  /*
   if (!treeCaloTower) {
     std::cout << treeCaloTower->GetName() << " not found!" << std::endl;
     doCaloTower = false;
@@ -224,16 +224,17 @@ bool TreeReaderReco::CheckTreesExistence(const std::string SamplePath, const std
     std::cout << treeCaloTowerEmu->GetName() << " not found!" << std::endl;
     doCaloTowerEmu = false;
   }
-
+  */
   if (!treeUpgradeEmu) {
     std::cout << treeUpgradeEmu->GetName() << " not found!" << std::endl;
     doUpgradeEmu = false;
   }
-
+  /*
   if (!treeuGTEmu) {
     std::cout << treeuGTEmu->GetName() << " not found!" << std::endl;
     douGTEmu = false;
   }
+  */
 
   if (!treeGenerator) {
     std::cout << treeGenerator->GetName() << " not found!"<<std::endl;

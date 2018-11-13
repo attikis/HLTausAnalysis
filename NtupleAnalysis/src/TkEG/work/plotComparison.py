@@ -160,49 +160,14 @@ def main(opts):
 
         # ROC curve ingredients (histograms)
         resList = [
-            ["TkEG_EtResolution" , "TkEG_EtResolution_1pr" , "TkEG_EtResolution_3pr" , "TkEG_EtResolution_withNeutrals" , "TkEG_EtResolution_noNeutrals" ], 
-            ["TkEG_EtaResolution", "TkEG_EtaResolution_1pr", "TkEG_EtaResolution_3pr", "TkEG_EtaResolution_withNeutrals", "TkEG_EtaResolution_noNeutrals"], 
-            ["TkEG_PhiResolution", "TkEG_PhiResolution_1pr", "TkEG_PhiResolution_3pr", "TkEG_PhiResolution_withNeutrals", "TkEG_PhiResolution_noNeutrals"],
-            
-            ["TkEG_EtResolution" , "TkEG_EtResolution_C"   , "TkEG_EtResolution_I"   , "TkEG_EtResolution_F" ],
-            ["TkEG_EtaResolution", "TkEG_EtaResolution_C"  , "TkEG_EtaResolution_I"  , "TkEG_EtaResolution_F"],
-            ["TkEG_PhiResolution", "TkEG_PhiResolution_C"  , "TkEG_PhiResolution_I"  , "TkEG_PhiResolution_F"],
+            ["PoorEtResolCand_InvMass","GoodEtResolCand_InvMass"], 
+            ["PoorEtResolCand_RelIso","GoodEtResolCand_RelIso"],
+            ["PoorEtResolCand_VtxIso","GoodEtResolCand_VtxIso"],
+            ["PoorEtResolCand_CHF","GoodEtResolCand_CHF"],
+            ["PoorEtResolCand_IsoTracks_N","GoodEtResolCand_IsoTracks_N"],
+            ["PoorEtResolCand_dR_EG_Seed", "GoodEtResolCand_dR_EG_Seed"],
 
-            ["TkEG_EtResolution_F", "TkEG_EtResolution_1pr_F", "TkEG_EtResolution_3pr_F", "TkEG_EtResolution_withNeutrals_F", "TkEG_EtResolution_noNeutrals_F"],
-            ["TkEG_EtaResolution_F", "TkEG_EtaResolution_1pr_F", "TkEG_EtaResolution_3pr_F", "TkEG_EtaResolution_withNeutrals_F", "TkEG_EtaResolution_noNeutrals_F"],
-            ["TkEG_PhiResolution_F", "TkEG_PhiResolution_1pr_F", "TkEG_PhiResolution_3pr_F", "TkEG_PhiResolution_withNeutrals_F", "TkEG_PhiResolution_noNeutrals_F"],
-
-            ["TkEG_EtResolution_F_withEGs", "TkEG_EtResolution_1pr_F_withEGs", "TkEG_EtResolution_3pr_F_withEGs", "TkEG_EtResolution_withNeutrals_F_withEGs", "TkEG_EtResolution_noNeutrals_F_withEGs"],
-            ["TkEG_EtaResolution_F_withEGs", "TkEG_EtaResolution_1pr_F_withEGs", "TkEG_EtaResolution_3pr_F_withEGs", "TkEG_EtaResolution_withNeutrals_F_withEGs", "TkEG_EtaResolution_noNeutrals_F_withEGs"],
-            ["TkEG_PhiResolution_F_withEGs", "TkEG_PhiResolution_1pr_F_withEGs", "TkEG_PhiResolution_3pr_F_withEGs", "TkEG_PhiResolution_withNeutrals_F_withEGs", "TkEG_PhiResolution_noNeutrals_F_withEGs"],
-            ["TkEG_EtResolution_F_noEGs", "TkEG_EtResolution_1pr_F_noEGs", "TkEG_EtResolution_3pr_F_noEGs", "TkEG_EtResolution_withNeutrals_F_noEGs", "TkEG_EtResolution_noNeutrals_F_noEGs"],
-            ["TkEG_EtaResolution_F_noEGs", "TkEG_EtaResolution_1pr_F_noEGs", "TkEG_EtaResolution_3pr_F_noEGs", "TkEG_EtaResolution_withNeutrals_F_noEGs", "TkEG_EtaResolution_noNeutrals_F_noEGs"],
-            ["TkEG_PhiResolution_F_noEGs", "TkEG_PhiResolution_1pr_F_noEGs", "TkEG_PhiResolution_3pr_F_noEGs", "TkEG_PhiResolution_withNeutrals_F_noEGs", "TkEG_PhiResolution_noNeutrals_F_noEGs"],
-
-            ["TkEG_EtResolution_F_withEGs_posEta", "TkEG_EtResolution_1pr_F_withEGs_posEta", "TkEG_EtResolution_3pr_F_withEGs_posEta", "TkEG_EtResolution_withNeutrals_F_withEGs_posEta", "TkEG_EtResolution_noNeutrals_F_withEGs_posEta"],
-            ["TkEG_EtaResolution_F_withEGs_posEta", "TkEG_EtaResolution_1pr_F_withEGs_posEta", "TkEG_EtaResolution_3pr_F_withEGs_posEta", "TkEG_EtaResolution_withNeutrals_F_withEGs_posEta", "TkEG_EtaResolution_noNeutrals_F_withEGs_posEta"],
-            ["TkEG_PhiResolution_F_withEGs_posEta", "TkEG_PhiResolution_1pr_F_withEGs_posEta", "TkEG_PhiResolution_3pr_F_withEGs_posEta", "TkEG_PhiResolution_withNeutrals_F_withEGs_posEta", "TkEG_PhiResolution_noNeutrals_F_withEGs_posEta"],
-            ["TkEG_EtResolution_F_noEGs_posEta", "TkEG_EtResolution_1pr_F_noEGs_posEta", "TkEG_EtResolution_3pr_F_noEGs_posEta", "TkEG_EtResolution_withNeutrals_F_noEGs_posEta", "TkEG_EtResolution_noNeutrals_F_noEGs_posEta"],
-            ["TkEG_EtaResolution_F_noEGs_posEta", "TkEG_EtaResolution_1pr_F_noEGs_posEta", "TkEG_EtaResolution_3pr_F_noEGs_posEta", "TkEG_EtaResolution_withNeutrals_F_noEGs_posEta", "TkEG_EtaResolution_noNeutrals_F_noEGs_posEta"],
-            ["TkEG_PhiResolution_F_noEGs_posEta", "TkEG_PhiResolution_1pr_F_noEGs_posEta", "TkEG_PhiResolution_3pr_F_noEGs_posEta", "TkEG_PhiResolution_withNeutrals_F_noEGs_posEta", "TkEG_PhiResolution_noNeutrals_F_noEGs_posEta"],
-
-            ["TkEG_EtResolution_F_withEGs_negEta", "TkEG_EtResolution_1pr_F_withEGs_negEta", "TkEG_EtResolution_3pr_F_withEGs_negEta", "TkEG_EtResolution_withNeutrals_F_withEGs_negEta", "TkEG_EtResolution_noNeutrals_F_withEGs_negEta"],
-            ["TkEG_EtaResolution_F_withEGs_negEta", "TkEG_EtaResolution_1pr_F_withEGs_negEta", "TkEG_EtaResolution_3pr_F_withEGs_negEta", "TkEG_EtaResolution_withNeutrals_F_withEGs_negEta", "TkEG_EtaResolution_noNeutrals_F_withEGs_negEta"],
-            ["TkEG_PhiResolution_F_withEGs_negEta", "TkEG_PhiResolution_1pr_F_withEGs_negEta", "TkEG_PhiResolution_3pr_F_withEGs_negEta", "TkEG_PhiResolution_withNeutrals_F_withEGs_negEta", "TkEG_PhiResolution_noNeutrals_F_withEGs_negEta"],
-            ["TkEG_EtResolution_F_noEGs_negEta", "TkEG_EtResolution_1pr_F_noEGs_negEta", "TkEG_EtResolution_3pr_F_noEGs_negEta", "TkEG_EtResolution_withNeutrals_F_noEGs_negEta", "TkEG_EtResolution_noNeutrals_F_noEGs_negEta"],
-            ["TkEG_EtaResolution_F_noEGs_negEta", "TkEG_EtaResolution_1pr_F_noEGs_negEta", "TkEG_EtaResolution_3pr_F_noEGs_negEta", "TkEG_EtaResolution_withNeutrals_F_noEGs_negEta", "TkEG_EtaResolution_noNeutrals_F_noEGs_negEta"],
-            ["TkEG_PhiResolution_F_noEGs_negEta", "TkEG_PhiResolution_1pr_F_noEGs_negEta", "TkEG_PhiResolution_3pr_F_noEGs_negEta", "TkEG_PhiResolution_withNeutrals_F_noEGs_negEta", "TkEG_PhiResolution_noNeutrals_F_noEGs_negEta"],
-
-            ["TkEG_ChargedResolution", "TkEG_ChargedResolution_1pr", "TkEG_ChargedResolution_3pr", "TkEG_ChargedResolution_withNeutrals", "TkEG_ChargedResolution_noNeutrals"],
-            ["TkEG_NeutralsResolution", "TkEG_NeutralsResolution_1pr", "TkEG_NeutralsResolution_3pr", "TkEG_NeutralsResolution_withNeutrals", "TkEG_NeutralsResolution_noNeutrals"],
-            
-            ["TkEG_EtResolution_withEGs", "TkEG_EtResolution_1pr_withEGs", "TkEG_EtResolution_3pr_withEGs", "TkEG_EtResolution_withNeutrals_withEGs", "TkEG_EtResolution_noNeutrals_withEGs"],
-            ["TkEG_EtResolution_noEGs", "TkEG_EtResolution_1pr_noEGs", "TkEG_EtResolution_3pr_noEGs", "TkEG_EtResolution_withNeutrals_noEGs", "TkEG_EtResolution_noNeutrals_noEGs"],
-            ["TkEG_EtResolution_withNeutrals", "TkEG_EtResolution_withNeutrals_1pr", "TkEG_EtResolution_withNeutrals_3pr"],
-
-            ["TkEG_EtResolution_withNeutrals", "TkEG_EtResolution_withNeutrals_1pion0", "TkEG_EtResolution_withNeutrals_2pion0", "TkEG_EtResolution_withNeutrals_3pion0"],#,"TkEG_EtResolution_withNeutrals_4pion0"],
-
-            ["TkEG_EtResolution_withNeutrals_withEGs", "TkEG_EtResolution_withNeutrals_withEGs_0to10GeV", "TkEG_EtResolution_withNeutrals_withEGs_10to20GeV", "TkEG_EtResolution_withNeutrals_withEGs_20to30GeV", "TkEG_EtResolution_withNeutrals_withEGs_30to40GeV", "TkEG_EtResolution_withNeutrals_withEGs_40to50GeV"]
+            ["TkEG_NEGs", "TkEG_NEGs_C", "TkEG_NEGs_I", "TkEG_NEGs_F"]
             ]
                        
     
@@ -210,53 +175,15 @@ def main(opts):
         for i, s in enumerate(dsets_signal, 1):
             PU = s.split("PU")[1]
             
-            # By decay mode
-            PlotHistos(datasetsMgr, resList[0], s, PU, "ResolutionEt_%s_all" % (s) )
-            PlotHistos(datasetsMgr, resList[1], s, PU, "ResolutionEta_%s_all" % (s) )
-            PlotHistos(datasetsMgr, resList[2], s, PU, "ResolutionPhi_%s_all" % (s) )
+            # Good Vs Poor ET resolution candidates in forward region
+            PlotHistos(datasetsMgr, resList[0], s, PU, "TkEG_InvMass_%s_GoodVsPoorRes" % (s) )
+            PlotHistos(datasetsMgr, resList[1], s, PU, "TkEG_RelIso_%s_GoodVsPoorRes" % (s) )
+            PlotHistos(datasetsMgr, resList[2], s, PU, "TkEG_VtxIso_%s_GoodVsPoorRes" % (s) )
+            PlotHistos(datasetsMgr, resList[3], s, PU, "TkEG_CHF_%s_GoodVsPoorRes"  % (s) )
+            PlotHistos(datasetsMgr, resList[4], s, PU, "TkEG_IsoTracks_N_%s_GoodVsPoorRes" % (s) )
+            PlotHistos(datasetsMgr, resList[5], s, PU, "TkEG_dR_EG_Seed_%s_GoodVsPoorRes" % (s) )
             
-            # By eta region (central, intermediate, forward)
-            PlotHistos(datasetsMgr, resList[3], s, PU, "ResolutionEt_%s_cif"  % (s) )
-            PlotHistos(datasetsMgr, resList[4], s, PU, "ResolutionEta_%s_cif" % (s) )
-            PlotHistos(datasetsMgr, resList[5], s, PU, "ResolutionPhi_%s_cif" % (s) )
-            
-            PlotHistos(datasetsMgr, resList[6], s, PU, "ResolutionEt_%s_all_F" % (s) )
-            PlotHistos(datasetsMgr, resList[7], s, PU, "ResolutionEta_%s_all_F" % (s) )
-            PlotHistos(datasetsMgr, resList[8], s, PU, "ResolutionPhi_%s_all_F" % (s) )
-
-            PlotHistos(datasetsMgr, resList[9] , s, PU, "ResolutionEt_%s_all_F_withEGs" % (s) )
-            PlotHistos(datasetsMgr, resList[10], s, PU, "ResolutionEta_%s_all_F_withEGs" % (s) )
-            PlotHistos(datasetsMgr, resList[11], s, PU, "ResolutionPhi_%s_all_F_withEGs" % (s) )
-            
-            PlotHistos(datasetsMgr, resList[12], s, PU, "ResolutionEt_%s_all_F_noEGs" % (s) )
-            PlotHistos(datasetsMgr, resList[13], s, PU, "ResolutionEta_%s_all_F_noEGs" % (s) )
-            PlotHistos(datasetsMgr, resList[14], s, PU, "ResolutionPhi_%s_all_F_noEGs" % (s) )
-
-            PlotHistos(datasetsMgr, resList[15], s, PU, "ResolutionEt_%s_all_F_withEGs_posEta" % (s) )
-            PlotHistos(datasetsMgr, resList[16], s, PU, "ResolutionEta_%s_all_F_withEGs_posEta" % (s) )
-            PlotHistos(datasetsMgr, resList[17], s, PU, "ResolutionPhi_%s_all_F_withEGs_posEta" % (s) )
-            
-            PlotHistos(datasetsMgr, resList[18], s, PU, "ResolutionEt_%s_all_F_noEGs_posEta" % (s) )
-            PlotHistos(datasetsMgr, resList[19], s, PU, "ResolutionEta_%s_all_F_noEGs_posEta" % (s) )
-            PlotHistos(datasetsMgr, resList[20], s, PU, "ResolutionPhi_%s_all_F_noEGs_posEta" % (s) )
-
-            PlotHistos(datasetsMgr, resList[21], s, PU, "ResolutionEt_%s_all_F_withEGs_negEta" % (s) )
-            PlotHistos(datasetsMgr, resList[22], s, PU, "ResolutionEta_%s_all_F_withEGs_negEta" % (s) )
-            PlotHistos(datasetsMgr, resList[23], s, PU, "ResolutionPhi_%s_all_F_withEGs_negEta" % (s) )
-            
-            PlotHistos(datasetsMgr, resList[24], s, PU, "ResolutionEt_%s_all_F_noEGs_negEta" % (s) )
-            PlotHistos(datasetsMgr, resList[25], s, PU, "ResolutionEta_%s_all_F_noEGs_negEta" % (s) )
-            PlotHistos(datasetsMgr, resList[26], s, PU, "ResolutionPhi_%s_all_F_noEGs_negEta" % (s) )
-
-            PlotHistos(datasetsMgr, resList[27], s, PU, "ResolutionCharged_%s_all" % (s) )
-            PlotHistos(datasetsMgr, resList[28], s, PU, "ResolutionNeutrals_%s_all" % (s) )
-
-            PlotHistos(datasetsMgr, resList[29] , s, PU, "ResolutionEt_%s_all_withEGs" % (s) )
-            PlotHistos(datasetsMgr, resList[30] , s, PU, "ResolutionEt_%s_all_noEGs" % (s) )
-            PlotHistos(datasetsMgr, resList[31] , s, PU, "ResolutionEt_%s_withNeutrals" % (s) )
-            PlotHistos(datasetsMgr, resList[32] , s, PU, "ResolutionEt_%s_withNeutrals_Npion0" % (s) )
-
-            PlotHistos(datasetsMgr, resList[33] , s, PU, "ResolutionEt_%s_withNeutrals_withEGs_etSteps" % (s) )
+            PlotHistos(datasetsMgr, resList[6], s, PU, "TkEG_NEGs_%s_cif" % (s) )
 
         print
 
@@ -271,25 +198,16 @@ def PlotHistos(datasetsMgr, histoList, signal, PU, saveName=None):
     hList     = []
     legDict   = {}
     algos     = getAlgos()
-    if "_all"  in saveName:
-        algos = ["Inclusive", "1-prong", "3-prong", "#geq 1 #pi^{0}'s", "0 #pi^{0}'s"]
-        if "_all_F"  in saveName:
-            algos = ["Inclusive (F)", "1-prong (F)", "3-prong (F)", "#geq 1 #pi^{0}'s (F)", "0 #pi^{0}'s (F)"]
+    if "_GoodVsPoorRes"  in saveName:
+        algos = ["0.4 < #sigma_{E_{T}} < 0.8", " #sigma_{E_{T}} #leq 0.4 || #sigma_{E_{T}} #geq 0.8"]
     if "_cif"  in saveName:
         #algos = ["Inclusive", "Central", "Intermediate", "Forward"]
         algos = ["Inclusive", "|#eta| < 0.8 (C)", "0.8 < |#eta| < 1.6 (I)", "|#eta| > 1.6 (F)"]
-    if "_withNeutrals" in saveName:
-        algos = ["#geq 1 #pi^{0}'s", "#geq 1 #pi^{0}'s (1-prong)", "#geq 1 #pi^{0}'s (3-prong)"]        
-        if "Npion0" in saveName:
-            algos = ["#geq 1 #pi^{0}'s", "1 #pi^{0}", "2 #pi^{0}'s", "3 #pi^{0}'s"]#, "4 #pi^{0}'s"]
-    if "etSteps" in saveName:
-            algos = ["#geq 1 #pi^{0}'s", "0 #leq E_{T} < 10", "10 #leq E_{T} < 20", "20 #leq E_{T} < 30", "30 #leq E_{T} < 40", "40 #leq E_{T} < 50"]
 
     # For-loop: All tau algorithms
     for l, hName in enumerate(histoList, 0):
-        
-        algo = hName.split("_")[0]
-        msg  = "Resolution for \"%s\" algorithm (%s)" % (algo, signal)
+        param = hName.split("_")[1]
+        msg  = "Comparison plot for \"%s\" parameter (%s)" % (param, signal)
         aux.PrintFlushed(msg, False)
         h = datasetsMgr.getDataset(signal).getDatasetRootHisto(hName).getHistogram()
         h.SetName(hName)
@@ -316,7 +234,7 @@ def PlotHistos(datasetsMgr, histoList, signal, PU, saveName=None):
         hName = h.getName()
         p.histoMgr.forHisto(hName, styles.getCaloStyle(i))
 
-        if "chargedresolution" in hName.lower() or "neutralsresolution" in hName.lower():
+        if "TkEG_NEGs" in hName: 
             p.histoMgr.setHistoDrawStyle(hName, "HIST")
             p.histoMgr.setHistoLegendStyle(hName, "L")
         else:
@@ -341,8 +259,6 @@ def GetHistoKwargs(h, opts):
     _mvLeg1 = {"dx": -0.15, "dy": -0.00, "dh": -0.0}
     _mvLeg2 = {"dx": -0.00, "dy": -0.00, "dh": -0.0}
     _mvLeg3 = {"dx": -0.05, "dy": -0.00, "dh": -0.0}
-    _mvLeg4 = {"dx": -0.55, "dy": -0.60, "dh": -0.15}
-    _mvLeg5 = {"dx": -0.53, "dy": -0.085, "dh": -0.0}
 
     logY    = False
     yMin    = 0.0
@@ -358,70 +274,51 @@ def GetHistoKwargs(h, opts):
         _yLabel = "Events / %.2f"
         
     _kwargs = {
-        "xlabel"           : "#delta x / x",
+        #"xlabel"           : "#delta x / x",
         "ylabel"           : _yLabel,
         "addMCUncertainty" : False, 
         "addLuminosityText": False,
         "addCmsText"       : True,
         "cmsExtraText"     : "Phase-2 Simulation",
         "cmsTextPosition"  : "outframe",
-        "opts"             : {"xmin": 0.0, "xmax": 0.8, "ymin": yMin, "ymax":1000, "ymaxfactor": yMaxF},
+        "opts"             : {"ymin": yMin, "ymaxfactor": yMaxF},
         "opts2"            : {"ymin": 0.59, "ymax": 1.41},
         "log"              : logY,
-        "rebinX"           : 5,
-        "moveLegend"       : _mvLeg2,
+        "rebinX"           : 1,
+        "moveLegend"       : _mvLeg1,
         "xtitlesize"       : 0.1,#xlabelSize,
         "ytitlesize"       : 0.1,#ylabelSize,
         "cutBox"           : {"cutValue":  0, "fillColor": 16, "box": False, "line": True , "cutGreaterThan": False},
         "cutBoxY"          : {"cutValue": 50, "fillColor": 16, "box": False, "line": False, "cutGreaterThan": False}
         }
 
-    if "resolutionet_" in h.lower():
-        #_kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
-        #_kwargs["opts"]       = {"xmin": -0.2, "xmax": 0.2, "ymin": 0, "ymaxfactor": yMaxF}
-        #if "_all_f" in h.lower() or "_cif" in h.lower():
-        _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
-        _kwargs["opts"]       = {"xmin": -0.2, "xmax": 0.2, "ymin": 0, "ymaxfactor": yMaxF}
-        _kwargs["rebinX"]     = 5
-        #_kwargs["moveLegend"] = _mvLeg1
-    if "resolutioneta_" in h.lower():
-        _kwargs["xlabel"]     = "#delta#eta / #eta^{vis}"
-        #_kwargs["opts"]       = {"xmin": -3.2, "xmax": 3.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
-        _kwargs["opts"]       = {"xmin": -0.1, "xmax": 0.1, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
-        #_kwargs["rebinX"]     = 1
-    if "resolutionphi_" in h.lower():
-        _kwargs["xlabel"]     = "#delta#phi / #phi^{vis}"
-        _kwargs["opts"]       = {"xmin": -0.1, "xmax": 0.1, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
-        #_kwargs["opts"]       = {"xmin": -2.2, "xmax": 2.2, "ymin": 0.8e-4, "ymaxfactor": yMaxF}
-        #_kwargs["rebinX"]     = 1
-
-    if "resolutionneutrals_" in h.lower():
-        _kwargs["xlabel"]     = "#delta#pi^{0}"
-        _kwargs["opts"]       = {"xmin": -5, "xmax": 5, "ymin": 0, "ymaxfactor": yMaxF}
-        _kwargs["rebinX"]     = 1
-
-    if "resolutioncharged_" in h.lower():
-        _kwargs["xlabel"]     = "#delta#pi^{#pm}"
-        _kwargs["opts"]       = {"xmin": -5, "xmax": 5, "ymin": 0, "ymaxfactor": yMaxF}
-        _kwargs["rebinX"]     = 1
+    if "invmass" in h.lower():
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 2.0, "ymin": 0, "ymaxfactor": yMaxF}
         
+        
+    if "chf" in h.lower():
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 1.0, "ymin": 0.001, "ymaxfactor": yMaxF}
+        _kwargs["log"]        = True
+    
+    if "isotracks_n" in h.lower():
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 8.5, "ymin": 0, "ymaxfactor": yMaxF}
 
-        #if "_all_f" in h.lower() or "_cif" in h.lower():
-        #    _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
-        #    _kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0, "ymaxfactor": yMaxF}
-        #_kwargs["moveLegend"] = _mvLeg1
+    if "dr_eg_seed" in h.lower():
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 0.15, "ymin": 0, "ymaxfactor": yMaxF}
 
+    if "reliso" in h.lower() or "badetresolcand_reliso" in h.lower():
+        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 1.2, "ymin": 0.0001, "ymaxfactor": yMaxF}
+        _kwargs["log"]  = True
+        
+    if "vtxiso" in h.lower() or "badetresolcand_vtxiso" in h.lower():
+        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 4.0, "ymin": 0.0001, "ymaxfactor": yMaxF}
+        _kwargs["log"]  = True
+        
     if "cif" in h.lower():
         _kwargs["moveLegend"] = _mvLeg1
-    if "all_f" in h.lower():
-        _kwargs["moveLegend"] = _mvLeg3
-    if "withneutrals" in h.lower():
-        _kwargs["moveLegend"] = _mvLeg4
-        if "npion0" in h.lower():
-            _kwargs["moveLegend"] = _mvLeg2
-    if "etsteps" in h.lower():
-        _kwargs["moveLegend"] = _mvLeg5
-   
+        #if "goodvspoor" in h.lower():
+        #_kwargs["moveLegend"] = _mvLeg3
+
     return _kwargs
 
 def getHistos(datasetsMgr, histoName):
@@ -539,7 +436,7 @@ if __name__ == "__main__":
 
     # Determine path for saving plots
     if opts.saveDir == None:
-        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/TkEG/", postfix="Resolutions")
+        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/TkEG/", postfix="Comparison")
     else:
         print "opts.saveDir = ", opts.saveDir
 

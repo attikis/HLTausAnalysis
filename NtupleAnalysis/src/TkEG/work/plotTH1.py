@@ -317,7 +317,7 @@ def GetHistoKwargs(h, opts):
     if "chargeddaugh_totalmass" in h.lower():
         kwargs["log"]  = True
         kwargs["opts"] = {"xmin": 0.0, "xmax": 2.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
-        kwargs["cutBox"] = {"cutValue": 1.4, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        kwargs["cutBox"] = {"cutValue": 1.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
     if "neutraldaugh_totalmass" in h.lower():
         kwargs["log"]  = True
@@ -364,20 +364,31 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.16, "ymin": 0.0001, "ymaxfactor": _yMaxF}
         kwargs["xlabel"] = "R_{max}^{sig}"
 
-    if "tkeg_isocone_invmass" in h.lower():
+    if "tkeg_isotracks_invmass" in h.lower():
         kwargs["log"]  = True
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.5, "ymin": 0.0001, "ymaxfactor": _yMaxF}
-
         
-    if "tkeg_reliso" in h.lower():
+    if "isotracks_n" in h.lower() or "isotracks_multiplicity" in h.lower():
+        kwargs["opts"]   = {"xmin": -0.5, "xmax": 5.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        
+    if "signalegs_multiplicity" in h.lower() or "isoegs_multiplicity" in h.lower():
+        kwargs["opts"]   = {"xmin": -0.5, "xmax": 5.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        
+    if "tkeg_reliso" in h.lower() or "badetresolcand_reliso" in h.lower():
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 1.2, "ymin": 0.001, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 0.20, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["log"]  = True
         
-    if "tkeg_vtxiso" in h.lower():
+    if "tkeg_vtxiso" in h.lower() or "badetresolcand_vtxiso" in h.lower():
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 4.0, "ymin": 0.0001, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["log"]  = True
+
+    if  "TkEG_PoorNeuResol_Pi0_ET" == h or "TkEG_PoorNeuResol_Pi0_closestEG_ET" == h :
+        kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+
+    if "TkEG_PoorNeuResol_dRmin_Pi0_EG" == h:
+        kwargs["opts"]   = {"xmin": 0, "xmax": 3.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "EGClusters_M" == h:
         kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
@@ -426,9 +437,17 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 50.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         #kwargs["log"]    = True                                                                                                                                         
 
-    if "EGs_Et" == h:
+    if "EGs_Et" == h or "clustEGs_Et" == h:
         kwargs["log"]  = True
-        kwargs["opts"] = {"xmin": 0.0, "xmax": 100.0, "ymin": 0.001, "ymax": 0.2, "ymaxfactor": _yMaxF}
+        kwargs["opts"] = {"xmin": 0.0, "xmax": 100.0, "ymin": 0.00001, "ymaxfactor": 1.4}
+        
+    if "EGs_Eta" == h:
+        kwargs["log"]  = True
+        kwargs["opts"] = {"xmin": -3.0, "xmax": 3.0, "ymin": 0.00001, "ymaxfactor": 1.4}
+
+    if "EGs_Multiplicity" == h:
+        kwargs["opts"] = {"xmin": 0, "xmax": 50, "ymin": 0.001, "ymaxfactor": _yMaxF}
+        kwargs["log"]  = True
 
     if "EGs_MCmatched_Et" == h:
         kwargs["log"]  = True
@@ -573,7 +592,7 @@ def main(opts):
         
         # Obsolete quantity
         #if h in skipList:
-        if "counter" in h.lower():
+        if "counter" in h.lower() or "resolution" in h.lower() or "eff_" in h.lower() or "rate" in h.lower() or "turnon" in h.lower():
             continue
 
         histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))
@@ -582,6 +601,7 @@ def main(opts):
         
         aux.PrintFlushed(h, plotCount==0)
         plotCount += 1
+        
         PlotHisto(datasetsMgr, h)
 
     print

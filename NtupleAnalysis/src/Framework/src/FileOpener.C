@@ -101,7 +101,7 @@ vector<string> FileOpener::GetListOfFiles(const string fullPath)
   
   char* dir  = gSystem->ExpandPathName(fullPath.c_str()); // cast a "std::string" to a "char*" with c_str()
   void* dirp = gSystem->OpenDirectory(dir);
-  const char* filename[200];
+  const char* filename[1000];
   TString str;
   
   // Get all files in the dir fullPath
