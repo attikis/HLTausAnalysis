@@ -184,6 +184,8 @@ def main(opts):
 
         turnOnLists_all = [["VtxIso_TurnOn25", "VtxIso_TurnOn25_1pr", "VtxIso_TurnOn25_3pr", "VtxIso_TurnOn25_withNeutrals", "VtxIso_TurnOn25_noNeutrals"],
                            ["VtxIso_TurnOn50", "VtxIso_TurnOn50_1pr", "VtxIso_TurnOn50_3pr", "VtxIso_TurnOn50_withNeutrals", "VtxIso_TurnOn50_noNeutrals"]]
+        #turnOnLists_all = [["VtxIsoTight_TurnOn25", "VtxIsoTight_TurnOn25_1pr", "VtxIsoTight_TurnOn25_3pr", "VtxIsoTight_TurnOn25_withNeutrals", "VtxIsoTight_TurnOn25_noNeutrals"],
+        #                   ["VtxIsoTight_TurnOn50", "VtxIsoTight_TurnOn50_1pr", "VtxIsoTight_TurnOn50_3pr", "VtxIsoTight_TurnOn50_withNeutrals", "VtxIsoTight_TurnOn50_noNeutrals"]]
 
 
 
