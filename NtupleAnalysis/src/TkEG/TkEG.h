@@ -345,6 +345,7 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_NHF_withNeutrals;
   TH1D* h_TkEG_clustEGs_MCMatch;
   TH1D* h_TkEG_clustEGs_dET_matchPion0;
+  TH1D* h_TkEG_clustEGs_ETResolution;
   TH1D* h_TkEG_isoTracks_InvMass;
   TH1D* h_TkEG_isoTracks_Multiplicity;
   //TH1D* h_TkEG_isoTracks_PtSum;
@@ -433,8 +434,10 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_EtResolution_1pr_noEGs;
   TH1D* h_TkEG_EtResolution_3pr_noEGs;
 
-  TH1D* h_TkEG_EtResolution_withNeutrals_withEGs_0to10GeV;
-  TH1D* h_TkEG_EtResolution_withNeutrals_withEGs_10to20GeV;
+  TH1D* h_TkEG_EtResolution_withNeutrals_withEGs_0to5GeV;
+  TH1D* h_TkEG_EtResolution_withNeutrals_withEGs_5to10GeV;
+  TH1D* h_TkEG_EtResolution_withNeutrals_withEGs_10to15GeV;
+  TH1D* h_TkEG_EtResolution_withNeutrals_withEGs_15to20GeV;
   TH1D* h_TkEG_EtResolution_withNeutrals_withEGs_20to30GeV;
   TH1D* h_TkEG_EtResolution_withNeutrals_withEGs_30to40GeV;
   TH1D* h_TkEG_EtResolution_withNeutrals_withEGs_40to50GeV;

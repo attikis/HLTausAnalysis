@@ -1120,6 +1120,7 @@ void TkEG::Loop()
 	  if (!isMatched) continue;
 
 	  h_TkEG_clustEGs_dET_matchPion0 ->  Fill( eg->getEt() - match_pion0.et() );
+	  h_TkEG_clustEGs_ETResolution   ->  Fill( (eg->getEt() - match_pion0.et())/match_pion0.et());
 
 	}
       }
@@ -1422,11 +1423,17 @@ void TkEG::Loop()
 	
 	if (tkeg->GetEGs().size() > 0) {
 	  h_TkEG_EtResolution_withNeutrals_withEGs -> Fill(ETresolution);
-	  if ( (tkeg->GetEGs().at(0).getEt() >= 0) && (tkeg->GetEGs().at(0).getEt() < 10) ) {
-	    h_TkEG_EtResolution_withNeutrals_withEGs_0to10GeV ->Fill(ETresolution);
+	  if ( (tkeg->GetEGs().at(0).getEt() >= 0) && (tkeg->GetEGs().at(0).getEt() < 5) ) {
+	    h_TkEG_EtResolution_withNeutrals_withEGs_0to5GeV ->Fill(ETresolution);
 	    }
-	  else if ( (tkeg->GetEGs().at(0).getEt() >= 10) && (tkeg->GetEGs().at(0).getEt() < 20) ) {
-	    h_TkEG_EtResolution_withNeutrals_withEGs_10to20GeV ->Fill(ETresolution);
+	  else if ( (tkeg->GetEGs().at(0).getEt() >= 5) && (tkeg->GetEGs().at(0).getEt() < 10) ) {
+	    h_TkEG_EtResolution_withNeutrals_withEGs_5to10GeV ->Fill(ETresolution);
+	  }
+	  else if ( (tkeg->GetEGs().at(0).getEt() >= 10) && (tkeg->GetEGs().at(0).getEt() < 15) ) {
+	    h_TkEG_EtResolution_withNeutrals_withEGs_10to15GeV ->Fill(ETresolution);
+	  }
+	  else if ( (tkeg->GetEGs().at(0).getEt() >= 15) && (tkeg->GetEGs().at(0).getEt() < 20) ) {
+	    h_TkEG_EtResolution_withNeutrals_withEGs_15to20GeV ->Fill(ETresolution);
 	  }
 	  else if ( (tkeg->GetEGs().at(0).getEt() >= 20) && (tkeg->GetEGs().at(0).getEt() < 30) ) {
 	    h_TkEG_EtResolution_withNeutrals_withEGs_20to30GeV ->Fill(ETresolution);
@@ -2572,7 +2579,7 @@ void TkEG::BookHistos_(void)
   h_TkEG_clustEGs_MCMatch->GetXaxis()->SetBinLabel(2,"MC Matched EG");
 
   histoTools_.BookHisto_1D(h_TkEG_clustEGs_dET_matchPion0, "TkEG_clustEGs_dET_matchPion0", ";#deltaE_{T}; Entries / bin", 100, -50, 50); 
-    
+  histoTools_.BookHisto_1D(h_TkEG_clustEGs_ETResolution, "TkEG_clustEGs_ETResolution", ";E_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0); 
   histoTools_.BookHisto_1D(h_TkEG_isoTracks_InvMass, "TkEG_isoTracks_InvMass", ";Invariant mass (iso-cone); Entries / bin", 5000, +0.0, +5.0);
   histoTools_.BookHisto_1D(h_TkEG_isoTracks_Multiplicity, "TkEG_isoTracks_Multiplicity", ";N_{iso-tks}; Entries / bin",11, -0.5, 10.5);
   histoTools_.BookHisto_1D(h_TkEG_isoTracks_Et, "TkEG_isoTracks_Et", tEt  , nEt  , minEt  , maxEt  );
@@ -2683,8 +2690,10 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_TkEG_EtResolution_1pr_withEGs, "TkEG_EtResolution_1pr_withEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
   histoTools_.BookHisto_1D(h_TkEG_EtResolution_3pr_withEGs, "TkEG_EtResolution_3pr_withEGs", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
 
-  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_withEGs_0to10GeV,  "TkEG_EtResolution_withNeutrals_withEGs_0to10GeV", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
-  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_withEGs_10to20GeV,  "TkEG_EtResolution_withNeutrals_withEGs_10to20GeV", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_withEGs_0to5GeV,  "TkEG_EtResolution_withNeutrals_withEGs_0to5GeV", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_withEGs_5to10GeV,  "TkEG_EtResolution_withNeutrals_withEGs_5to10GeV", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_withEGs_10to15GeV,  "TkEG_EtResolution_withNeutrals_withEGs_10to15GeV", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
+  histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_withEGs_15to20GeV,  "TkEG_EtResolution_withNeutrals_withEGs_15to20GeV", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
   histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_withEGs_20to30GeV,  "TkEG_EtResolution_withNeutrals_withEGs_20to30GeV", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
   histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_withEGs_30to40GeV,  "TkEG_EtResolution_withNeutrals_withEGs_30to40GeV", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
   histoTools_.BookHisto_1D(h_TkEG_EtResolution_withNeutrals_withEGs_40to50GeV,  "TkEG_EtResolution_withNeutrals_withEGs_40to50GeV", ";Et resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
@@ -3248,6 +3257,7 @@ void TkEG::WriteHistos_(void)
   h_TkEG_NHF_withNeutrals->Write();
   h_TkEG_clustEGs_MCMatch->Write();
   h_TkEG_clustEGs_dET_matchPion0->Write();
+  h_TkEG_clustEGs_ETResolution->Write();
   h_TkEG_isoTracks_InvMass->Write();
   h_TkEG_isoTracks_Multiplicity->Write();
   h_TkEG_isoTracks_Et->Write();
@@ -3357,8 +3367,10 @@ void TkEG::WriteHistos_(void)
   h_TkEG_EtResolution_1pr_noEGs->Write();
   h_TkEG_EtResolution_3pr_noEGs->Write();
 
-  h_TkEG_EtResolution_withNeutrals_withEGs_0to10GeV->Write();
-  h_TkEG_EtResolution_withNeutrals_withEGs_10to20GeV->Write();
+  h_TkEG_EtResolution_withNeutrals_withEGs_0to5GeV->Write();
+  h_TkEG_EtResolution_withNeutrals_withEGs_5to10GeV->Write();
+  h_TkEG_EtResolution_withNeutrals_withEGs_10to15GeV->Write();
+  h_TkEG_EtResolution_withNeutrals_withEGs_15to20GeV->Write();
   h_TkEG_EtResolution_withNeutrals_withEGs_20to30GeV->Write();
   h_TkEG_EtResolution_withNeutrals_withEGs_30to40GeV->Write();
   h_TkEG_EtResolution_withNeutrals_withEGs_40to50GeV->Write();
@@ -4088,7 +4100,19 @@ void TkEG::FinaliseEffHisto_(TH1D *histo,
 				       const int nEvtsTotal)
 //============================================================================
 {
+  /*
+  TH1D *h = new TH1D("TotalEvents", "nEvtsTotal", 300, 0.0, 300);
+  for (int i = 1; i<= h->GetNbinsX(); i++) {
+    h->SetBinContent(i, nEvtsTotal);
+  }
 
+  // for (int i = 1; i<= h->GetNbinsX(); i++) { 
+  //   cout <<  h->GetBinContent(i)<<endl;
+  // }
+
+  TEfficiency* hEff = 0;
+  hEff = new TEfficiency(*histo, *h);
+  `*/
   const int nBins = histo->GetNbinsX()+1;
   double eff, err;
 
@@ -4101,8 +4125,11 @@ void TkEG::FinaliseEffHisto_(TH1D *histo,
     // Update current histo bin to true eff value and error
     histo->SetBinContent(i, eff);
     histo->SetBinError  (i, err);
-  }
 
+    //cout<<"previous = "<< histo->GetBinContent(i)<<" +- "<<err<<endl;
+    //cout<<"now      = "<< hEff->GetEfficiency(i)<<" +- "<<hEff->GetEfficiencyErrorUp(i)<<endl;
+  }
+  
   return;
 }
 
@@ -4112,7 +4139,6 @@ void TkEG::FinaliseEffHisto_(TH2D *histo,
 				       const int nEvtsTotal)
 //============================================================================
 {
-
   const int nBinsX  = histo->GetNbinsX()+1;
   const int nBinsY  = histo->GetNbinsY()+1;
   double eff, err;
