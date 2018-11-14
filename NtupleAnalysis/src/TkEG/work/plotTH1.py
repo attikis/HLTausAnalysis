@@ -299,7 +299,6 @@ def GetHistoKwargs(h, opts):
     if "nstubs" in hName:
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 10, "ymin": _yMin, "ymaxfactor": _yMaxF}
                 
-
     if "multiplicity" in h.lower():
         kwargs["opts"]   = {"xmin": -0.5, "xmax": 20, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
@@ -384,11 +383,17 @@ def GetHistoKwargs(h, opts):
         kwargs["cutBox"] = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["log"]  = True
 
+    if "TkEG_PoorNeuResol_NeuMultiplicity" == h:
+        kwargs["opts"]   = {"xmin": 0, "xmax": 8, "ymin": _yMin, "ymaxfactor": _yMaxF}
+
+    if "TkEG_PoorNeuResol_dR_Pi0_visTau" == h :
+        kwargs["opts"]   = {"xmin": 0, "xmax": 0.3, "ymin": _yMin, "ymaxfactor": _yMaxF}
+
     if  "TkEG_PoorNeuResol_Pi0_ET" == h or "TkEG_PoorNeuResol_Pi0_closestEG_ET" == h :
-        kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": 0, "xmax": 80.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "TkEG_PoorNeuResol_dRmin_Pi0_EG" == h:
-        kwargs["opts"]   = {"xmin": 0, "xmax": 3.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "EGClusters_M" == h:
         kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
@@ -418,7 +423,6 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0, "xmax": 5.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 0.3, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
-
     if "leadtrks_pt" in h.lower():
         _yLabel = "Arbitrary Units / %.0f "
         units            = "GeV"
@@ -436,6 +440,16 @@ def GetHistoKwargs(h, opts):
         kwargs["cutBox"] = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 50.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         #kwargs["log"]    = True                                                                                                                                         
+
+    if "TkEG_clustEGs_dET_matchPion0" == h:
+        kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        kwargs["opts"]   = {"xmin": -30.0, "xmax": 50.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+
+    if "TkEG_clustEGs_ETResolution" == h:
+        kwargs["opts"]   = {"xmin": -0.2, "xmax": 0.2, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
+        kwargs["xlabel"] = "#deltaE_{T} / p_{T}^{#pi^{0}}"
+
 
     if "EGs_Et" == h or "clustEGs_Et" == h:
         kwargs["log"]  = True
@@ -592,7 +606,7 @@ def main(opts):
         
         # Obsolete quantity
         #if h in skipList:
-        if "counter" in h.lower() or "resolution" in h.lower() or "eff_" in h.lower() or "rate" in h.lower() or "turnon" in h.lower():
+        if "counter" in h.lower() or "phiresolution" in h.lower() or "etaresolution" in h.lower() or "eff_" in h.lower() or "rate" in h.lower() or "turnon" in h.lower():
             continue
 
         histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))

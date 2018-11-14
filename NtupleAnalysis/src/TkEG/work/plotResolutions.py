@@ -202,7 +202,7 @@ def main(opts):
 
             ["TkEG_EtResolution_withNeutrals", "TkEG_EtResolution_withNeutrals_1pion0", "TkEG_EtResolution_withNeutrals_2pion0", "TkEG_EtResolution_withNeutrals_3pion0"],#,"TkEG_EtResolution_withNeutrals_4pion0"],
 
-            ["TkEG_EtResolution_withNeutrals_withEGs", "TkEG_EtResolution_withNeutrals_withEGs_0to10GeV", "TkEG_EtResolution_withNeutrals_withEGs_10to20GeV", "TkEG_EtResolution_withNeutrals_withEGs_20to30GeV", "TkEG_EtResolution_withNeutrals_withEGs_30to40GeV", "TkEG_EtResolution_withNeutrals_withEGs_40to50GeV"]
+            ["TkEG_EtResolution_withNeutrals_withEGs", "TkEG_EtResolution_withNeutrals_withEGs_0to5GeV","TkEG_EtResolution_withNeutrals_withEGs_5to10GeV","TkEG_EtResolution_withNeutrals_withEGs_10to15GeV", "TkEG_EtResolution_withNeutrals_withEGs_15to20GeV", "TkEG_EtResolution_withNeutrals_withEGs_20to30GeV", "TkEG_EtResolution_withNeutrals_withEGs_30to40GeV", "TkEG_EtResolution_withNeutrals_withEGs_40to50GeV"]
             ]
                        
     
@@ -283,7 +283,7 @@ def PlotHistos(datasetsMgr, histoList, signal, PU, saveName=None):
         if "Npion0" in saveName:
             algos = ["#geq 1 #pi^{0}'s", "1 #pi^{0}", "2 #pi^{0}'s", "3 #pi^{0}'s"]#, "4 #pi^{0}'s"]
     if "etSteps" in saveName:
-            algos = ["#geq 1 #pi^{0}'s", "0 #leq E_{T} < 10", "10 #leq E_{T} < 20", "20 #leq E_{T} < 30", "30 #leq E_{T} < 40", "40 #leq E_{T} < 50"]
+            algos = ["#geq 1 #pi^{0}'s", "0 #leq E_{T} < 5","5 #leq E_{T} < 10", "10 #leq E_{T} < 15", "15 #leq E_{T} < 20", "20 #leq E_{T} < 30", "30 #leq E_{T} < 40", "40 #leq E_{T} < 50"]
 
     # For-loop: All tau algorithms
     for l, hName in enumerate(histoList, 0):

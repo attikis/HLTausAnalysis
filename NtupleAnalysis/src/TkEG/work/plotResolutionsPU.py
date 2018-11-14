@@ -218,7 +218,7 @@ def GetHistoKwargs(h, opts):
     _cutBoxY= {"cutValue": 1.00, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
     _leg    = {"dx": -0.4, "dy": -0.3, "dh": -0.4}
     _leg2   = {"dx": -0.75, "dy": -0.3, "dh": -0.4}
-    _ratio  = True
+    _ratio  = False
     _log    = False
     _yMin   = 0.0
     _yMax   = None
@@ -451,7 +451,7 @@ if __name__ == "__main__":
     INTLUMI     = 1.0
     NORMTOONE   = True
     SAVEDIR     = None
-    SAVEFORMATS = [".C", ".png", ".pdf"]
+    SAVEFORMATS = [".pdf"]
     VERBOSE     = False
 
     parser = OptionParser(usage="Usage: %prog [options]" , add_help_option=False,conflict_handler="resolve")
