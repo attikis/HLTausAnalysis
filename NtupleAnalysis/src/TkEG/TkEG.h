@@ -236,6 +236,8 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_Pion0_Et;
   TH1D* h_Photons_Et;
   TH1D* h_Photons_dR;
+  TH1D* h_Photons_dEta;
+  TH1D* h_Photons_dPhi;
   TH2D* h_Pion0Et_Vs_PhotonsDR;
   TH1D* h_Photons_EGs_Matching;
 
@@ -441,7 +443,6 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_EtResolution_withNeutrals_withEGs_20to30GeV;
   TH1D* h_TkEG_EtResolution_withNeutrals_withEGs_30to40GeV;
   TH1D* h_TkEG_EtResolution_withNeutrals_withEGs_40to50GeV;
-  
 
   TH1D* h_TkEG_EtResolution_F_withEGs;
   TH1D* h_TkEG_EtResolution_F_withEGs_posEta;
@@ -621,7 +622,10 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_PoorNeuResol_Pi0_ET;
   TH1D* h_TkEG_PoorNeuResol_dRmin_Pi0_EG;
   TH1D* h_TkEG_PoorNeuResol_Pi0_closestEG_ET;
-  
+  TH2D* h_TkEG_PoorNeuResol_Pi0_closestEG_ET_Vs_dRmin_Pi0_EG;
+  TH2D* h_TkEG_PoorNeuResol_Pi0_ET_Vs_closestEG_ET;
+
+
   TH1D* h_nonMCmatchedCandidates_decayMode;
 
   TH1D* h_MCmatch_dR;

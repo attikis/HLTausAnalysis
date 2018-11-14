@@ -279,13 +279,17 @@ void TkEG::Loop()
 	  GenParticle photon_1 = genTau->finalDaughtersNeutral().at(0).daughters().at(0);
 	  GenParticle photon_2 = genTau->finalDaughtersNeutral().at(0).daughters().at(1);
 
-	  double photons_dR = auxTools_.DeltaR( photon_1.eta(), photon_1.phi(), photon_2.eta(), photon_2.phi() );
-
+	  double photons_dR   = auxTools_.DeltaR( photon_1.eta(), photon_1.phi(), photon_2.eta(), photon_2.phi() );
+	  double photons_dEta = auxTools_.DeltaEta( photon_1.eta(), photon_2.eta());
+	  double photons_dPhi = auxTools_.DeltaPhi( photon_1.phi(), photon_2.phi());
+						   
 	  // Fill histos (photons properties)
-	  h_Pion0_Et   -> Fill (genTau->finalDaughtersNeutral().at(0).et());
-	  h_Photons_Et -> Fill (photon_1.et());
-	  h_Photons_Et -> Fill (photon_2.et());
-	  h_Photons_dR -> Fill (photons_dR);
+	  h_Pion0_Et     -> Fill (genTau->finalDaughtersNeutral().at(0).et());
+	  h_Photons_Et   -> Fill (photon_1.et());
+	  h_Photons_Et   -> Fill (photon_2.et());
+	  h_Photons_dR   -> Fill (photons_dR);
+	  h_Photons_dEta -> Fill (photons_dEta);
+	  h_Photons_dPhi -> Fill (photons_dPhi);
 
 	  h_Pion0Et_Vs_PhotonsDR -> Fill (genTau->finalDaughtersNeutral().at(0).et(), photons_dR);
 	  
@@ -301,8 +305,8 @@ void TkEG::Loop()
 
 	  // Find the minimum dR between photons and EGs
 	  
-	  // --- will check the matching only for pion0s with ET>10GeV (because EGs ET is >10GeV)
-	  if (genTau->finalDaughtersNeutral().at(0).et() < 10) continue;
+	  // --- will check the matching only for pion0s with ET>1.5GeV (because EGs ET is >10GeV)
+	  if (genTau->finalDaughtersNeutral().at(0).et() < 1.5) continue;
 
 	  // For-loop: All the EGs in the event                                                                                                                         
 	  for (auto eg = L1EGs.begin(); eg != L1EGs.end() ; eg++) { 
@@ -374,8 +378,8 @@ void TkEG::Loop()
 	//int genD_pdgId     = d.pdgId();
 	p4sum += d.p4();
 	
-	// Leading charged product should have pt > 10 GeV
-	if (d.pt() < 10.0) continue;
+	// Leading charged product should have pt > 5 GeV
+	if (d.pt() < 5.0) continue;
 
 	bool notLeading = false;
 
@@ -407,15 +411,12 @@ void TkEG::Loop()
 	if (notLeading) continue;
 
 	// Each neutral product should have ET > 10GeV (most of the times it is absorbed by one EG - EG ET threshold is 10 GeV)
-	//sumET =0;
-	//for (unsigned int i = 0; i < genTau->finalDaughtersNeutral().size(); i++) sumET += genTau->finalDaughtersNeutral().at(i).et();
-	//if (sumET >= 2.0) {
 
 	// For-loop: All neutral daughters
 	for (unsigned int i = 0; i < genTau->finalDaughtersNeutral().size(); i++) {
 	  GenParticle d_n      = genTau->finalDaughtersNeutral().at(i);
 	  
-	  if (d_n.et() < 10) continue;
+	  if (d_n.et() < 1.5) continue;
 
 	  // Find the maximum deltaR of the leading charged product and the other neutral products
 	  deltaRneutral = auxTools_.DeltaR(d.eta(), d.phi(), d_n.eta(), d_n.phi());
@@ -1101,6 +1102,8 @@ void TkEG::Loop()
 	  // For-loop: All pion0s in the event                                                                                                                         
 	  for (vector<GenParticle>::iterator daugh = neuDaugh.begin() ; daugh != neuDaugh.end() ; daugh ++){
 
+	    if (daugh->et() < 1.5) continue;
+
 	    deltaR = auxTools_.DeltaR( eg->getEta(), eg->getPhi(), daugh->eta(), daugh->phi() );
 	    
 	    if (deltaR < match_dR) {
@@ -1212,9 +1215,12 @@ void TkEG::Loop()
 	      closestEG = *eg;
 	    }
 	  }
-
+	  // Fill histos
 	  h_TkEG_PoorNeuResol_dRmin_Pi0_EG     -> Fill( min_dR );
 	  h_TkEG_PoorNeuResol_Pi0_closestEG_ET -> Fill( closestEG.getEt() );
+	  h_TkEG_PoorNeuResol_Pi0_closestEG_ET_Vs_dRmin_Pi0_EG -> Fill( closestEG.getEt() , min_dR );
+	  h_TkEG_PoorNeuResol_Pi0_ET_Vs_closestEG_ET           -> Fill( daugh->et(), closestEG.getEt() );
+	  
 	}
       }
       
@@ -2338,6 +2344,14 @@ void TkEG::BookHistos_(void)
   // dR of the two photons from pi0 (1 prong decay, 1 pi0 cases)
   histoTools_.BookHisto_1D(h_Photons_dR  , "Photons_dR"  , ";#Delta R; Entries / bin",   200,  0.0,   +2.0);
 
+  // dPhi of the two photons from pi0 (1 prong decay, 1 pi0 cases)
+  histoTools_.BookHisto_1D(h_Photons_dPhi  , "Photons_dPhi"  , ";#Delta#phi; Entries / bin",   21,  -3.15,  +3.15);
+  
+  // dEta of the two photons from pi0 (1 prong decay, 1 pi0 cases)
+  histoTools_.BookHisto_1D(h_Photons_dEta  , "Photons_dEta"  , ";#Delta#eta; Entries / bin",  100,  -10.0,  10.0);
+  
+  //
+
   // Et of pi0 Vs dR of the two photons from pi0 (1 prong decay, 1 pi0 cases)
   histoTools_.BookHisto_2D(h_Pion0Et_Vs_PhotonsDR, "Pion0Et_Vs_PhotonsDR", ";E_{T} (#pi^{0})  (GeV); #DeltaR (photon_{1}, photon_{2})", 100, 0.0, 100.0, 100, 0.0, 1.0);
 
@@ -2463,7 +2477,7 @@ void TkEG::BookHistos_(void)
   // DR of lead trk and EGs (before the correction of EG's eta
   histoTools_.BookHisto_1D(h_leadTrk_EG_dR_beforecorrection, "leadTrk_EG_dR_beforecorrection", ";#DeltaR(trk_{ldg}, EG); entries / bin",   60,  0.0,   +6.0);
 
-  // DPhi of lead trk and EGs                                                                      
+  // DPhi of lead trk and EGs                                                       
   histoTools_.BookHisto_1D(h_leadTrk_EG_dPhi, "leadTrk_EG_dPhi", ";#Delta#phi(trk_{ldg}, EG); entries / bin",  21,  -3.15,  +3.15);
 
   // DEta of lead trk and EGs
@@ -2579,7 +2593,7 @@ void TkEG::BookHistos_(void)
   h_TkEG_clustEGs_MCMatch->GetXaxis()->SetBinLabel(2,"MC Matched EG");
 
   histoTools_.BookHisto_1D(h_TkEG_clustEGs_dET_matchPion0, "TkEG_clustEGs_dET_matchPion0", ";#deltaE_{T}; Entries / bin", 100, -50, 50); 
-  histoTools_.BookHisto_1D(h_TkEG_clustEGs_ETResolution, "TkEG_clustEGs_ETResolution", ";E_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0); 
+  histoTools_.BookHisto_1D(h_TkEG_clustEGs_ETResolution, "TkEG_clustEGs_ETResolution", ";E_{T} resolution (GeV);Clusters / bin", 20000, -10.0, +10.0); 
   histoTools_.BookHisto_1D(h_TkEG_isoTracks_InvMass, "TkEG_isoTracks_InvMass", ";Invariant mass (iso-cone); Entries / bin", 5000, +0.0, +5.0);
   histoTools_.BookHisto_1D(h_TkEG_isoTracks_Multiplicity, "TkEG_isoTracks_Multiplicity", ";N_{iso-tks}; Entries / bin",11, -0.5, 10.5);
   histoTools_.BookHisto_1D(h_TkEG_isoTracks_Et, "TkEG_isoTracks_Et", tEt  , nEt  , minEt  , maxEt  );
@@ -2608,9 +2622,11 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_TkEG_PoorNeuResol_dR_Pi0_visTau, "TkEG_PoorNeuResol_dR_Pi0_visTau", ";#DeltaR (#pi^{0}, #tau_{vis})", 50, 0.0, 0.5);
   histoTools_.BookHisto_1D(h_TkEG_PoorNeuResol_dEta_Pi0_visTau, "TkEG_PoorNeuResol_dEta_Pi0_visTau", ";#Delta#eta (#pi^{0}, #tau_{vis})", 100,  -10.0,  10.0);
   histoTools_.BookHisto_1D(h_TkEG_PoorNeuResol_dPhi_Pi0_visTau, "TkEG_PoorNeuResol_dPhi_Pi0_visTau", ";#Delta#phi (#pi^{0}, #tau_{vis})",  21,  -3.15,  +3.15);
-  histoTools_.BookHisto_1D(h_TkEG_PoorNeuResol_Pi0_ET, "TkEG_PoorNeuResol_Pi0_ET", tEt, nEt, minEt, maxEt);
-  histoTools_.BookHisto_1D(h_TkEG_PoorNeuResol_Pi0_closestEG_ET, "TkEG_PoorNeuResol_Pi0_closestEG_ET", tEt, nEt, minEt, maxEt);
+  histoTools_.BookHisto_1D(h_TkEG_PoorNeuResol_Pi0_ET, "TkEG_PoorNeuResol_Pi0_ET", ";E_{T}^{#pi^{0}};Entries/bin", nEt, minEt, maxEt);
+  histoTools_.BookHisto_1D(h_TkEG_PoorNeuResol_Pi0_closestEG_ET, "TkEG_PoorNeuResol_Pi0_closestEG_ET", ";E_{T}^{EG}; Entries/bin", nEt, minEt, maxEt);
   histoTools_.BookHisto_1D(h_TkEG_PoorNeuResol_dRmin_Pi0_EG, "TkEG_PoorNeuResol_dRmin_Pi0_EG", ";#DeltaR_{min} (#pi^{0}, EG)", 120, 0.0, 6.0);
+  histoTools_.BookHisto_2D(h_TkEG_PoorNeuResol_Pi0_closestEG_ET_Vs_dRmin_Pi0_EG, "TkEG_PoorNeuResol_Pi0_closestEG_ET_Vs_dRmin_Pi0_EG",";E_{T}^{EG};#DeltaR_{min} (#pi^{0}, EG); Entries/bin", nEt, minEt, maxEt, 120, 0.0, 6.0);
+  histoTools_.BookHisto_2D(h_TkEG_PoorNeuResol_Pi0_ET_Vs_closestEG_ET, "TkEG_PoorNeuResol_Pi0_ET_Vs_closestEG_ET", ";E_{T}^{#pi^{0}};E_{T}^{EG};Entries/bin", nEt, minEt, maxEt, nEt, minEt, maxEt);
 
   // Pt resolution of TkEG candidate
   histoTools_.BookHisto_1D(h_TkEG_PtResolution, "TkEG_PtResolution", ";p_{T} resolution (GeV);Clusters / bin", 2000, -1.0, +1.0);
@@ -3163,6 +3179,8 @@ void TkEG::WriteHistos_(void)
   h_Pion0_Et->Write();
   h_Photons_Et->Write();
   h_Photons_dR->Write();
+  h_Photons_dEta->Write();
+  h_Photons_dPhi->Write();
   h_Pion0Et_Vs_PhotonsDR->Write();
   h_Photons_EGs_Matching->Write();
 
@@ -3289,7 +3307,8 @@ void TkEG::WriteHistos_(void)
   h_TkEG_PoorNeuResol_Pi0_ET->Write();
   h_TkEG_PoorNeuResol_dRmin_Pi0_EG->Write();
   h_TkEG_PoorNeuResol_Pi0_closestEG_ET->Write();
-
+  h_TkEG_PoorNeuResol_Pi0_closestEG_ET_Vs_dRmin_Pi0_EG->Write();
+  h_TkEG_PoorNeuResol_Pi0_ET_Vs_closestEG_ET->Write();
 
   h_TkEG_PtResolution->Write();
   h_TkEG_PtResolution_C->Write();
