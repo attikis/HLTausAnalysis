@@ -226,7 +226,7 @@ def main(opts):
             if 1: 
                 opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/", postfix="TurnOns")
 
-                PlotTurnOns(datasetsMgr, turnOnLists[0], s, PU, "TurnOns_25GeV_%s_Inclusive" % (s), prefix)
+                PlotTurnOns(datasetsMgr, turnOnLists[0], s, PU, "TurnOns_25GeV_%s_Inclusive" % (s) )
                 PlotTurnOns(datasetsMgr, turnOnLists[1], s, PU, "TurnOns_50GeV_%s_Inclusive" % (s) )
 
                 PlotTurnOns(datasetsMgr, turnOnLists_noNeutrals[0], s, PU, "TurnOns_25GeV_%s_noNeutrals" % (s) )

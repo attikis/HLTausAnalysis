@@ -415,8 +415,6 @@ void CaloTk::Loop()
 	if(DEBUG) cout << "\tGetting the GenParticles" << endl;
 	if (0) GenParticles = GetGenParticles(false); // time-consuming
 	GenTaus             = GetGenParticles(15, true);
-	// GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 1.479); // CaloTaus currently eta-restricted
-	// GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 1.479); // CaloTaus currently eta-restricted
 	GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 1.3); // CaloTaus currently eta-restricted
 	GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 1.3); // CaloTaus currently eta-restricted
       }

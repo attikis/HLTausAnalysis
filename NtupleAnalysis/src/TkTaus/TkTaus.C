@@ -41,7 +41,7 @@ void TkTaus::InitVars_()
   seedTk_minPt       =   5.0;       //  5.0
   seedTk_minEta      =   0.0;       //  0.0
   seedTk_maxEta      =   2.5;       //  2.5
-  seedTk_maxChiSq    =  50.0;       // 50.0
+  seedTk_maxChiSq    =  80.0;       // 50.0
   seedTk_minStubs    =    5;        //  5
 
   // Signal cone tracks
@@ -416,7 +416,7 @@ void TkTaus::Loop()
 	if(DEBUG) cout << "\tGetting the GenParticles" << endl;
 	if (0) GenParticles = GetGenParticles(false); // time-consuming
 	GenTaus             = GetGenParticles(15, true);
-	GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 999.9); // for visEt and genP plots
+	GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 2.3); // for visEt and genP plots
 	GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 2.3);
       }
 
@@ -571,7 +571,7 @@ void TkTaus::Loop()
 	double vtxIso = L1TkTauCandidate.CalculateVtxIso(true, isoCone_useCone);
 
 	// Get the matching gen-particle
-	GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic); // GenTausTrigger ?
+	GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic);
 	if ( L1TkTauCandidate.HasMatchingGenParticle() ) bFoundMC = true;
 	      
 	// Print information on L1TkTauCandidate ??
