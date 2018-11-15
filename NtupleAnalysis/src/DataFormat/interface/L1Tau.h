@@ -46,6 +46,8 @@ class L1Tau{
   double eta(void) const {return theEta;}
   double phi(void) const {return thePhi;}
 
+  void setEt(double Et) {theEt = Et;}
+
   unsigned short getIndex(void) const {return theIndex;}
   double getEt(void) const {return theEt;}
   double getEta(void) const {return theEta;}
