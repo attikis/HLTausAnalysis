@@ -229,7 +229,9 @@ class CaloTk : public TreeAnalyserMC{
   bool IsWithinEtaRegion(string etaRegion,
 			 double eta);
 
-  
+  double findClosest(double [], int, double);
+  double getClosest(double,double,double);
+
   // Variable declaration
   // L1TkPrimaryVertex *pvProducer;
   AuxTools auxTools_;
@@ -241,6 +243,8 @@ class CaloTk : public TreeAnalyserMC{
   // GenParticles Histograms
   TH2D* hGenP_VisEt_Vs_dRMaxLdgPion;
   TH2D* hGenP_PtLdg_Vs_dRMaxLdgPion;
+
+  TH2D* E_calo2E_vis_Vs_eta_calo;
 
   // Counters
   TH1D* hCounters;
