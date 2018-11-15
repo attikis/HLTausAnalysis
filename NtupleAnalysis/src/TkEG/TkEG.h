@@ -284,6 +284,7 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_EGs_Phi;
   TH1D* h_EGs_IEta;
   TH1D* h_EGs_IPhi;
+  TH1D* h_EGs_HwQual;
   TH2D* h_EGs_EtaVsEt;
 
   TH1D* h_leadTrk_EG_dR;
@@ -346,6 +347,8 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_CHF_withNeutrals;
   TH1D* h_TkEG_NHF_withNeutrals;
   TH1D* h_TkEG_clustEGs_MCMatch;
+  TH1D* h_TkEG_clustEGs_Matched_HwQual;
+  TH1D* h_TkEG_clustEGs_nonMatched_HwQual;
   TH1D* h_TkEG_clustEGs_dET_matchPion0;
   TH1D* h_TkEG_clustEGs_ETResolution;
   TH1D* h_TkEG_isoTracks_InvMass;
