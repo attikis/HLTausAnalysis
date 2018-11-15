@@ -13,7 +13,7 @@ EXAMPLES:
 
 
 LAST USED:
-./plotAlgos.py -m multicrab_CaloTk_v92X_16h12m34s_15Nov2018,multicrab_TkTaus_v92X_14h39m23s_15Nov2018,multicrab_TkEG_v92X_17h04m49s_15Nov2018
+./plotAlgos.py -m multicrab_CaloTk_v92X_16h12m34s_15Nov2018,multicrab_TkTaus_v92X_17h56m36s_15Nov2018,multicrab_TkEG_v92X_17h04m49s_15Nov2018
 
 '''
 #================================================================================================ 
@@ -219,8 +219,7 @@ def main(opts):
     datasetsMgr.PrintInfo()
 
     # Define the mapping histograms in numerator->denominator pairs
-    VariableList = ["L1Taus_SingleTau_Eff", "L1Taus_SingleTau_Rate"]
-    #VariableList = ["L1Taus_SingleTau_Eff", "L1Taus_SingleTau_Rate", "L1Taus_TurnOn25", "L1Taus_TurnOn50"]
+    VariableList = ["L1Taus_SingleTau_Eff", "L1Taus_SingleTau_Rate", "L1Taus_TurnOn25", "L1Taus_TurnOn50"]
 
     counter =  0
     opts.nDatasets = len(datasetsMgr.getAllDatasets())
@@ -292,10 +291,11 @@ def PlotHistos(datasetName, hPath, saveName):
         if (j == 0):
             refHisto = histograms.Histo(histo, algo, legendStyle = "L", drawStyle="HIST")
             refHisto.getRootHisto().SetLineStyle(ROOT.kSolid)
-            refHisto.getRootHisto().SetLineWidth(3)
+            refHisto.getRootHisto().SetLineWidth(4)
         else:
             text = str(j)
             #histoList.append(histograms.Histo(histo, algo, legendStyle = "LP", drawStyle="AP"))
+            histo.SetLineWidth(4)
             histoList.append(histograms.Histo(histo, algo, legendStyle = "L", drawStyle="HIST"))
         j = j + 1
 
@@ -350,6 +350,7 @@ def PlotRateVsEff(datasetsMgr, dataset, Type, PU):
         algo   = opts.mcrabs[j].split("_")[1]
         graph.SetName(algo)
         styles.styles[j].apply(graph) 
+        graph.SetLineWidth(4)
         gList.append(graph)
         legDict[algo] = getAlgoLabel(algo)
 
@@ -359,10 +360,11 @@ def PlotRateVsEff(datasetsMgr, dataset, Type, PU):
     p.setLegendHeader(plots._legendLabels[signal])
 
     # Set individual styles
-    for index, h in enumerate(p.histoMgr.getHistos()):
+    for index, h in enumerate(p.histoMgr.getHistos(), 1):
         hName = h.getName()
         legDict[hName] = getAlgoLabel(hName)
-        p.histoMgr.forHisto(hName, styles.getCaloStyle(index))
+        #p.histoMgr.forHisto(hName, styles.getCaloStyle(index))
+        #styles.styles[j].apply(histo) 
         p.histoMgr.setHistoDrawStyle(h.getName(), "LX") # "X" = Do not draw error bars
         p.histoMgr.setHistoLegendStyle(h.getName(), "L") #LP
 
