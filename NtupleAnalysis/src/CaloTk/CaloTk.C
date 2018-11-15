@@ -1310,10 +1310,10 @@ void CaloTk::Loop()
     // Best Performing WP
     ////////////////////////////////////////////////////////////////////////////////////////////////    
     L1Taus_BestWP = L1Taus_RelIsoTight;
-    FillTurnOn_Numerator_(L1Taus_BestWP, 25.0, hL1CaloTkTaus_TurnOn25, hL1CaloTkTaus_TurnOn25_1pr, hL1CaloTkTaus_TurnOn25_3pr, hL1CaloTkTaus_TurnOn25_withNeutrals, hL1CaloTkTaus_TurnOn25_noNeutrals); 
-    FillTurnOn_Numerator_(L1Taus_BestWP, 50.0, hL1CaloTkTaus_TurnOn50, hL1CaloTkTaus_TurnOn50_1pr, hL1CaloTkTaus_TurnOn50_3pr, hL1CaloTkTaus_TurnOn50_withNeutrals, hL1CaloTkTaus_TurnOn50_noNeutrals); 
-    FillSingleTau_(L1Taus_BestWP, hL1CaloTkTaus_SingleTau_Rate, hL1CaloTkTaus_SingleTau_Eff);
-    FillDiTau_(L1Taus_BestWP, hL1CaloTkTaus_DiTau_Rate, hL1CaloTkTaus_DiTau_Eff);
+    FillTurnOn_Numerator_(L1Taus_BestWP, 25.0, hL1Taus_TurnOn25, hL1Taus_TurnOn25_1pr, hL1Taus_TurnOn25_3pr, hL1Taus_TurnOn25_withNeutrals, hL1Taus_TurnOn25_noNeutrals); 
+    FillTurnOn_Numerator_(L1Taus_BestWP, 50.0, hL1Taus_TurnOn50, hL1Taus_TurnOn50_1pr, hL1Taus_TurnOn50_3pr, hL1Taus_TurnOn50_withNeutrals, hL1Taus_TurnOn50_noNeutrals); 
+    FillSingleTau_(L1Taus_BestWP, hL1Taus_SingleTau_Rate, hL1Taus_SingleTau_Eff);
+    FillDiTau_(L1Taus_BestWP, hL1Taus_DiTau_Rate, hL1Taus_DiTau_Eff);
 
 
     // Progress bar
@@ -1455,12 +1455,8 @@ void CaloTk::Loop()
 
 
       // Best performing WP
-
-      // Single-Tau
-      histoTools_.ConvertToRateHisto_1D( hL1CaloTkTaus_SingleTau_Rate, N );
-            
-      // Di-Tau
-      histoTools_.ConvertToRateHisto_1D( hL1CaloTkTaus_DiTau_Rate, N );
+      histoTools_.ConvertToRateHisto_1D( hL1Taus_SingleTau_Rate, N );
+      histoTools_.ConvertToRateHisto_1D( hL1Taus_DiTau_Rate, N );
             
     }
   else // new: speed things up a bit
@@ -1560,14 +1556,8 @@ void CaloTk::Loop()
       FinaliseEffHisto_( hDiTau_Eff_Tk_RelIsoTight, nEvtsWithMaxHTaus);;
 
       // Best performing WP
-      
-      // Single-Tau
-      FinaliseEffHisto_( hL1CaloTkTaus_SingleTau_Eff, nEvtsWithMaxHTaus);
-      
-      // Di-Tau
-      FinaliseEffHisto_( hL1CaloTkTaus_DiTau_Eff,nEvtsWithMaxHTaus);
-
-
+      FinaliseEffHisto_( hL1Taus_SingleTau_Eff, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hL1Taus_DiTau_Eff,nEvtsWithMaxHTaus);
 
     }
   
@@ -1672,18 +1662,16 @@ void CaloTk::Loop()
   histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn50_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
 
   // Turn-ons for the best performing WP
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn25, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn25_1pr, hMcHadronicTau_VisEt_1pr);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn25_3pr, hMcHadronicTau_VisEt_3pr);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn25_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
-
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn50, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn50_1pr, hMcHadronicTau_VisEt_1pr);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn50_3pr, hMcHadronicTau_VisEt_3pr);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn50_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
-
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn25             , hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn25_1pr         , hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn25_3pr         , hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn25_noNeutrals  , hMcHadronicTau_VisEt_noNeutrals);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn50             , hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn50_1pr         , hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn50_3pr         , hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn50_noNeutrals  , hMcHadronicTau_VisEt_noNeutrals);
 
   ////////////////////////////////////////////////
   // Write the histograms to the file
@@ -1986,7 +1974,7 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hRelIsoTight_Rate_I, "RelIsoTight_Rate_I", "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hRelIsoTight_Rate_F, "RelIsoTight_Rate_F", "", nEt , minEt , maxEt );
   
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_SingleTau_Rate, "L1CaloTkTaus_SingleTau_Rate", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_SingleTau_Rate, "L1Taus_SingleTau_Rate", "", nEt , minEt , maxEt );
 
   histoTools_.BookHisto_1D(hCalo_Eff     , "Calo_Eff"     , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hCalo_Eff_C   , "Calo_Eff_C"   , "", nEt , minEt , maxEt );
@@ -2021,7 +2009,7 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hRelIsoTight_Eff_I, "RelIsoTight_Eff_I", "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hRelIsoTight_Eff_F, "RelIsoTight_Eff_F", "", nEt , minEt , maxEt );
 
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_SingleTau_Eff, "L1CaloTkTaus_SingleTau_Eff", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_SingleTau_Eff, "L1Taus_SingleTau_Eff", "", nEt , minEt , maxEt );
 
   // DiTau
   histoTools_.BookHisto_1D(hDiTau_Rate_Calo    , "DiTau_Rate_Calo"    , "", nEt , minEt , maxEt );
@@ -2057,7 +2045,7 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hDiTau_Rate_RelIsoTight_I, "DiTau_Rate_RelIsoTight_I", "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hDiTau_Rate_RelIsoTight_F, "DiTau_Rate_RelIsoTight_F", "", nEt , minEt , maxEt );
 
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_DiTau_Rate, "L1CaloTkTaus_DiTau_Rate", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_DiTau_Rate, "L1Taus_DiTau_Rate", "", nEt , minEt , maxEt );
 
 
   histoTools_.BookHisto_1D(hDiTau_Eff_Calo     , "DiTau_Eff_Calo"    , "", nEt , minEt , maxEt );
@@ -2093,7 +2081,7 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hDiTau_Eff_RelIsoTight_I, "DiTau_Eff_RelIsoTight_I" , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hDiTau_Eff_RelIsoTight_F, "DiTau_Eff_RelIsoTight_F" , "", nEt , minEt , maxEt );
 
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_DiTau_Eff, "L1CaloTkTaus_DiTau_Eff", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_DiTau_Eff, "L1Taus_DiTau_Eff", "", nEt , minEt , maxEt );
 
   
   // Turn-Ons
@@ -2200,18 +2188,16 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hRelIsoTight_TurnOn50_noNeutrals, "RelIsoTight_TurnOn50_noNeutrals" , "", 60 , minEt , maxEt );
 
   // Turn-ons for the best performing WP
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn25, "L1CaloTkTaus_TurnOn25", "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn25_1pr, "L1CaloTkTaus_TurnOn25_1pr" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn25_3pr, "L1CaloTkTaus_TurnOn25_3pr" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn25_withNeutrals, "L1CaloTkTaus_TurnOn25_withNeutrals" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn25_noNeutrals, "L1CaloTkTaus_TurnOn25_noNeutrals" , "", 60 , minEt , maxEt );
-
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn50, "L1CaloTkTaus_TurnOn50", "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn50_1pr, "L1CaloTkTaus_TurnOn50_1pr" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn50_3pr, "L1CaloTkTaus_TurnOn50_3pr" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn50_withNeutrals, "L1CaloTkTaus_TurnOn50_withNeutrals" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn50_noNeutrals, "L1CaloTkTaus_TurnOn50_noNeutrals" , "", 60 , minEt , maxEt );
-
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn25             , "L1Taus_TurnOn25"             , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn25_1pr         , "L1Taus_TurnOn25_1pr"         , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn25_3pr         , "L1Taus_TurnOn25_3pr"         , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn25_withNeutrals, "L1Taus_TurnOn25_withNeutrals", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn25_noNeutrals  , "L1Taus_TurnOn25_noNeutrals"  , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn50             , "L1Taus_TurnOn50"             , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn50_1pr         , "L1Taus_TurnOn50_1pr"         , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn50_3pr         , "L1Taus_TurnOn50_3pr"         , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn50_withNeutrals, "L1Taus_TurnOn50_withNeutrals", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn50_noNeutrals  , "L1Taus_TurnOn50_noNeutrals"  , "", 60 , minEt , maxEt );
 
   // DiTau (Calo-Other)
   histoTools_.BookHisto_2D(hDiTau_Rate_Calo_VtxIso, "DiTau_Rate_Calo_VtxIso", "", nEt, minEt, maxEt, nEt, minEt, maxEt);
@@ -2445,7 +2431,7 @@ void CaloTk::WriteHistos_(void)
   hRelIsoTight_Rate_I->Write();
   hRelIsoTight_Rate_F->Write();
 
-  hL1CaloTkTaus_SingleTau_Rate->Write();
+  hL1Taus_SingleTau_Rate->Write();
 
   // SingleTau: Efficiencies
   hCalo_Eff->Write();
@@ -2481,7 +2467,7 @@ void CaloTk::WriteHistos_(void)
   hRelIsoTight_Eff_I->Write();
   hRelIsoTight_Eff_F->Write();
 
-  hL1CaloTkTaus_SingleTau_Eff->Write();
+  hL1Taus_SingleTau_Eff->Write();
 
   // DiTau: Rates
   hDiTau_Rate_Calo->Write();
@@ -2517,7 +2503,7 @@ void CaloTk::WriteHistos_(void)
   hDiTau_Rate_RelIsoTight_I->Write();
   hDiTau_Rate_RelIsoTight_F->Write();
 
-  hL1CaloTkTaus_DiTau_Rate->Write();
+  hL1Taus_DiTau_Rate->Write();
 
   // DiTau: Efficiencies
   hDiTau_Eff_Calo->Write();
@@ -2553,7 +2539,7 @@ void CaloTk::WriteHistos_(void)
   hDiTau_Eff_RelIsoTight_I->Write();
   hDiTau_Eff_RelIsoTight_F->Write();
 
-  hL1CaloTkTaus_DiTau_Eff->Write();
+  hL1Taus_DiTau_Eff->Write();
 
   // DiTau (Calo-Other)
   hDiTau_Rate_Calo_VtxIso->Write();
@@ -2675,17 +2661,16 @@ void CaloTk::WriteHistos_(void)
   hRelIsoTight_TurnOn50_noNeutrals->Write();
 
   // Turn-ons for the best performing WP
-  hL1CaloTkTaus_TurnOn25->Write();
-  hL1CaloTkTaus_TurnOn25_1pr->Write();
-  hL1CaloTkTaus_TurnOn25_3pr->Write();
-  hL1CaloTkTaus_TurnOn25_withNeutrals->Write();
-  hL1CaloTkTaus_TurnOn25_noNeutrals->Write();
-
-  hL1CaloTkTaus_TurnOn50->Write();
-  hL1CaloTkTaus_TurnOn50_1pr->Write();
-  hL1CaloTkTaus_TurnOn50_3pr->Write();
-  hL1CaloTkTaus_TurnOn50_withNeutrals->Write();
-  hL1CaloTkTaus_TurnOn50_noNeutrals->Write();
+  hL1Taus_TurnOn25->Write();
+  hL1Taus_TurnOn25_1pr->Write();
+  hL1Taus_TurnOn25_3pr->Write();
+  hL1Taus_TurnOn25_withNeutrals->Write();
+  hL1Taus_TurnOn25_noNeutrals->Write();
+  hL1Taus_TurnOn50->Write();
+  hL1Taus_TurnOn50_1pr->Write();
+  hL1Taus_TurnOn50_3pr->Write();
+  hL1Taus_TurnOn50_withNeutrals->Write();
+  hL1Taus_TurnOn50_noNeutrals->Write();
 
   outFile->Write();
 
