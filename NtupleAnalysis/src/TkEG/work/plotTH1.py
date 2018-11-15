@@ -109,7 +109,7 @@ def PlotHisto(datasetsMgr, h):
         dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False)
         dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False)
         opts.normalizeToOne = False
-    elif "resolution" in h.lower():
+    elif "resolution" in h.lower() or "PoorNeuResol" in h or "match" in h.lower():
         dsetsMgr.remove("SingleNeutrino_L1TPU140", close=False)
         dsetsMgr.remove("SingleNeutrino_L1TPU200", close=False)
     elif "rate" in h.lower():
@@ -249,7 +249,7 @@ def GetHistoKwargs(h, opts):
         
     if "etresolution" in hName:
         _units  = ""
-        _format = "%0.2f " + _units
+        _format = "%0.3f " + _units
         #_xLabel = "(E_{T}^{calo} - p_{T}^{vis}) / p_{T}^{vis}"
         _xLabel = "#deltaE_{T} / p_{T}^{vis}"
         _rebinX = 1
@@ -299,7 +299,6 @@ def GetHistoKwargs(h, opts):
     if "nstubs" in hName:
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 10, "ymin": _yMin, "ymaxfactor": _yMaxF}
                 
-
     if "multiplicity" in h.lower():
         kwargs["opts"]   = {"xmin": -0.5, "xmax": 20, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
@@ -335,6 +334,12 @@ def GetHistoKwargs(h, opts):
     if "photons_dr" in h.lower():
         kwargs["opts"] = {"xmin": 0.0, "xmax": 0.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
+    if "photons_deta" in h.lower():
+        kwargs["opts"] = {"xmin": 0.0, "xmax": 0.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
+
+    if "photons_dphi" in h.lower():
+        kwargs["opts"] = {"xmin": -0.4, "xmax": 0.4, "ymin": _yMin, "ymaxfactor": _yMaxF}
+    
     if "chi2" in h.lower():
         kwargs["rebinX"] = 2
 
@@ -384,11 +389,17 @@ def GetHistoKwargs(h, opts):
         kwargs["cutBox"] = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["log"]  = True
 
+    if "TkEG_PoorNeuResol_NeuMultiplicity" == h:
+        kwargs["opts"]   = {"xmin": 0, "xmax": 8, "ymin": _yMin, "ymaxfactor": _yMaxF}
+
+    if "TkEG_PoorNeuResol_dR_Pi0_visTau" == h :
+        kwargs["opts"]   = {"xmin": 0, "xmax": 0.3, "ymin": _yMin, "ymaxfactor": _yMaxF}
+
     if  "TkEG_PoorNeuResol_Pi0_ET" == h or "TkEG_PoorNeuResol_Pi0_closestEG_ET" == h :
-        kwargs["opts"]   = {"xmin": 0, "xmax": 100.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": 0, "xmax": 80.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "TkEG_PoorNeuResol_dRmin_Pi0_EG" == h:
-        kwargs["opts"]   = {"xmin": 0, "xmax": 3.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
 
     if "EGClusters_M" == h:
         kwargs["opts"]   = {"xmin": 0, "xmax": 2.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
@@ -418,7 +429,6 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0, "xmax": 5.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 0.3, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
 
-
     if "leadtrks_pt" in h.lower():
         _yLabel = "Arbitrary Units / %.0f "
         units            = "GeV"
@@ -437,6 +447,17 @@ def GetHistoKwargs(h, opts):
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 50.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         #kwargs["log"]    = True                                                                                                                                         
 
+    if "TkEG_clustEGs_dET_matchPion0" in h:
+        kwargs["opts"]   = {"xmin": -30.0, "xmax": 50.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        
+    if "TkEG_clustEGs_ETResolution" in h:
+        kwargs["opts"]   = {"xmin": -1.0, "xmax": 1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        kwargs["xlabel"] = "#deltaE_{T} / p_{T}^{#pi^{0}}"
+        kwargs["ylabel"] = "Arbitrary Units / %.3f "        
+        kwargs["rebinX"] = 5
+        
     if "EGs_Et" == h or "clustEGs_Et" == h:
         kwargs["log"]  = True
         kwargs["opts"] = {"xmin": 0.0, "xmax": 100.0, "ymin": 0.00001, "ymaxfactor": 1.4}
@@ -461,20 +482,6 @@ def GetHistoKwargs(h, opts):
         kwargs["log"]  = True
         kwargs["opts"] = {"xmin": 0.0, "xmax": 10.0, "ymin": 0.001, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 0.8, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-
-    if "etresolution" in hName or "ptresolution" in hName:
-        kwargs["opts"] = {"xmin": -1.0, "xmax": 1.0, "ymin": 0.0, "ymaxfactor": _yMaxF}
-        kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-
-    if "etaresolution" in hName:
-        kwargs["opts"] = {"xmin": -0.3, "xmax": 0.3, "ymin": 0.0, "ymaxfactor": _yMaxF}
-        kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-
-    if "phiresolution" in hName:
-        kwargs["opts"] = {"xmin": -0.3, "xmax": 0.3, "ymin": 0.0, "ymaxfactor": _yMaxF}
-        kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        
-
 
     return kwargs
 
@@ -592,7 +599,7 @@ def main(opts):
         
         # Obsolete quantity
         #if h in skipList:
-        if "counter" in h.lower() or "resolution" in h.lower() or "eff_" in h.lower() or "rate" in h.lower() or "turnon" in h.lower():
+        if "counter" in h.lower() or "phiresolution" in h.lower() or "etaresolution" in h.lower() or "eff_" in h.lower() or "rate" in h.lower() or "turnon" in h.lower():
             continue
 
         histoType  = str(type(datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDatasetRootHisto(h).getHistogram()))

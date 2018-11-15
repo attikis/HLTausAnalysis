@@ -46,6 +46,7 @@ set PSEUDO_MCRAB_DIR = ${1}
 ./plotRateVsEff.py -e "SingleE" -m $PSEUDO_MCRAB_DIR --url
 ./plotTH2.py -e "SingleE" --logZ --normalizeToOne -m $PSEUDO_MCRAB_DIR --url
 ./plotResolutions.py -i "GluGluHToTauTau_14TeV_L1TPU200" -n -m $PSEUDO_MCRAB_DIR --url
+./plotResolutionsPU.py -i "GluGluHToTauTau" -n -m $PSEUDO_MCRAB_DIR  --url
 ./plotComparison.py -i "SingleTau_L1TPU200" -n -m $PSEUDO_MCRAB_DIR --url
 
 #./plotTkTau.py -n -e "SingleE|Charged|TT" -m $PSEUDO_MCRAB_DIR --url

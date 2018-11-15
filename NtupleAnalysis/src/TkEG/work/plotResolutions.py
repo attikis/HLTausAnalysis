@@ -202,7 +202,7 @@ def main(opts):
 
             ["TkEG_EtResolution_withNeutrals", "TkEG_EtResolution_withNeutrals_1pion0", "TkEG_EtResolution_withNeutrals_2pion0", "TkEG_EtResolution_withNeutrals_3pion0"],#,"TkEG_EtResolution_withNeutrals_4pion0"],
 
-            ["TkEG_EtResolution_withNeutrals_withEGs", "TkEG_EtResolution_withNeutrals_withEGs_0to10GeV", "TkEG_EtResolution_withNeutrals_withEGs_10to20GeV", "TkEG_EtResolution_withNeutrals_withEGs_20to30GeV", "TkEG_EtResolution_withNeutrals_withEGs_30to40GeV", "TkEG_EtResolution_withNeutrals_withEGs_40to50GeV"]
+            ["TkEG_EtResolution_withNeutrals_withEGs", "TkEG_EtResolution_withNeutrals_withEGs_0to5GeV","TkEG_EtResolution_withNeutrals_withEGs_5to10GeV","TkEG_EtResolution_withNeutrals_withEGs_10to15GeV", "TkEG_EtResolution_withNeutrals_withEGs_15to20GeV", "TkEG_EtResolution_withNeutrals_withEGs_20to30GeV", "TkEG_EtResolution_withNeutrals_withEGs_30to40GeV", "TkEG_EtResolution_withNeutrals_withEGs_40to50GeV"]
             ]
                        
     
@@ -283,7 +283,7 @@ def PlotHistos(datasetsMgr, histoList, signal, PU, saveName=None):
         if "Npion0" in saveName:
             algos = ["#geq 1 #pi^{0}'s", "1 #pi^{0}", "2 #pi^{0}'s", "3 #pi^{0}'s"]#, "4 #pi^{0}'s"]
     if "etSteps" in saveName:
-            algos = ["#geq 1 #pi^{0}'s", "0 #leq E_{T} < 10", "10 #leq E_{T} < 20", "20 #leq E_{T} < 30", "30 #leq E_{T} < 40", "40 #leq E_{T} < 50"]
+            algos = ["#geq 1 #pi^{0}'s", "0 #leq E_{T} < 5","5 #leq E_{T} < 10", "10 #leq E_{T} < 15", "15 #leq E_{T} < 20", "20 #leq E_{T} < 30", "30 #leq E_{T} < 40", "40 #leq E_{T} < 50"]
 
     # For-loop: All tau algorithms
     for l, hName in enumerate(histoList, 0):
@@ -316,7 +316,7 @@ def PlotHistos(datasetsMgr, histoList, signal, PU, saveName=None):
         hName = h.getName()
         p.histoMgr.forHisto(hName, styles.getCaloStyle(i))
 
-        if "chargedresolution" in hName.lower() or "neutralsresolution" in hName.lower():
+        if "chargedresolution" in hName.lower() or "neutralsresolution" in hName.lower() or "withNeutrals_withEGs" in hName: 
             p.histoMgr.setHistoDrawStyle(hName, "HIST")
             p.histoMgr.setHistoLegendStyle(hName, "L")
         else:
@@ -353,9 +353,9 @@ def GetHistoKwargs(h, opts):
         yMaxF = 1.2
 
     if opts.normalizeToOne:
-        _yLabel = "Arbitrary Units / %.2f"
+        _yLabel = "Arbitrary Units / %.3f"
     else:
-        _yLabel = "Events / %.2f"
+        _yLabel = "Events / %.3f"
         
     _kwargs = {
         "xlabel"           : "#delta x / x",
@@ -405,7 +405,8 @@ def GetHistoKwargs(h, opts):
         _kwargs["opts"]       = {"xmin": -5, "xmax": 5, "ymin": 0, "ymaxfactor": yMaxF}
         _kwargs["rebinX"]     = 1
         
-
+    if "etsteps" in h.lower():
+        _kwargs["rebinX"]     = 10
         #if "_all_f" in h.lower() or "_cif" in h.lower():
         #    _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
         #    _kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0, "ymaxfactor": yMaxF}
@@ -420,6 +421,7 @@ def GetHistoKwargs(h, opts):
         if "npion0" in h.lower():
             _kwargs["moveLegend"] = _mvLeg2
     if "etsteps" in h.lower():
+        
         _kwargs["moveLegend"] = _mvLeg5
    
     return _kwargs

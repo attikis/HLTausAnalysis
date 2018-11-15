@@ -270,7 +270,22 @@ def GetHistoKwargs(h, opts):
     if "EtaVsEt" in h:
         _kwargs["opts"]    = {"xmin": -3.0, "xmax": +3.0, "ymin": 0.0, "ymax": 40.0}
         #_kwargs["zmin"]    = 1e-6
+
+    if "Pion0Et_Vs_PhotonsDR" in h:
+        _kwargs["opts"]    = {"xmin": 0, "xmax": 50.0, "ymin": 0.0, "ymax": 2.0}
+
+    if "genTau_chargedDaugh_PtLead_dRmax" in h or "genTau_neutralDaugh_PtLead_dRmax" in h:
+        _kwargs["opts"]    = {"xmin": 0, "xmax": 0.3, "ymin": 0.0, "ymax": 100.0}
+        _kwargs["cutBox"]  = {"cutValue": 0.15, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        _kwargs["cutBoxY"] = {"cutValue": 5.00, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+
         
+    if "TkEG_PoorNeuResol_Pi0_closestEG_ET_Vs_dRmin_Pi0_EG" in h:
+        _kwargs["opts"]    = {"xmin": 0.0, "xmax": 100, "ymin": 0.0, "ymax": 3.0}
+
+    if "TkEG_PoorNeuResol_Pi0_ET_Vs_closestEG_ET" in h:
+        _kwargs["opts"]    = {"xmin": 0.0, "xmax": 150, "ymin": 0.0, "ymax": 150.0}
+
 
     return _kwargs
     
@@ -321,7 +336,7 @@ def getCustomTGraph(histoName, constant=0.0, coeff=1.0, xmin = 0, xmax = 200, st
             continue
 
         # Calculate x and y value
-        if "GenP_VisEt_Vs" in histoName or "GenP_PtLdg_Vs" in histoName:
+        if "PtLead_dRmax" in histoName:
             xVal = float(x)/float(step)
             yVal = (constant)/(coeff*xVal)
         else:
@@ -414,13 +429,7 @@ def Plot2dHistograms(datasetsMgr, dsetName, histoName, index):
     step = 1    
     xmin = 0
     xmax = 0
-    if "GenP_VisEt_Vs" in histoName:
-        const=   3.5
-        coeff=   1.0        
-        step =   100    
-        xmin =   0
-        xmax =  30
-    if "GenP_PtLdg_Vs" in histoName:
+    if "PtLead_dRmax" in histoName:
         const=   2.5 #2.0
         coeff=   1.0
         step = 100
@@ -433,7 +442,7 @@ def Plot2dHistograms(datasetsMgr, dsetName, histoName, index):
         xmin =   0
         xmax =   0#3
 
-    if "GenP_VisEt_Vs" in histoName or "GenP_PtLdg_Vs" in histoName:
+    if "PtLead_dRmax" in histoName:
         gr = getCustomTGraph(histoName, const, coeff, xmin, xmax, step)
         gr.SetLineWidth(3)
         gr.Draw("L same")

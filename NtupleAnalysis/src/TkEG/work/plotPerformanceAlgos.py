@@ -80,28 +80,75 @@ def GetDatasetsFromDir(opts):
     Verbose("Getting datasets")
     
     if (not opts.includeOnlyTasks and not opts.excludeTasks):
-        datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
-                                                        dataEra=opts.dataEra,
-                                                        searchMode=opts.searchMode, 
-                                                        analysisName=opts.analysis,
-                                                        optimizationMode=opts.optMode)
+        datasetsCaloTk = dataset.getDatasetsFromMulticrabDirs([opts.mcrabCaloTk],
+                                                              dataEra=opts.dataEra,
+                                                              searchMode=opts.searchMode, 
+                                                              analysisName=opts.analysis,
+                                                              optimizationMode=opts.optMode)
+        datasetsTkTaus = dataset.getDatasetsFromMulticrabDirs(["/afs/cern.ch/work/m/mtoumazo/scratch0/CMSSW_10_1_7/src/HLTausAnalysis/NtupleAnalysis/src/TkTaus/work/"+opts.mcrabTkEG],
+                                                              dataEra=opts.dataEra,
+                                                              searchMode=opts.searchMode, 
+                                                              analysisName=opts.analysis,
+                                                              optimizationMode=opts.optMode)
+        
+        datasetsTkEG   = dataset.getDatasetsFromMulticrabDirs(["/afs/cern.ch/work/m/mtoumazo/scratch0/CMSSW_10_1_7/src/HLTausAnalysis/NtupleAnalysis/src/TkEG/work/"+opts.mcrabTkEG],
+                                                              dataEra=opts.dataEra,
+                                                              searchMode=opts.searchMode, 
+                                                              analysisName=opts.analysis,
+                                                              optimizationMode=opts.optMode)
+        
     elif (opts.includeOnlyTasks):
-        datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
-                                                        dataEra=opts.dataEra,
-                                                        searchMode=opts.searchMode,
-                                                        analysisName=opts.analysis,
-                                                        includeOnlyTasks=opts.includeOnlyTasks,
-                                                        optimizationMode=opts.optMode)
+        datasetsCaloTk = dataset.getDatasetsFromMulticrabDirs(["/afs/cern.ch/work/m/mtoumazo/scratch0/CMSSW_10_1_7/src/HLTausAnalysis/NtupleAnalysis/src/CaloTk/work/"+opts.mcrabCaloTk],
+                                                              dataEra=opts.dataEra,
+                                                              searchMode=opts.searchMode,
+                                                              analysisName=opts.analysis,
+                                                              includeOnlyTasks=opts.includeOnlyTasks,
+                                                              optimizationMode=opts.optMode)
+        datasetsTkTaus = dataset.getDatasetsFromMulticrabDirs(["/afs/cern.ch/work/m/mtoumazo/scratch0/CMSSW_10_1_7/src/HLTausAnalysis/NtupleAnalysis/src/TkTaus/work/"+opts.mcrabTkEG],
+                                                              dataEra=opts.dataEra,
+                                                              searchMode=opts.searchMode,
+                                                              analysisName=opts.analysis,
+                                                              includeOnlyTasks=opts.includeOnlyTasks,
+                                                              optimizationMode=opts.optMode)
+
+        datasetsTkEG   = dataset.getDatasetsFromMulticrabDirs(["/afs/cern.ch/work/m/mtoumazo/scratch0/CMSSW_10_1_7/src/HLTausAnalysis/NtupleAnalysis/src/TkEG/work/"+opts.mcrabTkEG],
+                                                              dataEra=opts.dataEra,
+                                                              searchMode=opts.searchMode,
+                                                              analysisName=opts.analysis,
+                                                              includeOnlyTasks=opts.includeOnlyTasks,
+                                                              optimizationMode=opts.optMode)
+        
     elif (opts.excludeTasks):
-        datasets = dataset.getDatasetsFromMulticrabDirs([opts.mcrab],
-                                                        dataEra=opts.dataEra,
-                                                        searchMode=opts.searchMode,
-                                                        analysisName=opts.analysis,
-                                                        excludeTasks=opts.excludeTasks,
-                                                        optimizationMode=opts.optMode)
+        datasetsCaloTk = dataset.getDatasetsFromMulticrabDirs([opts.mcrabCaloTk],
+                                                              dataEra=opts.dataEra,
+                                                              searchMode=opts.searchMode,
+                                                              analysisName=opts.analysis,
+                                                              excludeTasks=opts.excludeTasks,
+                                                              optimizationMode=opts.optMode)
+        
+        datasetsCaloTk = dataset.getDatasetsFromMulticrabDirs(["/afs/cern.ch/work/m/mtoumazo/scratch0/CMSSW_10_1_7/src/HLTausAnalysis/NtupleAnalysis/src/CaloTk/work/"+opts.mcrabCaloTk],
+                                                              dataEra=opts.dataEra,
+                                                              searchMode=opts.searchMode,
+                                                              analysisName=opts.analysis,
+                                                              excludeTasks=opts.excludeTasks,
+                                                              optimizationMode=opts.optMode)
+        datasetsTkTaus = dataset.getDatasetsFromMulticrabDirs(["/afs/cern.ch/work/m/mtoumazo/scratch0/CMSSW_10_1_7/src/HLTausAnalysis/NtupleAnalysis/src/TkTaus/work/"+opts.mcrabTkEG],
+                                                              dataEra=opts.dataEra,
+                                                              searchMode=opts.searchMode,
+                                                              analysisName=opts.analysis,
+                                                              excludeTasks=opts.excludeTasks,
+                                                              optimizationMode=opts.optMode)
+
+        datasetsTkEG   = dataset.getDatasetsFromMulticrabDirs(["/afs/cern.ch/work/m/mtoumazo/scratch0/CMSSW_10_1_7/src/HLTausAnalysis/NtupleAnalysis/src/TkEG/work/"+opts.mcrabTkEG],
+                                                              dataEra=opts.dataEra,
+                                                              searchMode=opts.searchMode,
+                                                              analysisName=opts.analysis,
+                                                              excludeTasks=opts.excludeTasks,
+                                                              optimizationMode=opts.optMode)
+                                                              
     else:
         raise Exception("This should never be reached")
-    return datasets
+    return datasetsCaloTk, datasetsTkTaus, datasetsTkEG
     
 
 def getAlgos():
@@ -129,116 +176,105 @@ def main(opts):
         opts.optMode = opt
 
         # Setup & configure the dataset manager 
-        datasetsMgr = GetDatasetsFromDir(opts)
-        datasetsMgr.updateNAllEventsToPUWeighted()
-        if 0:
-            datasetsMgr.loadLuminosities() # from lumi.json
+        datasetsCaloTkMgr, datasetsTkTausMgr, datasetsTkEGMgr = GetDatasetsFromDir(opts)
 
-        # Custom filtering of datasets 
-        datasetsToRemove = []
-        # For-loop: All dsets to be removed
-        for i, d in enumerate(datasetsToRemove, 0):
-            msg = "Removing dataset %s" % d
-            Print(ShellStyles.WarningLabel() + msg + ShellStyles.NormalStyle(), i==0)
-            datasetsMgr.remove(filter(lambda name: d in name, datasetsMgr.getAllDatasetNames()))        
+        datasetsMgrs = [datasetsCaloTkMgr,datasetsTkTausMgr, datasetsTkEGMgr]
+        for datasetsMgr in datasetsMgrs: 
+            datasetsMgr.updateNAllEventsToPUWeighted()
+            if 0:
+                datasetsMgr.loadLuminosities() # from lumi.json
+                
+            # Custom filtering of datasets 
+            datasetsToRemove = []
+            # For-loop: All dsets to be removed
+            for i, d in enumerate(datasetsToRemove, 0):
+                msg = "Removing dataset %s" % d
+                Print(ShellStyles.WarningLabel() + msg + ShellStyles.NormalStyle(), i==0)
+                datasetsMgr.remove(filter(lambda name: d in name, datasetsMgr.getAllDatasetNames()))        
 
-        # Merge histograms (see NtupleAnalysis/python/tools/plots.py) 
-        plots.mergeRenameReorderForDataMC(datasetsMgr) 
 
-        # Print dataset information
-        datasetsMgr.PrintInfo()
-        if opts.verbose:
-            datasetsMgr.PrintCrossSections()
- 
-        # Define signal and background datasets names
-        dsets_signal  = []
-        dsets_minBias = []
-        for d in datasetsMgr.getAllDatasetNames():
-            if "SingleNeutrino" in d:
-                dsets_minBias.append(d)
-            else:
-                dsets_signal.append(d)
+            # Merge histograms (see NtupleAnalysis/python/tools/plots.py) 
+            plots.mergeRenameReorderForDataMC(datasetsMgr) 
+            
+            # Print dataset information
+            datasetsMgr.PrintInfo() # fixme: make it generic (first check that each of the managers has the same samples and print them one time)
 
-        # ROC curve ingredients (histograms)
-        effLists    = [["TkEG_Eff", "RelIso_Eff", "VtxIso_Eff", "VtxIsoLoose_Eff", "VtxIsoTight_Eff", "RelIsoLoose_Eff", "RelIsoTight_Eff"], 
+            if opts.verbose:
+                datasetsMgr.PrintCrossSections()
+
+
+            # Define signal and background datasets names
+            dsets_signal  = []
+            dsets_minBias = []
+            for d in datasetsMgr.getAllDatasetNames():
+                if "SingleNeutrino" in d:
+                    dsets_minBias.append(d)
+                else:
+                    dsets_signal.append(d)
+
+            '''
+            # ROC curve ingredients (histograms)
+            effLists    = [["TkEG_Eff", "RelIso_Eff", "VtxIso_Eff", "VtxIsoLoose_Eff", "VtxIsoTight_Eff", "RelIsoLoose_Eff", "RelIsoTight_Eff"], 
                        ["Eff_DiTau_TkEG", "Eff_DiTau_VtxIso", "Eff_DiTau_RelIso"]]
         
         
-        rateLists   = [["TkEG_Rate", "RelIso_Rate", "VtxIso_Rate", "VtxIsoLoose_Rate", "VtxIsoTight_Rate", "RelIsoLoose_Rate", "RelIsoTight_Rate"], 
+            rateLists   = [["TkEG_Rate", "RelIso_Rate", "VtxIso_Rate", "VtxIsoLoose_Rate", "VtxIsoTight_Rate", "RelIsoLoose_Rate", "RelIsoTight_Rate"], 
                        ["Rate_DiTau_TkEG", "Rate_DiTau_VtxIso", "Rate_DiTau_RelIso"]]
 
-        turnOnLists = [["TkEG_TurnOn25", "RelIso_TurnOn25", "VtxIso_TurnOn25"],# "VtxIsoLoose_TurnOn25", "VtxIsoTight_TurnOn25", "RelIsoLoose_TurnOn25", "RelIsoTight_TurnOn25"], 
+            turnOnLists = [["TkEG_TurnOn25", "RelIso_TurnOn25", "VtxIso_TurnOn25"],# "VtxIsoLoose_TurnOn25", "VtxIsoTight_TurnOn25", "RelIsoLoose_TurnOn25", "RelIsoTight_TurnOn25"], 
                        ["TkEG_TurnOn50", "RelIso_TurnOn50", "VtxIso_TurnOn50"]]#, "VtxIsoLoose_TurnOn50", "VtxIsoTight_TurnOn50", "RelIsoLoose_TurnOn50", "RelIsoTight_TurnOn50"]]
-
-        turnOnLists_noNeutrals = [["TkEG_TurnOn25_noNeutrals", "RelIso_TurnOn25_noNeutrals", "VtxIso_TurnOn25_noNeutrals"], 
-                                  ["TkEG_TurnOn50_noNeutrals", "RelIso_TurnOn50_noNeutrals", "VtxIso_TurnOn50_noNeutrals"]]
-
-        turnOnLists_withNeutrals = [["TkEG_TurnOn25_withNeutrals", "RelIso_TurnOn25_withNeutrals", "VtxIso_TurnOn25_withNeutrals"], 
-                                    ["TkEG_TurnOn50_withNeutrals", "RelIso_TurnOn50_withNeutrals", "VtxIso_TurnOn50_withNeutrals"]]
-
-        turnOnLists_1pr = [["TkEG_TurnOn25_1pr", "RelIso_TurnOn25_1pr", "VtxIso_TurnOn25_1pr"], 
-                           ["TkEG_TurnOn50_1pr", "RelIso_TurnOn50_1pr", "VtxIso_TurnOn50_1pr"]]
-
-        turnOnLists_3pr = [["TkEG_TurnOn25_3pr", "RelIso_TurnOn25_3pr", "VtxIso_TurnOn25_3pr"], 
-                           ["TkEG_TurnOn50_3pr", "RelIso_TurnOn50_3pr", "VtxIso_TurnOn50_3pr"]]
-
-        turnOnLists_all = [["VtxIso_TurnOn25", "VtxIso_TurnOn25_1pr", "VtxIso_TurnOn25_3pr", "VtxIso_TurnOn25_withNeutrals", "VtxIso_TurnOn25_noNeutrals"],
-                           ["VtxIso_TurnOn50", "VtxIso_TurnOn50_1pr", "VtxIso_TurnOn50_3pr", "VtxIso_TurnOn50_withNeutrals", "VtxIso_TurnOn50_noNeutrals"]]
-        #turnOnLists_all = [["VtxIsoTight_TurnOn25", "VtxIsoTight_TurnOn25_1pr", "VtxIsoTight_TurnOn25_3pr", "VtxIsoTight_TurnOn25_withNeutrals", "VtxIsoTight_TurnOn25_noNeutrals"],
-        #                   ["VtxIsoTight_TurnOn50", "VtxIsoTight_TurnOn50_1pr", "VtxIsoTight_TurnOn50_3pr", "VtxIsoTight_TurnOn50_withNeutrals", "VtxIsoTight_TurnOn50_noNeutrals"]]
-
-
-
-        # For-loop: All background histos (min bias)
-        for i, b in enumerate(dsets_minBias, 1):
-            bPU = b.split("PU")[1]
-
-            # Create rate plots (SingleTau, DiTau)
-            PlotRate(datasetsMgr, rateLists[0], b, bPU)
-            PlotRate(datasetsMgr, rateLists[1], b, bPU)
+        
             
-            # For-loop: All signal histos
-            for j, s in enumerate(dsets_signal, 1):
-                sPU = s.split("PU")[1]
+            # For-loop: All background histos (min bias)
+            for i, b in enumerate(dsets_minBias, 1):
+                bPU = b.split("PU")[1]
 
                 # Create rate plots (SingleTau, DiTau)
-                PlotEfficiency(datasetsMgr, effLists[0], s, sPU)
-                PlotEfficiency(datasetsMgr, effLists[1], s, sPU)
-
-                if bPU != sPU:
-                    continue
-                else:
-                    PU = sPU
-
-                # For-loop: All triggers (Calo, Calo+Tk, Calo+VtxIso)
-                for k in range(0, len(effLists)):
-                    eff  = effLists[k]
-                    rate = rateLists[k]
-                    Verbose("Bkg = %s, Signal = %s" % (b, s), False)
-                    PlotRateVsEff(datasetsMgr, eff, rate, s, b, PU)
-
-        # For-loop: All signal histos
-        for i, s in enumerate(dsets_signal, 1):
-            PU = s.split("PU")[1]
+                PlotRate(datasetsMgr, rateLists[0], b, bPU)
+                PlotRate(datasetsMgr, rateLists[1], b, bPU)
             
-            # Create rate plots (SingleTau, DiTau)
-            #PlotTurnOns(datasetsMgr, turnOnLists[0], s, PU)
-            #PlotTurnOns(datasetsMgr, turnOnLists[1], s, PU)
-            PlotTurnOns(datasetsMgr, turnOnLists[0], s, PU, "TurnOns_25GeV_%s_Inclusive" % (s) )
-            PlotTurnOns(datasetsMgr, turnOnLists[1], s, PU, "TurnOns_50GeV_%s_Inclusive" % (s) )
-            PlotTurnOns(datasetsMgr, turnOnLists_noNeutrals[0], s, PU, "TurnOns_25GeV_%s_noNeutrals" % (s) )
-            PlotTurnOns(datasetsMgr, turnOnLists_noNeutrals[1], s, PU, "TurnOns_50GeV_%s_noNeutrals" % (s) )
-            PlotTurnOns(datasetsMgr, turnOnLists_withNeutrals[0], s, PU, "TurnOns_25GeV_%s_withNeutrals" % (s) )
-            PlotTurnOns(datasetsMgr, turnOnLists_withNeutrals[1], s, PU, "TurnOns_50GeV_%s_withNeutrals" % (s) )
-            PlotTurnOns(datasetsMgr, turnOnLists_1pr[0], s, PU, "TurnOns_25GeV_%s_1pr" % (s) )
-            PlotTurnOns(datasetsMgr, turnOnLists_1pr[1], s, PU, "TurnOns_50GeV_%s_1pr" % (s) )
-            PlotTurnOns(datasetsMgr, turnOnLists_3pr[0], s, PU, "TurnOns_25GeV_%s_3pr" % (s) )
-            PlotTurnOns(datasetsMgr, turnOnLists_3pr[1], s, PU, "TurnOns_50GeV_%s_3pr" % (s) )
-            PlotTurnOns(datasetsMgr, turnOnLists_all[0], s, PU, "TurnOns_25GeV_%s_all" % (s) )
-            PlotTurnOns(datasetsMgr, turnOnLists_all[1], s, PU, "TurnOns_50GeV_%s_all" % (s) )
-        print
+                # For-loop: All signal histos
+                for j, s in enumerate(dsets_signal, 1):
+                    sPU = s.split("PU")[1]
+                    
+                    # Create rate plots (SingleTau, DiTau)
+                    PlotEfficiency(datasetsMgr, effLists[0], s, sPU)
+                    PlotEfficiency(datasetsMgr, effLists[1], s, sPU)
 
-    Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
+                    if bPU != sPU:
+                        continue
+                    else:
+                        PU = sPU
+
+                    # For-loop: All triggers (Calo, Calo+Tk, Calo+VtxIso)
+                    for k in range(0, len(effLists)):
+                        eff  = effLists[k]
+                        rate = rateLists[k]
+                        Verbose("Bkg = %s, Signal = %s" % (b, s), False)
+                        PlotRateVsEff(datasetsMgr, eff, rate, s, b, PU)
+
+            # For-loop: All signal histos
+            for i, s in enumerate(dsets_signal, 1):
+                PU = s.split("PU")[1]
+                
+                # Create rate plots (SingleTau, DiTau)
+                # PlotTurnOns(datasetsMgr, turnOnLists[0], s, PU)
+                # PlotTurnOns(datasetsMgr, turnOnLists[1], s, PU)
+                PlotTurnOns(datasetsMgr, turnOnLists[0], s, PU, "TurnOns_25GeV_%s_Inclusive" % (s) )
+                PlotTurnOns(datasetsMgr, turnOnLists[1], s, PU, "TurnOns_50GeV_%s_Inclusive" % (s) )
+                PlotTurnOns(datasetsMgr, turnOnLists_noNeutrals[0], s, PU, "TurnOns_25GeV_%s_noNeutrals" % (s) )
+                PlotTurnOns(datasetsMgr, turnOnLists_noNeutrals[1], s, PU, "TurnOns_50GeV_%s_noNeutrals" % (s) )
+                PlotTurnOns(datasetsMgr, turnOnLists_withNeutrals[0], s, PU, "TurnOns_25GeV_%s_withNeutrals" % (s) )
+                PlotTurnOns(datasetsMgr, turnOnLists_withNeutrals[1], s, PU, "TurnOns_50GeV_%s_withNeutrals" % (s) )
+                PlotTurnOns(datasetsMgr, turnOnLists_1pr[0], s, PU, "TurnOns_25GeV_%s_1pr" % (s) )
+                PlotTurnOns(datasetsMgr, turnOnLists_1pr[1], s, PU, "TurnOns_50GeV_%s_1pr" % (s) )
+                PlotTurnOns(datasetsMgr, turnOnLists_3pr[0], s, PU, "TurnOns_25GeV_%s_3pr" % (s) )
+                PlotTurnOns(datasetsMgr, turnOnLists_3pr[1], s, PU, "TurnOns_50GeV_%s_3pr" % (s) )
+                PlotTurnOns(datasetsMgr, turnOnLists_all[0], s, PU, "TurnOns_25GeV_%s_all" % (s) )
+                PlotTurnOns(datasetsMgr, turnOnLists_all[1], s, PU, "TurnOns_50GeV_%s_all" % (s) )
+        print
+        '''
+        Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
     return
 
 
@@ -754,7 +790,13 @@ if __name__ == "__main__":
     # Define the available script options
     parser = OptionParser(usage="Usage: %prog [options]")
 
-    parser.add_option("-m", "--mcrab", dest="mcrab", action="store", 
+    parser.add_option("--mcrabCaloTk", dest="mcrabCaloTk", action="store", 
+                      help="Path to the multicrab directory for input")
+
+    parser.add_option("--mcrabTkTaus", dest="mcrabTkTaus", action="store", 
+                      help="Path to the multicrab directory for input")
+
+    parser.add_option("--mcrabTkEG", dest="mcrabTkEG", action="store", 
                       help="Path to the multicrab directory for input")
 
     parser.add_option("-o", "--optMode", dest="optMode", type="string", default=OPTMODE, 
@@ -812,7 +854,7 @@ if __name__ == "__main__":
         parser.print_help()
         sys.exit(1)
 
-    if opts.mcrab == None:
+    if opts.mcrabCaloTk == None:
         Print("Not enough arguments passed to script execution. Printing docstring & EXIT.")
         parser.print_help()
         #print __doc__
@@ -820,7 +862,7 @@ if __name__ == "__main__":
 
     # Determine path for saving plots
     if opts.saveDir == None:
-        opts.saveDir = aux.getSaveDirPath(opts.mcrab, prefix="hltaus/TkEG/", postfix="ROC")
+        opts.saveDir = aux.getSaveDirPath(opts.mcrabCaloTk, prefix="hltaus/", postfix="ROC")
     else:
         print "opts.saveDir = ", opts.saveDir
 
