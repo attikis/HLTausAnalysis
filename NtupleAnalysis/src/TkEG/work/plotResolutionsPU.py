@@ -209,7 +209,7 @@ def GetHistoKwargs(h, opts):
         _yNorm = "a.u." #"Arbitrary Units"
     else:
         _yNorm = "Events"
-    _yLabel = _yNorm + " / %.2f "
+    _yLabel = _yNorm + " / %.3f "
     _rebinX = 5
     _rebinY = None
     _units  = ""
@@ -233,7 +233,7 @@ def GetHistoKwargs(h, opts):
 
     if "etresolution" in hName:
         _units  = ""
-        _format = "%0.2f " + _units
+        _format = "%0.3f " + _units
         _xLabel = "#deltaE_{T} / E_{T}^{vis}"
         _rebinX = +10
         _xMin   = -0.2

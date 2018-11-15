@@ -316,7 +316,7 @@ def PlotHistos(datasetsMgr, histoList, signal, PU, saveName=None):
         hName = h.getName()
         p.histoMgr.forHisto(hName, styles.getCaloStyle(i))
 
-        if "chargedresolution" in hName.lower() or "neutralsresolution" in hName.lower():
+        if "chargedresolution" in hName.lower() or "neutralsresolution" in hName.lower() or "withNeutrals_withEGs" in hName: 
             p.histoMgr.setHistoDrawStyle(hName, "HIST")
             p.histoMgr.setHistoLegendStyle(hName, "L")
         else:
@@ -353,9 +353,9 @@ def GetHistoKwargs(h, opts):
         yMaxF = 1.2
 
     if opts.normalizeToOne:
-        _yLabel = "Arbitrary Units / %.2f"
+        _yLabel = "Arbitrary Units / %.3f"
     else:
-        _yLabel = "Events / %.2f"
+        _yLabel = "Events / %.3f"
         
     _kwargs = {
         "xlabel"           : "#delta x / x",
@@ -405,7 +405,8 @@ def GetHistoKwargs(h, opts):
         _kwargs["opts"]       = {"xmin": -5, "xmax": 5, "ymin": 0, "ymaxfactor": yMaxF}
         _kwargs["rebinX"]     = 1
         
-
+    if "etsteps" in h.lower():
+        _kwargs["rebinX"]     = 10
         #if "_all_f" in h.lower() or "_cif" in h.lower():
         #    _kwargs["xlabel"]     = "#deltaE_{T} / E_{T}^{vis}"
         #    _kwargs["opts"]       = {"xmin": -1.0, "xmax": 1.0, "ymin": 0, "ymaxfactor": yMaxF}
@@ -420,6 +421,7 @@ def GetHistoKwargs(h, opts):
         if "npion0" in h.lower():
             _kwargs["moveLegend"] = _mvLeg2
     if "etsteps" in h.lower():
+        
         _kwargs["moveLegend"] = _mvLeg5
    
     return _kwargs
