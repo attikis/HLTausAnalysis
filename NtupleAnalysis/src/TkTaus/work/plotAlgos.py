@@ -219,8 +219,8 @@ def main(opts):
     datasetsMgr.PrintInfo()
 
     # Define the mapping histograms in numerator->denominator pairs
-    # VariableList = ["L1Taus_SingleTau_Eff", "L1Taus_SingleTau_Rate"]
-    VariableList = ["L1Taus_SingleTau_Eff", "L1Taus_SingleTau_Rate", "L1Taus_TurnOn25", "L1Taus_TurnOn50"]
+    VariableList = ["L1Taus_SingleTau_Eff", "L1Taus_SingleTau_Rate"]
+    #VariableList = ["L1Taus_SingleTau_Eff", "L1Taus_SingleTau_Rate", "L1Taus_TurnOn25", "L1Taus_TurnOn50"]
 
     counter =  0
     opts.nDatasets = len(datasetsMgr.getAllDatasets())
@@ -230,9 +230,10 @@ def main(opts):
     for dataset in datasetsMgr.getAllDatasets():
         
         opts.saveDir = aux.getSaveDirPath(opts.mcrabs[0], prefix="hltaus/", postfix="ROC")
-        # PlotRateVsEff(datasetsMgr, dataset, "SingleTau", "PU140")
-        # PlotRateVsEff(datasetsMgr, dataset, "SingleTau", "PU200")
-        # PlotRateVsEff(datasetsMgr, datase, "DiTau")
+        PlotRateVsEff(datasetsMgr, dataset, "SingleTau", "PU140")
+        PlotRateVsEff(datasetsMgr, dataset, "SingleTau", "PU200")
+        PlotRateVsEff(datasetsMgr, dataset, "DiTau", "PU140")
+        PlotRateVsEff(datasetsMgr, dataset, "DiTau", "PU200")
 
         # For-looop: All variables
         for hName in VariableList:
@@ -345,34 +346,25 @@ def PlotRateVsEff(datasetsMgr, dataset, Type, PU):
         # Get Histogram from dataset
         hEff   = os.path.join(opts.folder, "L1Taus_%s_Eff" % (Type) )
         hRate  = os.path.join(opts.folder, "L1Taus_%s_Rate" % (Type) )
-        graph  = convert2RateVsEffTGraph(datasetsMgr, hEff, hRate, signal, bkg)
+        graph  = convert2RateVsEffTGraph(dMgr, hEff, hRate, signal, bkg)
         algo   = opts.mcrabs[j].split("_")[1]
         graph.SetName(algo)
+        styles.styles[j].apply(graph) 
         gList.append(graph)
         legDict[algo] = getAlgoLabel(algo)
 
-#        if (j == 0):
-#            graph.SetLineStyle(ROOT.kSolid)
-#            graph.SetLineColor(ROOT.kBlack)
-#            graph.SetLineWidth(3)
-#        else:
-#            graph.SetLineStyle(j)
-#            graph.SetLineColor(ROOT.kBlue)
-#            graph.SetLineWidth(4)
 
     # Create the plotter object 
-    p = plots.ComparisonManyPlot(gList[0], gList[:1], saveFormats=[])
+    p = plots.ComparisonManyPlot(gList[0], gList[1:], saveFormats=[])
     p.setLegendHeader(plots._legendLabels[signal])
 
     # Set individual styles
-    #for index, h in enumerate(p.histoMgr.getHistos()):
-    for index, g in enumerate(gList, 1):
-        #legDict[hName] = getAlgoLabel(hName)
-        #p.histoMgr.forHisto(hName, styles.getCaloStyle(index))
-        #p.histoMgr.setHistoDrawStyle(h.getName(), "LX") # "X" = Do not draw error bars
-        #p.histoMgr.setHistoLegendStyle(h.getName(), "L") #LP
-        p.histoMgr.setHistoDrawStyle(g.GetName(), "PX") # "X" = Do not draw error bars
-        p.histoMgr.setHistoLegendStyle(g.GetName(), "LP") #LP
+    for index, h in enumerate(p.histoMgr.getHistos()):
+        hName = h.getName()
+        legDict[hName] = getAlgoLabel(hName)
+        p.histoMgr.forHisto(hName, styles.getCaloStyle(index))
+        p.histoMgr.setHistoDrawStyle(h.getName(), "LX") # "X" = Do not draw error bars
+        p.histoMgr.setHistoLegendStyle(h.getName(), "L") #LP
 
     # Set legend labels
     p.histoMgr.setHistoLegendLabelMany(legDict)
