@@ -10,10 +10,11 @@ USAGE:
 
 EXAMPLES:
 ./plotAlgos.py -m multicrab_CaloTk_v92X_16h12m34s_15Nov2018,multicrab_TkTaus_v92X_14h39m23s_15Nov2018 --bandValue 2
+./plotAlgos.py -m multicrab_CaloTk_v92X_16h12m34s_15Nov2018,multicrab_TkTaus_v92X_17h56m36s_15Nov2018,multicrab_TkEG_v92X_17h04m49s_15Nov2018 --gridX --gridY
 
 
 LAST USED:
-./plotAlgos.py -m multicrab_CaloTk_v92X_16h12m34s_15Nov2018,multicrab_TkTaus_v92X_17h56m36s_15Nov2018,multicrab_TkEG_v92X_17h04m49s_15Nov2018
+./plotAlgos.py -m multicrab_CaloTk_v92X_16h12m34s_15Nov2018,multicrab_TkTaus_v92X_17h56m36s_15Nov2018,multicrab_TkEG_v92X_21h00m14s_15Nov2018
 
 '''
 #================================================================================================ 
@@ -23,6 +24,7 @@ import sys
 import math
 import copy
 import os
+import datetime
 from optparse import OptionParser
 
 import getpass
@@ -109,7 +111,8 @@ def GetHistoKwargs(h, opts):
     # Definitions
     _mvLeg1 = {"dx": -0.14, "dy": -0.02, "dh": -0.1}
     _mvLeg2 = {"dx": -0.14, "dy": -0.02, "dh": -0.1}
-    _mvLeg3 = {"dx": -0.14, "dy": -0.50, "dh": -0.1}
+    _mvLeg3 = {"dx": -0.50, "dy": -0.02, "dh": -0.1}
+    _mvLeg4 = {"dx": -0.14, "dy": -0.50, "dh": -0.1}
     logY    = True
     yMin    = 0.0
 
@@ -137,13 +140,15 @@ def GetHistoKwargs(h, opts):
         }
 
     if h == "RateVsEff":
-        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 1.0, "ymin": yMin, "ymax":5000, "ymaxfactor": yMaxF}
+        #_kwargs["opts"]   = {"xmin": 0.0, "xmax": 1.0, "ymin": yMin, "ymax":5000, "ymaxfactor": yMaxF}
+        _kwargs["opts"]   = {"xmin": 0.0, "xmax": 0.8, "ymin": yMin, "ymax":5000, "ymaxfactor": yMaxF}
         _kwargs["moveLegend"] = _mvLeg3
 
     if "_Rate" in h:
         _kwargs["xlabel"]     = "E_{T} (GeV)"
         _kwargs["ylabel"]     = "Rate (kHz)"# / %.0f GeV"
-        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 200.0, "ymin": 1, "ymax":5e4, "ymaxfactor": yMaxF}
+        #_kwargs["opts"]       = {"xmin": 0.0, "xmax": 200.0, "ymin": 1, "ymax":5e4, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 160.0, "ymin": 1, "ymax":5e4, "ymaxfactor": yMaxF}
         _kwargs["moveLegend"] = _mvLeg1
         _kwargs["cutBoxY"]    = {"cutValue": 50, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}
 
@@ -152,7 +157,8 @@ def GetHistoKwargs(h, opts):
         _kwargs["xlabel"]     = "E_{T} (%s)" % (units)
         _kwargs["ylabel"]     = "Efficiency / %0.0f " + units
         _kwargs["log"]        = False
-        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 200.0, "ymin": 0.0, "ymax": 1.0, "ymaxfactor": yMaxF}
+        #_kwargs["opts"]       = {"xmin": 0.0, "xmax": 200.0, "ymin": 0.0, "ymax": 1.0, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 160.0, "ymin": 0.0, "ymax": 1.0, "ymaxfactor": yMaxF}
         _kwargs["moveLegend"] = _mvLeg2
         _kwargs["cutBoxY"]    = {"cutValue": 50, "fillColor": 16, "box": False, "line": False, "cutGreaterThan": False}
         _kwargs["cutBoxX"]    = {"cutValue": 10, "fillColor": 16, "box": True, "line": True, "cutGreaterThan": False}
@@ -163,8 +169,9 @@ def GetHistoKwargs(h, opts):
         _kwargs["ylabel"]     = "Efficiency / %0.0f " + _units
         _kwargs["log"]        = False
         _kwargs["rebinX"]     = 1 # do NOT change
-        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 200.0, "ymin": 0.0, "ymax": 1.15, "ymaxfactor": yMaxF}
-        _kwargs["cutBoxY"]    = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": True, "cutGreaterThan": False}
+        #_kwargs["opts"]       = {"xmin": 0.0, "xmax": 200.0, "ymin": 0.0, "ymax": 1.15, "ymaxfactor": yMaxF}
+        _kwargs["opts"]       = {"xmin": 0.0, "xmax": 160.0, "ymin": 0.0, "ymax": 1.15, "ymaxfactor": yMaxF}
+        _kwargs["cutBoxY"]    = {"cutValue": 1.0, "fillColor": 16, "box": False, "line": False, "cutGreaterThan": False}
         _kwargs["moveLegend"] = _mvLeg3
         if "50" in h:
             _kwargs["cutBox"] = {"cutValue": 50.0, "fillColor": 16, "box": False, "line": False, "cutGreaterThan": False}
@@ -228,11 +235,11 @@ def main(opts):
     # For-loop: All datasets
     for dataset in datasetsMgr.getAllDatasets():
         
-        opts.saveDir = aux.getSaveDirPath(opts.mcrabs[0], prefix="hltaus/", postfix="ROC")
+        opts.saveDir = aux.getSaveDirPath(opts.saveDirBase, prefix="hltaus/", postfix="ROC")
         PlotRateVsEff(datasetsMgr, dataset, "SingleTau", "PU140")
         PlotRateVsEff(datasetsMgr, dataset, "SingleTau", "PU200")
-        PlotRateVsEff(datasetsMgr, dataset, "DiTau", "PU140")
-        PlotRateVsEff(datasetsMgr, dataset, "DiTau", "PU200")
+        PlotRateVsEff(datasetsMgr, dataset, "DiTau"    , "PU140")
+        PlotRateVsEff(datasetsMgr, dataset, "DiTau"    , "PU200")
 
         # For-looop: All variables
         for hName in VariableList:
@@ -244,8 +251,8 @@ def main(opts):
 
             if "neutrino" in dataset.getName().lower():        
                 if "rate" in hName.lower():
-                    opts.saveDir = aux.getSaveDirPath(opts.mcrabs[0], prefix="hltaus/", postfix="Rates")
-                    PlotHistos(dataset.getName(), hPath, hName.split("_")[0] )
+                    opts.saveDir = aux.getSaveDirPath(opts.saveDirBase, prefix="hltaus/", postfix="Rates")
+                    PlotHistos(dataset.getName(), hPath, hName.split("_")[0] + "_")
                 else:
                     pass
             else:
@@ -253,12 +260,12 @@ def main(opts):
                     continue
                 else:
                     if "eff" in hName.lower():
-                        opts.saveDir = aux.getSaveDirPath(opts.mcrabs[0], prefix="hltaus/", postfix="Efficiencies")
-                        PlotHistos(dataset.getName(), hPath, hName.split("_")[0] )
+                        opts.saveDir = aux.getSaveDirPath(opts.saveDirBase, prefix="hltaus/", postfix="Efficiencies")
+                        PlotHistos(dataset.getName(), hPath, hName.split("_")[0] + "_" )
 
                     if "turnon" in hName.lower():
-                        opts.saveDir = aux.getSaveDirPath(opts.mcrabs[0], prefix="hltaus/", postfix="TurnOns")
-                        PlotHistos(dataset.getName(), hPath, hName.split("_")[0] )
+                        opts.saveDir = aux.getSaveDirPath(opts.saveDirBase, prefix="hltaus/", postfix="TurnOns")
+                        PlotHistos(dataset.getName(), hPath, hName.split("_")[1] + "_" )
 
     aux.Print("All plots saved under directory %s" % (ShellStyles.NoteStyle() + aux.convertToURL(opts.saveDir, opts.url) + ShellStyles.NormalStyle()), True)
     return
@@ -289,14 +296,18 @@ def PlotHistos(datasetName, hPath, saveName):
         legDict[algo] = getAlgoLabel(algo)
 
         if (j == 0):
-            refHisto = histograms.Histo(histo, algo, legendStyle = "L", drawStyle="HIST")
-            refHisto.getRootHisto().SetLineStyle(ROOT.kSolid)
-            refHisto.getRootHisto().SetLineWidth(4)
+            if "turnon" in saveName.lower():
+                refHisto = histograms.Histo(histo, algo, legendStyle = "LP", drawStyle="AP")
+            else:
+                refHisto = histograms.Histo(histo, algo, legendStyle = "L", drawStyle="HIST")
+                refHisto.getRootHisto().SetLineStyle(ROOT.kSolid)
+                refHisto.getRootHisto().SetLineWidth(4)
         else:
-            text = str(j)
-            #histoList.append(histograms.Histo(histo, algo, legendStyle = "LP", drawStyle="AP"))
-            histo.SetLineWidth(4)
-            histoList.append(histograms.Histo(histo, algo, legendStyle = "L", drawStyle="HIST"))
+            if "turnon" in saveName.lower():
+                histoList.append(histograms.Histo(histo, algo, legendStyle = "LP", drawStyle="AP"))
+            else:
+                histo.SetLineWidth(4)
+                histoList.append(histograms.Histo(histo, algo, legendStyle = "L", drawStyle="HIST"))
         j = j + 1
 
     # Create the plotter object 
@@ -363,8 +374,6 @@ def PlotRateVsEff(datasetsMgr, dataset, Type, PU):
     for index, h in enumerate(p.histoMgr.getHistos(), 1):
         hName = h.getName()
         legDict[hName] = getAlgoLabel(hName)
-        #p.histoMgr.forHisto(hName, styles.getCaloStyle(index))
-        #styles.styles[j].apply(histo) 
         p.histoMgr.setHistoDrawStyle(h.getName(), "LX") # "X" = Do not draw error bars
         p.histoMgr.setHistoLegendStyle(h.getName(), "L") #LP
 
@@ -379,7 +388,7 @@ def PlotRateVsEff(datasetsMgr, dataset, Type, PU):
         histograms.addText(0.65, 0.1, "#\pm %.1f %% band" % (opts.bandValue), 20)
 
     # Save plot in all formats
-    saveName = Type + dataset.getName()
+    saveName = Type + "_" + dataset.getName()
     aux.SavePlot(p, opts.saveDir, saveName, opts.saveFormats, True)
     return
 
@@ -678,18 +687,23 @@ if __name__ == "__main__":
             aux.Verbose(msg , True)
 
     # Determine path for saving plots
+    opts.saveDirBase = None
     if opts.saveDir == None:
-        opts.saveDir = aux.getSaveDirPath(opts.mcrabs[0], prefix="hltaus/", postfix="ROC")
+        dirName = "multicrab" #"_".join(opts.mcrabs[0].split("_")[:2]) 
+        for m in opts.mcrabs:
+            dirName +=  "_" + m.split("_")[1]
+        dirName += "_" + datetime.date.today().strftime("%d%h%Y")
+        opts.saveDir = aux.getSaveDirPath(dirName, prefix="hltaus/", postfix="")
+        opts.saveDirBase = aux.getSaveDirPath(dirName, prefix="hltaus/", postfix="")
     else:
         print "opts.saveDir = ", opts.saveDir
+        print "opts.saveDirBase = ", opts.saveDirBase
 
     # Overwrite default save formats?
     if opts.formats != None:
         opts.saveFormats = opts.formats.split(",")
     else:
         opts.saveFormats = SAVEFORMATS
-    #if opts.saveDir == None:
-    #    opts.saveDir = aux.getSaveDirPath(opts.mcrabs[0] + "to" + opts.mcrabs[-1].split("_")[-1], prefix=opts.prefix, postfix=opts.postfix)
 
     # Call the main function
     main(opts)
