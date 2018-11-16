@@ -415,8 +415,6 @@ void CaloTk::Loop()
 	if(DEBUG) cout << "\tGetting the GenParticles" << endl;
 	if (0) GenParticles = GetGenParticles(false); // time-consuming
 	GenTaus             = GetGenParticles(15, true);
-	// GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 1.479); // CaloTaus currently eta-restricted
-	// GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 1.479); // CaloTaus currently eta-restricted
 	GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 1.3); // CaloTaus currently eta-restricted
 	GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 1.3); // CaloTaus currently eta-restricted
       }
@@ -545,6 +543,81 @@ void CaloTk::Loop()
     // ======================================================================================
     int iCalo = -1;
     bool bFoundMC = false;
+
+    // calibration values as a function of eta
+    double eta_values [30] = {-1.2615 , -1.1745 , -1.0875 , -1.0005 , -0.9135 , -0.8265 , -0.7395 , -0.6525 , -0.5655 , -0.4785 , -0.3915 , -0.3045 , -0.2175 , -0.1305 , -0.0435 , 0.0435 , 0.1305 , 0.2175 , 0.3045 , 0.3915 , 0.4785 , 0.5655 , 0.6525 , 0.7395 , 0.8265 , 0.9135 , 1.0005 , 1.0875 , 1.1745 , 1.2615};
+
+    double et20to40 [30] = {1.08888888889 , 1.08214285714 , 1.09558823529 , 1.09705882353 , 1.08928571429 , 1.17321428571 , 1.13863636364 , 0.951388888889 , 1.04134615385 , 1.05202702703 , 1.0737804878 , 1.07928571429 , 1.03722222222 , 1.027 , 1.0625 , 1.04659090909 , 1.00663265306 , 1.08520408163 , 1.05982142857 , 1.068 , 1.09705882353 , 1.04294871795 , 1.10714285714 , 1.135 , 1.07243589744 , 1.09527027027 , 1.10227272727 , 1.045 , 1.125 , 1.17833333333};
+    double et40to60 [30] = {1.18958333333 , 1.30038461538 , 1.20746753247 , 1.23157894737 , 1.28042168675 , 1.29902597403 , 1.209 , 1.20691489362 , 1.24527027027 , 1.22334710744 , 1.20441176471 , 1.18962264151 , 1.16615044248 , 1.19963768116 , 1.20445205479 , 1.19322033898 , 1.18793103448 , 1.19318181818 , 1.21378504673 , 1.1619047619 , 1.30176767677 , 1.179 , 1.25026315789 , 1.27069892473 , 1.24722222222 , 1.24368686869 , 1.25069444444 , 1.34326923077 , 1.29326923077 , 1.12934782609};
+    double et60to80 [30] = {1.58534482759 , 1.40650684932 , 1.49871794872 , 1.44539473684 , 1.43042168675 , 1.41547619048 , 1.39267241379 , 1.31238317757 , 1.31113138686 , 1.32147887324 , 1.20506993007 , 1.28493589744 , 1.275 , 1.26075949367 , 1.23529411765 , 1.22561728395 , 1.2175170068 , 1.27432885906 , 1.32 , 1.32578125 , 1.31092592593 , 1.34016393443 , 1.41803278689 , 1.36583333333 , 1.37180851064 , 1.42040229885 , 1.42175324675 , 1.45856164384 , 1.32023809524 , 1.4262195122};
+    double et80to100 [30] = {1.47269230769 , 1.66231343284 , 1.553 , 1.5643258427 , 1.44587378641 , 1.50247252747 , 1.42363636364 , 1.38863636364 , 1.33968531469 , 1.36578947368 , 1.32950819672 , 1.30347222222 , 1.24542253521 , 1.21581632653 , 1.28823529412 , 1.25534188034 , 1.2147810219 , 1.32261904762 , 1.26145833333 , 1.34029850746 , 1.32115384615 , 1.36694915254 , 1.3975 , 1.41733870968 , 1.43305084746 , 1.56658415842 , 1.57279411765 , 1.55601265823 , 1.6765625 , 1.63642857143};
+    double et100to150 [30] = {1.78409090909 , 1.72857142857 , 1.63770718232 , 1.61 , 1.54431818182 , 1.49327411168 , 1.50070850202 , 1.40084541063 , 1.39107929515 , 1.3392578125 , 1.34017509728 , 1.29774590164 , 1.28189655172 , 1.29989539749 , 1.299 , 1.2872 , 1.27120253165 , 1.31080246914 , 1.27810077519 , 1.26927966102 , 1.35357142857 , 1.3712962963 , 1.42927350427 , 1.48027522936 , 1.58156108597 , 1.52722222222 , 1.58534482759 , 1.67808988764 , 1.69887096774 , 1.7722972973};
+    double et150to200 [30] = {1.72346938776 , 1.71826923077 , 1.64004065041 , 1.57863636364 , 1.51637931034 , 1.53665048544 , 1.40175438596 , 1.34458333333 , 1.2822519084 , 1.35403225806 , 1.3206043956 , 1.23417431193 , 1.2626146789 , 1.2048245614 , 1.22244897959 , 1.21875 , 1.26811926606 , 1.28713592233 , 1.25291666667 , 1.25432692308 , 1.26517857143 , 1.29241071429 , 1.41261904762 , 1.44426605505 , 1.50809352518 , 1.53815789474 , 1.6356741573 , 1.60185950413 , 1.72682481752 , 1.71026315789};
+    double etGE200 [30] = {1.4875 , 1.56132478632 , 1.43695652174 , 1.37755102041 , 1.42888349515 , 1.29547619048 , 1.2260989011 , 1.2244047619 , 1.23230337079 , 1.16793478261 , 1.15030864198 , 1.13611111111 , 1.04772727273 , 1.12837078652 , 1.1130952381 , 1.09785714286 , 1.18611111111 , 1.20917721519 , 1.08095238095 , 1.168125 , 1.25625 , 1.20192307692 , 1.1356741573 , 1.31777108434 , 1.35804347826 , 1.31432038835 , 1.42342105263 , 1.5325 , 1.49905660377 , 1.53264705882};
+
+    double dummy_eta = 0;
+
+    if (true) {
+    // calibrate energy of calo taus for different energy slices
+    for (vector<L1Tau>::iterator calo = L1Taus.begin(); calo != L1Taus.end(); calo++)
+      {
+//        std::cout << calo->getEt() << "\n";
+
+       	if(calo->getEt() >= 20 && calo->getEt() < 40) {
+          dummy_eta = findClosest(eta_values,30,calo->getEta());
+          for (int i=0; i<30; i++) {
+	    if (dummy_eta == eta_values[i]) calo->setEt( (1/et20to40[i])*calo->getEt() );
+	  }
+	}
+
+        if(calo->getEt() >= 40 && calo->getEt() < 60) {
+          dummy_eta = findClosest(eta_values,30,calo->getEta());
+          for (int i=0; i<30; i++) {
+            if (dummy_eta == eta_values[i]) calo->setEt( (1/et40to60[i])*calo->getEt() );
+          }
+	}
+
+        if(calo->getEt() >= 60 && calo->getEt() < 80) {
+          dummy_eta = findClosest(eta_values,30,calo->getEta());
+          for (int i=0; i<30; i++) {
+            if (dummy_eta == eta_values[i]) calo->setEt( (1/et60to80[i])*calo->getEt() );
+          }
+	}
+
+        if(calo->getEt() >= 80 && calo->getEt() < 100) {
+          dummy_eta = findClosest(eta_values,30,calo->getEta());
+          for (int i=0; i<30; i++) {
+            if (dummy_eta == eta_values[i]) calo->setEt( (1/et80to100[i])*calo->getEt() );
+          }
+	}
+
+        if(calo->getEt() >= 100 && calo->getEt() < 150) {
+          dummy_eta = findClosest(eta_values,30,calo->getEta());
+          for (int i=0; i<30; i++) {
+            if (dummy_eta == eta_values[i]) calo->setEt( (1/et100to150[i])*calo->getEt() );
+          }
+	}
+
+        if(calo->getEt() >= 150 && calo->getEt() < 200) {
+          dummy_eta = findClosest(eta_values,30,calo->getEta());
+          for (int i=0; i<30; i++) {
+            if (dummy_eta == eta_values[i]) calo->setEt( (1/et150to200[i])*calo->getEt() );
+          }
+	}
+
+        if(calo->getEt() >= 200) {
+          dummy_eta = findClosest(eta_values,30,calo->getEta());
+          for (int i=0; i<30; i++) {
+            if (dummy_eta == eta_values[i]) calo->setEt( (1/etGE200[i])*calo->getEt() );
+          }
+	}
+
+  //      std::cout << "new " << calo->getEt() << "\n";
+
+      } // for calibration
+      } // if you want to calibrate
+
+    sort(L1Taus.begin(), L1Taus.end(), [](L1Tau& a, L1Tau& b) {return a.et()  > b.et();});
 
     // For-loop: All calo taus
     for (vector<L1Tau>::iterator calo = L1Taus.begin(); calo != L1Taus.end(); calo++)
@@ -1237,10 +1310,10 @@ void CaloTk::Loop()
     // Best Performing WP
     ////////////////////////////////////////////////////////////////////////////////////////////////    
     L1Taus_BestWP = L1Taus_RelIsoTight;
-    FillTurnOn_Numerator_(L1Taus_BestWP, 25.0, hL1CaloTkTaus_TurnOn25, hL1CaloTkTaus_TurnOn25_1pr, hL1CaloTkTaus_TurnOn25_3pr, hL1CaloTkTaus_TurnOn25_withNeutrals, hL1CaloTkTaus_TurnOn25_noNeutrals); 
-    FillTurnOn_Numerator_(L1Taus_BestWP, 50.0, hL1CaloTkTaus_TurnOn50, hL1CaloTkTaus_TurnOn50_1pr, hL1CaloTkTaus_TurnOn50_3pr, hL1CaloTkTaus_TurnOn50_withNeutrals, hL1CaloTkTaus_TurnOn50_noNeutrals); 
-    FillSingleTau_(L1Taus_BestWP, hL1CaloTkTaus_SingleTau_Rate, hL1CaloTkTaus_SingleTau_Eff);
-    FillDiTau_(L1Taus_BestWP, hL1CaloTkTaus_DiTau_Rate, hL1CaloTkTaus_DiTau_Eff);
+    FillTurnOn_Numerator_(L1Taus_BestWP, 25.0, hL1Taus_TurnOn25, hL1Taus_TurnOn25_1pr, hL1Taus_TurnOn25_3pr, hL1Taus_TurnOn25_withNeutrals, hL1Taus_TurnOn25_noNeutrals); 
+    FillTurnOn_Numerator_(L1Taus_BestWP, 50.0, hL1Taus_TurnOn50, hL1Taus_TurnOn50_1pr, hL1Taus_TurnOn50_3pr, hL1Taus_TurnOn50_withNeutrals, hL1Taus_TurnOn50_noNeutrals); 
+    FillSingleTau_(L1Taus_BestWP, hL1Taus_SingleTau_Rate, hL1Taus_SingleTau_Eff);
+    FillDiTau_(L1Taus_BestWP, hL1Taus_DiTau_Rate, hL1Taus_DiTau_Eff);
 
 
     // Progress bar
@@ -1382,12 +1455,8 @@ void CaloTk::Loop()
 
 
       // Best performing WP
-
-      // Single-Tau
-      histoTools_.ConvertToRateHisto_1D( hL1CaloTkTaus_SingleTau_Rate, N );
-            
-      // Di-Tau
-      histoTools_.ConvertToRateHisto_1D( hL1CaloTkTaus_DiTau_Rate, N );
+      histoTools_.ConvertToRateHisto_1D( hL1Taus_SingleTau_Rate, N );
+      histoTools_.ConvertToRateHisto_1D( hL1Taus_DiTau_Rate, N );
             
     }
   else // new: speed things up a bit
@@ -1487,14 +1556,8 @@ void CaloTk::Loop()
       FinaliseEffHisto_( hDiTau_Eff_Tk_RelIsoTight, nEvtsWithMaxHTaus);;
 
       // Best performing WP
-      
-      // Single-Tau
-      FinaliseEffHisto_( hL1CaloTkTaus_SingleTau_Eff, nEvtsWithMaxHTaus);
-      
-      // Di-Tau
-      FinaliseEffHisto_( hL1CaloTkTaus_DiTau_Eff,nEvtsWithMaxHTaus);
-
-
+      FinaliseEffHisto_( hL1Taus_SingleTau_Eff, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hL1Taus_DiTau_Eff,nEvtsWithMaxHTaus);
 
     }
   
@@ -1599,18 +1662,16 @@ void CaloTk::Loop()
   histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn50_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
 
   // Turn-ons for the best performing WP
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn25, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn25_1pr, hMcHadronicTau_VisEt_1pr);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn25_3pr, hMcHadronicTau_VisEt_3pr);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn25_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
-
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn50, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn50_1pr, hMcHadronicTau_VisEt_1pr);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn50_3pr, hMcHadronicTau_VisEt_3pr);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
-  histoTools_.DivideHistos_1D(hL1CaloTkTaus_TurnOn50_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
-
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn25             , hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn25_1pr         , hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn25_3pr         , hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn25_noNeutrals  , hMcHadronicTau_VisEt_noNeutrals);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn50             , hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn50_1pr         , hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn50_3pr         , hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn50_noNeutrals  , hMcHadronicTau_VisEt_noNeutrals);
 
   ////////////////////////////////////////////////
   // Write the histograms to the file
@@ -1913,7 +1974,7 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hRelIsoTight_Rate_I, "RelIsoTight_Rate_I", "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hRelIsoTight_Rate_F, "RelIsoTight_Rate_F", "", nEt , minEt , maxEt );
   
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_SingleTau_Rate, "L1CaloTkTaus_SingleTau_Rate", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_SingleTau_Rate, "L1Taus_SingleTau_Rate", "", nEt , minEt , maxEt );
 
   histoTools_.BookHisto_1D(hCalo_Eff     , "Calo_Eff"     , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hCalo_Eff_C   , "Calo_Eff_C"   , "", nEt , minEt , maxEt );
@@ -1948,7 +2009,7 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hRelIsoTight_Eff_I, "RelIsoTight_Eff_I", "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hRelIsoTight_Eff_F, "RelIsoTight_Eff_F", "", nEt , minEt , maxEt );
 
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_SingleTau_Eff, "L1CaloTkTaus_SingleTau_Eff", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_SingleTau_Eff, "L1Taus_SingleTau_Eff", "", nEt , minEt , maxEt );
 
   // DiTau
   histoTools_.BookHisto_1D(hDiTau_Rate_Calo    , "DiTau_Rate_Calo"    , "", nEt , minEt , maxEt );
@@ -1984,7 +2045,7 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hDiTau_Rate_RelIsoTight_I, "DiTau_Rate_RelIsoTight_I", "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hDiTau_Rate_RelIsoTight_F, "DiTau_Rate_RelIsoTight_F", "", nEt , minEt , maxEt );
 
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_DiTau_Rate, "L1CaloTkTaus_DiTau_Rate", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_DiTau_Rate, "L1Taus_DiTau_Rate", "", nEt , minEt , maxEt );
 
 
   histoTools_.BookHisto_1D(hDiTau_Eff_Calo     , "DiTau_Eff_Calo"    , "", nEt , minEt , maxEt );
@@ -2020,7 +2081,7 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hDiTau_Eff_RelIsoTight_I, "DiTau_Eff_RelIsoTight_I" , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hDiTau_Eff_RelIsoTight_F, "DiTau_Eff_RelIsoTight_F" , "", nEt , minEt , maxEt );
 
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_DiTau_Eff, "L1CaloTkTaus_DiTau_Eff", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_DiTau_Eff, "L1Taus_DiTau_Eff", "", nEt , minEt , maxEt );
 
   
   // Turn-Ons
@@ -2127,18 +2188,16 @@ void CaloTk::BookHistos_(void)
   histoTools_.BookHisto_1D(hRelIsoTight_TurnOn50_noNeutrals, "RelIsoTight_TurnOn50_noNeutrals" , "", 60 , minEt , maxEt );
 
   // Turn-ons for the best performing WP
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn25, "L1CaloTkTaus_TurnOn25", "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn25_1pr, "L1CaloTkTaus_TurnOn25_1pr" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn25_3pr, "L1CaloTkTaus_TurnOn25_3pr" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn25_withNeutrals, "L1CaloTkTaus_TurnOn25_withNeutrals" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn25_noNeutrals, "L1CaloTkTaus_TurnOn25_noNeutrals" , "", 60 , minEt , maxEt );
-
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn50, "L1CaloTkTaus_TurnOn50", "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn50_1pr, "L1CaloTkTaus_TurnOn50_1pr" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn50_3pr, "L1CaloTkTaus_TurnOn50_3pr" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn50_withNeutrals, "L1CaloTkTaus_TurnOn50_withNeutrals" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1CaloTkTaus_TurnOn50_noNeutrals, "L1CaloTkTaus_TurnOn50_noNeutrals" , "", 60 , minEt , maxEt );
-
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn25             , "L1Taus_TurnOn25"             , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn25_1pr         , "L1Taus_TurnOn25_1pr"         , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn25_3pr         , "L1Taus_TurnOn25_3pr"         , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn25_withNeutrals, "L1Taus_TurnOn25_withNeutrals", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn25_noNeutrals  , "L1Taus_TurnOn25_noNeutrals"  , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn50             , "L1Taus_TurnOn50"             , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn50_1pr         , "L1Taus_TurnOn50_1pr"         , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn50_3pr         , "L1Taus_TurnOn50_3pr"         , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn50_withNeutrals, "L1Taus_TurnOn50_withNeutrals", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn50_noNeutrals  , "L1Taus_TurnOn50_noNeutrals"  , "", 60 , minEt , maxEt );
 
   // DiTau (Calo-Other)
   histoTools_.BookHisto_2D(hDiTau_Rate_Calo_VtxIso, "DiTau_Rate_Calo_VtxIso", "", nEt, minEt, maxEt, nEt, minEt, maxEt);
@@ -2372,7 +2431,7 @@ void CaloTk::WriteHistos_(void)
   hRelIsoTight_Rate_I->Write();
   hRelIsoTight_Rate_F->Write();
 
-  hL1CaloTkTaus_SingleTau_Rate->Write();
+  hL1Taus_SingleTau_Rate->Write();
 
   // SingleTau: Efficiencies
   hCalo_Eff->Write();
@@ -2408,7 +2467,7 @@ void CaloTk::WriteHistos_(void)
   hRelIsoTight_Eff_I->Write();
   hRelIsoTight_Eff_F->Write();
 
-  hL1CaloTkTaus_SingleTau_Eff->Write();
+  hL1Taus_SingleTau_Eff->Write();
 
   // DiTau: Rates
   hDiTau_Rate_Calo->Write();
@@ -2444,7 +2503,7 @@ void CaloTk::WriteHistos_(void)
   hDiTau_Rate_RelIsoTight_I->Write();
   hDiTau_Rate_RelIsoTight_F->Write();
 
-  hL1CaloTkTaus_DiTau_Rate->Write();
+  hL1Taus_DiTau_Rate->Write();
 
   // DiTau: Efficiencies
   hDiTau_Eff_Calo->Write();
@@ -2480,7 +2539,7 @@ void CaloTk::WriteHistos_(void)
   hDiTau_Eff_RelIsoTight_I->Write();
   hDiTau_Eff_RelIsoTight_F->Write();
 
-  hL1CaloTkTaus_DiTau_Eff->Write();
+  hL1Taus_DiTau_Eff->Write();
 
   // DiTau (Calo-Other)
   hDiTau_Rate_Calo_VtxIso->Write();
@@ -2602,28 +2661,26 @@ void CaloTk::WriteHistos_(void)
   hRelIsoTight_TurnOn50_noNeutrals->Write();
 
   // Turn-ons for the best performing WP
-  hL1CaloTkTaus_TurnOn25->Write();
-  hL1CaloTkTaus_TurnOn25_1pr->Write();
-  hL1CaloTkTaus_TurnOn25_3pr->Write();
-  hL1CaloTkTaus_TurnOn25_withNeutrals->Write();
-  hL1CaloTkTaus_TurnOn25_noNeutrals->Write();
-
-  hL1CaloTkTaus_TurnOn50->Write();
-  hL1CaloTkTaus_TurnOn50_1pr->Write();
-  hL1CaloTkTaus_TurnOn50_3pr->Write();
-  hL1CaloTkTaus_TurnOn50_withNeutrals->Write();
-  hL1CaloTkTaus_TurnOn50_noNeutrals->Write();
+  hL1Taus_TurnOn25->Write();
+  hL1Taus_TurnOn25_1pr->Write();
+  hL1Taus_TurnOn25_3pr->Write();
+  hL1Taus_TurnOn25_withNeutrals->Write();
+  hL1Taus_TurnOn25_noNeutrals->Write();
+  hL1Taus_TurnOn50->Write();
+  hL1Taus_TurnOn50_1pr->Write();
+  hL1Taus_TurnOn50_3pr->Write();
+  hL1Taus_TurnOn50_withNeutrals->Write();
+  hL1Taus_TurnOn50_noNeutrals->Write();
 
   outFile->Write();
 
   return;
 }
 
-
-//****************************************************************************
+//============================================================================
 bool CaloTk::IsWithinEtaRegion(string etaRegion,
                                  double eta)
-//****************************************************************************
+//============================================================================
 {
 
   bool bWithinEtaRegion = false;
@@ -3485,6 +3542,59 @@ void CaloTk::GetLdgAndSubldgIndices(vector<L1TkTauParticle> myTaus,
     }
 
   return;
+}
+
+double CaloTk::findClosest(double arr[], int n, double target) 
+{ 
+    // Corner cases 
+    if (target <= arr[0]) 
+        return arr[0]; 
+    if (target >= arr[n - 1]) 
+        return arr[n - 1]; 
+  
+    // Doing binary search 
+    int i = 0, j = n, mid = 0; 
+    while (i < j) { 
+        mid = (i + j) / 2; 
+  
+        if (arr[mid] == target) 
+            return arr[mid]; 
+  
+        /* If target is less than array element, 
+            then search in left */
+        if (target < arr[mid]) { 
+  
+            // If target is greater than previous 
+            // to mid, return closest of two 
+            if (mid > 0 && target > arr[mid - 1]) 
+                return getClosest(arr[mid - 1], 
+                                  arr[mid], target); 
+  
+            /* Repeat for left half */
+            j = mid; 
+        } 
+  
+        // If target is greater than mid 
+        else { 
+            if (mid < n - 1 && target < arr[mid + 1]) 
+                return getClosest(arr[mid], 
+                                  arr[mid + 1], target); 
+            // update i 
+            i = mid + 1;  
+        } 
+    } 
+  
+    // Only single element left after search 
+    return arr[mid]; 
+} 
+
+double CaloTk::getClosest(double val1, double val2, 
+               double target) 
+{ 
+    if (target - val1 >= val2 - target) 
+        return val2; 
+    else
+        return val1; 
 }
 
 #endif

@@ -729,17 +729,16 @@ class TkEG : public TreeAnalyserMC{
   TH1D* hRelIsoTight_TurnOn50_noNeutrals;
 
   // Turn-ons for the best performing WP
-  TH1D* hL1TkEGTaus_TurnOn25;
-  TH1D* hL1TkEGTaus_TurnOn25_1pr;
-  TH1D* hL1TkEGTaus_TurnOn25_3pr;
-  TH1D* hL1TkEGTaus_TurnOn25_withNeutrals;
-  TH1D* hL1TkEGTaus_TurnOn25_noNeutrals;
-
-  TH1D* hL1TkEGTaus_TurnOn50;
-  TH1D* hL1TkEGTaus_TurnOn50_1pr;
-  TH1D* hL1TkEGTaus_TurnOn50_3pr;
-  TH1D* hL1TkEGTaus_TurnOn50_withNeutrals;
-  TH1D* hL1TkEGTaus_TurnOn50_noNeutrals;
+  TH1D* hL1Taus_TurnOn25;
+  TH1D* hL1Taus_TurnOn25_1pr;
+  TH1D* hL1Taus_TurnOn25_3pr;
+  TH1D* hL1Taus_TurnOn25_withNeutrals;
+  TH1D* hL1Taus_TurnOn25_noNeutrals;
+  TH1D* hL1Taus_TurnOn50;
+  TH1D* hL1Taus_TurnOn50_1pr;
+  TH1D* hL1Taus_TurnOn50_3pr;
+  TH1D* hL1Taus_TurnOn50_withNeutrals;
+  TH1D* hL1Taus_TurnOn50_noNeutrals;
   
   // SingleTau: Rates
   TH1D* hTkEG_Rate;
@@ -771,7 +770,7 @@ class TkEG : public TreeAnalyserMC{
   TH1D* hRelIsoTight_Rate_I;
   TH1D* hRelIsoTight_Rate_F;
   
-  TH1D* hL1TkEGTaus_SingleTau_Rate;
+  TH1D* hL1Taus_SingleTau_Rate;
 
   // DiTau: Rates
   TH1D* hDiTau_Rate_TkEG;
@@ -803,7 +802,7 @@ class TkEG : public TreeAnalyserMC{
   TH1D* hDiTau_Rate_RelIsoTight_I;
   TH1D* hDiTau_Rate_RelIsoTight_F;
 
-  TH1D* hL1TkEGTaus_DiTau_Rate;
+  TH1D* hL1Taus_DiTau_Rate;
 
   // SingleTau: Efficiencies
   TH1D* hTkEG_Eff;
@@ -835,7 +834,7 @@ class TkEG : public TreeAnalyserMC{
   TH1D* hRelIsoTight_Eff_I;
   TH1D* hRelIsoTight_Eff_F;      
   
-  TH1D* hL1TkEGTaus_SingleTau_Eff;
+  TH1D* hL1Taus_SingleTau_Eff;
 
   // DiTau: Efficiencies
   TH1D* hDiTau_Eff_TkEG;
@@ -867,7 +866,7 @@ class TkEG : public TreeAnalyserMC{
   TH1D* hDiTau_Eff_RelIsoTight_I;
   TH1D* hDiTau_Eff_RelIsoTight_F;
   
-  TH1D* hL1TkEGTaus_DiTau_Eff;
+  TH1D* hL1Taus_DiTau_Eff;
 
 };
 

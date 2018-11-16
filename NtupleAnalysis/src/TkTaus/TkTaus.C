@@ -41,7 +41,7 @@ void TkTaus::InitVars_()
   seedTk_minPt       =   5.0;       //  5.0
   seedTk_minEta      =   0.0;       //  0.0
   seedTk_maxEta      =   2.5;       //  2.5
-  seedTk_maxChiSq    =  50.0;       // 50.0
+  seedTk_maxChiSq    =  80.0;       // 50.0
   seedTk_minStubs    =    5;        //  5
 
   // Signal cone tracks
@@ -416,7 +416,7 @@ void TkTaus::Loop()
 	if(DEBUG) cout << "\tGetting the GenParticles" << endl;
 	if (0) GenParticles = GetGenParticles(false); // time-consuming
 	GenTaus             = GetGenParticles(15, true);
-	GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 999.9); // for visEt and genP plots
+	GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 2.3); // for visEt and genP plots
 	GenTausTrigger      = GetHadronicGenTaus(GenTaus, 20.0, 2.3);
       }
 
@@ -571,7 +571,7 @@ void TkTaus::Loop()
 	double vtxIso = L1TkTauCandidate.CalculateVtxIso(true, isoCone_useCone);
 
 	// Get the matching gen-particle
-	GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic); // GenTausTrigger ?
+	GetMatchingGenParticle(L1TkTauCandidate, GenTausHadronic);
 	if ( L1TkTauCandidate.HasMatchingGenParticle() ) bFoundMC = true;
 	      
 	// Print information on L1TkTauCandidate ??
@@ -1084,8 +1084,8 @@ void TkTaus::Loop()
     FillTurnOn_Numerator_(L1TkTaus_RelIsoTight , 50.0, hRelIsoTight_TurnOn50, hRelIsoTight_TurnOn50_1pr, hRelIsoTight_TurnOn50_3pr, hRelIsoTight_TurnOn50_withNeutrals, hRelIsoTight_TurnOn50_noNeutrals);
     
     // Turn-ons for the best performing WP
-    FillTurnOn_Numerator_(L1TkTaus_RelIsoTight , 25.0, hL1TkTaus_TurnOn25, hL1TkTaus_TurnOn25_1pr, hL1TkTaus_TurnOn25_3pr, hL1TkTaus_TurnOn25_withNeutrals, hL1TkTaus_TurnOn25_noNeutrals); 
-    FillTurnOn_Numerator_(L1TkTaus_RelIsoTight , 50.0, hL1TkTaus_TurnOn50, hL1TkTaus_TurnOn50_1pr, hL1TkTaus_TurnOn50_3pr, hL1TkTaus_TurnOn50_withNeutrals, hL1TkTaus_TurnOn50_noNeutrals); 
+    FillTurnOn_Numerator_(L1TkTaus_RelIsoTight , 25.0, hL1Taus_TurnOn25, hL1Taus_TurnOn25_1pr, hL1Taus_TurnOn25_3pr, hL1Taus_TurnOn25_withNeutrals, hL1Taus_TurnOn25_noNeutrals); 
+    FillTurnOn_Numerator_(L1TkTaus_RelIsoTight , 50.0, hL1Taus_TurnOn50, hL1Taus_TurnOn50_1pr, hL1Taus_TurnOn50_3pr, hL1Taus_TurnOn50_withNeutrals, hL1Taus_TurnOn50_noNeutrals); 
 
     ////////////////////////////////////////////////
     // SingleTau
@@ -1185,12 +1185,8 @@ void TkTaus::Loop()
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Rates and efficiencies for the best performing WP
     ////////////////////////////////////////////////////////////////////////////////////////////////    
-
-    // Single-Tau 
-    FillSingleTau_(L1TkTaus_RelIsoTight, hL1TkTaus_SingleTau_Rate  , hL1TkTaus_SingleTau_Eff);
-    
-    // Di-Tau
-    FillDiTau_(L1TkTaus_RelIsoTight, hL1TkTaus_DiTau_Rate  , hL1TkTaus_DiTau_Eff);
+    FillSingleTau_(L1TkTaus_RelIsoTight, hL1Taus_SingleTau_Rate, hL1Taus_SingleTau_Eff);
+    FillDiTau_(L1TkTaus_RelIsoTight    , hL1Taus_DiTau_Rate    , hL1Taus_DiTau_Eff);
 
 
     // Progress bar
@@ -1314,12 +1310,8 @@ void TkTaus::Loop()
       histoTools_.ConvertToRateHisto_2D(hDiTau_Rate_Tk_RelIsoTight, N);
 
       // Best performing WP
-      
-      // Single-Tau
-      histoTools_.ConvertToRateHisto_1D( hL1TkTaus_SingleTau_Rate, N );
-      
-      // Di-Tau
-      histoTools_.ConvertToRateHisto_1D( hL1TkTaus_DiTau_Rate, N );
+      histoTools_.ConvertToRateHisto_1D( hL1Taus_SingleTau_Rate, N );
+      histoTools_.ConvertToRateHisto_1D( hL1Taus_DiTau_Rate, N );
 
 
     }
@@ -1403,12 +1395,8 @@ void TkTaus::Loop()
       FinaliseEffHisto_( hDiTau_Eff_Tk_RelIsoTight, nEvtsWithMaxHTaus);;
 
       // Best performing WP
-      
-      // Single-Tau
-      FinaliseEffHisto_( hL1TkTaus_SingleTau_Eff, nEvtsWithMaxHTaus);
-      
-      // Di-Tau
-      FinaliseEffHisto_( hL1TkTaus_DiTau_Eff    , nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hL1Taus_SingleTau_Eff, nEvtsWithMaxHTaus);
+      FinaliseEffHisto_( hL1Taus_DiTau_Eff    , nEvtsWithMaxHTaus);
 
     }
   
@@ -1501,18 +1489,16 @@ void TkTaus::Loop()
   histoTools_.DivideHistos_1D(hRelIsoTight_TurnOn50_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
 
   // Turn-ons for the best performing WP
-  histoTools_.DivideHistos_1D(hL1TkTaus_TurnOn25, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hL1TkTaus_TurnOn25_1pr, hMcHadronicTau_VisEt_1pr);
-  histoTools_.DivideHistos_1D(hL1TkTaus_TurnOn25_3pr, hMcHadronicTau_VisEt_3pr);
-  histoTools_.DivideHistos_1D(hL1TkTaus_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
-  histoTools_.DivideHistos_1D(hL1TkTaus_TurnOn25_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
-
-  histoTools_.DivideHistos_1D(hL1TkTaus_TurnOn50, hMcHadronicTau_VisEt);
-  histoTools_.DivideHistos_1D(hL1TkTaus_TurnOn50_1pr, hMcHadronicTau_VisEt_1pr);
-  histoTools_.DivideHistos_1D(hL1TkTaus_TurnOn50_3pr, hMcHadronicTau_VisEt_3pr);
-  histoTools_.DivideHistos_1D(hL1TkTaus_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
-  histoTools_.DivideHistos_1D(hL1TkTaus_TurnOn50_noNeutrals, hMcHadronicTau_VisEt_noNeutrals);
-
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn25             , hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn25_1pr         , hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn25_3pr         , hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn25_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn25_noNeutrals  , hMcHadronicTau_VisEt_noNeutrals);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn50             , hMcHadronicTau_VisEt);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn50_1pr         , hMcHadronicTau_VisEt_1pr);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn50_3pr         , hMcHadronicTau_VisEt_3pr);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn50_withNeutrals, hMcHadronicTau_VisEt_withNeutrals);
+  histoTools_.DivideHistos_1D(hL1Taus_TurnOn50_noNeutrals  , hMcHadronicTau_VisEt_noNeutrals);
 
   ////////////////////////////////////////////////
   // Write the histograms to the file
@@ -1795,7 +1781,7 @@ void TkTaus::BookHistos_(void)
   histoTools_.BookHisto_1D(hRelIsoTight_Rate_I, "RelIsoTight_Rate_I", "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hRelIsoTight_Rate_F, "RelIsoTight_Rate_F", "", nEt , minEt , maxEt );
   
-  histoTools_.BookHisto_1D(hL1TkTaus_SingleTau_Rate, "L1TkTaus_SingleTau_Rate", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_SingleTau_Rate, "L1Taus_SingleTau_Rate", "", nEt , minEt , maxEt );
 
   histoTools_.BookHisto_1D(hTk_Eff       , "Tk_Eff"       , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hTk_Eff_C     , "Tk_Eff_C"     , "", nEt , minEt , maxEt );
@@ -1826,7 +1812,7 @@ void TkTaus::BookHistos_(void)
   histoTools_.BookHisto_1D(hRelIsoTight_Eff_I, "RelIsoTight_Eff_I", "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hRelIsoTight_Eff_F, "RelIsoTight_Eff_F", "", nEt , minEt , maxEt );
 
-  histoTools_.BookHisto_1D(hL1TkTaus_SingleTau_Eff, "L1TkTaus_SingleTau_Eff", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_SingleTau_Eff, "L1Taus_SingleTau_Eff", "", nEt , minEt , maxEt );
 
   // DiTau
   histoTools_.BookHisto_1D(hDiTau_Rate_Tk      , "DiTau_Rate_Tk"      , "", nEt , minEt , maxEt );
@@ -1858,7 +1844,7 @@ void TkTaus::BookHistos_(void)
   histoTools_.BookHisto_1D(hDiTau_Rate_RelIsoTight_I, "DiTau_Rate_RelIsoTight_I", "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hDiTau_Rate_RelIsoTight_F, "DiTau_Rate_RelIsoTight_F", "", nEt , minEt , maxEt );
 
-  histoTools_.BookHisto_1D(hL1TkTaus_DiTau_Rate, "L1TkTaus_DiTau_Rate", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_DiTau_Rate, "L1Taus_DiTau_Rate", "", nEt , minEt , maxEt );
 
   histoTools_.BookHisto_1D(hDiTau_Eff_Tk       , "DiTau_Eff_Tk"      , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hDiTau_Eff_Tk_C     , "DiTau_Eff_Tk_C"    , "", nEt , minEt , maxEt );
@@ -1889,7 +1875,7 @@ void TkTaus::BookHistos_(void)
   histoTools_.BookHisto_1D(hDiTau_Eff_RelIsoTight_I, "DiTau_Eff_RelIsoTight_I" , "", nEt , minEt , maxEt );
   histoTools_.BookHisto_1D(hDiTau_Eff_RelIsoTight_F, "DiTau_Eff_RelIsoTight_F" , "", nEt , minEt , maxEt );
   
-  histoTools_.BookHisto_1D(hL1TkTaus_DiTau_Eff, "L1TkTaus_DiTau_Eff", "", nEt , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_DiTau_Eff, "L1Taus_DiTau_Eff", "", nEt , minEt , maxEt );
 
 
   // Turn-Ons
@@ -1984,17 +1970,16 @@ void TkTaus::BookHistos_(void)
   histoTools_.BookHisto_1D(hRelIsoTight_TurnOn50_noNeutrals, "RelIsoTight_TurnOn50_noNeutrals" , "", 60 , minEt , maxEt );
 
   // Turn-ons for the best performing WP
-  histoTools_.BookHisto_1D(hL1TkTaus_TurnOn25, "L1TkTaus_TurnOn25", "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1TkTaus_TurnOn25_1pr, "L1TkTaus_TurnOn25_1pr" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1TkTaus_TurnOn25_3pr, "L1TkTaus_TurnOn25_3pr" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1TkTaus_TurnOn25_withNeutrals, "L1TkTaus_TurnOn25_withNeutrals" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1TkTaus_TurnOn25_noNeutrals, "L1TkTaus_TurnOn25_noNeutrals" , "", 60 , minEt , maxEt );
-
-  histoTools_.BookHisto_1D(hL1TkTaus_TurnOn50, "L1TkTaus_TurnOn50", "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1TkTaus_TurnOn50_1pr, "L1TkTaus_TurnOn50_1pr" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1TkTaus_TurnOn50_3pr, "L1TkTaus_TurnOn50_3pr" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1TkTaus_TurnOn50_withNeutrals, "L1TkTaus_TurnOn50_withNeutrals" , "", 60 , minEt , maxEt );
-  histoTools_.BookHisto_1D(hL1TkTaus_TurnOn50_noNeutrals, "L1TkTaus_TurnOn50_noNeutrals" , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn25             , "L1Taus_TurnOn25"             , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn25_1pr         , "L1Taus_TurnOn25_1pr"         , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn25_3pr         , "L1Taus_TurnOn25_3pr"         , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn25_withNeutrals, "L1Taus_TurnOn25_withNeutrals", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn25_noNeutrals  , "L1Taus_TurnOn25_noNeutrals"  , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn50             , "L1Taus_TurnOn50"             , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn50_1pr         , "L1Taus_TurnOn50_1pr"         , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn50_3pr         , "L1Taus_TurnOn50_3pr"         , "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn50_withNeutrals, "L1Taus_TurnOn50_withNeutrals", "", 60 , minEt , maxEt );
+  histoTools_.BookHisto_1D(hL1Taus_TurnOn50_noNeutrals  , "L1Taus_TurnOn50_noNeutrals"  , "", 60 , minEt , maxEt );
 
 
   // DiTau (Tk-Other)
@@ -2194,7 +2179,7 @@ void TkTaus::WriteHistos_(void)
   hRelIsoTight_Rate_I->Write();
   hRelIsoTight_Rate_F->Write();
 
-  hL1TkTaus_SingleTau_Rate->Write();
+  hL1Taus_SingleTau_Rate->Write();
 
   // SingleTau: Efficiencies
   hTk_Eff->Write();
@@ -2226,7 +2211,7 @@ void TkTaus::WriteHistos_(void)
   hRelIsoTight_Eff_I->Write();
   hRelIsoTight_Eff_F->Write();
 
-  hL1TkTaus_SingleTau_Eff->Write();
+  hL1Taus_SingleTau_Eff->Write();
 
   // DiTau: Rates
   hDiTau_Rate_Tk->Write();
@@ -2258,7 +2243,7 @@ void TkTaus::WriteHistos_(void)
   hDiTau_Rate_RelIsoTight_I->Write();
   hDiTau_Rate_RelIsoTight_F->Write();
 
-  hL1TkTaus_DiTau_Rate->Write();
+  hL1Taus_DiTau_Rate->Write();
 
   // DiTau: Efficiencies
   hDiTau_Eff_Tk->Write();
@@ -2290,7 +2275,7 @@ void TkTaus::WriteHistos_(void)
   hDiTau_Eff_RelIsoTight_I->Write();
   hDiTau_Eff_RelIsoTight_F->Write();
 
-  hL1TkTaus_DiTau_Eff->Write();
+  hL1Taus_DiTau_Eff->Write();
 
   // DiTau (Tk-Other)
   hDiTau_Rate_Tk_VtxIso->Write();
@@ -2387,17 +2372,16 @@ void TkTaus::WriteHistos_(void)
   hRelIsoTight_TurnOn50_noNeutrals->Write();
 
   // Turn-ons for the best performing WP
-  hL1TkTaus_TurnOn25->Write();
-  hL1TkTaus_TurnOn25_1pr->Write();
-  hL1TkTaus_TurnOn25_3pr->Write();
-  hL1TkTaus_TurnOn25_withNeutrals->Write();
-  hL1TkTaus_TurnOn25_noNeutrals->Write();
-
-  hL1TkTaus_TurnOn50->Write();
-  hL1TkTaus_TurnOn50_1pr->Write();
-  hL1TkTaus_TurnOn50_3pr->Write();
-  hL1TkTaus_TurnOn50_withNeutrals->Write();
-  hL1TkTaus_TurnOn50_noNeutrals->Write();
+  hL1Taus_TurnOn25->Write();
+  hL1Taus_TurnOn25_1pr->Write();
+  hL1Taus_TurnOn25_3pr->Write();
+  hL1Taus_TurnOn25_withNeutrals->Write();
+  hL1Taus_TurnOn25_noNeutrals->Write();
+  hL1Taus_TurnOn50->Write();
+  hL1Taus_TurnOn50_1pr->Write();
+  hL1Taus_TurnOn50_3pr->Write();
+  hL1Taus_TurnOn50_withNeutrals->Write();
+  hL1Taus_TurnOn50_noNeutrals->Write();
 
   outFile->Write();
 
