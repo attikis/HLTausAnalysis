@@ -34,6 +34,9 @@ void CaloTk::InitVars_()
   realTauMom = datasets_.McTauMomPdgId_;
   nMaxNumOfHTausPossible = datasets_.nMcTaus_;
 
+  // CaloTaus
+  calibrateCaloTaus  = true;
+
   // Matching tracks
   seedTk_Collection  =  "TTTracks"; // "TTTracks"
   seedTk_nFitParams  =   4;         //  4
@@ -557,65 +560,78 @@ void CaloTk::Loop()
 
     double dummy_eta = 0;
 
-    if (true) {
-    // calibrate energy of calo taus for different energy slices
+    // Calibrate energy of calo taus for different energy slices
+    if (calibrateCaloTaus) {
+
+      // For-loop: All CaloTaus
     for (vector<L1Tau>::iterator calo = L1Taus.begin(); calo != L1Taus.end(); calo++)
       {
-//        std::cout << calo->getEt() << "\n";
+	// std::cout << calo->getEt() << "\n";
 
-       	if(calo->getEt() >= 20 && calo->getEt() < 40) {
-          dummy_eta = findClosest(eta_values,30,calo->getEta());
-          for (int i=0; i<30; i++) {
-	    if (dummy_eta == eta_values[i]) calo->setEt( (1/et20to40[i])*calo->getEt() );
+       	if(calo->getEt() >= 20 && calo->getEt() < 40) 
+	  {
+	    dummy_eta = findClosest(eta_values,30,calo->getEta());
+	    for (int i=0; i<30; i++) 
+	      {
+		if (dummy_eta == eta_values[i]) calo->setEt( (1/et20to40[i])*calo->getEt() );
+	      }
 	  }
-	}
 
-        if(calo->getEt() >= 40 && calo->getEt() < 60) {
+        if(calo->getEt() >= 40 && calo->getEt() < 60) 
+	  {
+	    dummy_eta = findClosest(eta_values,30,calo->getEta());
+	    for (int i=0; i<30; i++) 
+	      {
+		if (dummy_eta == eta_values[i]) calo->setEt( (1/et40to60[i])*calo->getEt() );
+	      }
+	  }
+
+        if(calo->getEt() >= 60 && calo->getEt() < 80) 
+	  {
+	    dummy_eta = findClosest(eta_values,30,calo->getEta());
+	    for (int i=0; i<30; i++) 
+	      {
+		if (dummy_eta == eta_values[i]) calo->setEt( (1/et60to80[i])*calo->getEt() );
+	      }
+	  }
+
+        if(calo->getEt() >= 80 && calo->getEt() < 100) 
+	  {
           dummy_eta = findClosest(eta_values,30,calo->getEta());
-          for (int i=0; i<30; i++) {
-            if (dummy_eta == eta_values[i]) calo->setEt( (1/et40to60[i])*calo->getEt() );
-          }
-	}
+          for (int i=0; i<30; i++) 
+	    {
+	      if (dummy_eta == eta_values[i]) calo->setEt( (1/et80to100[i])*calo->getEt() );
+	    }
+	  }
 
-        if(calo->getEt() >= 60 && calo->getEt() < 80) {
-          dummy_eta = findClosest(eta_values,30,calo->getEta());
-          for (int i=0; i<30; i++) {
-            if (dummy_eta == eta_values[i]) calo->setEt( (1/et60to80[i])*calo->getEt() );
-          }
-	}
+        if(calo->getEt() >= 100 && calo->getEt() < 150) 
+	  {
+	    dummy_eta = findClosest(eta_values,30,calo->getEta());
+	    for (int i=0; i<30; i++) 
+	      {
+		if (dummy_eta == eta_values[i]) calo->setEt( (1/et100to150[i])*calo->getEt() );
+	      }
+	  }
 
-        if(calo->getEt() >= 80 && calo->getEt() < 100) {
-          dummy_eta = findClosest(eta_values,30,calo->getEta());
-          for (int i=0; i<30; i++) {
-            if (dummy_eta == eta_values[i]) calo->setEt( (1/et80to100[i])*calo->getEt() );
-          }
-	}
+        if(calo->getEt() >= 150 && calo->getEt() < 200)
+	  {
+	    dummy_eta = findClosest(eta_values,30,calo->getEta());
+	    for (int i=0; i<30; i++)
+	      {
+		if (dummy_eta == eta_values[i]) calo->setEt( (1/et150to200[i])*calo->getEt() );
+	      }
+	  }
+	
+        if(calo->getEt() >= 200)
+	  {
+	    dummy_eta = findClosest(eta_values,30,calo->getEta());
+	    for (int i=0; i<30; i++) {
+	      if (dummy_eta == eta_values[i]) calo->setEt( (1/etGE200[i])*calo->getEt() );
+	    }
+	  }
 
-        if(calo->getEt() >= 100 && calo->getEt() < 150) {
-          dummy_eta = findClosest(eta_values,30,calo->getEta());
-          for (int i=0; i<30; i++) {
-            if (dummy_eta == eta_values[i]) calo->setEt( (1/et100to150[i])*calo->getEt() );
-          }
-	}
-
-        if(calo->getEt() >= 150 && calo->getEt() < 200) {
-          dummy_eta = findClosest(eta_values,30,calo->getEta());
-          for (int i=0; i<30; i++) {
-            if (dummy_eta == eta_values[i]) calo->setEt( (1/et150to200[i])*calo->getEt() );
-          }
-	}
-
-        if(calo->getEt() >= 200) {
-          dummy_eta = findClosest(eta_values,30,calo->getEta());
-          for (int i=0; i<30; i++) {
-            if (dummy_eta == eta_values[i]) calo->setEt( (1/etGE200[i])*calo->getEt() );
-          }
-	}
-
-  //      std::cout << "new " << calo->getEt() << "\n";
-
-      } // for calibration
-      } // if you want to calibrate
+      } // For-loop: All CaloTaus
+    } // if you want to calibrate
 
     sort(L1Taus.begin(), L1Taus.end(), [](L1Tau& a, L1Tau& b) {return a.et()  > b.et();});
 

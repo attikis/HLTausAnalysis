@@ -106,6 +106,9 @@ class CaloTk : public TreeAnalyserMC{
   bool mcMatching_unique;
   double diTau_deltaPOCAz;
 
+  // CaloTaus
+  bool calibrateCaloTaus;
+
   // L1TkTau - Matching track
   string seedTk_Collection;
   int seedTk_nFitParams;
