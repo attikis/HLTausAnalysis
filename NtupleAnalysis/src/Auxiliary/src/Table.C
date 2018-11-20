@@ -522,7 +522,7 @@ void Table::Print(bool printTitleRows)
       _PrintTitleRow();
     }
   _PrintTableRows();
-  //  if (printTitleRows) _PrintRow(rowsBottom_); // hLine at the end not needed
+  if (printTitleRows) _PrintRow(rowsBottom_); // hLine at the end not needed
   return;
  
 }
