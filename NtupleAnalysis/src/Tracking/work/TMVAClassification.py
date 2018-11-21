@@ -39,28 +39,24 @@ import getopt # command line parser
 # --------------------------------------------
 
 # Default settings for command line arguments
-DEFAULT_OUTFNAME    = "TMVA.root"
-DEFAULT_PSEUDOMCRAB = "multicrab_CaloTk_v92X_10h34m50s_12Nov2018"
-DEFAULT_INFNAMESIG  = "histograms-RelValSingleTauFlatPt2To100_pythia8_PU25ns_93X_upgrade2023_realistic_v5_2023D17PU200_93X.root"
-DEFAULT_INFNAMEBKG  = "histograms-SingleNeutrino_PhaseIIFall17D_L1TPU200_93X.root"
-DEFAULT_TREESIG     = "tree"
-DEFAULT_TREEBKG     = "tree"
-DEFAULT_METHODS     = "Cuts,CutsD,CutsPCA,CutsGA,CutsSA,Likelihood,LikelihoodD,LikelihoodPCA,LikelihoodKDE,LikelihoodMIX,PDERS,PDERSD,PDERSPCA,PDEFoam,PDEFoamBoost,KNN,LD,Fisher,FisherG,BoostedFisher,HMatrix,FDA_GA,FDA_SA,FDA_MC,FDA_MT,FDA_GAMT,FDA_MCMT,MLP,MLPBFGS,MLPBNN,CFMlpANN,TMlpANN,SVM,BDT,BDTD,BDTG,BDTB,RuleFit"
+DEFAULT_OUTFNAME = "TMVA.root"
+DEFAULT_INFNAME  = "histograms-TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU200_93X.root"
+DEFAULT_TREESIG  = "treeS"
+DEFAULT_TREEBKG  = "treeB"
+DEFAULT_METHODS  = "Cuts,CutsD,CutsPCA,CutsGA,CutsSA,Likelihood,LikelihoodD,LikelihoodPCA,LikelihoodKDE,LikelihoodMIX,PDERS,PDERSD,PDERSPCA,PDEFoam,PDEFoamBoost,KNN,LD,Fisher,FisherG,BoostedFisher,HMatrix,FDA_GA,FDA_SA,FDA_MC,FDA_MT,FDA_GAMT,FDA_MCMT,MLP,MLPBFGS,MLPBNN,CFMlpANN,TMlpANN,SVM,BDT,BDTD,BDTG,BDTB,RuleFit"
 
 # Print usage help
 def usage():
     print " "
     print "Usage: python %s [options]" % sys.argv[0]
-    print "  -m  | --methods       : gives methods to be run (default: all methods)"
-    print "  -f  | --folder        : name of pseudomulticrab folder to use."
-    print "  -iS | --inputfileSig  : name of input ROOT file -Signal (default: '%s')" % DEFAULT_INFNAMESIG
-    print "  -iB | --inputfileBkg  : name of input ROOT file -Signal (default: '%s')" % DEFAULT_INFNAMESIG
-    print "  -o  | --outputfile    : name of output ROOT file containing results (default: '%s')" % DEFAULT_OUTFNAME
-    print "  -t  | --inputtrees    : input ROOT Trees for signal and background (default: '%s %s')" \
+    print "  -m | --methods    : gives methods to be run (default: all methods)"
+    print "  -i | --inputfile  : name of input ROOT file (default: '%s')" % DEFAULT_INFNAME
+    print "  -o | --outputfile : name of output ROOT file containing results (default: '%s')" % DEFAULT_OUTFNAME
+    print "  -t | --inputtrees : input ROOT Trees for signal and background (default: '%s %s')" \
           % (DEFAULT_TREESIG, DEFAULT_TREEBKG)
-    print "  -v  | --verbose"
-    print "  -?  | --usage         : print this help message"
-    print "  -h  | --help          : print this help message"
+    print "  -v | --verbose"
+    print "  -? | --usage      : print this help message"
+    print "  -h | --help       : print this help message"
     print " "
 
 # Main routine
@@ -78,9 +74,7 @@ def main():
         usage()
         sys.exit(1)
 
-    pseudomcrab = DEFAULT_PSEUDOMCRAB
-    infnameSig  = DEFAULT_INFNAMESIG
-    infnameBkg  = DEFAULT_INFNAMEBKG
+    infname     = DEFAULT_INFNAME
     treeNameSig = DEFAULT_TREESIG
     treeNameBkg = DEFAULT_TREEBKG
     outfname    = DEFAULT_OUTFNAME
@@ -92,12 +86,8 @@ def main():
             sys.exit(0)
         elif o in ("-m", "--methods"):
             methods = a
-        elif o in ("-f", "--folder"):
-            pseudomcrab = a
-        elif o in ("-iS", "--inputfileSig"):
-            infnameSig = a
-        elif o in ("-iB", "--inputfileBkg"):
-            infnameBkg = a
+        elif o in ("-i", "--inputfile"):
+            infname = a
         elif o in ("-o", "--outputfile"):
             outfname = a
         elif o in ("-t", "--inputtrees"):
@@ -158,6 +148,7 @@ def main():
     # Define the input variables that shall be used for the classifier training
     # note that you may also use variable expressions, such as: "3*var1/var2*abs(var3)"
     # [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
+
     dataloader.AddVariable( "seedPt", "p_{T}", "GeV", 'F' )
     dataloader.AddVariable( "seedChi2", "#chi^{2}", "", 'F' )
     dataloader.AddVariable( "seedStubs", "N_{stubs}", "", 'I' )
@@ -173,17 +164,13 @@ def main():
     #dataloader.AddSpectator( "spec2 := var1*3",  "Spectator 2", "units", 'F' );
 
     # Read input data
-    #if gSystem.AccessPathName( pseudomcrab+"/SingleTau_L1TPU200/results/"+infnameSig ) != 0: gSystem.Exec( "wget http://root.cern.ch/files/" + infnameSig )
-    #if gSystem.AccessPathName( pseudomcrab+"/SingleNeutrino_L1TPU200/results/"+infnameBkg ) != 0: gSystem.Exec( "wget http://root.cern.ch/files/" + infnameBkg )
-
-    #inputSig = TFile.Open( pseudomcrab+"/SingleTau_L1TPU200/results/"+infnameSig )
-    #inputBkg = TFile.Open( pseudomcrab+"/SingleNeutrino_L1TPU200/results/"+infnameBkg )
-    inputSig = TFile.Open( infnameSig )
-    inputBkg = TFile.Open( infnameBkg )
+    if gSystem.AccessPathName( infname ) != 0: gSystem.Exec( "wget http://root.cern.ch/files/" + infname )
+        
+    input = TFile.Open( infname )
 
     # Get the signal and background trees for training
-    signal      = inputSig.Get( treeNameSig )
-    background  = inputBkg.Get( treeNameBkg )
+    signal      = input.Get( treeNameSig )
+    background  = input.Get( treeNameBkg )
     
     # Global event weights (see below for setting event-wise weights)
     signalWeight     = 1.0
@@ -220,15 +207,15 @@ def main():
 
     # Apply additional cuts on the signal and background sample. 
     # example for cut: mycut = TCut( "abs(var1)<0.5 && abs(var2-0.5)<1" )
-    mycutSig = TCut( "" ) 
-    mycutBkg = TCut( "" ) 
+    mycutSig = TCut( "seedPt>=2 && seedChi2<=100" ) 
+    mycutBkg = TCut( "seedPt>=2 && seedChi2<=100" ) 
     
     # Here, the relevant variables are copied over in new, slim trees that are
     # used for TMVA training and testing
     # "SplitMode=Random" means that the input events are randomly shuffled before
     # splitting them into training and test samples
     dataloader.PrepareTrainingAndTestTree( mycutSig, mycutBkg,
-                                        "nTrain_Signal=3652:nTrain_Background=3652:nTest_Signal=3652:nTest_Background=3652:SplitMode=Random:NormMode=NumEvents:!V" )
+                                           "nTrain_Signal=7473:nTrain_Background=7473:nTest_Signal=7473:nTest_Background=7473:SplitMode=Random:NormMode=NumEvents:!V" )
 
     # --------------------------------------------------------------------------------------------------
 
