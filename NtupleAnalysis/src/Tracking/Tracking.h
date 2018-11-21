@@ -49,10 +49,21 @@ class Tracking : public TreeAnalyserMC{
   virtual void Loop();
 
   void PrintSettings(void);
+  
+  // Tree 
+  TTree* treeS;
+  TTree* treeB;
+  TBranch* b_seedPt_S;
+  TBranch* b_seedChi2_S;
+  TBranch* b_seedStubs_S;
+  TBranch* b_seedPt_B;
+  TBranch* b_seedChi2_B;
+  TBranch* b_seedStubs_B;
 
   // Public Variables
   bool DEBUG;
   string mcSample;
+
   string tk_Collection;
   int tk_nFitParams;
   double tk_minPt;
@@ -74,6 +85,19 @@ class Tracking : public TreeAnalyserMC{
   void WriteHistos_(void);
   void InitVars_(void);
 
+  // Seed tracks
+  string seedTk_Collection;
+  int seedTk_nFitParams;
+  double seedTk_minPt;
+  double seedTk_minEta;
+  double seedTk_maxEta;
+  double seedTk_maxChiSq;
+  double seedTk_minStubs;
+
+  double deltaR_MCmatch;
+
+  vector<GenParticle> GenTaus;
+  vector<GenParticle> GenTausHadronic;
 
   void FinaliseHistos_(void);
 
@@ -217,6 +241,8 @@ class Tracking : public TreeAnalyserMC{
   vector<int> pixHits_TTPixelTrackIndex;
 
   // Histograms
+  TH1D* h_LeadingChargedDaughters_MatchingResolution;
+
   TH1D* h_tp_pt;
   TH1D* h_tp_pt_L;
   TH1D* h_tp_pt_C;

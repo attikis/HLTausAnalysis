@@ -14,8 +14,8 @@ void Tracking::InitVars_()
 
   // Options
   bVerbose           = false;
-  bPrintEfficiencies = true;
-  bPrintResolutions  = true;
+  bPrintEfficiencies = false;
+  bPrintResolutions  = false;
   bPrintFitInfo      = false;
   bSaveFitInfo       = false;
   tp_dxy_Max         = 1.0;
@@ -103,6 +103,17 @@ void Tracking::InitVars_()
   tk_minStubs    =   0;         // Default: 0
   tk_minStubsPS  =   0;         // Default: 0
   tk_maxStubsPS  = 1e6;         // Default: 1e6
+
+  // Seed tracks
+  seedTk_Collection  =  "TTTracks"; // "TTTracks"
+  seedTk_nFitParams  =   4;         //  4
+  seedTk_minPt       =   0.0;       //  5.0
+  seedTk_minEta      =   0.0;       //  0.0
+  seedTk_maxEta      =   2.5;       //  2.5
+  seedTk_maxChiSq    = 999.9;       // 50.0
+  seedTk_minStubs    =     0;        //  5               
+
+  deltaR_MCmatch     =  0.10; 
 
   return;
 }
@@ -293,14 +304,14 @@ void Tracking::PrintPixelTrackCuts_(void)
 void Tracking::Loop()
 //============================================================================
 {
-
+  
   gErrorIgnoreLevel = kFatal;
-
-  if (1) std::cout << "=== Tracking::Loop()" << std::endl;
+  
+  if (DEBUG) std::cout << "=== Tracking::Loop()" << std::endl;
   
   // Sanity check
   if (fChain == 0) return;
-  cout << "\tGetting Tree Entries ..." << endl;
+  if (DEBUG) cout << "\tGetting Tree Entries ..." << endl;
   const Long64_t nEntries = (MaxEvents == -1) ? fChain->GetEntries() : min((int)fChain->GetEntries(), MaxEvents);
   Int_t  NPBarDivisions  = 100;
   Int_t PBarWidth        = 150;
@@ -311,30 +322,221 @@ void Tracking::Loop()
   //auxTools_.PrintPSets(fChain);
   // if (DEBUG) PrintSettings();
   // if (DEBUG) PrintPixelTrackCuts_();
-
+  bool isMinBias  = false;  
   Long64_t nbytes       = 0;
   Long64_t nb           = 0;
   unsigned int nAllEvts = fChain->GetEntries();
   unsigned int nEvts    = 0;
 
+
+  // Determine what sample this is
+  std::size_t found = mcSample.find("SingleNeutrino");
+  if (found!=std::string::npos)
+    {
+      isMinBias = true;
+      if (DEBUG) std::cout << "Minimum Bias sample" << std::endl;
+    }
+  else
+    {
+      if (DEBUG) std::cout << "Not a Minimum Bias sample." << std::endl;
+    } 
+ 
   // Print User Settings
   if (DEBUG) cout << "\tPrinting user settings:" << endl;
   if (DEBUG) PrintSettings();
   
   if (DEBUG) cout << "\tAnalyzing " << nEntries << "/" << fChain->GetEntries() << " events" << endl;
+
+
   // For-loop: All TTree Entries
   for (int jentry = 0; jentry < nEntries; jentry++, nEvts++)
     {
       
-      if(DEBUG) cout << "\tEntry = " << jentry << endl;
+      if (DEBUG) cout << "\tEntry = " << jentry << endl;
       
       // Load the tree && Get the entry
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);
       nbytes += nb;
+
+
+      // ********************************************************
+      // SEED TRACKS PARAMETERS OPTIMISATION
+      // ********************************************************
+      if (DEBUG) cout<<"\t**** SEED TRACKS PARAMETERS OPTIMISATION ****"<<endl;
+
+      ///////////////////////////////////////////////////////////
+      // TTree & branches
+      /////////////////////////////////////////////////////////// 
+            
+      // Tree 
+      float seed_Pt_S,seed_Pt_B;
+      float seed_Chi2_S, seed_Chi2_B;
+      int seed_Stubs_S, seed_Stubs_B;
       
+      b_seedPt_S    -> SetAddress(&seed_Pt_S);
+      b_seedChi2_S  -> SetAddress(&seed_Chi2_S);
+      b_seedStubs_S -> SetAddress(&seed_Stubs_S);
+
+      b_seedPt_B    -> SetAddress(&seed_Pt_B);
+      b_seedChi2_B  -> SetAddress(&seed_Chi2_B);
+      b_seedStubs_B -> SetAddress(&seed_Stubs_B);
       
+
+      // Get the GenTaus Collections 
+      if (!isMinBias) {
+	GenTaus             = GetGenParticles(15, true);
+	GenTausHadronic     = GetHadronicGenTaus(GenTaus, 00.0, 2.3); // for visEt and genP plots
+      }
+      if (DEBUG) PrintGenParticleCollection(GenTausHadronic);    
+ 
+      // Get the TTTracks Collection
+      vector<TTTrack> seedTTTracks = GetTTTracks(seedTk_minPt, seedTk_minEta, seedTk_maxEta, seedTk_maxChiSq,
+						 seedTk_minStubs, seedTk_nFitParams, false);
+      sort( seedTTTracks.begin(), seedTTTracks.end() );
+
+      ///////////////////////////////////////////////////////////
+      // Find leading charged daughters of hadronic GenTaus
+      /////////////////////////////////////////////////////////// 
+
+      // Intitializations
+      vector<GenParticle> leadingChargedDaughters;
+      
+      // For-loop: All hadronic gen-taus
+      for (vector<GenParticle>::iterator genTau = GenTausHadronic.begin(); genTau != GenTausHadronic.end(); genTau++) {
+
+	vector<GenParticle> chargedDaughters = genTau->finalDaughtersCharged();
+	if (DEBUG) {
+	  cout << "\tCharged Daughters of Hadronic GenTau with index "<<genTau->index()<<" :"<<endl;
+	  PrintGenParticleCollection(chargedDaughters);
+	}
+	
+	double ldgDaughPt   = -1000.0;
+	int ldgDaughIndx    = -1;
+	GenParticle ldgDaugh;
+	
+	// For-loop: All charged daughters
+	for (vector<GenParticle>::iterator daugh = chargedDaughters.begin(); daugh != chargedDaughters.end(); daugh++) {
+	  
+	  if (DEBUG) daugh->PrintProperties();
+	  
+	  if (daugh->pt() > ldgDaughPt)
+	    {
+	      ldgDaughPt   = daugh->pt();
+	      ldgDaugh     = *daugh;
+	    }
+	} // For-loop: All charged daughters
+
+	if (DEBUG) ldgDaugh.PrintProperties();
+	leadingChargedDaughters.push_back(ldgDaugh);
+	
+      } // For-loop: All hadronic gen-taus
+      
+      if (DEBUG) {
+	cout << "\tLeading Charged Daughters of Hadronic GenTaus in the event:"<<endl;
+	PrintGenParticleCollection(leadingChargedDaughters);
+      }
+      
+      ///////////////////////////////////////////////////////////////////////
+      // Match TTTracks to the leading charged daughters of hadronic GenTaus
+      /////////////////////////////////////////////////////////// ///////////
+
+      int matched_Daughters = 0;
+      vector<TTTrack> matchTTTracks;
+      // For-loop: All leading charged daughters
+      for (vector<GenParticle>::iterator daugh = leadingChargedDaughters.begin(); daugh != leadingChargedDaughters.end(); daugh++) {
+
+	if (DEBUG) daugh->PrintProperties();
+
+	double deltaR;
+	TTTrack matchTrk;
+	double mindR          = 999.9;
+	bool isMatched        = false;
+
+	// For-loop: All seed tracks
+	for (vector<TTTrack>::iterator trk = seedTTTracks.begin(); trk != seedTTTracks.end(); trk++) {
+	  
+	  if (DEBUG) trk->PrintProperties();
+	
+	  // Skip track if the ID of its matched tracking particle is not the same with the one of leading charged daughter
+	  if (trk->getTPPdgId() != daugh->pdgId()) continue;
+	  
+	  // Find the track closest to the leading charged daughter
+	  deltaR = auxTools_.DeltaR( daugh->eta(), daugh->phi(), trk->getEta(), trk->getPhi() );
+	  
+	  if (deltaR < mindR) {
+	    mindR    = deltaR;
+	    matchTrk = *trk;
+	  }
+	  
+	} // For-loop: All seed tracks
+      
+	if (mindR < deltaR_MCmatch) isMatched = true;
+	
+	if (isMatched) 
+	  {
+	    if (DEBUG) matchTrk.PrintProperties();
+	    matchTTTracks.push_back(matchTrk);
+	    matched_Daughters++;
+	  }
+	else
+	  {
+	    if (DEBUG) {
+	      daugh->PrintProperties();
+	      cout << "minimum deltaR of cherged daughter with index "<< daugh->index() <<" is :  "<<mindR<<endl;
+	    }
+	  }
+      } // For-loop: All leading charged daughters
+      
+      if (DEBUG) cout << "All leading charged daughters are "<< leadingChargedDaughters.size()<< "  , the matched ones are "<< matched_Daughters <<  " and the resolution is " << leadingChargedDaughters.size()-matched_Daughters<<endl;
+
+      // Fill histo
+      h_LeadingChargedDaughters_MatchingResolution -> Fill(leadingChargedDaughters.size()-matched_Daughters);
+      
+      // Sort the matched TTTracks
+      sort( matchTTTracks.begin(), matchTTTracks.end() );
+      
+      // Substract matched Tracks from the seed Tracks to get the background Tracks
+      std::vector<TTTrack> bkgTTTracks;
+      std::set_difference(
+			  seedTTTracks.begin() , seedTTTracks.end(),
+			  matchTTTracks.begin(), matchTTTracks.end(),
+			  std::back_inserter( bkgTTTracks )
+			  );
+
+      if (DEBUG) {
+	PrintTTTrackCollection(seedTTTracks);
+	PrintTTTrackCollection(matchTTTracks);
+	PrintTTTrackCollection(bkgTTTracks);
+      }
+
+      ///////////////////////////////////////////////////////////
+      // Fill signal and background tracks parameters
+      /////////////////////////////////////////////////////////// 
+
+      // For-loop: All signal tracks
+      for (vector<TTTrack>::iterator sigTrk = matchTTTracks.begin(); sigTrk != matchTTTracks.end(); sigTrk++) { 
+	seed_Pt_S    = sigTrk->getPt();
+	seed_Chi2_S  = sigTrk->getChi2();
+	seed_Stubs_S = sigTrk->getNumOfStubs();
+	treeS->Fill();
+      }
+
+      // For-loop: All background tracks
+      for (vector<TTTrack>::iterator bkgTrk = bkgTTTracks.begin(); bkgTrk != bkgTTTracks.end(); bkgTrk++) {
+        seed_Pt_B    = bkgTrk->getPt();
+        seed_Chi2_B  = bkgTrk->getChi2();
+        seed_Stubs_B = bkgTrk->getNumOfStubs();
+        treeB->Fill();
+      }
+
+
+      // ********************************************************
+      // TRACKING PERFORMANCE 
+      // ********************************************************
+      if (DEBUG) cout<<"\t**** TRACKING PERFORMANCE ****"<<endl;
+
       ///////////////////////////////////////////////////////////
       // For-loop: TPs
       ///////////////////////////////////////////////////////////
@@ -791,7 +993,23 @@ void Tracking::BookHistos_(void)
 //============================================================================
 {
   if (DEBUG) std::cout << "=== Tracking::BookHistos_()" << std::endl;
-  
+
+  outFile->cd();
+
+  // Tree
+  treeS = new TTree("treeS", "TTreeS");
+  treeB = new TTree("treeB", "TTreeB");
+
+  b_seedPt_S     = treeS -> Branch("seedPt"   , &b_seedPt_S   , "b_seedPt_S/F");
+  b_seedChi2_S   = treeS -> Branch("seedChi2" , &b_seedChi2_S , "b_seedChi2_S/F");
+  b_seedStubs_S  = treeS -> Branch("seedStubs", &b_seedStubs_S, "b_seedStubs_S/I");
+
+  b_seedPt_B     = treeB -> Branch("seedPt"   , &b_seedPt_B   , "b_seedPt_B/F");
+  b_seedChi2_B   = treeB -> Branch("seedChi2" , &b_seedChi2_B , "b_seedChi2_B/F");
+  b_seedStubs_B  = treeB -> Branch("seedStubs", &b_seedStubs_B, "b_seedStubs_B/I");
+
+  histoTools_.BookHisto_1D(h_LeadingChargedDaughters_MatchingResolution, "LeadingChargedDaughters_MatchingResolution", "N_{daugh} - N_{daugh}^{matched}; Entries", 9, -4.5, 4.5);
+
   // Event-Type histograms
   histoTools_.BookHisto_1D(hCounters, "Counters",  "", 2, 0.0, +2.0);
 
@@ -1109,6 +1327,12 @@ void Tracking::WriteHistos_(void)
   // Location -> outFile
   outFile->cd();
 
+  // Write the trees
+  treeS->Write();
+  treeB->Write();
+
+  h_LeadingChargedDaughters_MatchingResolution->Write();
+
   // Fill the counters
   hCounters->Write();
 
@@ -1171,7 +1395,6 @@ void Tracking::WriteHistos_(void)
   h_eff_phi->Write();
   h_eff_z0->Write();
   h_eff_d0->Write();
-
 
   // resolution histograms
   h_res_pt->Write();
@@ -1273,7 +1496,7 @@ void Tracking::WriteHistos_(void)
 
 
   // Write the outfile
-  outFile->Write();
+  //outFile->Write();
 
 }
 
