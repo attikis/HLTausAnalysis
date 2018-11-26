@@ -56,9 +56,11 @@ class Tracking : public TreeAnalyserMC{
   TBranch* b_seedPt_S;
   TBranch* b_seedChi2_S;
   TBranch* b_seedStubs_S;
+  TBranch* b_seedEta_S;
   TBranch* b_seedPt_B;
   TBranch* b_seedChi2_B;
   TBranch* b_seedStubs_B;
+  TBranch* b_seedEta_B;
 
   // Public Variables
   bool DEBUG;

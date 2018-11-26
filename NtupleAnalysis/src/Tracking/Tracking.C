@@ -307,14 +307,14 @@ void Tracking::Loop()
   
   gErrorIgnoreLevel = kFatal;
   
-  if (DEBUG) std::cout << "=== Tracking::Loop()" << std::endl;
+  if (0) std::cout << "=== Tracking::Loop()" << std::endl;
   
   // Sanity check
   if (fChain == 0) return;
-  if (DEBUG) cout << "\tGetting Tree Entries ..." << endl;
+  if (0) cout << "\tGetting Tree Entries ..." << endl;
   const Long64_t nEntries = (MaxEvents == -1) ? fChain->GetEntries() : min((int)fChain->GetEntries(), MaxEvents);
   Int_t  NPBarDivisions  = 100;
-  Int_t PBarWidth        = 150;
+  Int_t PBarWidth        = 100;
   
   // Initialisations
   InitVars_();
@@ -374,15 +374,18 @@ void Tracking::Loop()
       float seed_Pt_S,seed_Pt_B;
       float seed_Chi2_S, seed_Chi2_B;
       int seed_Stubs_S, seed_Stubs_B;
+      float seed_Eta_S, seed_Eta_B;
       
       b_seedPt_S    -> SetAddress(&seed_Pt_S);
       b_seedChi2_S  -> SetAddress(&seed_Chi2_S);
       b_seedStubs_S -> SetAddress(&seed_Stubs_S);
+      b_seedEta_S   -> SetAddress(&seed_Eta_S);
 
       b_seedPt_B    -> SetAddress(&seed_Pt_B);
       b_seedChi2_B  -> SetAddress(&seed_Chi2_B);
       b_seedStubs_B -> SetAddress(&seed_Stubs_B);
-      
+      b_seedEta_B   -> SetAddress(&seed_Eta_B);
+
 
       // Get the GenTaus Collections 
       if (!isMinBias) {
@@ -442,6 +445,7 @@ void Tracking::Loop()
       // Match TTTracks to the leading charged daughters of hadronic GenTaus
       /////////////////////////////////////////////////////////// ///////////
 
+      double deltaR;
       int matched_Daughters = 0;
       vector<TTTrack> matchTTTracks;
       // For-loop: All leading charged daughters
@@ -449,7 +453,6 @@ void Tracking::Loop()
 
 	if (DEBUG) daugh->PrintProperties();
 
-	double deltaR;
 	TTTrack matchTrk;
 	double mindR          = 999.9;
 	bool isMatched        = false;
@@ -484,7 +487,7 @@ void Tracking::Loop()
 	  {
 	    if (DEBUG) {
 	      daugh->PrintProperties();
-	      cout << "minimum deltaR of cherged daughter with index "<< daugh->index() <<" is :  "<<mindR<<endl;
+	      cout << "minimum deltaR of charged daughter with index "<< daugh->index() <<" is :  "<<mindR<<endl;
 	    }
 	  }
       } // For-loop: All leading charged daughters
@@ -497,6 +500,7 @@ void Tracking::Loop()
       // Sort the matched TTTracks
       sort( matchTTTracks.begin(), matchTTTracks.end() );
       
+      /*
       // Substract matched Tracks from the seed Tracks to get the background Tracks
       std::vector<TTTrack> bkgTTTracks;
       std::set_difference(
@@ -504,23 +508,52 @@ void Tracking::Loop()
 			  matchTTTracks.begin(), matchTTTracks.end(),
 			  std::back_inserter( bkgTTTracks )
 			  );
+      */
+
+      // Get the background tracks 
+      std::vector<TTTrack> bkgTTTracks;
+
+      // For-loop: All seed tracks
+      for (vector<TTTrack>::iterator trk = seedTTTracks.begin(); trk != seedTTTracks.end(); trk++) {
+	
+	if (DEBUG) trk->PrintProperties();
+	
+	double mindR          = 999.9;
+
+	// For-loop: All hadronic gen-taus
+	for (vector<GenParticle>::iterator genTau = GenTausHadronic.begin(); genTau != GenTausHadronic.end(); genTau++) {
+	  
+	  // Find the dR of the track and the GenTau
+	  deltaR = auxTools_.DeltaR( genTau->eta(), genTau->phi(), trk->getEta(), trk->getPhi() );
+	  
+	  if (deltaR < mindR) mindR = deltaR;
+		  
+	} // For-loop: All hadronic gen-taus
+
+	if (mindR <= 0.5) continue;
+	bkgTTTracks.push_back(*trk);
+
+      } // For-loop: All seed tracks
 
       if (DEBUG) {
-	PrintTTTrackCollection(seedTTTracks);
+	// PrintTTTrackCollection(seedTTTracks);
 	PrintTTTrackCollection(matchTTTracks);
 	PrintTTTrackCollection(bkgTTTracks);
       }
 
+
       ///////////////////////////////////////////////////////////
       // Fill signal and background tracks parameters
       /////////////////////////////////////////////////////////// 
-
+      
       // For-loop: All signal tracks
       for (vector<TTTrack>::iterator sigTrk = matchTTTracks.begin(); sigTrk != matchTTTracks.end(); sigTrk++) { 
 	seed_Pt_S    = sigTrk->getPt();
 	seed_Chi2_S  = sigTrk->getChi2();
 	seed_Stubs_S = sigTrk->getNumOfStubs();
+	seed_Eta_S   = sigTrk->getEta();
 	treeS->Fill();
+
       }
 
       // For-loop: All background tracks
@@ -528,6 +561,7 @@ void Tracking::Loop()
         seed_Pt_B    = bkgTrk->getPt();
         seed_Chi2_B  = bkgTrk->getChi2();
         seed_Stubs_B = bkgTrk->getNumOfStubs();
+	seed_Eta_B   = bkgTrk->getEta();
         treeB->Fill();
       }
 
@@ -1003,10 +1037,12 @@ void Tracking::BookHistos_(void)
   b_seedPt_S     = treeS -> Branch("seedPt"   , &b_seedPt_S   , "b_seedPt_S/F");
   b_seedChi2_S   = treeS -> Branch("seedChi2" , &b_seedChi2_S , "b_seedChi2_S/F");
   b_seedStubs_S  = treeS -> Branch("seedStubs", &b_seedStubs_S, "b_seedStubs_S/I");
+  b_seedEta_S    = treeS -> Branch("seedEta"  , &b_seedEta_S  , "b_seedEta_S/F");
 
   b_seedPt_B     = treeB -> Branch("seedPt"   , &b_seedPt_B   , "b_seedPt_B/F");
   b_seedChi2_B   = treeB -> Branch("seedChi2" , &b_seedChi2_B , "b_seedChi2_B/F");
   b_seedStubs_B  = treeB -> Branch("seedStubs", &b_seedStubs_B, "b_seedStubs_B/I");
+  b_seedEta_B    = treeB -> Branch("seedEta"  , &b_seedEta_B  , "b_seedEta_B/F");
 
   histoTools_.BookHisto_1D(h_LeadingChargedDaughters_MatchingResolution, "LeadingChargedDaughters_MatchingResolution", "N_{daugh} - N_{daugh}^{matched}; Entries", 9, -4.5, 4.5);
 
