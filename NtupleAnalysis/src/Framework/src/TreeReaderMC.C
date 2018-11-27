@@ -584,30 +584,30 @@ void TreeReaderMC::PrintGenParticleCollection(vector<GenParticle> collection)
 //============================================================================
 {
   if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::PrintGenParticleCollection()" << std::endl;
+ 
+  Table info("Index | Pt | Eta | Phi | Mass | Charge | PdgId | Status | vX | vY | vZ | mothers | daughters |", "Text");
   
-  
-  for (vector<GenParticle>::iterator p = collection.begin(); p != collection.end(); p++)
-    {
-      if (cfg_DEBUG*0) std::cout << "\nGenParticle:" << endl;
-      p->PrintProperties();
+  // For-loop: All GenParticles
+  int row=0;
+  for (vector<GenParticle>::iterator p = collection.begin(); p != collection.end(); p++) {
+    // Construct table
+    info.AddRowColumn(row, auxTools_.ToString( p->index() , 1) );
+    info.AddRowColumn(row, auxTools_.ToString( p->pt()    , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->eta()   , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->phi()   , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->mass()  , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->charge(), 1) );
+    info.AddRowColumn(row, auxTools_.ToString( p->pdgId() , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->status(), 1) );
+    info.AddRowColumn(row, auxTools_.ToString( p->vx()    , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->vy()    , 3) );
+    info.AddRowColumn(row, auxTools_.ToString( p->vz()    , 3) );
+    info.AddRowColumn(row, auxTools_.ConvertIntVectorToString(p->mothersIndex()) );
+    info.AddRowColumn(row, auxTools_.ConvertIntVectorToString(p->daughtersIndex()) );
+    row++;
+  }
+  info.Print();
 
-      // For more information
-      if (cfg_DEBUG*0){
-
-	std::cout << "\nDaughters:" << endl;
-	p->PrintDaughters();
-	std::cout << "\nFinal Daughters:" << endl;
-	p->PrintFinalDaughters();
-	std::cout << "\nFinal Daughters (Charged):" << endl;
-	p->PrintFinalDaughtersCharged();
-	std::cout << "\nFinal Daughters (Neutral):" << endl;
-	p->PrintFinalDaughtersNeutral();
-	std::cout << "\nMothers:" << endl;
-	p->PrintMothers();
-      }
-      
-    }
-  
   return;
 }
 
