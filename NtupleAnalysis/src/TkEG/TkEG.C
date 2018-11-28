@@ -58,7 +58,7 @@ void TkEG::InitVars_()
   minDeltaR_leadtrk = 0.0;
   maxDeltaR_leadtrk = 0.15;//0.3;
   maxDeltaR_const   = 2.5;
-  maxDeltaZ_trk     = 0.8;  // cm
+  maxDeltaZ_trk     = 1.0;  // cm
   maxInvMass_trk    = 1.5; // GeV 
   minEt_EG          = 1.5;  // GeV
   minDeltaR_EG      = 0.0;
@@ -693,6 +693,8 @@ void TkEG::Loop()
 
     h_EGs_N -> Fill( L1EGs.size() );
 
+    vector<GenParticle> GenPion0s = GetGenParticles(111, true);
+
     // For-loop: All the EGs in the event
     for (auto eg = L1EGs.begin(); eg != L1EGs.end() ; eg++) {
 
@@ -702,7 +704,41 @@ void TkEG::Loop()
 	h_EGs_EtaVsEt -> Fill( eg->getEta(), eg->getEt() ); 
 	
 	h_EGs_HwQual  -> Fill (eg->getHwQual());
+	
+	GenParticle match_pion0;
+	double deltaR;
+	double match_dR = 999;
+	bool isMatched = false;
+	
+	// For-loop: All pion0s in the event                                                                                                                         
+	for (vector<GenParticle>::iterator pi0 = GenPion0s.begin() ; pi0 != GenPion0s.end() ; pi0 ++){
+	  
+	  if (pi0->et() < 1.5) continue;
+	  
+	  deltaR = auxTools_.DeltaR( eg->getEta(), eg->getPhi(), pi0->eta(), pi0->phi() );
+	  
+	  if (deltaR < match_dR) {
+	    match_dR = deltaR;
+	    match_pion0 = *pi0;
+	  }
+	  
+	} // For-loop: All pion0s in the event                                                                                                                    
 
+	float ETResolution = (eg->getEt() - match_pion0.et())/match_pion0.et();
+
+	// Matching of clustered EG
+	if ( (match_dR < 0.1) && (abs(ETResolution) < 0.5) ) {
+	  isMatched = true;
+	}
+	
+	h_EGs_MCMatch -> Fill(isMatched);
+	
+	if (!isMatched) continue;
+	
+	h_EGs_Matched_dR_EG_matchPion0 -> Fill ( match_dR );
+	h_EGs_Matched_ETResolution     -> Fill ( ETResolution );
+	
+       
     }// For-loop: All the EGs in the event
     
 
@@ -2482,6 +2518,14 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_EGs_HwQual, "EGs_HwQual", ";Quality bit; EGs / bin", 32, 0.5, 32.5); 
   histoTools_.BookHisto_2D(h_EGs_EtaVsEt, "EGs_EtaVsEt", ";#eta ;E_{T} (GeV); Entries/bin"  , nEta  , minEta  , maxEta, nEt  , minEt  , maxEt);
 
+  // MC Matched EGs 
+  histoTools_.BookHisto_1D(h_EGs_MCMatch,"EGs_MCMatch", ";;Entries / bin", 2, 0, 2);
+  h_EGs_MCMatch->GetXaxis()->SetBinLabel(1,"not MC Matched EG");
+  h_EGs_MCMatch->GetXaxis()->SetBinLabel(2,"MC Matched EG");
+
+  histoTools_.BookHisto_1D(h_EGs_Matched_dR_EG_matchPion0,"EGs_Matched_dR_EG_matchPion0", ";#DeltaR(EG, #pi^{0}); Entries / bin",30,  0.0,   +0.3);
+  histoTools_.BookHisto_1D(h_EGs_Matched_ETResolution, "EGs_Matched_ETResolution", ";E_{T} resolution (GeV);Clusters / bin", 20000, -10.0, +10.0); 
+
   // DR of lead trk and EGs
   histoTools_.BookHisto_1D(h_leadTrk_EG_dR, "leadTrk_EG_dR", ";#DeltaR(trk_{ldg}, EG); entries / bin",   60,  0.0,   +6.0);
 
@@ -3242,6 +3286,10 @@ void TkEG::WriteHistos_(void)
 //  h_EGs_IPhi->Write();
   h_EGs_HwQual->Write();
   h_EGs_EtaVsEt->Write();
+
+  h_EGs_MCMatch->Write();
+  h_EGs_Matched_dR_EG_matchPion0->Write();
+  h_EGs_Matched_ETResolution->Write();
 
   h_clustEGs_allEGs      -> Write();
   h_clustEGs_passEt      -> Write();

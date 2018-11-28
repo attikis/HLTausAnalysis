@@ -454,7 +454,7 @@ def GetHistoKwargs(h, opts):
     if "TkEG_clustEGs_ETResolution" in h:
         kwargs["opts"]   = {"xmin": -1.0, "xmax": 1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
-        kwargs["xlabel"] = "#deltaE_{T} / p_{T}^{#pi^{0}}"
+        kwargs["xlabel"] = "#deltaE_{T} / E_{T}^{#pi^{0}}"
         kwargs["ylabel"] = "Arbitrary Units / %.3f "        
         kwargs["rebinX"] = 5
         
@@ -473,6 +473,13 @@ def GetHistoKwargs(h, opts):
     if "EGs_MCmatched_Et" == h:
         kwargs["log"]  = True
         kwargs["opts"] = {"xmin": 0.0, "xmax": 100.0, "ymin": 0.001, "ymax": 0.2, "ymaxfactor": _yMaxF}
+        
+    if "EGs_Matched_ETResolution" in h:
+        kwargs["opts"]   = {"xmin": -1.0, "xmax": 1.0, "ymin": _yMin, "ymaxfactor": _yMaxF}
+        kwargs["cutBox"] = {"cutValue": 0.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        kwargs["xlabel"] = "#deltaE_{T} / E_{T}^{#pi^{0}}"
+        kwargs["ylabel"] = "Arbitrary Units / %.3f "        
+        kwargs["rebinX"] = 5
 
     if "mcmatch_dr" in h.lower():
         kwargs["log"]  = True

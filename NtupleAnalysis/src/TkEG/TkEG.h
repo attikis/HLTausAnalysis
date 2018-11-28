@@ -289,6 +289,10 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_EGs_HwQual;
   TH2D* h_EGs_EtaVsEt;
 
+  TH1D* h_EGs_MCMatch;
+  TH1D* h_EGs_Matched_dR_EG_matchPion0;
+  TH1D* h_EGs_Matched_ETResolution;
+
   TH1D* h_leadTrk_EG_dR;
   TH1D* h_leadTrk_EG_dR_beforecorrection;
   TH1D* h_leadTrk_EG_dPhi;
