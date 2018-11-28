@@ -42,7 +42,7 @@ void TkEG::InitVars_()
   cfg_tk_minPt       = 2.00;        // Default: 2.0
   cfg_tk_minEta      = 0.0;         // Default: 0.0
   cfg_tk_maxEta      = 1.5;//2.5;        // Default: 1e6
-  cfg_tk_maxChiSq    = 50.0;         // Default: 1e6
+  cfg_tk_maxChiSq    = 95.0;         // Default: 1e6
   cfg_tk_minStubs    =   5;         // Default: 0
 
   // EGs parameters
@@ -52,7 +52,7 @@ void TkEG::InitVars_()
 
   // TkEG algorithm parameters
   minStubs_trk      = 5; 
-  maxChi2_trk       = 50.0; // GeV
+  maxChi2_trk       = 95.0; // GeV
   minPt_leadtrk     = 5.0; // GeV
   maxEta_leadtrk    = 1.5;//2.5;
   minDeltaR_leadtrk = 0.0;
@@ -244,16 +244,18 @@ void TkEG::Loop()
 	h_genTausAll_Eta1VsEta2 -> Fill (GenTaus.at(0).eta(), GenTaus.at(1).eta());
 	h_genTausAll_Phi1VsPhi2 -> Fill (GenTaus.at(0).phi(), GenTaus.at(1).phi());
       }
+
+      
     }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // INITIAL STUDIES 
-    ////////////////////////////////////////////////////////////////////////////////////////////////    
     
     // Consider only events with at least one genuine hadronic tau (except for MinBias sample)    
     h_genTausHad_N->Fill( GenTausHadronic.size() );
     //if (GenTausHadronic.size() < 1 && !isMinBias) continue;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // INITIAL GEN-LEVEL STUDIES 
+    ////////////////////////////////////////////////////////////////////////////////////////////////    
+    
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -951,11 +953,12 @@ void TkEG::Loop()
 	else cout << " and does not have a matching generator tau" << endl;
       }
 
-      newTauCandidate.SetShrinkingConeConst(maxDeltaR_const);
-      newTauCandidate.SetSigConeMaxOpen(maxDeltaR_leadtrk);
-      newTauCandidate.FindIsoConeTracks(TTTracks);
-      newTauCandidate.FindSignalConeEGs(L1EGs);
-      newTauCandidate.FindIsoConeEGs(L1EGs);
+      SetTauCandidateProperties(&newTauCandidate);
+      // newTauCandidate.SetShrinkingConeConst(maxDeltaR_const);
+      // newTauCandidate.SetSigConeMaxOpen(maxDeltaR_leadtrk);
+      // newTauCandidate.FindIsoConeTracks(TTTracks);
+      // newTauCandidate.FindSignalConeEGs(L1EGs);
+      // newTauCandidate.FindIsoConeEGs(L1EGs);
       
       L1TkEGTauCandidates.push_back(newTauCandidate);
       
@@ -988,7 +991,7 @@ void TkEG::Loop()
     for (auto tkeg = L1TkEGTauCandidates.begin(); tkeg != L1TkEGTauCandidates.end(); tkeg++) {
 
       // ------ RELATIVE ISOLATION ------
-      double relIso = tkeg->CalculateRelIso(TTTracks, maxDeltaZ_iso);
+      double relIso = tkeg->CalculateRelIso(TTTracks, L1EGs, maxDeltaZ_iso);
       
       // Fill relative isolation histogram
       h_TkEG_relIso->Fill( relIso );
@@ -1158,7 +1161,7 @@ void TkEG::Loop()
         h_TkEG_isoTracks_InvMass -> Fill( p4sum.M() );
 	h_TkEG_isoTracks_Et      -> Fill( p4sum.Et());
 	h_TkEG_isoTracks_Eta     -> Fill( p4sum.Eta());
-	h_TkEG_DonutRatio        -> Fill( GetDonutRatio(*tkeg, isoTracks, false) );
+	h_TkEG_DonutRatio        -> Fill( GetDonutRatio(&(*tkeg), isoTracks, false) );
       }
 
       //if (tkeg->HasMatchingGenParticle()){ //marina
@@ -2116,6 +2119,18 @@ void TkEG::Loop()
 //  return;
 //}
 
+//============================================================================
+void TkEG::SetTauCandidateProperties(L1TkEGParticle *tauCandidate)
+//============================================================================
+{
+  tauCandidate->SetShrinkingConeConst(maxDeltaR_const);
+  tauCandidate->SetSigConeMaxOpen(maxDeltaR_leadtrk);
+  tauCandidate->FindIsoConeTracks(TTTracks);
+  tauCandidate->FindSignalConeEGs(L1EGs);
+  tauCandidate->FindIsoConeEGs(L1EGs);
+  
+  return;
+}
 
 //============================================================================
 float TkEG::DeltaPhi(float phi1, float phi2) 
@@ -2172,7 +2187,7 @@ float TkEG::CorrectedEta(float eta, float zTrack)  {
 
 //============================================================================
 bool TkEG::IsWithinEtaRegion(string etaRegion, 
-				 double eta)
+			     double eta)
 //============================================================================
 {
 
@@ -2190,9 +2205,9 @@ bool TkEG::IsWithinEtaRegion(string etaRegion,
 
 
 //============================================================================
-double TkEG::GetDonutRatio(L1TkEGParticle &L1TkEG,
-			     vector<TTTrack> isoTTTracks, 
-			     bool bUseCone)
+double TkEG::GetDonutRatio(L1TkEGParticle *L1TkEG,
+			   vector<TTTrack> isoTTTracks, 
+			   bool bUseCone)
 //============================================================================
 {
   /*
@@ -2204,12 +2219,12 @@ double TkEG::GetDonutRatio(L1TkEGParticle &L1TkEG,
     for a given eta ring)
    */
 
-  TTTrack seedTk = L1TkEG.GetLeadingTrack();  
+  TTTrack seedTk = L1TkEG->GetLeadingTrack();  
   vector<TTTrack> isoConeTks; 
-  isoConeTks = L1TkEG.GetIsoConeTracks();
+  isoConeTks = L1TkEG->GetIsoConeTracks();
   double sumPt_smallRAnnulus = 0.0;
   double sumPt_largeRAnnulus = 0.0;
-  double smallR = L1TkEG.GetIsoConeMax();
+  double smallR = L1TkEG->GetIsoConeMax();
   double largeR = sqrt(2)*smallR;
   double sumPt_ratio = 0.0;
 

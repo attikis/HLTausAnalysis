@@ -89,13 +89,14 @@ class TkEG : public TreeAnalyserMC{
   void InitObjects(void);
   void InitVars_(void);
   //void SortL1TkEGs();
+  void SetTauCandidateProperties(L1TkEGParticle *tauCandidate);
   float DeltaPhi(float phi1, float phi2);
   float deltaR(float eta1, float eta2, float phi1, float phi2);
   float CorrectedEta(float eta, float zTrack);
   bool IsWithinEtaRegion(string etaRegion, double eta);
   vector<L1TkEGParticle> GetMcMatchedL1TkEGs(vector<L1TkEGParticle> L1TkEGs);
 
-  double GetDonutRatio(L1TkEGParticle &L1TkEG, 
+  double GetDonutRatio(L1TkEGParticle *L1TkEG, 
 		       vector<TTTrack> isoTTTracks,
 		       bool bUseCone);
   
