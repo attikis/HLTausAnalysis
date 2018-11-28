@@ -75,7 +75,7 @@ class L1TkEGParticle{
   vector<EG> GetIsoConeEGs() const {return isoEGs_;}
   
   double CalculateVtxIso(vector<TTTrack> TTTracks, bool useIsoCone=false); 
-  double CalculateRelIso(vector<TTTrack> TTTracks, double deltaZ0_max=999.9, bool useIsoCone=false);
+  double CalculateRelIso(vector<TTTrack> TTTracks, vector<EG> EGs, double deltaZ0_max=999.9, bool useIsoCone=false);
   double GetVtxIso()  const { return vtxIso_;}
   double GetRelIso()  const { return relIso_;}
   void SetVtxIso(double vtxIso) { vtxIso_ = vtxIso;}

@@ -274,13 +274,16 @@ double L1TkEGParticle::CalculateVtxIso(vector<TTTrack> TTTracks, bool useIsoCone
 
 
 //****************************************************************************
-double L1TkEGParticle::CalculateRelIso(vector<TTTrack> TTTracks, double deltaZ0_max, bool useIsoCone)
+double L1TkEGParticle::CalculateRelIso(vector<TTTrack> TTTracks, vector<EG> EGs, 
+				       double deltaZ0_max, bool useIsoCone)
 //****************************************************************************
 {
   TTTrack leadingTrack = theTracks[0];
   vector<TTTrack> clustTracks  = theTracks;
+  vector<EG> clustEGs  = theEGs;
   double relIso = -1.0;
-  double ptSum  = 0;
+  double ptSum  = 0.0;
+  double etSum  = 0.0;
   double deltaR;
 
   // For-loop: All TTTracks
@@ -299,7 +302,6 @@ double L1TkEGParticle::CalculateRelIso(vector<TTTrack> TTTracks, double deltaZ0_
     // Apply dz0 cut
     if (abs (tk->getZ0() - leadingTrack.getZ0() ) > deltaZ0_max) continue;
     
-    
     // Check if the track is in the iso-cone
     deltaR = auxTools.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), tk->getEta(), tk->getPhi());
   
@@ -307,8 +309,29 @@ double L1TkEGParticle::CalculateRelIso(vector<TTTrack> TTTracks, double deltaZ0_
     
   } // For-loop: All TTTracks
   
+
+  // For-loop: All EGs
+  for (auto eg = EGs.begin(); eg != EGs.end(); eg++) {
+  
+    if (useIsoCone) {
+      // Check if the eg is clustered in the tau candidate
+      bool clustered = false;
+      
+      for (auto clusteg = clustEGs.begin(); clusteg != clustEGs.end(); clusteg++){
+	if (clusteg->index() == eg->index()) clustered = true;
+      }
+      if (clustered) continue;	
+    }
+    
+    // Check if the eg is in the iso-cone
+    deltaR = auxTools.DeltaR(leadingTrack.getEta(), leadingTrack.getPhi(), CorrectedEta(eg->getEta(), leadingTrack.getZ0()), eg->getPhi());
+
+    if (deltaR > GetIsoConeMin() && deltaR < GetIsoConeMax()) etSum += eg -> getEt();
+    
+  } // For-loop: All EGs
+  
   // Calculate relative isolation
-  relIso = ptSum / GetTotalEt();
+  relIso = (ptSum + etSum) / GetTotalEt();
   SetRelIso(relIso);
   
   return relIso;
