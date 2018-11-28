@@ -114,6 +114,8 @@ void Tracking::InitVars_()
   seedTk_minStubs    =     0;        //  5               
 
   deltaR_MCmatch     =  0.10; 
+  minDeltaR_leadtrk  =  0.0;
+  maxDeltaR_leadtrk  =  0.15;//0.3;
 
   return;
 }
@@ -373,18 +375,21 @@ void Tracking::Loop()
       // Tree 
       float seed_Pt_S,seed_Pt_B;
       float seed_Chi2_S, seed_Chi2_B;
+      float seed_Chi2Red_S, seed_Chi2Red_B;
       int seed_Stubs_S, seed_Stubs_B;
       float seed_Eta_S, seed_Eta_B;
       
-      b_seedPt_S    -> SetAddress(&seed_Pt_S);
-      b_seedChi2_S  -> SetAddress(&seed_Chi2_S);
-      b_seedStubs_S -> SetAddress(&seed_Stubs_S);
-      b_seedEta_S   -> SetAddress(&seed_Eta_S);
+      b_seedPt_S       -> SetAddress(&seed_Pt_S);
+      b_seedChi2_S     -> SetAddress(&seed_Chi2_S);
+      b_seedChi2Red_S  -> SetAddress(&seed_Chi2Red_S);
+      b_seedStubs_S    -> SetAddress(&seed_Stubs_S);
+      b_seedEta_S      -> SetAddress(&seed_Eta_S);
 
-      b_seedPt_B    -> SetAddress(&seed_Pt_B);
-      b_seedChi2_B  -> SetAddress(&seed_Chi2_B);
-      b_seedStubs_B -> SetAddress(&seed_Stubs_B);
-      b_seedEta_B   -> SetAddress(&seed_Eta_B);
+      b_seedPt_B       -> SetAddress(&seed_Pt_B);
+      b_seedChi2_B     -> SetAddress(&seed_Chi2_B);
+      b_seedChi2Red_B  -> SetAddress(&seed_Chi2Red_B);
+      b_seedStubs_B    -> SetAddress(&seed_Stubs_B);
+      b_seedEta_B      -> SetAddress(&seed_Eta_B);
 
 
       // Get the GenTaus Collections 
@@ -500,19 +505,41 @@ void Tracking::Loop()
       // Sort the matched TTTracks
       sort( matchTTTracks.begin(), matchTTTracks.end() );
       
-      /*
+      
       // Substract matched Tracks from the seed Tracks to get the background Tracks
-      std::vector<TTTrack> bkgTTTracks;
+      std::vector<TTTrack> remainingTTTracks;
       std::set_difference(
 			  seedTTTracks.begin() , seedTTTracks.end(),
 			  matchTTTracks.begin(), matchTTTracks.end(),
-			  std::back_inserter( bkgTTTracks )
+			  std::back_inserter( remainingTTTracks )
 			  );
-      */
+      
 
       // Get the background tracks 
       std::vector<TTTrack> bkgTTTracks;
+      bool highPtNeighbourFound;
 
+      // For-loop: All the remaining tracks
+      for (vector<TTTrack>::iterator trk = remainingTTTracks.begin(); trk != remainingTTTracks.end(); trk++) {
+	
+	// Check that there are no close tracks (in terms of deltaR) with higher Pt
+	highPtNeighbourFound = false;
+	for (vector<TTTrack>::iterator trackIter = remainingTTTracks.begin(); !highPtNeighbourFound && trackIter != remainingTTTracks.end(); trackIter++) {
+	  if (DEBUG*0) std::cout << "Considering neighbour track " << trackIter->index() << std::endl;
+	  deltaR = auxTools_.DeltaR(trk->getEta(), trk->getPhi(), trackIter->getEta(), trackIter->getPhi());
+	  if (DEBUG*0) std::cout << "DeltaR = " << deltaR << std::endl;
+	  if (deltaR > minDeltaR_leadtrk && deltaR < maxDeltaR_leadtrk && trackIter->getPt() > trk->getPt())
+	    highPtNeighbourFound = true;
+	  if (DEBUG*0) std::cout << "High-pT neighbour found, leading track cadidate " << trk->index() << " discarded" << std::endl;
+	}
+	// If not, save the lead track as a background track
+	if (!highPtNeighbourFound) {
+	  bkgTTTracks.push_back(*trk);
+	}
+	
+      } // For-loop: All the remaining tracks
+
+      /*
       // For-loop: All seed tracks
       for (vector<TTTrack>::iterator trk = seedTTTracks.begin(); trk != seedTTTracks.end(); trk++) {
 	
@@ -534,7 +561,7 @@ void Tracking::Loop()
 	bkgTTTracks.push_back(*trk);
 
       } // For-loop: All seed tracks
-
+      */
       if (DEBUG) {
 	// PrintTTTrackCollection(seedTTTracks);
 	PrintTTTrackCollection(matchTTTracks);
@@ -548,20 +575,22 @@ void Tracking::Loop()
       
       // For-loop: All signal tracks
       for (vector<TTTrack>::iterator sigTrk = matchTTTracks.begin(); sigTrk != matchTTTracks.end(); sigTrk++) { 
-	seed_Pt_S    = sigTrk->getPt();
-	seed_Chi2_S  = sigTrk->getChi2();
-	seed_Stubs_S = sigTrk->getNumOfStubs();
-	seed_Eta_S   = sigTrk->getEta();
+	seed_Pt_S       = sigTrk->getPt();
+	seed_Chi2_S     = sigTrk->getChi2();
+	seed_Chi2Red_S  = sigTrk->getChi2Red();
+	seed_Stubs_S    = sigTrk->getNumOfStubs();
+	seed_Eta_S      = sigTrk->getEta();
 	treeS->Fill();
 
       }
 
       // For-loop: All background tracks
       for (vector<TTTrack>::iterator bkgTrk = bkgTTTracks.begin(); bkgTrk != bkgTTTracks.end(); bkgTrk++) {
-        seed_Pt_B    = bkgTrk->getPt();
-        seed_Chi2_B  = bkgTrk->getChi2();
-        seed_Stubs_B = bkgTrk->getNumOfStubs();
-	seed_Eta_B   = bkgTrk->getEta();
+        seed_Pt_B       = bkgTrk->getPt();
+        seed_Chi2_B     = bkgTrk->getChi2();
+        seed_Chi2Red_B  = bkgTrk->getChi2Red();
+        seed_Stubs_B    = bkgTrk->getNumOfStubs();
+	seed_Eta_B      = bkgTrk->getEta();
         treeB->Fill();
       }
 
@@ -1034,15 +1063,17 @@ void Tracking::BookHistos_(void)
   treeS = new TTree("treeS", "TTreeS");
   treeB = new TTree("treeB", "TTreeB");
 
-  b_seedPt_S     = treeS -> Branch("seedPt"   , &b_seedPt_S   , "b_seedPt_S/F");
-  b_seedChi2_S   = treeS -> Branch("seedChi2" , &b_seedChi2_S , "b_seedChi2_S/F");
-  b_seedStubs_S  = treeS -> Branch("seedStubs", &b_seedStubs_S, "b_seedStubs_S/I");
-  b_seedEta_S    = treeS -> Branch("seedEta"  , &b_seedEta_S  , "b_seedEta_S/F");
+  b_seedPt_S        = treeS -> Branch("seedPt"      , &b_seedPt_S      , "b_seedPt_S/F");
+  b_seedChi2_S      = treeS -> Branch("seedChi2"    , &b_seedChi2_S    , "b_seedChi2_S/F");
+  b_seedChi2Red_S   = treeS -> Branch("seedChi2Red" , &b_seedChi2Red_S , "b_seedChi2Red_S/F");
+  b_seedStubs_S     = treeS -> Branch("seedStubs"   , &b_seedStubs_S   , "b_seedStubs_S/I");
+  b_seedEta_S       = treeS -> Branch("seedEta"     , &b_seedEta_S     , "b_seedEta_S/F");
 
-  b_seedPt_B     = treeB -> Branch("seedPt"   , &b_seedPt_B   , "b_seedPt_B/F");
-  b_seedChi2_B   = treeB -> Branch("seedChi2" , &b_seedChi2_B , "b_seedChi2_B/F");
-  b_seedStubs_B  = treeB -> Branch("seedStubs", &b_seedStubs_B, "b_seedStubs_B/I");
-  b_seedEta_B    = treeB -> Branch("seedEta"  , &b_seedEta_B  , "b_seedEta_B/F");
+  b_seedPt_B        = treeB -> Branch("seedPt"      , &b_seedPt_B      , "b_seedPt_B/F");
+  b_seedChi2_B      = treeB -> Branch("seedChi2"    , &b_seedChi2_B    , "b_seedChi2_B/F");
+  b_seedChi2Red_B   = treeB -> Branch("seedChi2Red" , &b_seedChi2Red_B , "b_seedChi2Red_B/F");
+  b_seedStubs_B     = treeB -> Branch("seedStubs"   , &b_seedStubs_B   , "b_seedStubs_B/I");
+  b_seedEta_B       = treeB -> Branch("seedEta"     , &b_seedEta_B     , "b_seedEta_B/F");
 
   histoTools_.BookHisto_1D(h_LeadingChargedDaughters_MatchingResolution, "LeadingChargedDaughters_MatchingResolution", "N_{daugh} - N_{daugh}^{matched}; Entries", 9, -4.5, 4.5);
 

@@ -55,10 +55,12 @@ class Tracking : public TreeAnalyserMC{
   TTree* treeB;
   TBranch* b_seedPt_S;
   TBranch* b_seedChi2_S;
+  TBranch* b_seedChi2Red_S;
   TBranch* b_seedStubs_S;
   TBranch* b_seedEta_S;
   TBranch* b_seedPt_B;
   TBranch* b_seedChi2_B;
+  TBranch* b_seedChi2Red_B;
   TBranch* b_seedStubs_B;
   TBranch* b_seedEta_B;
 
@@ -97,6 +99,8 @@ class Tracking : public TreeAnalyserMC{
   double seedTk_minStubs;
 
   double deltaR_MCmatch;
+  float minDeltaR_leadtrk; 
+  float maxDeltaR_leadtrk; 
 
   vector<GenParticle> GenTaus;
   vector<GenParticle> GenTausHadronic;
