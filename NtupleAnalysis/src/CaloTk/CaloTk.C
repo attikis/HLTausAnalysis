@@ -43,7 +43,7 @@ void CaloTk::InitVars_()
   seedTk_minPt       =   5.0;       //  5.0
   seedTk_minEta      =   0.0;       //  0.0
   seedTk_maxEta      =   2.5;       //  2.5
-  seedTk_maxChiSq    =  50.0;       // 50.0
+  seedTk_maxChiSq    =  94.0;       // 50.0
   seedTk_minStubs    =    5;        //  5
 
   // Signal cone tracks
@@ -52,7 +52,7 @@ void CaloTk::InitVars_()
   sigConeTks_minPt       =   2.0;  //   2.0
   sigConeTks_minEta      =   0.0;  //   0.0
   sigConeTks_maxEta      =   2.5;  // 999.9
-  sigConeTks_maxChiSq    =  50.0;  //  50.0
+  sigConeTks_maxChiSq    =  94.0;  //  50.0
   sigConeTks_minStubs    =   5;    //   4
   sigConeTks_dPOCAz      =   1.0;  // 0.80 (A. Ryd)
   sigConeTks_maxInvMass  =   1.5;  // 1.77 (A. Ryd)
@@ -63,7 +63,7 @@ void CaloTk::InitVars_()
   isoConeTks_minPt       =   2.0; //   2.0
   isoConeTks_minEta      =   0.0; //   0.0
   isoConeTks_maxEta      =   2.5; //   2.5
-  isoConeTks_maxChiSq    =  50.0; //  50.00
+  isoConeTks_maxChiSq    =  94.0; //  50.00
   isoConeTks_minStubs    =   5;   //   4
 
   // Signal cone parameters

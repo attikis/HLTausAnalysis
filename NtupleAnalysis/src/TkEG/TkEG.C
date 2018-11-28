@@ -42,7 +42,7 @@ void TkEG::InitVars_()
   cfg_tk_minPt       = 2.00;        // Default: 2.0
   cfg_tk_minEta      = 0.0;         // Default: 0.0
   cfg_tk_maxEta      = 1.5;//2.5;        // Default: 1e6
-  cfg_tk_maxChiSq    = 95.0;         // Default: 1e6
+  cfg_tk_maxChiSq    = 94.0;         // Default: 1e6
   cfg_tk_minStubs    =   5;         // Default: 0
 
   // EGs parameters
@@ -52,7 +52,7 @@ void TkEG::InitVars_()
 
   // TkEG algorithm parameters
   minStubs_trk      = 5; 
-  maxChi2_trk       = 95.0; // GeV
+  maxChi2_trk       = 94.0; // GeV
   minPt_leadtrk     = 5.0; // GeV
   maxEta_leadtrk    = 1.5;//2.5;
   minDeltaR_leadtrk = 0.0;
