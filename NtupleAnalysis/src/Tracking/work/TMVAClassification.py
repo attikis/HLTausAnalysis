@@ -22,6 +22,7 @@
 # example:                                                                       #
 #                                                                                #
 #    python TMVAClassification.py --methods Fisher,Likelihood                    #
+#    python TMVAClassification.py --methods Cuts --etaRegion C                   #
 #                                                                                #
 # The output file "TMVA.root" can be analysed with the use of dedicated          #
 # macros (simply say: root -l <../macros/macro.C>), which can be conveniently    #
@@ -39,11 +40,14 @@ import getopt # command line parser
 # --------------------------------------------
 
 # Default settings for command line arguments
-DEFAULT_OUTFNAME = "TMVA.root"
-DEFAULT_INFNAME  = "histograms-TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU200_93X.root"
-DEFAULT_TREESIG  = "treeS"
-DEFAULT_TREEBKG  = "treeB"
-DEFAULT_METHODS  = "Cuts,CutsD,CutsPCA,CutsGA,CutsSA,Likelihood,LikelihoodD,LikelihoodPCA,LikelihoodKDE,LikelihoodMIX,PDERS,PDERSD,PDERSPCA,PDEFoam,PDEFoamBoost,KNN,LD,Fisher,FisherG,BoostedFisher,HMatrix,FDA_GA,FDA_SA,FDA_MC,FDA_MT,FDA_GAMT,FDA_MCMT,MLP,MLPBFGS,MLPBNN,CFMlpANN,TMlpANN,SVM,BDT,BDTD,BDTG,BDTB,RuleFit"
+DEFAULT_OUTFNAME  = "TMVA.root"
+DEFAULT_INFNAME   = "histograms-TT_TuneCUETP8M2T4_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU200_93X.root"
+DEFAULT_INFNAME2  = "histograms-GluGluHToTauTau_M125_14TeV_powheg_pythia8_PhaseIIFall17D_L1TPU200_93X.root"
+DEFAULT_INFNAME3  = "histograms-PYTHIA_Tauola_TB_ChargedHiggs200_14TeV_PhaseIIFall17D_L1TPU200_93X.root"
+DEFAULT_TREESIG   = "treeS"
+DEFAULT_TREEBKG   = "treeB"
+DEFAULT_ETAREGION = "None"
+DEFAULT_METHODS   = "Cuts,CutsD,CutsPCA,CutsGA,CutsSA,Likelihood,LikelihoodD,LikelihoodPCA,LikelihoodKDE,LikelihoodMIX,PDERS,PDERSD,PDERSPCA,PDEFoam,PDEFoamBoost,KNN,LD,Fisher,FisherG,BoostedFisher,HMatrix,FDA_GA,FDA_SA,FDA_MC,FDA_MT,FDA_GAMT,FDA_MCMT,MLP,MLPBFGS,MLPBNN,CFMlpANN,TMlpANN,SVM,BDT,BDTD,BDTG,BDTB,RuleFit"
 
 # Print usage help
 def usage():
@@ -54,6 +58,7 @@ def usage():
     print "  -o | --outputfile : name of output ROOT file containing results (default: '%s')" % DEFAULT_OUTFNAME
     print "  -t | --inputtrees : input ROOT Trees for signal and background (default: '%s %s')" \
           % (DEFAULT_TREESIG, DEFAULT_TREEBKG)
+    print "  -e | --etaRegion  : eta region of the training ( C, I, F ) (default: '%s')" % DEFAULT_ETAREGION
     print "  -v | --verbose"
     print "  -? | --usage      : print this help message"
     print "  -h | --help       : print this help message"
@@ -64,10 +69,9 @@ def main():
 
     try:
         # retrive command line options
-        shortopts  = "m:i:t:o:vh?"
-        longopts   = ["methods=", "inputfile=", "inputtrees=", "outputfile=", "verbose", "help", "usage"]
+        shortopts  = "m:i:t:o:e:vh?"
+        longopts   = ["methods=", "inputfile=", "inputtrees=", "outputfile=","etaRegion=", "verbose", "help", "usage"]
         opts, args = getopt.getopt( sys.argv[1:], shortopts, longopts )
-
     except getopt.GetoptError:
         # print help information and exit:
         print "ERROR: unknown options in argument %s" % sys.argv[1:]
@@ -78,6 +82,7 @@ def main():
     treeNameSig = DEFAULT_TREESIG
     treeNameBkg = DEFAULT_TREEBKG
     outfname    = DEFAULT_OUTFNAME
+    etaRegion   = DEFAULT_ETAREGION
     methods     = DEFAULT_METHODS
     verbose     = False
     for o, a in opts:
@@ -101,6 +106,8 @@ def main():
                 sys.exit(1)
             treeNameSig = trees[0]
             treeNameBkg = trees[1]
+        if o in ("-e", "--etaRegion"):
+            etaRegion = a
         elif o in ("-v", "--verbose"):
             verbose = True
 
@@ -127,8 +134,15 @@ def main():
     TMVA.Tools.Instance()
 
     # Output file
+    if etaRegion == "C" or etaRegion == "c":
+        outfname = outfname.split(".root")[0]+"_C.root"
+    elif etaRegion == "I" or etaRegion =="i":
+        outfname = outfname.split(".root")[0]+"_I.root"
+    elif etaRegion == "F" or etaRegion =="f":
+        outfname = outfname.split(".root")[0]+"_F.root"
+        
     outputFile = TFile( outfname, 'RECREATE' )
-    
+
     # Create instance of TMVA factory (see TMVA/macros/TMVAClassification.C for more factory options)
     # All TMVA output can be suppressed by removing the "!" (not) in 
     # front of the "Silent" argument in the option string
@@ -150,8 +164,11 @@ def main():
     # [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
 
     dataloader.AddVariable( "seedPt", "p_{T}", "GeV", 'F' )
-    dataloader.AddVariable( "seedChi2", "#chi^{2}", "", 'F' )
-    dataloader.AddVariable( "seedStubs", "N_{stubs}", "", 'I' )
+    #dataloader.AddVariable( "seedChi2", "#chi^{2}", "", 'F' )
+    dataloader.AddVariable( "seedChi2Red", "#chi^{2}/dof", "", 'F' )
+    #dataloader.AddVariable( "seedStubs", "N_{stubs}", "", 'I' )
+    #dataloader.AddVariable( "seedEta", "#eta", "", 'F' )
+
     #dataloader.AddVariable( "myvar1 := var1+var2", 'F' )
     #dataloader.AddVariable( "myvar2 := var1-var2", "Expression 2", "", 'F' )
     #dataloader.AddVariable( "var3",                "Variable 3", "units", 'F' )
@@ -166,12 +183,18 @@ def main():
     # Read input data
     if gSystem.AccessPathName( infname ) != 0: gSystem.Exec( "wget http://root.cern.ch/files/" + infname )
         
-    input = TFile.Open( infname )
+    input  = TFile.Open( infname )
+    input2 = TFile.Open( DEFAULT_INFNAME2 )
+    input3 = TFile.Open( DEFAULT_INFNAME3 )
 
     # Get the signal and background trees for training
     signal      = input.Get( treeNameSig )
+    signal2     = input2.Get( treeNameSig )
+    signal3     = input3.Get( treeNameSig )
+
     background  = input.Get( treeNameBkg )
-    
+
+
     # Global event weights (see below for setting event-wise weights)
     signalWeight     = 1.0
     backgroundWeight = 1.0
@@ -180,7 +203,9 @@ def main():
     #
     # the following method is the prefered one:
     # you can add an arbitrary number of signal or background trees
-    dataloader.AddSignalTree    ( signal,     signalWeight     )
+    dataloader.AddSignalTree    ( signal ,     signalWeight     )
+    dataloader.AddSignalTree    ( signal2,     signalWeight     )
+    dataloader.AddSignalTree    ( signal3,     signalWeight     )
     dataloader.AddBackgroundTree( background, backgroundWeight )
 
     # To give different trees for training and testing, do as follows:
@@ -207,15 +232,37 @@ def main():
 
     # Apply additional cuts on the signal and background sample. 
     # example for cut: mycut = TCut( "abs(var1)<0.5 && abs(var2-0.5)<1" )
-    mycutSig = TCut( "seedPt>=2 && seedChi2<=100" ) 
-    mycutBkg = TCut( "seedPt>=2 && seedChi2<=100" ) 
     
+    if etaRegion == "C" or etaRegion == "c":
+        mycutSig = TCut("seedPt>=2 && seedChi2<=100 && abs(seedEta)>0 && abs(seedEta)<0.8 && seedStubs>=5") 
+        mycutBkg = TCut("seedPt>=2 && seedChi2<=100 && abs(seedEta)>0 && abs(seedEta)<0.8 && seedStubs>=5") 
+
+        dataloader.PrepareTrainingAndTestTree( mycutSig, mycutBkg, "nTrain_Signal=0:nTrain_Background=37717:nTest_Signal=0:nTest_Background=37717:SplitMode=Random:NormMode=NumEvents:!V" )
+
+    elif etaRegion == "I"or etaRegion =="i":
+        mycutSig_I = TCut("seedPt>=2 && seedChi2<=100 && abs(seedEta)>0.8 && abs(seedEta)<1.6 && seedStubs>=5") 
+        mycutBkg_I = TCut("seedPt>=2 && seedChi2<=100 && abs(seedEta)>0.8 && abs(seedEta)<1.6 && seedStubs>=5") 
+
+        dataloader.PrepareTrainingAndTestTree( mycutSig_I, mycutBkg_I, "nTrain_Signal=0:nTrain_Background=28552:nTest_Signal=0:nTest_Background=28552:SplitMode=Random:NormMode=NumEvents:!V" )
+
+    elif etaRegion == "F"or etaRegion =="f":
+        mycutSig_F = TCut("seedPt>=2 && seedChi2<=100 && abs(seedEta)>1.6 && seedStubs>=5") 
+        mycutBkg_F = TCut("seedPt>=2 && seedChi2<=100 && abs(seedEta)>1.6 && seedStubs>=5") 
+        
+        dataloader.PrepareTrainingAndTestTree( mycutSig_F, mycutBkg_F, "nTrain_Signal=0:nTrain_Background=15430:nTest_Signal=0:nTest_Background=15430:SplitMode=Random:NormMode=NumEvents:!V" )
+
+    else:
+        mycutSig = TCut("seedPt>=2 && seedChi2<=100")# && seedStubs>=5") 
+        mycutBkg = TCut("seedPt>=2 && seedChi2<=100")# && seedStubs>=5") 
+        
+        dataloader.PrepareTrainingAndTestTree( mycutSig, mycutBkg, "nTrain_Signal=0:nTrain_Background=81699:nTest_Signal=0:nTest_Background=81699:SplitMode=Random:NormMode=NumEvents:!V" )
+
     # Here, the relevant variables are copied over in new, slim trees that are
     # used for TMVA training and testing
     # "SplitMode=Random" means that the input events are randomly shuffled before
     # splitting them into training and test samples
-    dataloader.PrepareTrainingAndTestTree( mycutSig, mycutBkg,
-                                           "nTrain_Signal=7473:nTrain_Background=7473:nTest_Signal=7473:nTest_Background=7473:SplitMode=Random:NormMode=NumEvents:!V" )
+   
+    #dataloader.PrepareTrainingAndTestTree( mycutSig, mycutBkg, "nTrain_Signal=0:nTrain_Background=0:nTest_Signal=0:nTest_Background=0:SplitMode=Random:NormMode=NumEvents:!V" )
 
     # --------------------------------------------------------------------------------------------------
 
@@ -412,10 +459,10 @@ def main():
     print "=== TMVAClassification is done!\n"
     
     # open the GUI for the result macros    
-    TMVA.TMVAGui(outfname)
+    #TMVA.TMVAGui(outfname)
     
     # keep the ROOT thread running
-    gApplication.Run() 
+    #gApplication.Run() 
 
 # ----------------------------------------------------------
 

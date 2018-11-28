@@ -379,12 +379,12 @@ def GetHistoKwargs(h, opts):
     if "signalegs_multiplicity" in h.lower() or "isoegs_multiplicity" in h.lower():
         kwargs["opts"]   = {"xmin": -0.5, "xmax": 5.5, "ymin": _yMin, "ymaxfactor": _yMaxF}
         
-    if "tkeg_reliso" in h.lower() or "badetresolcand_reliso" in h.lower():
+    if "tkeg_reliso" == h.lower() or "badetresolcand_reliso" in h.lower():
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 1.2, "ymin": 0.001, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 0.20, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["log"]  = True
         
-    if "tkeg_vtxiso" in h.lower() or "badetresolcand_vtxiso" in h.lower():
+    if "tkeg_vtxiso" == h.lower() or "badetresolcand_vtxiso" in h.lower():
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 4.0, "ymin": 0.0001, "ymaxfactor": _yMaxF}
         kwargs["cutBox"] = {"cutValue": 0.5, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
         kwargs["log"]  = True
