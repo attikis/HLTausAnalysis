@@ -164,7 +164,8 @@ def main():
     # [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
 
     dataloader.AddVariable( "seedPt", "p_{T}", "GeV", 'F' )
-    dataloader.AddVariable( "seedChi2", "#chi^{2}", "", 'F' )
+    #dataloader.AddVariable( "seedChi2", "#chi^{2}", "", 'F' )
+    dataloader.AddVariable( "seedChi2Red", "#chi^{2}/dof", "", 'F' )
     #dataloader.AddVariable( "seedStubs", "N_{stubs}", "", 'I' )
     #dataloader.AddVariable( "seedEta", "#eta", "", 'F' )
 

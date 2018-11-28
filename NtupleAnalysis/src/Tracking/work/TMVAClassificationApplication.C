@@ -138,10 +138,10 @@ void TMVAClassificationApplication( TString myMethodList = "" )
 
    // Create a set of variables and declare them to the reader
    // - the variable names MUST corresponds in name and type to those given in the weight file(s) used
-   Float_t seedPt, seedChi2;
+   Float_t seedPt, seedChi2Red;
    Float_t seedStubs; 
    reader->AddVariable( "seedPt"    , &seedPt );
-   reader->AddVariable( "seedChi2"  , &seedChi2 );
+   reader->AddVariable( "seedChi2Red"  , &seedChi2Red );
    //reader->AddVariable( "seedStubs" , &seedStubs );
 
    /*
@@ -336,7 +336,7 @@ void TMVAClassificationApplication( TString myMethodList = "" )
    */
    if (Use["Cuts"]) {
      
-     float signalEff = 0.8850;
+     float signalEff = 0.8950;
      // test: retrieve cuts for particular signal efficiency
      // CINT ignores dynamic_casts so we have to use a cuts-secific Reader function to acces the pointer  
      TMVA::MethodCuts* mcuts = reader->FindCutsMVA( "Cuts method" ) ;
