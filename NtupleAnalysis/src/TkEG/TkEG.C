@@ -1271,9 +1271,9 @@ void TkEG::Loop()
 	  h_TkEG_PoorNeuResol_dRmin_Pi0_EG         -> Fill( min_dR );
 	  h_TkEG_PoorNeuResol_dRmin_Seed_closestEG -> Fill( min_dR_seed);
 	  h_TkEG_PoorNeuResol_Pi0_closestEG_ET     -> Fill( closestEG.getEt() );
-	  h_TkEG_PoorNeuResol_Pi0_closestEG_ET_Vs_dRmin_Pi0_EG -> Fill( closestEG.getEt() , min_dR );
-	  h_TkEG_PoorNeuResol_Pi0_ET_Vs_closestEG_ET           -> Fill( daugh->et(), closestEG.getEt() );
-	  
+	  h_TkEG_PoorNeuResol_Pi0_closestEG_ET_Vs_dRmin_Pi0_EG          -> Fill( closestEG.getEt() , min_dR );
+          if (min_dR < 0.2) h_TkEG_PoorNeuResol_Pi0_ET_Vs_closestEG_ET  -> Fill( daugh->et(), closestEG.getEt() );
+
 	}
       }
       
