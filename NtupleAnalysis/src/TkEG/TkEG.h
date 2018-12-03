@@ -162,13 +162,12 @@ class TkEG : public TreeAnalyserMC{
   bool RelativeIsolation;
 
   // New parameters
-  unsigned int minStubs_trk;  
-  float maxChi2_trk;     
-  float maxChi2_trk_alt;
-  float minPt_leadtrk;    
-  float maxEta_leadtrk;   
-  float minDeltaR_leadtrk; 
-  float maxDeltaR_leadtrk; 
+  unsigned int leadTrk_minStubs;  
+  float leadTrk_maxChi2;     
+  float leadTrk_maxChi2_alt;
+  float leadTrk_minPt;    
+  float leadTrk_maxEta;   
+  float leadTrk_maxDeltaR; 
   float maxDeltaR_const;
   float maxDeltaZ_trk; 
   float maxInvMass_trk;  

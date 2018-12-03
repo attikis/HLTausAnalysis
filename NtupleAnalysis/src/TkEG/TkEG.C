@@ -46,13 +46,14 @@ void TkEG::InitVars_()
   cfg_eg_minEta      = 0.0;         // Default: 0.0
   cfg_eg_maxEta      = 1.5;//2.5;        // Default: 1e6   
 
-  // TkEG algorithm parameters
-  minStubs_trk      = 5; 
-  maxChi2_trk       = 94.0; // GeV
-  minPt_leadtrk     = 5.0; // GeV
-  maxEta_leadtrk    = 1.5;//2.5;
-  minDeltaR_leadtrk = 0.0;
-  maxDeltaR_leadtrk = 0.15;//0.3;
+  // Tk+EG algorithm parameters
+  // --- leading tracks (tau-seeds)
+  leadTrk_minStubs  = 5; 
+  leadTrk_maxChi2   = 94.0; // GeV
+  leadTrk_minPt     = 5.0; // GeV
+  leadTrk_maxEta    = 1.5;//2.5;
+  leadTrk_maxDeltaR = 0.15;//0.3;
+  // --- track clustering
   maxDeltaR_const   = 2.5;
   maxDeltaZ_trk     = 1.0;  // cm
   maxInvMass_trk    = 1.5; // GeV 
@@ -61,8 +62,7 @@ void TkEG::InitVars_()
   maxDeltaR_EG      = 0.15;//0.3;
   maxInvMass_EG     = 1.77; // GeV
   maxDeltaR_MCmatch = 0.1;    
-
-  
+  // --- isolation
   //minDeltaR_iso     = 0.15;
   maxDeltaR_iso     = 0.3;
   maxDeltaZ_iso     = 0.6;  // cm
@@ -218,13 +218,22 @@ void TkEG::Loop()
     // E.g. for ttbar, only events with two taus within trigger acceptance are considered for efficiency calculation)
     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
     if (bFoundAllTaus_) nEvtsWithMaxHTaus++;
+    
+    // Consider only events with at least one genuine hadronic tau (except for MinBias sample)    
+    //if (GenTausHadronic.size() < 1 && !isMinBias) continue;
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Gen-Level Studies
+    ////////////////////////////////////////////////////////////////////////////////////////////////    
+    if (DEBUG) cout << "\n\t=== Gen-Level Studies" <<endl;
 
-    // Fill histos with genTau info
+    // Fill histos with ALL GenTaus properties
     if (DEBUG) cout << "\n=== All gen-taus info " << endl;
 
     if (!isMinBias){
+
       h_genTausAll_N->Fill(GenTaus.size());
+
       for (vector<GenParticle>::iterator genTau = GenTaus.begin(); genTau != GenTaus.end(); genTau++) {
 	h_genTausAll_Pt  -> Fill(genTau->pt());
 	h_genTausAll_Eta -> Fill(genTau->eta());
@@ -236,25 +245,12 @@ void TkEG::Loop()
 	h_genTausAll_Phi1VsPhi2 -> Fill (GenTaus.at(0).phi(), GenTaus.at(1).phi());
       }
 
-      
     }
-    
-    // Consider only events with at least one genuine hadronic tau (except for MinBias sample)    
+
+    // Fill histo with the multiplicity of the hadronic gen-taus 
     h_genTausHad_N->Fill( GenTausHadronic.size() );
-    //if (GenTausHadronic.size() < 1 && !isMinBias) continue;
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // INITIAL GEN-LEVEL STUDIES 
-    ////////////////////////////////////////////////////////////////////////////////////////////////    
     
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Gen-Level Studies
-    ////////////////////////////////////////////////////////////////////////////////////////////////    
-    if (DEBUG) cout << "\n\t=== Gen-Level Studies" <<endl;
-
-
     // For-loop: All hadronic gen-taus
     for (vector<GenParticle>::iterator genTau = GenTausHadronic.begin(); genTau != GenTausHadronic.end(); genTau++) {
 
@@ -263,6 +259,8 @@ void TkEG::Loop()
       h_genTausHad_chargedDaugh_N-> Fill(genTau->finalDaughtersCharged().size());
       h_genTausHad_neutralDaugh_N-> Fill(genTau->finalDaughtersNeutral().size());
 
+      // ===== MATCHING PHOTONS WITH EGS ======
+            
       // Consider only 1-prong decays with 1 neutral product (pion0)
       if ((genTau->finalDaughtersCharged().size() == 1) && (genTau->finalDaughtersNeutral().size() == 1)) {
 
@@ -351,13 +349,12 @@ void TkEG::Loop()
 	    else {
 	      h_Photons_EGs_Matching  -> Fill(3);
 	    }
-	   
 	  }
-	    
 	}
       } 
-            
-      // Angular Separation of charged and neutral daughters of hadronic gen tau
+      
+      // ====== Angular Separation of charged and neutral daughters of hadronic gen tau ======
+
       TLorentzVector p4sum;
       float deltaRcharged;
       float deltaRneutral;
@@ -457,7 +454,8 @@ void TkEG::Loop()
 	h_genTau_NHF -> Fill(neutralET/ genTau->p4vis().Et());
       }
 
-    }
+    } // For-loop: All hadronic gen-taus
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //  Tracks + EG Algorithm
@@ -472,19 +470,19 @@ void TkEG::Loop()
     bool highPtNeighbourFound;
 	
     // Pt Cut
-    tmp = GetTTTracks(minPt_leadtrk, 0.0, 999.9, 999.9, 0, cfg_tk_nFitParams, false, false);
+    tmp = GetTTTracks(leadTrk_minPt, 0.0, 999.9, 999.9, 0, cfg_tk_nFitParams, false, false);
     if (tmp.size() > 0) nEvtsSeedPt++;
     
     // Eta cut
-    tmp = GetTTTracks(minPt_leadtrk, 0.0, maxEta_leadtrk, 999.9, 0, cfg_tk_nFitParams, false, false);
+    tmp = GetTTTracks(leadTrk_minPt, 0.0, leadTrk_maxEta, 999.9, 0, cfg_tk_nFitParams, false, false);
     if (tmp.size() > 0) nEvtsSeedEta++;
 
     // Chi^2 cut
-    tmp = GetTTTracks(minPt_leadtrk, 0.0, maxEta_leadtrk, maxChi2_trk, 0, cfg_tk_nFitParams, false, false);
+    tmp = GetTTTracks(leadTrk_minPt, 0.0, leadTrk_maxEta, leadTrk_maxChi2, 0, cfg_tk_nFitParams, false, false);
     if (tmp.size() > 0) nEvtsSeedChiSq++;
 
     // Stubs Multiplicity cut
-    tmp = GetTTTracks(minPt_leadtrk, 0.0, maxEta_leadtrk, maxChi2_trk, minStubs_trk, cfg_tk_nFitParams, false, false);
+    tmp = GetTTTracks(leadTrk_minPt, 0.0, leadTrk_maxEta, leadTrk_maxChi2, leadTrk_minStubs, cfg_tk_nFitParams, false, false);
     if (tmp.size() > 0) nEvtsSeedStubs++;
 
     // No higher Pt neighbour in the signal cone
@@ -494,7 +492,7 @@ void TkEG::Loop()
 
       for (vector<TTTrack>::iterator trackIter = TTTracks.begin(); !highPtNeighbourFound && trackIter != TTTracks.end(); trackIter++) {
 	deltaR = auxTools_.DeltaR(seedTrkIter->getEta(), seedTrkIter->getPhi(), trackIter->getEta(), trackIter->getPhi());
-	if (deltaR > minDeltaR_leadtrk && deltaR < maxDeltaR_leadtrk && trackIter->getPt() > seedTrkIter->getPt())
+	if (deltaR < leadTrk_maxDeltaR && trackIter->getPt() > seedTrkIter->getPt())
 	  highPtNeighbourFound = true;
       }
       
@@ -538,17 +536,17 @@ void TkEG::Loop()
       h_trk_NStubsVsChi2_all -> Fill (leadTrkIter->getNumOfStubs(), leadTrkIter->getChi2());
 
       // Pt and eta cuts
-      if (leadTrkIter->getPt() < minPt_leadtrk) continue;
+      if (leadTrkIter->getPt() < leadTrk_minPt) continue;
       counter_passPtCut++;
-      if (leadTrkIter->getEta() > maxEta_leadtrk) continue;
+      if (leadTrkIter->getEta() > leadTrk_maxEta) continue;
       counter_passEtaCut++;
 
       // Plot chi^2 for >=5 stub leading tracks
-      if (leadTrkIter->getNumOfStubs() >= minStubs_trk) h_trk_Chi2_all_5stubs -> Fill (leadTrkIter->getChi2());
+      if (leadTrkIter->getNumOfStubs() >= leadTrk_minStubs) h_trk_Chi2_all_5stubs -> Fill (leadTrkIter->getChi2());
 
       // Only use high quality tracks
-      if (leadTrkIter->getNumOfStubs() < minStubs_trk) continue;
-      if (leadTrkIter->getChi2() > maxChi2_trk) continue;
+      if (leadTrkIter->getNumOfStubs() < leadTrk_minStubs) continue;
+      if (leadTrkIter->getChi2() > leadTrk_maxChi2) continue;
       counter_passChi2Nstubs++;
 
       if (DEBUG) std:: cout << "Leading track candidate " << leadTrkIter->index() << "passed cuts!" << std::endl;
@@ -558,7 +556,7 @@ void TkEG::Loop()
          if (DEBUG*0) std::cout << "Considering neighbour track " << trackIter->index() << std::endl;
          deltaR = auxTools_.DeltaR(leadTrkIter->getEta(), leadTrkIter->getPhi(), trackIter->getEta(), trackIter->getPhi());
          if (DEBUG*0) std::cout << "DeltaR = " << deltaR << std::endl;
-         if (deltaR > minDeltaR_leadtrk && deltaR < maxDeltaR_leadtrk && trackIter->getPt() > leadTrkIter->getPt())
+         if (deltaR < leadTrk_maxDeltaR && trackIter->getPt() > leadTrkIter->getPt())
            highPtNeighbourFound = true;
            if (DEBUG*0) std::cout << "High-pT neighbour found, leading track cadidate " << leadTrkIter->index() << " discarded" << std::endl;
       }
@@ -607,7 +605,7 @@ void TkEG::Loop()
       
       // Shrinking cone size
       maxDeltaR = maxDeltaR_const/leadTrackPtr->getPt();
-      if (maxDeltaR > maxDeltaR_leadtrk) maxDeltaR = maxDeltaR_leadtrk;
+      if (maxDeltaR > leadTrk_maxDeltaR) maxDeltaR = leadTrk_maxDeltaR;
 
       h_SigCone_DeltaR -> Fill (maxDeltaR);
 
@@ -631,8 +629,6 @@ void TkEG::Loop()
 
 	if (deltaR > maxDeltaR) continue;
 	trkcounter_passDRmax += 1;
-	if (deltaR < minDeltaR_leadtrk) continue;
-	trkcounter_passDRmin += 1;
 
 	// Add the p4 of the new track
 	p4sum += trackIter->p4();
@@ -753,7 +749,7 @@ void TkEG::Loop()
 
       // Shrinking cone size
       maxDeltaR = maxDeltaR_const/leadTrackPtr->getPt();
-      if (maxDeltaR > maxDeltaR_EG) maxDeltaR = maxDeltaR_leadtrk;
+      if (maxDeltaR > maxDeltaR_EG) maxDeltaR = leadTrk_maxDeltaR;
       
       TLorentzVector p4sum; // initialized to (0,0,0,0)  //marina
       // EG clustering counters
@@ -982,7 +978,7 @@ void TkEG::Loop()
 
       SetTauCandidateProperties(&newTauCandidate);
       // newTauCandidate.SetShrinkingConeConst(maxDeltaR_const);
-      // newTauCandidate.SetSigConeMaxOpen(maxDeltaR_leadtrk);
+      // newTauCandidate.SetSigConeMaxOpen(leadTrk_maxDeltaR);
       // newTauCandidate.FindIsoConeTracks(TTTracks);
       // newTauCandidate.FindSignalConeEGs(L1EGs);
       // newTauCandidate.FindIsoConeEGs(L1EGs);
@@ -2151,7 +2147,7 @@ void TkEG::SetTauCandidateProperties(L1TkEGParticle *tauCandidate)
 //============================================================================
 {
   tauCandidate->SetShrinkingConeConst(maxDeltaR_const);
-  tauCandidate->SetSigConeMaxOpen(maxDeltaR_leadtrk);
+  tauCandidate->SetSigConeMaxOpen(leadTrk_maxDeltaR);
   tauCandidate->FindIsoConeTracks(TTTracks);
   tauCandidate->FindSignalConeEGs(L1EGs);
   tauCandidate->FindIsoConeEGs(L1EGs);
