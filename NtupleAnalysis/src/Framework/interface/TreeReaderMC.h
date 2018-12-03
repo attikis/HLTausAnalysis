@@ -59,6 +59,10 @@ class TreeReaderMC : public TreeReaderReco, public virtual TREEDEFINITIONGENP
 
   void PrintL1EGCollection(vector<L1EG> collection);
 
+  void PrintEGCollection(vector<EG> collection);
+
+  void PrintL1TKEMCollection(vector<L1TKEM> collection);
+
   void PrintL1JetCollection(vector<L1Jet> collection);
 
   void PrintL1TauCollection(vector<L1Tau> collection);

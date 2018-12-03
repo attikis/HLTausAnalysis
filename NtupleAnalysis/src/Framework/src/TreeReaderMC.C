@@ -747,6 +747,7 @@ vector<L1EG> TreeReaderMC::GetL1EGs(bool bPrintList)
   return theL1EGs;
 }
 
+
 //============================================================================
 L1EG TreeReaderMC::GetL1EG(unsigned int Index)
 //============================================================================
@@ -773,44 +774,6 @@ L1EG TreeReaderMC::GetL1EG(unsigned int Index)
     return theL1EG;
 }
 
-//============================================================================
-vector<L1TKEM> TreeReaderMC::GetL1TKEMs(bool bPrintList)
-//============================================================================
-{
-  vector<L1TKEM> theL1TKEMs;
-  L1TKEM theL1TKEM;
-
-  // For-loop: All L1 EG
-  for (Size_t i = 0; i < tkEM_Et.size(); i++)
-    {
-      theL1TKEM = GetL1TKEM(i);
-      theL1TKEMs.push_back(theL1TKEM);
-    }
-  
-//  if (bPrintList) PrintL1EGCollection(theL1EGs); 
-  return theL1TKEMs;
-}
-
-//============================================================================
-L1TKEM TreeReaderMC::GetL1TKEM(unsigned int Index)
-//============================================================================
-{
-  
-  L1TKEM theL1TKEM(Index,
-	       tkEM_Et.at(Index),
-	       tkEM_Eta.at(Index),
-	       tkEM_Phi.at(Index),
-	       tkEM_EGRefPt.at(Index),
-               tkEM_EGRefEta.at(Index),
-               tkEM_EGRefPhi.at(Index),
-	       tkEM_TrkIso.at(Index),
-	       tkEM_Bx.at(Index),
-               tkEM_HwQual.at(Index),
-//               tkEM_zVtx.at(Index)); //is always empty?
-	       0);
-
-  return theL1TKEM;
-}
 
 //============================================================================
 vector<EG> TreeReaderMC::GetEGs(const double minEt,
@@ -834,9 +797,10 @@ vector<EG> TreeReaderMC::GetEGs(const double minEt,
       theEGs.push_back(theEG); // FIX ME: pass as parameter
     }
   
-//  if (bPrintList) PrintL1EGCollection(theL1EGs); 
+  if (bPrintList) PrintEGCollection(theEGs); 
   return theEGs;
 }
+
 
 //============================================================================
 EG TreeReaderMC::GetEG(unsigned int Index)
@@ -854,6 +818,46 @@ EG TreeReaderMC::GetEG(unsigned int Index)
 	       0);
 
   return theEG;
+}
+
+
+//============================================================================
+vector<L1TKEM> TreeReaderMC::GetL1TKEMs(bool bPrintList)
+//============================================================================
+{
+  vector<L1TKEM> theL1TKEMs;
+  L1TKEM theL1TKEM;
+
+  // For-loop: All L1 EG
+  for (Size_t i = 0; i < tkEM_Et.size(); i++)
+    {
+      theL1TKEM = GetL1TKEM(i);
+      theL1TKEMs.push_back(theL1TKEM);
+    }
+  
+  if (bPrintList) PrintL1TKEMCollection(theL1TKEMs); 
+  return theL1TKEMs;
+}
+
+//============================================================================
+L1TKEM TreeReaderMC::GetL1TKEM(unsigned int Index)
+//============================================================================
+{
+  
+  L1TKEM theL1TKEM(Index,
+	       tkEM_Et.at(Index),
+	       tkEM_Eta.at(Index),
+	       tkEM_Phi.at(Index),
+	       tkEM_EGRefPt.at(Index),
+               tkEM_EGRefEta.at(Index),
+               tkEM_EGRefPhi.at(Index),
+	       tkEM_TrkIso.at(Index),
+	       tkEM_Bx.at(Index),
+               tkEM_HwQual.at(Index),
+//               tkEM_zVtx.at(Index)); //is always empty?
+	       0);
+
+  return theL1TKEM;
 }
 
 
@@ -995,6 +999,61 @@ void TreeReaderMC::PrintL1EGCollection(vector<L1EG> collection)
   info.AddRowColumn(row, auxTools_.ToString( p->getNTT()        , 3) );
   info.AddRowColumn(row, auxTools_.ToString( p->getShape()      , 3) );
   info.AddRowColumn(row, auxTools_.ToString( p->getTowerHoE()   , 3) );
+  
+  }
+
+  info.Print();
+  return;
+}
+
+//============================================================================
+void TreeReaderMC::PrintEGCollection(vector<EG> collection)
+//============================================================================
+{
+  
+  Table info("Index | Et | Eta | Phi | Iso | Bx | HwQual", "Text");
+  
+  // For-loop: All L1EG
+  int row=0;
+  for (auto p = collection.begin(); p != collection.end(); p++, row++)
+  {
+    // Construct table
+  info.AddRowColumn(row, auxTools_.ToString( p->getIndex() ) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getEt()         , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getEta()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getPhi()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getIso()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getBx()         , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getHwQual()     , 3) );
+  
+  }
+  info.Print();
+  return;
+}
+
+
+//============================================================================
+void TreeReaderMC::PrintL1TKEMCollection(vector<L1TKEM> collection)
+//============================================================================
+{
+  
+  Table info("Index | Et | Eta | Phi |  EGRefPt | EGRefEta | EGRefPhi | TrkIso | Bx | HwQual", "Text");
+  
+  // For-loop: All L1EG
+  int row=0;
+  for (auto p = collection.begin(); p != collection.end(); p++, row++)
+  {
+    // Construct table
+  info.AddRowColumn(row, auxTools_.ToString( p->getIndex() ) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getEt()         , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getEta()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getPhi()        , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getEGRefPt()    , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getEGRefEta()   , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getEGRefPhi()   , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getTrkIso()     , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getBx()         , 3) );
+  info.AddRowColumn(row, auxTools_.ToString( p->getHwQual()     , 3) );
   
   }
 
