@@ -201,6 +201,7 @@ class TkEG : public TreeAnalyserMC{
   vector<L1TkEGParticle> L1TkEGTaus_RelIsoTight;
   vector<L1TkEGParticle> L1TkEGTaus_VtxIsoTight;
 
+  vector<GenParticle> GenTaus;
   vector<GenParticle> GenTausHadronic;
   vector<GenParticle> GenTausTrigger;
 

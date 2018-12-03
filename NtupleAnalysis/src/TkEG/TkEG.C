@@ -32,10 +32,6 @@ void TkEG::InitVars_()
   
   if (DEBUG) std::cout << "=== TkEG::InitVars_()" << std::endl;
   
-  cfg_AddL1Tks   = true;
-  cfg_AddEGs     = true;
-  cfg_AddGenP    = true;
-  
   // Track parameters
   cfg_tk_Collection  =  "TTTracks"; // Default: "TTTracks" (not "TTPixelTracks")
   cfg_tk_nFitParams  = 4;           // Default: 4
@@ -191,37 +187,32 @@ void TkEG::Loop()
     ////////////////////////////////////////////////////////////////////////////////////////////////       
 
     // Tracks
-    if (cfg_AddL1Tks) {
-      TTTracks = GetTTTracks(cfg_tk_minPt, cfg_tk_minEta, cfg_tk_maxEta, cfg_tk_maxChiSq, cfg_tk_minStubs, cfg_tk_nFitParams, false);
-      sort( TTTracks.begin(), TTTracks.end() ); // Sort from highest Pt to lowest (not done by default)
-      if (DEBUG*0) cout << "\n=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
-      if (DEBUG*0) PrintTTTrackCollection(TTTracks);
-    }    
+    TTTracks = GetTTTracks(cfg_tk_minPt, cfg_tk_minEta, cfg_tk_maxEta, cfg_tk_maxChiSq, cfg_tk_minStubs, cfg_tk_nFitParams, false);
+    sort( TTTracks.begin(), TTTracks.end() ); // Sort from highest Pt to lowest (not done by default)
+    if (DEBUG*0) cout << "\n=== TTracks (" << L1Tks_Pt->size() << ")" << endl;
+    if (DEBUG*0) PrintTTTrackCollection(TTTracks);
     
     // EGs
-    if (cfg_AddEGs) {
-      L1EGs = GetEGs(cfg_eg_minEt, cfg_eg_minEta, cfg_eg_maxEta, false);
-      sort( L1EGs.begin(), L1EGs.end() ); // Sort from highest Et to lowest Et (should be already done by default)
-      if (DEBUG) cout << "\n=== L1EGs (" << L1EGs.size() << ")" << endl;
-//      if (DEBUG*0) PrintL1EGCollection(L1EGs);
-    }
-
+    L1EGs = GetEGs(cfg_eg_minEt, cfg_eg_minEta, cfg_eg_maxEta, false);
+    sort( L1EGs.begin(), L1EGs.end() ); // Sort from highest Et to lowest Et (should be already done by default)
+    if (DEBUG) cout << "\n=== L1EGs (" << L1EGs.size() << ")" << endl;
+    if (DEBUG*0) PrintEGCollection(L1EGs);
+    
     // GenParticles (skip for MinBias samples as no real taus exist)
-    vector<GenParticle> GenTaus;
-    if (!isMinBias) GenTaus = GetGenParticles(15, true);
-    if (DEBUG*0) PrintGenParticleCollection(GenTaus);
-    
-    // Hadronic GenTaus (skip for MinBias samples)
+    GenTaus.clear();
     GenTausHadronic.clear();
-    if (cfg_AddGenP) {
-      if (DEBUG) cout << "\n=== GenParticles (" << GenP_Pt.size() << ")" << endl;
-      if (!isMinBias) GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 1.4);//999.9
-      if (DEBUG*0) PrintGenParticleCollection(GenTausHadronic);
-    }
+    GenTausTrigger.clear();  
     
-    // Triggred GenTaus (skip for MinBias samples)
-    vector<GenParticle> GenTausTrigger;  
-    if (!isMinBias) GenTausTrigger = GetHadronicGenTaus(GenTaus, 20.0, 1.4);//2.3);  
+    if (!isMinBias) {
+      GenTaus = GetGenParticles(15, true);
+      GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 1.4);//999.9
+      GenTausTrigger = GetHadronicGenTaus(GenTaus, 20.0, 1.4);//2.3);
+    }
+    if (DEBUG*0) {
+      PrintGenParticleCollection(GenTaus);
+      PrintGenParticleCollection(GenTausHadronic);
+      PrintGenParticleCollection(GenTausTrigger);
+    }
     
     // Ensure that all taus are found, needed by the current efficiency definition 
     // E.g. for ttbar, only events with two taus within trigger acceptance are considered for efficiency calculation)
