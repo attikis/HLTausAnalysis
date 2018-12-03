@@ -575,17 +575,18 @@ void Tracking::Loop()
       
       // For-loop: All signal tracks
       for (vector<TTTrack>::iterator sigTrk = matchTTTracks.begin(); sigTrk != matchTTTracks.end(); sigTrk++) { 
+	// Tree
 	seed_Pt_S       = sigTrk->getPt();
 	seed_Chi2_S     = sigTrk->getChi2();
 	seed_Chi2Red_S  = sigTrk->getChi2Red();
 	seed_Stubs_S    = sigTrk->getNumOfStubs();
 	seed_Eta_S      = sigTrk->getEta();
 	treeS->Fill();
-
       }
 
       // For-loop: All background tracks
       for (vector<TTTrack>::iterator bkgTrk = bkgTTTracks.begin(); bkgTrk != bkgTTTracks.end(); bkgTrk++) {
+	// Tree
         seed_Pt_B       = bkgTrk->getPt();
         seed_Chi2_B     = bkgTrk->getChi2();
         seed_Chi2Red_B  = bkgTrk->getChi2Red();
