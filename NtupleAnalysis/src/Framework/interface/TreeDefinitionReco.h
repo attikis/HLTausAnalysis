@@ -205,6 +205,8 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   vector<float>   *L1Tks_z0;
   vector<float>   *L1Tks_ChiSquared;
   vector<int>     *L1Tks_NStubs;
+  vector<float>   *L1Tks_StubPtConsistency;
+  vector<float>   *L1Tks_RInv;
   vector<int>     *L1Tks_IsGenuine;
   vector<int>     *L1Tks_IsLoose;
   vector<int>     *L1Tks_IsUnknown;
@@ -581,6 +583,8 @@ class TreeDefinitionReco : public virtual TreeDefinitionBase
   TBranch        *b_L1Tks_z0;   
   TBranch        *b_L1Tks_ChiSquared;   
   TBranch        *b_L1Tks_NStubs;   
+  TBranch        *b_L1Tks_StubPtConsistency;
+  TBranch        *b_L1Tks_RInv;
   TBranch        *b_L1Tks_IsGenuine;   
   TBranch        *b_L1Tks_IsLoose;   
   TBranch        *b_L1Tks_IsUnknown;   
@@ -833,6 +837,8 @@ void TreeDefinitionReco::InitReco(TChain *chain)
   L1Tks_z0 = 0;
   L1Tks_ChiSquared = 0;
   L1Tks_NStubs = 0;
+  L1Tks_StubPtConsistency = 0;
+  L1Tks_RInv = 0;
   L1Tks_IsGenuine = 0;
   L1Tks_IsLoose = 0;
   L1Tks_IsUnknown = 0;
@@ -1123,6 +1129,8 @@ void TreeDefinitionReco::InitReco(TChain *chain)
       fTracks->SetBranchAddress("trk_z0", &L1Tks_z0, &b_L1Tks_z0);
       fTracks->SetBranchAddress("trk_chi2", &L1Tks_ChiSquared, &b_L1Tks_ChiSquared);
       fTracks->SetBranchAddress("trk_nstub", &L1Tks_NStubs, &b_L1Tks_NStubs);
+      fTracks->SetBranchAddress("trk_stubPtConsistency", &L1Tks_StubPtConsistency, &b_L1Tks_StubPtConsistency);
+      fTracks->SetBranchAddress("trk_RInv", &L1Tks_RInv, &b_L1Tks_RInv);
       fTracks->SetBranchAddress("trk_genuine", &L1Tks_IsGenuine, &b_L1Tks_IsGenuine);
       fTracks->SetBranchAddress("trk_loose", &L1Tks_IsLoose, &b_L1Tks_IsLoose);
       fTracks->SetBranchAddress("trk_unknown", &L1Tks_IsUnknown, &b_L1Tks_IsUnknown);

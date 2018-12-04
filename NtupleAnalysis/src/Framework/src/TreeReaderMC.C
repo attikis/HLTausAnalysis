@@ -400,6 +400,8 @@ TTTrack TreeReaderMC::GetTTTrack(unsigned int Index,
   bool isLoose        = L1Tks_IsLoose->at(Index);
   bool isFake         = L1Tks_IsFake->at(Index);
   int  nStubs         = L1Tks_NStubs->at(Index);
+  float stubPtConsistency = L1Tks_StubPtConsistency->at(Index);
+  float RInv              = L1Tks_RInv->at(Index);
   int  matchTP_pdgId  = L1Tks_TP_PdgId->at(Index);
   float  matchTP_pt   = L1Tks_TP_Pt   ->at(Index);
   float  matchTP_eta  = L1Tks_TP_Eta  ->at(Index);
@@ -410,7 +412,7 @@ TTTrack TreeReaderMC::GetTTTrack(unsigned int Index,
   if (cfg_DEBUG*0)  cout << "Constructing the track TTTrack" << endl;
   
   // Construct the TTTrack
-  TTTrack theTTTrack(Index, p, d0, z0, aChi2, isGenuine, isUnknown, isCombinatoric, isLoose, isFake, nStubs, matchTP_pdgId, matchTP_pt, matchTP_eta, matchTP_phi, matchTP_z0, matchTP_dxy, nFitParams);
+  TTTrack theTTTrack(Index, p, d0, z0, aChi2, isGenuine, isUnknown, isCombinatoric, isLoose, isFake, nStubs, stubPtConsistency, RInv, matchTP_pdgId, matchTP_pt, matchTP_eta, matchTP_phi, matchTP_z0, matchTP_dxy, nFitParams);
 
   if (cfg_DEBUG*0) theTTTrack.PrintProperties();
 
@@ -550,7 +552,7 @@ void TreeReaderMC::PrintTTTrackCollection(vector<TTTrack> collection)
 {
   if (cfg_DEBUG*0) std::cout << "=== TreeReaderMC::PrintTTTrackCollection()" << std::endl;
 
-  Table info("Index | Pt | Eta | Phi | z0 | d0 | Chi2 | DOF | Chi2Red | Stubs | Genuine | Unknown | Comb.", "Text");
+  Table info("Index | Pt | Eta | Phi | z0 | d0 | Chi2 | DOF | Chi2Red | Stubs | StubPtConsistency | RInv | Genuine | Unknown | Comb.", "Text");
       
   // For-loop: All TTTracsk
   int row=0;
@@ -568,6 +570,8 @@ void TreeReaderMC::PrintTTTrackCollection(vector<TTTrack> collection)
       info.AddRowColumn(row, auxTools_.ToString( p->getDOF()) );
       info.AddRowColumn(row, auxTools_.ToString( p->getChi2Red(), 3) );
       info.AddRowColumn(row, auxTools_.ToString( p->getNumOfStubs()) );// + " (" + auxTools_.ToString(p->getNumOfStubsPS()) + ")");
+      info.AddRowColumn(row, auxTools_.ToString( p->getStubPtConsistency() ));
+      info.AddRowColumn(row, auxTools_.ToString( p->getRInv() ));
       info.AddRowColumn(row, auxTools_.ToString( p->getIsGenuine()) );
       info.AddRowColumn(row, auxTools_.ToString( p->getIsUnknown()) );
       info.AddRowColumn(row, auxTools_.ToString( p->getIsCombinatoric()) );
