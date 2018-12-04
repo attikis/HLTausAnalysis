@@ -33,12 +33,12 @@ void TkEG::InitVars_()
   if (DEBUG) std::cout << "=== TkEG::InitVars_()" << std::endl;
   
   // Track parameters
-  cfg_tk_Collection  =  "TTTracks"; // Default: "TTTracks" (not "TTPixelTracks")
+  cfg_tk_Collection  = "TTTracks"; // Default: "TTTracks" (not "TTPixelTracks")
   cfg_tk_nFitParams  =    4;        // Default: 4
   cfg_tk_minPt       = 2.00;        // Default: 2.0
   cfg_tk_minEta      =  0.0;        // Default: 0.0
   cfg_tk_maxEta      =  1.5;//2.5;  // Default: 1e6
-  cfg_tk_maxChiSq    = 94.0;        // Default: 1e6
+  cfg_tk_maxChiSq    = 95.0;        // Default: 1e6
   cfg_tk_minStubs    =    5;        // Default: 0
 
   // EGs parameters
@@ -49,7 +49,7 @@ void TkEG::InitVars_()
   // Tk+EG algorithm parameters
   // --- leading tracks (tau-seeds)
   leadTrk_minStubs  = 5; 
-  leadTrk_maxChi2   = 94.0; // GeV
+  leadTrk_maxChi2   = 25.0; // GeV
   leadTrk_minPt     = 5.0;  // GeV
   leadTrk_maxEta    = 1.5;  //2.5;
   leadTrk_maxDeltaR = 0.15; //0.3;
@@ -155,18 +155,16 @@ void TkEG::Loop()
   unsigned int counter_passNoHigherPtNeigh = 0;
 
   // Track clustering counters
-  unsigned int trkcounter_allTracks = 0;
+  unsigned int trkcounter_allTracks     = 0;
   unsigned int trkcounter_allNonLeading = 0;
-  unsigned int trkcounter_passZ = 0;
-  unsigned int trkcounter_passDRmax = 0;
-  unsigned int trkcounter_passDRmin = 0;
-  unsigned int trkcounter_passInvMass = 0;    
+  unsigned int trkcounter_passZ         = 0;
+  unsigned int trkcounter_passDRmax     = 0;
+  unsigned int trkcounter_passDRmin     = 0;
+  unsigned int trkcounter_passInvMass   = 0;    
 
   // Tau Candidate Composition Counters 
   unsigned int counter_hasGenTau = 0;
-  unsigned int counter_hasEG = 0;
-
-
+  unsigned int counter_hasEG     = 0;
 
   ////////////////////////////////////////////////////////////////////////////////////////////////
   // For-loop: Entries
@@ -207,13 +205,14 @@ void TkEG::Loop()
       GenTaus = GetGenParticles(15, true);
       GenTausHadronic = GetHadronicGenTaus(GenTaus, 00.0, 1.4);//999.9
       GenTausTrigger = GetHadronicGenTaus(GenTaus, 20.0, 1.4);//2.3);
+
+      if (DEBUG*0) {
+	PrintGenParticleCollection(GenTaus);
+	PrintGenParticleCollection(GenTausHadronic);
+	PrintGenParticleCollection(GenTausTrigger);
+      }
     }
-    if (DEBUG*0) {
-      PrintGenParticleCollection(GenTaus);
-      PrintGenParticleCollection(GenTausHadronic);
-      PrintGenParticleCollection(GenTausTrigger);
-    }
-    
+
     // Ensure that all taus are found, needed by the current efficiency definition 
     // E.g. for ttbar, only events with two taus within trigger acceptance are considered for efficiency calculation)
     bFoundAllTaus_ = ( (int) GenTausTrigger.size() >= nMaxNumOfHTausPossible);
@@ -255,9 +254,9 @@ void TkEG::Loop()
     for (vector<GenParticle>::iterator genTau = GenTausHadronic.begin(); genTau != GenTausHadronic.end(); genTau++) {
 
       // Fill histo with the number of the decay products of hadronic taus
-      h_genTausHad_Daughters_N-> Fill(genTau->finalDaughters().size());
-      h_genTausHad_chargedDaugh_N-> Fill(genTau->finalDaughtersCharged().size());
-      h_genTausHad_neutralDaugh_N-> Fill(genTau->finalDaughtersNeutral().size());
+      h_genTausHad_Daughters_N    -> Fill(genTau->finalDaughters().size());
+      h_genTausHad_chargedDaugh_N -> Fill(genTau->finalDaughtersCharged().size());
+      h_genTausHad_neutralDaugh_N -> Fill(genTau->finalDaughtersNeutral().size());
 
       // ===== MATCHING PHOTONS WITH EGS ======
             
