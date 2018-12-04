@@ -114,6 +114,7 @@ class TkTaus : public TreeAnalyserMC{
   double seedTk_minEta;
   double seedTk_maxEta;
   double seedTk_maxChiSq;
+  bool seedTk_useChiSqDOF;
   double seedTk_minStubs;
 
   // Signal Cone Tracks
@@ -123,6 +124,7 @@ class TkTaus : public TreeAnalyserMC{
   double sigConeTks_minEta;
   double sigConeTks_maxEta;
   double sigConeTks_maxChiSq;
+  bool sigConeTks_useChiSqDOF;
   unsigned int sigConeTks_minStubs;
   double sigConeTks_dPOCAz;
   double sigConeTks_maxInvMass;
@@ -134,6 +136,7 @@ class TkTaus : public TreeAnalyserMC{
   double isoConeTks_minEta;
   double isoConeTks_maxEta;
   double isoConeTks_maxChiSq;
+  bool isoConeTks_useChiSqDOF;
   unsigned int isoConeTks_minStubs;
   double isoConeTks_dPOCAz;
 

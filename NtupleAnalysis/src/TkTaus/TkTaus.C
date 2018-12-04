@@ -41,7 +41,8 @@ void TkTaus::InitVars_()
   seedTk_minPt       =   5.0;       //  5.0
   seedTk_minEta      =   0.0;       //  0.0
   seedTk_maxEta      =   2.5;       //  2.5
-  seedTk_maxChiSq    =  94.0;       // 50.0
+  seedTk_maxChiSq    =  16.0;       // 50.0
+  seedTk_useChiSqDOF =  true;       // false
   seedTk_minStubs    =    5;        //  5
 
   // Signal cone tracks
@@ -50,7 +51,8 @@ void TkTaus::InitVars_()
   sigConeTks_minPt       =   2.0;  //   2.0
   sigConeTks_minEta      =   0.0;  //   0.0
   sigConeTks_maxEta      =   2.5;  // 999.9
-  sigConeTks_maxChiSq    =  94.0;  //  50.0
+  sigConeTks_maxChiSq    =  seedTk_maxChiSq;  //  50.0
+  sigConeTks_useChiSqDOF =  seedTk_useChiSqDOF;  // false
   sigConeTks_minStubs    =   5;    //   4
   sigConeTks_dPOCAz      =   1.0;  // 0.80 (A. Ryd)
   sigConeTks_maxInvMass  =   1.5;  // 1.77 (A. Ryd)
@@ -61,7 +63,8 @@ void TkTaus::InitVars_()
   isoConeTks_minPt       =   2.0; //   2.0
   isoConeTks_minEta      =   0.0; //   0.0
   isoConeTks_maxEta      =   2.5; //   2.5
-  isoConeTks_maxChiSq    =  94.0; //  50.00
+  isoConeTks_maxChiSq    =  seedTk_maxChiSq; //  50.00
+  isoConeTks_useChiSqDOF =  seedTk_useChiSqDOF;    // false
   isoConeTks_minStubs    =   5;   //   4
 
   // Signal cone parameters
@@ -436,26 +439,26 @@ void TkTaus::Loop()
 
     // Smart Counter
     vector<TTTrack> tmp;    
-    tmp = GetTTTracks(seedTk_minPt, 0.0, 999.9, 999.9, 0, seedTk_nFitParams, false, false);
+    tmp = GetTTTracks(seedTk_minPt, 0.0, 999.9, 999.9, 0, seedTk_nFitParams, false, seedTk_useChiSqDOF);
     if (tmp.size() > 0) nEvtsSeedPt++;
-    tmp = GetTTTracks(seedTk_minPt, seedTk_minEta, seedTk_maxEta, 999.9, 0, seedTk_nFitParams, false, false);
+    tmp = GetTTTracks(seedTk_minPt, seedTk_minEta, seedTk_maxEta, 999.9, 0, seedTk_nFitParams, false, seedTk_useChiSqDOF);
     if (tmp.size() > 0) nEvtsSeedEta++;
-    tmp = GetTTTracks(seedTk_minPt, seedTk_minEta, seedTk_maxEta, seedTk_maxChiSq, 0, seedTk_nFitParams, false, false);
+    tmp = GetTTTracks(seedTk_minPt, seedTk_minEta, seedTk_maxEta, seedTk_maxChiSq, 0, seedTk_nFitParams, false, seedTk_useChiSqDOF);
     if (tmp.size() > 0) nEvtsSeedChiSq++;
-    tmp = GetTTTracks(seedTk_minPt, seedTk_minEta, seedTk_maxEta, seedTk_maxChiSq, seedTk_minStubs, seedTk_nFitParams, false, false);
+    tmp = GetTTTracks(seedTk_minPt, seedTk_minEta, seedTk_maxEta, seedTk_maxChiSq, seedTk_minStubs, seedTk_nFitParams, false, seedTk_useChiSqDOF);
     if (tmp.size() > 0) nEvtsSeedStubs++;
     tmp.clear();
 
     vector<TTTrack> seedTTTracks = GetTTTracks(seedTk_minPt, seedTk_minEta, seedTk_maxEta, seedTk_maxChiSq,
-					       seedTk_minStubs, seedTk_nFitParams, false, false);
+					       seedTk_minStubs, seedTk_nFitParams, false, seedTk_useChiSqDOF);
     
     vector<TTTrack> sigTTTracks = GetTTTracks(sigConeTks_minPt, sigConeTks_minEta, sigConeTks_maxEta, 
 					      sigConeTks_maxChiSq, sigConeTks_minStubs, 
-					      sigConeTks_nFitParams, false, false);
+					      sigConeTks_nFitParams, false, sigConeTks_useChiSqDOF);
     
     vector<TTTrack> isoTTTracks = GetTTTracks(isoConeTks_minPt , isoConeTks_minEta, isoConeTks_maxEta, 
 					      isoConeTks_maxChiSq, isoConeTks_minStubs, 
-					      isoConeTks_nFitParams, false, false);
+					      isoConeTks_nFitParams, false, isoConeTks_useChiSqDOF);
 
     if (0) // DEBUG
       {
