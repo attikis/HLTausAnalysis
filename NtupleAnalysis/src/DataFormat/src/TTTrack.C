@@ -27,8 +27,9 @@ void TTTrack::_InitVars(void)
   theIsLoose = false;
   theIsFake = false;
   theNStubs = 0.0;
+  theStubPtConsistency = 0.0;
+  theRInv = 0.0;
   theMomentum.SetXYZ(0.0, 0.0, 0.0);
-  //theRInv = 0.0;
   theZ0 = 0.0;
   theD0 = 0.0;
   //theCharge = -9999;
@@ -56,6 +57,8 @@ TTTrack::TTTrack(unsigned short aIndex,
 		 bool isLoose,
 		 bool isFake,
 		 unsigned int nStubs,
+		 float aStubPtConsistency,
+		 float aRInv,
 		 int matchTP_pdgId,
 		 float matchTP_pt,
 		 float matchTP_eta,
@@ -76,6 +79,8 @@ TTTrack::TTTrack(unsigned short aIndex,
   theIsLoose           = isLoose;
   theIsFake            = isFake;
   theNStubs            = nStubs;
+  theStubPtConsistency = aStubPtConsistency;
+  theRInv              = aRInv;
   theTPPdgId           = matchTP_pdgId;
   theTPPt              = matchTP_pt;
   theTPEta             = matchTP_eta;
@@ -85,7 +90,6 @@ TTTrack::TTTrack(unsigned short aIndex,
   theMomentum          = aMomentum;
   theFitParameters     = nFitParams;
   theD0                = d0;//getD0(); // after "thePOCA" and nFitParams are assigned
-  //theRInv              = aRInv;
   //theCharge            = getCharge(); // after "theRInv" is assigned
   theZ0                = z0;//getZ0();
   theStubs             = getNumOfStubs();
@@ -148,7 +152,7 @@ void TTTrack::PrintProperties(void)
 {
   
   //Table info("Index | Pt | Eta | Phi | x0 | y0 | z0 | d0 | Q | Chi2 | DOF | Chi2Red | Stubs (PS) | StubPtCons. | Genuine | Unknown | Combinatoric", "Text");
-  Table info("Index | Pt | Eta | Phi | z0 | d0 | Chi2 | DOF | Chi2Red | Stubs | Genuine | Unknown | Combinatoric", "Text");
+  Table info("Index | Pt | Eta | Phi | z0 | d0 | Chi2 | DOF | Chi2Red | Stubs | StubPtCons. | RInv | Genuine | Unknown | Combinatoric", "Text");
   info.AddRowColumn(0, auxTools.ToString( theIndex) );
   info.AddRowColumn(0, auxTools.ToString( theMomentum.Perp(), 3) );
   info.AddRowColumn(0, auxTools.ToString( theMomentum.Eta() , 3) );  
@@ -160,6 +164,8 @@ void TTTrack::PrintProperties(void)
   info.AddRowColumn(0, auxTools.ToString( getDOF()) );
   info.AddRowColumn(0, auxTools.ToString( getChi2Red(), 3) );
   info.AddRowColumn(0, auxTools.ToString( getNumOfStubs()) );// + " (" + auxTools.ToString(getNumOfStubsPS()) + ")");
+  info.AddRowColumn(0, auxTools.ToString( getStubPtConsistency() ));
+  info.AddRowColumn(0, auxTools.ToString( getRInv() ));
   info.AddRowColumn(0, auxTools.ToString( getIsGenuine()) );
   info.AddRowColumn(0, auxTools.ToString( getIsUnknown()) );
   info.AddRowColumn(0, auxTools.ToString( getIsCombinatoric()) );
@@ -175,7 +181,7 @@ void TTTrack::PrintAllProperties(void)
 // ****************************************************************************
 {
   
-  Table info("Pt | Eta | Phi | z0 | d0 | Chi2 | DOF | Chi2Red | Stubs | Genuine | Unknown | Comb. | Loose | Fake", "Text");  
+  Table info("Pt | Eta | Phi | z0 | d0 | Chi2 | DOF | Chi2Red | Stubs | StubPtCons. | RInv | Genuine | Unknown | Comb. | Loose | Fake", "Text");  
   info.AddRowColumn(0, auxTools.ToString( theMomentum.Perp(), 4) );
   info.AddRowColumn(0, auxTools.ToString( theMomentum.Eta() , 4) );
   info.AddRowColumn(0, auxTools.ToString( theMomentum.Phi() , 4) );
@@ -188,6 +194,8 @@ void TTTrack::PrintAllProperties(void)
   info.AddRowColumn(0, auxTools.ToString( getDOF())     );
   info.AddRowColumn(0, auxTools.ToString( getChi2Red()) );
   info.AddRowColumn(0, auxTools.ToString( getNumOfStubs()));// + " (" + auxTools.ToString(getNumOfStubsPS()) + ")");
+  info.AddRowColumn(0, auxTools.ToString( getStubPtConsistency() ));
+  info.AddRowColumn(0, auxTools.ToString( getRInv() ));
   info.AddRowColumn(0, auxTools.ToString( getIsGenuine()) );
   info.AddRowColumn(0, auxTools.ToString( getIsUnknown()) );
   info.AddRowColumn(0, auxTools.ToString( getIsCombinatoric()) );

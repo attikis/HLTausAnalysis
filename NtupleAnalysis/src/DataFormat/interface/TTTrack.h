@@ -34,6 +34,8 @@ class TTTrack{
 	  bool isLoose,
 	  bool isFake,
 	  unsigned int nStubs,
+	  float aStubPtConsistency, 
+	  float aRInv,
 	  int matchTP_pdgId,
 	  float matchTP_pt,
 	  float matchTP_eta,
@@ -59,6 +61,8 @@ class TTTrack{
   bool getIsLoose(void) const {return theIsLoose;}
   bool getIsFake(void) const {return theIsFake;}
   unsigned int getNumOfStubs(void) const {return theNStubs;}
+  float getStubPtConsistency(void) const {return theStubPtConsistency;}
+  float getRInv(void) const {return theRInv;}
   int getTPPdgId(void) const {return theTPPdgId;}
   float getTPPt(void) const {return theTPPt;}
   float getTPEta(void) const {return theTPEta;}
@@ -89,6 +93,8 @@ class TTTrack{
   bool theIsLoose;
   bool theIsFake;
   unsigned int theNStubs;
+  float theStubPtConsistency;
+  float theRInv;
   int theTPPdgId;
   float theTPPt;
   float theTPEta;
