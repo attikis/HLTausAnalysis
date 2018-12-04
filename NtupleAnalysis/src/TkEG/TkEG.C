@@ -34,38 +34,38 @@ void TkEG::InitVars_()
   
   // Track parameters
   cfg_tk_Collection  =  "TTTracks"; // Default: "TTTracks" (not "TTPixelTracks")
-  cfg_tk_nFitParams  = 4;           // Default: 4
+  cfg_tk_nFitParams  =    4;        // Default: 4
   cfg_tk_minPt       = 2.00;        // Default: 2.0
-  cfg_tk_minEta      = 0.0;         // Default: 0.0
-  cfg_tk_maxEta      = 1.5;//2.5;        // Default: 1e6
-  cfg_tk_maxChiSq    = 94.0;         // Default: 1e6
-  cfg_tk_minStubs    =   5;         // Default: 0
+  cfg_tk_minEta      =  0.0;        // Default: 0.0
+  cfg_tk_maxEta      =  1.5;//2.5;  // Default: 1e6
+  cfg_tk_maxChiSq    = 94.0;        // Default: 1e6
+  cfg_tk_minStubs    =    5;        // Default: 0
 
   // EGs parameters
   cfg_eg_minEt       = 2.00;        // Default: 2.0
   cfg_eg_minEta      = 0.0;         // Default: 0.0
-  cfg_eg_maxEta      = 1.5;//2.5;        // Default: 1e6   
+  cfg_eg_maxEta      = 1.5;//2.5;   // Default: 1e6   
 
   // Tk+EG algorithm parameters
   // --- leading tracks (tau-seeds)
   leadTrk_minStubs  = 5; 
   leadTrk_maxChi2   = 94.0; // GeV
-  leadTrk_minPt     = 5.0; // GeV
-  leadTrk_maxEta    = 1.5;//2.5;
-  leadTrk_maxDeltaR = 0.15;//0.3;
+  leadTrk_minPt     = 5.0;  // GeV
+  leadTrk_maxEta    = 1.5;  //2.5;
+  leadTrk_maxDeltaR = 0.15; //0.3;
   // --- track clustering
-  maxDeltaR_const   = 2.5;
-  maxDeltaZ_trk     = 1.0;  // cm
-  maxInvMass_trk    = 1.5; // GeV 
-  minEt_EG          = 1.5;  // GeV
-  minDeltaR_EG      = 0.0;
-  maxDeltaR_EG      = 0.15;//0.3;
+  maxDeltaR_const   =  2.5;
+  maxDeltaZ_trk     =  1.0; // cm
+  maxInvMass_trk    =  1.5; // GeV 
+  minEt_EG          =  1.5; // GeV
+  minDeltaR_EG      =  0.0;
+  maxDeltaR_EG      = 0.15; //0.3;
   maxInvMass_EG     = 1.77; // GeV
   maxDeltaR_MCmatch = 0.1;    
   // --- isolation
   //minDeltaR_iso     = 0.15;
-  maxDeltaR_iso     = 0.3;
-  maxDeltaZ_iso     = 0.6;  // cm
+  maxDeltaR_iso     =  0.3;
+  maxDeltaZ_iso     =  0.6; // cm
   useRelIso         = true;
   relIso_WP         = 0.10; //0.2
   vtxIso_WP         = 0.50;
