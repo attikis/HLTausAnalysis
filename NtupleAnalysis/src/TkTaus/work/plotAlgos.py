@@ -11,10 +11,12 @@ USAGE:
 EXAMPLES:
 ./plotAlgos.py -m multicrab_CaloTk_v92X_16h12m34s_15Nov2018,multicrab_TkTaus_v92X_14h39m23s_15Nov2018 --bandValue 2
 ./plotAlgos.py -m multicrab_CaloTk_v92X_16h12m34s_15Nov2018,multicrab_TkTaus_v92X_17h56m36s_15Nov2018,multicrab_TkEG_v92X_17h04m49s_15Nov2018 --gridX --gridY
+./plotAlgos.py -m multicrab_CaloTk_v92X_16h12m34s_15Nov2018,multicrab_TkTaus_v92X_17h56m36s_15Nov2018,multicrab_TkEG_v92X_21h00m14s_15Nov2018
+./plotAlgos.py -m multicrab_CaloTk_v92X_15h24m39s_28Nov2018,multicrabV4_TkTau_OptSeedsWithChiSqDOF_SigRMax0p25Const2p5Pt2dZ1p0_IsoCone0p30_VtxIso0p5_RelIso0p15dZ0p5_19h54m13s_28Nov2018/,multicrab_TkEG_v92X_15h23m30s_28Nov2018/
 
 
 LAST USED:
-./plotAlgos.py -m multicrab_CaloTk_v92X_16h12m34s_15Nov2018,multicrab_TkTaus_v92X_17h56m36s_15Nov2018,multicrab_TkEG_v92X_21h00m14s_15Nov2018
+./plotAlgos.py -m multicrab_CaloTk_v92X_15h24m39s_28Nov2018,multicrabV4_TkTau_OptSeedsWithChiSqDOF_SigRMax0p25Const2p5Pt2dZ1p0_IsoCone0p30_VtxIso0p5_RelIso0p15dZ0p5_19h54m13s_28Nov2018/,multicrab_TkEG_v92X_13h24m17s_29Nov2018_NEWEGS
 
 '''
 #================================================================================================ 
@@ -190,6 +192,7 @@ def getAlgoLabel(algo):
     # labelDict["TkTaus"] = "#font[72]{Tracks-only}"
     # labelDict["TkEG"]   = "#font[72]{Tracks+e/#gamma}"
     labelDict["CaloTk"] = "Calo+Tracks"
+    labelDict["TkTau"] = "Tracks-only"
     labelDict["TkTaus"] = "Tracks-only"
     labelDict["TkEG"]   = "Tracks+EG"
     if algo not in labelDict.keys():
@@ -582,7 +585,8 @@ if __name__ == "__main__":
     RATIO        = False
     SAVEDIR      = None
     SEARCHMODE   = None
-    SAVEFORMATS  = [".png"] #[".C", ".png", ".pdf"]
+    # SAVEFORMATS  = [".png"]
+    SAVEFORMATS  = [".C", ".png", ".pdf"]
     URL          = False
     VERBOSE      = False
     PREFIX       = ""
