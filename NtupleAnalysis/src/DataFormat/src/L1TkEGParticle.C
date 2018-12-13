@@ -16,13 +16,23 @@ L1TkEGParticle::L1TkEGParticle()
 
 
 //****************************************************************************
-L1TkEGParticle::L1TkEGParticle(vector<TTTrack> tracks, vector<EG> EGs,
-                               GenParticle genTau, bool matching)
+L1TkEGParticle::L1TkEGParticle(vector<TTTrack> tracks,
+			       vector<EG> EGs, 
+			       float sigCone_dRMin, 
+			       float sigCone_dRMax, 
+			       float isoCone_dRMin, 
+			       float isoCone_dRMax,
+                               GenParticle genTau,
+			       bool matching)
 //****************************************************************************
 {
 
-  theTracks = tracks;
-  theEGs = EGs;
+  theTracks        = tracks;
+  theEGs           = EGs;
+  theSigCone_dRMin = sigCone_dRMin;
+  theSigCone_dRMax = sigCone_dRMax;
+  theIsoCone_dRMin = isoCone_dRMin;
+  theIsoCone_dRMax = isoCone_dRMax;
   theGenTau = genTau;
   theMatching = matching;
 }
@@ -33,7 +43,7 @@ L1TkEGParticle::L1TkEGParticle(double vtxIso,
 			       double CHF, 
 			       double NHF,
 			       double shrinkConeConst,
-			       double sigConeMaxOpen,
+			       double sigConeCutOffdR,
 			       vector<TTTrack> isoTracks, 
 			       vector<EG> signalEGs,
 			       vector<EG> isoEGs)
@@ -45,7 +55,7 @@ L1TkEGParticle::L1TkEGParticle(double vtxIso,
   SetCHF(CHF);
   SetNHF(NHF);
   SetShrinkingConeConst(shrinkConeConst);
-  SetSigConeMaxOpen(sigConeMaxOpen);
+  SetSigConeCutOffdR(sigConeCutOffdR);
   SetIsoConeTracks(isoTracks);
   SetIsoConeEGs(isoEGs);
   SetSignalConeEGs(signalEGs);
@@ -97,6 +107,30 @@ float L1TkEGParticle::CorrectedEta(float eta, float zTrack)  {
 
 
 //****************************************************************************
+TLorentzVector L1TkEGParticle::GetTracksP4()
+//****************************************************************************
+{
+  TLorentzVector sum; // initialized to (0,0,0,0)
+
+  for (auto tk = theTracks.begin(); tk != theTracks.end(); tk++)
+    sum += tk->p4(); //NB! Assumes pion mass!
+  
+  return sum;
+}
+
+//****************************************************************************
+TLorentzVector L1TkEGParticle::GetEGsP4()
+//****************************************************************************
+{
+  TLorentzVector sum; // initialized to (0,0,0,0)
+
+  for (auto eg = theEGs.begin(); eg != theEGs.end(); eg++)
+    sum += eg->p4(); //NB! Approximation Pt ~ Et used in TLorentzVector!
+
+  return sum;
+}
+
+//****************************************************************************
 TLorentzVector L1TkEGParticle::GetTotalP4()
 //****************************************************************************
 {
@@ -111,24 +145,6 @@ TLorentzVector L1TkEGParticle::GetTotalP4()
   return sum;
 }
 
-
-//****************************************************************************
-double L1TkEGParticle::GetSigConeMax()
-//****************************************************************************
-{
-  double maxDeltaR = GetShrinkingConeConst()/(theTracks[0].getPt());
-  if (maxDeltaR > GetSigConeMaxOpen()) maxDeltaR = GetSigConeMaxOpen();
-
-  return maxDeltaR;
-  
-}
-
-//****************************************************************************
-double L1TkEGParticle::GetIsoConeMin()
-//****************************************************************************
-{
-  return GetSigConeMax();
-}
 
 //****************************************************************************
 void L1TkEGParticle::FindIsoConeTracks(vector<TTTrack> TTTracks, bool useIsoCone)
