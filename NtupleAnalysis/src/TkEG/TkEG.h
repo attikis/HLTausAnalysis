@@ -52,9 +52,8 @@ class TkEG : public TreeAnalyserMC{
   // Public function declarations
   virtual void Loop();
   void PrintSettings(void);
-  
   void ApplyDiTauZMatching(vector<L1TkEGParticle> &L1TkEGs);
-
+  
   // Public variables
   bool DEBUG;  
 
@@ -76,7 +75,6 @@ class TkEG : public TreeAnalyserMC{
   void WriteHistos_(void);
   void InitObjects(void);
   void InitVars_(void);
-  //void SortL1TkEGs();
   void SetTauCandidateProperties(L1TkEGParticle *tauCandidate);
   float DeltaPhi(float phi1, float phi2);
   float deltaR(float eta1, float eta2, float phi1, float phi2);
@@ -233,17 +231,14 @@ class TkEG : public TreeAnalyserMC{
   TH2D* h_Pion0Et_Vs_PhotonsDR;
   TH1D* h_Photons_EGs_Matching;
 
-  TH1D* h_trk_Chi2_all_5stubs;
-  TH1D* h_leadTrk4stubs_MCmatched_Chi2;
+  // Tracks Properties
   TH1D* h_trk_Chi2_all;
   TH1D* h_trk_Chi2Red_all;
-  TH1D* h_trk_NStubs_all;                                                                                                                                              
+  TH1D* h_trk_NStubs_all;
   TH2D* h_trk_NStubsVsChi2_all;
   
-
   TH1D* h_Counters_leadTrks;
-  TH1D* h_leadTrks_Multiplicity;
-  
+  TH1D* h_leadTrks_all_Multiplicity;
   TH1D* h_leadTrks_Pt;
   TH1D* h_leadTrks_Eta;
   TH1D* h_leadTrks_Phi;
@@ -334,8 +329,6 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_NEGs_C;
   TH1D* h_TkEG_NEGs_I;
   TH1D* h_TkEG_NEGs_F;
-  TH1D* h_TkEG_CHF;
-  TH1D* h_TkEG_NHF;
   TH1D* h_TkEG_CHF_withNeutrals;
   TH1D* h_TkEG_NHF_withNeutrals;
   TH1D* h_TkEG_clustEGs_MCMatch;
