@@ -9,26 +9,17 @@
 #include "../Framework/src/TreeAnalyserMC.C"
 #include "../Auxiliary/src/AuxTools.C"
 #include "../DataFormat/interface/TTTrack.h"
-//#include "../DataFormat/src/L1EG.C"
-#include "../DataFormat/src/L1TKEM.C"
-#include "../DataFormat/src/EG.C"
-#include "../DataFormat/src//L1TkEGParticle.C"
 #include "../DataFormat/src/TrackingParticle.C" // for GetTTTrack function
 
 //#include "../Auxiliary/src/Table.C"
 //#include "../Auxiliary/src/MCTools.C"
 #include "../Auxiliary/src/HistoTools.C"
 //#include "../Auxiliary/src/Datasets.C" 
-//#include "../DataFormat/src/L1TkEGParticle.C"
 #include "../DataFormat/src/GenParticle.C"
-//#include "../DataFormat/src/TrackingParticle.C"
-//#include "../DataFormat/interface/TTTrack.h"
-//#include "../DataFormat/interface/TTPixelTrack.h"
-//#include "../DataFormat/src/L1Tau.C"
-//#include "../DataFormat/src/L1Jet.C"
-
-// #include "../Plugins/src/L1TkPrimaryVertex.C"
-//#include "../Plugins/src/L1PixelTrackFit.C"
+#include "../DataFormat/src/TrackingParticle.C"
+#include "../DataFormat/interface/TTTrack.h"
+#include "../DataFormat/src/EG.C"
+#include "../DataFormat/src/L1TkEGParticle.C"
 
 // ROOT
 #include "TEfficiency.h"
@@ -65,12 +56,11 @@ class TkEG : public TreeAnalyserMC{
   void ApplyDiTauZMatching(vector<L1TkEGParticle> &L1TkEGs);
 
   // Public variables
+  bool DEBUG;  
+
   string mcSample;
-  bool cfg_AddL1Tks;  
-  bool cfg_AddEGs; 
-  bool cfg_AddGenP;
   string cfg_tk_Collection;
-  int cfg_tk_nFitParams;
+  int    cfg_tk_nFitParams;
   double cfg_tk_minPt;
   double cfg_tk_minEta;
   double cfg_tk_maxEta;
@@ -79,8 +69,6 @@ class TkEG : public TreeAnalyserMC{
   double cfg_eg_minEt;
   double cfg_eg_minEta;
   double cfg_eg_maxEta;
-
-  bool DEBUG;  
     
  private:
   // Private function declarations
@@ -94,6 +82,16 @@ class TkEG : public TreeAnalyserMC{
   float deltaR(float eta1, float eta2, float phi1, float phi2);
   float CorrectedEta(float eta, float zTrack);
   bool IsWithinEtaRegion(string etaRegion, double eta);
+
+  void GetShrinkingConeSizes(float tk_pt,
+			     float shrinkCone_Constant,
+			     const float sigCone_dRCutoff,
+			     float &sigCone_dRMin,
+			     float &sigCone_dRMax,
+			     float &isoCone_dRMin,
+			     float &isoCone_dRMax,
+			     bool isoCone_useCone);
+
   vector<L1TkEGParticle> GetMcMatchedL1TkEGs(vector<L1TkEGParticle> L1TkEGs);
 
   double GetDonutRatio(L1TkEGParticle *L1TkEG, 
@@ -149,37 +147,28 @@ class TkEG : public TreeAnalyserMC{
 				   
   // Private variables
   
-  // Old parameters
-  float ETmin; // min ET in GeV of L1EG objects
-  float ZMAX; // |z_track| < ZMAX in cm
-  float CHI2MAX;		
-  float DRmin;
-  float DRmax;
-  float minPt_leading_track;
-  bool PrimaryVtxConstrain; // use the primary vertex
-  float DeltaZMax; // | z_track - z_primaryvtx | < DeltaZMax in cm. 
-  float IsoCut;
-  bool RelativeIsolation;
-
-  // New parameters
+  // Tk+EG algorithm parameters
   unsigned int leadTrk_minStubs;  
   float leadTrk_maxChi2;     
   float leadTrk_maxChi2_alt;
   float leadTrk_minPt;    
   float leadTrk_maxEta;   
   float leadTrk_maxDeltaR; 
-  float maxDeltaR_const;
+  float shrinkCone_Constant;
+  float sigCone_dRMin;
+  float sigCone_dRMax;
+  float sigCone_cutoffDeltaR;
+  float isoCone_dRMin;
+  float isoCone_dRMax;
+  bool isoCone_useCone;
+
   float maxDeltaZ_trk; 
   float maxInvMass_trk;  
-  float minEt_EG;     
-  float minDeltaR_EG;   
-  float maxDeltaR_EG;   
   float maxInvMass_EG;  
   float maxDeltaR_MCmatch; 
   float minDeltaR_iso;  
   float maxDeltaR_iso;   
   float maxDeltaZ_iso;   
-  float useRelIso;  
   float relIso_WP;  
   float vtxIso_WP;
 
@@ -192,6 +181,7 @@ class TkEG : public TreeAnalyserMC{
   vector<TTTrack> TTTracks;
   vector<EG> L1EGs;
   vector< vector <TTTrack> > trackTauCandidates;
+  vector<L1TkEGParticle> AllTauCandidates;
   vector<L1TkEGParticle> L1TkEGTauCandidates;
   vector<L1TkEGParticle> L1TkEGTaus_RelIso;
   vector<L1TkEGParticle> L1TkEGTaus_VtxIso;
@@ -263,7 +253,6 @@ class TkEG : public TreeAnalyserMC{
 
   TH1D* h_leadTrk_clustTrks_dZ0;
 
-  TH1D* h_Counters_clustTrks;
   TH1D* h_clustTrks_Pt;
   TH1D* h_clustTrks_Eta;
   TH1D* h_clustTrks_Phi;
@@ -297,9 +286,6 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_leadTrk_EG_dR_beforecorrection;
   TH1D* h_leadTrk_EG_dPhi;
   TH1D* h_leadTrk_EG_dEta;
-  TH1D* h_leadTrk_EG_dRmin;
-  TH1D* h_leadTrk_EG_dPhiMin;
-  TH1D* h_leadTrk_EG_dEtaMin;
 
   TH1D* h_clustEGs_allEGs;
   TH1D* h_clustEGs_passEt;
@@ -607,21 +593,6 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_TkEG_NeutralsResolution_withNeutrals;
   TH1D* h_TkEG_NeutralsResolution_1pr;
   TH1D* h_TkEG_NeutralsResolution_3pr;
-
-  // Poor Et resolution candidates 
-  TH1D* h_PoorEtResolCand_InvMass;
-  TH1D* h_PoorEtResolCand_RelIso;
-  TH1D* h_PoorEtResolCand_VtxIso;
-  TH1D* h_PoorEtResolCand_CHF;
-  TH1D* h_PoorEtResolCand_IsoTracks_N;
-  TH1D* h_PoorEtResolCand_dR_EG_Seed;
-  // Good Et resolution candidates
-  TH1D* h_GoodEtResolCand_InvMass;
-  TH1D* h_GoodEtResolCand_RelIso;
-  TH1D* h_GoodEtResolCand_VtxIso;
-  TH1D* h_GoodEtResolCand_CHF;
-  TH1D* h_GoodEtResolCand_IsoTracks_N;
-  TH1D* h_GoodEtResolCand_dR_EG_Seed;
 
   // Poor Neutral Resolution candidates
   TH1D* h_TkEG_PoorNeuResol_NeuMultiplicity;
