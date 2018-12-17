@@ -2869,6 +2869,7 @@ void TkEG::WriteHistos_(void)
   h_leadTrks_Pt->Write();
   h_leadTrks_Eta->Write();
   h_leadTrks_Phi->Write();
+  h_leadTrks_Phi_Eta->Write();
 
   h_leadTrk_clustTrks_dZ0->Write();
 
@@ -2879,7 +2880,6 @@ void TkEG::WriteHistos_(void)
   h_trkClusters_M_beforeCut->Write();
 
   h_EGs_N -> Write();
-  h_EGs_MCmatched_Et->Write();
   h_EGs_Et->Write();
   h_EGs_Eta->Write();
   h_EGs_Phi->Write();
@@ -2891,7 +2891,6 @@ void TkEG::WriteHistos_(void)
   h_EGs_Matched_ETResolution->Write();
 
   h_leadTrk_EG_dR->Write();
-  h_leadTrk_EG_dR_beforecorrection->Write();
   h_leadTrk_EG_dPhi->Write();
   h_leadTrk_EG_dEta->Write();
 
@@ -3419,13 +3418,6 @@ void TkEG::WriteHistos_(void)
   hDiTau_Eff_RelIsoTight_F->Write();
 
   hL1Taus_DiTau_Eff->Write();
-
-  // Write 2-D histograms
-  h_leadTrks_Phi_Eta->Write();
-  h_clustEGs_Et_Eta->Write();
-  h_clustEGs_Phi_Eta->Write();
-  h_clustEGs_counter->Write();
-  
 
   // Write the outfile
   outFile->Write();

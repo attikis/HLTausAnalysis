@@ -255,7 +255,6 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_trkClusters_M_beforeCut;
 
   TH1D* h_EGs_N;
-  TH1D* h_EGs_MCmatched_Et;
   TH1D* h_EGs_Et;
   TH1D* h_EGs_Eta;
   TH1D* h_EGs_Phi;
@@ -269,7 +268,6 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_EGs_Matched_ETResolution;
 
   TH1D* h_leadTrk_EG_dR;
-  TH1D* h_leadTrk_EG_dR_beforecorrection;
   TH1D* h_leadTrk_EG_dPhi;
   TH1D* h_leadTrk_EG_dEta;
 
