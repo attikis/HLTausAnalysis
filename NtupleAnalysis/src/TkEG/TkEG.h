@@ -211,16 +211,16 @@ class TkEG : public TreeAnalyserMC{
   TH1D* h_genTausHad_chargedDaugh_N;
   TH1D* h_genTausHad_neutralDaugh_N;
   TH1D* h_genTausHad_N;
-  TH1D* h_genTau_chargedDaugh_Pt;
-  TH1D* h_genTau_chargedDaugh_totalMass;
-  TH1D* h_genTau_neutralDaugh_totalMass;
-  TH1D* h_genTau_neutralDaugh_Et;
+  TH1D* h_genTausHad_chargedDaugh_Pt;
+  TH1D* h_genTausHad_chargedDaugh_totalMass;
+  TH1D* h_genTausHad_neutralDaugh_totalMass;
+  TH1D* h_genTausHad_neutralDaugh_Et;
   TH2D* h_genTauHad_chargedPtVsneutralET;
-  TH1D* h_genTau_CHF;
-  TH1D* h_genTau_NHF;
-  TH2D* h_genTau_chargedDaugh_visPt_dRmax;
-  TH2D* h_genTau_chargedDaugh_PtLead_dRmax;
-  TH2D* h_genTau_neutralDaugh_PtLead_dRmax;
+  TH1D* h_genTausHad_CHF;
+  TH1D* h_genTausHad_NHF;
+  TH2D* h_genTausHad_chargedDaugh_visPt_dRmax;
+  TH2D* h_genTausHad_chargedDaugh_PtLead_dRmax;
+  TH2D* h_genTausHad_neutralDaugh_PtLead_dRmax;
 
   TH1D* h_Pion0_Et;
   TH1D* h_Photons_Et;
@@ -248,17 +248,8 @@ class TkEG : public TreeAnalyserMC{
 
   TH1D* h_leadTrk_clustTrks_dZ0;
 
-  TH1D* h_clustTrks_Pt;
-  TH1D* h_clustTrks_Eta;
-  TH1D* h_clustTrks_Phi;
-  TH2D* h_clustTrks_Phi_Eta;
-  TH2D* h_clustTrks_counter;
-
   TH1D *h_SigCone_DeltaR;
 
-  TH1D* h_trkClusters_MultiplicityPerCluster;
-  TH1D* h_MCmatch_chargedDaugh_N;
-  TH1D* h_MCmatch_neutralDaugh_N;
   TH1D* h_trkClusters_Pt;
   TH1D* h_trkClusters_M;
   TH1D* h_trkClusters_M_beforeCut;

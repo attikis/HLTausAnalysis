@@ -69,10 +69,10 @@ void TkEG::InitVars_()
   isoCone_useCone      = false; // instead of annulus
 
   // Tracks & EGs clustering
-  maxDeltaZ_trk       =  1.00; // cm
-  maxInvMass_trk      =  1.50; // GeV 
-  maxInvMass_EG       =  1.77; // GeV
-  maxDeltaR_MCmatch   =  0.10;    
+  maxDeltaZ_trk     =  1.00; // cm
+  maxInvMass_trk    =  1.50; // GeV 
+  maxInvMass_EG     =  1.77; // GeV
+  maxDeltaR_MCmatch =  0.10;    
 
   // Isolation
   //minDeltaR_iso     = 0.15;
@@ -112,23 +112,24 @@ void TkEG::Loop()
   // Initialisations
   InitVars_();
   BookHistos_();
-  Long64_t nbytes              = 0;
-  Long64_t nb                  = 0;
-  int nEvtsWithMaxHTaus        = 0; 
-  unsigned int nEvts           = 0;
-  unsigned int nEvtsSeedPt     = 0;
-  unsigned int nEvtsSeedEta    = 0;
-  unsigned int nEvtsSeedChiSq  = 0;
-  unsigned int nEvtsSeedStubs  = 0;
-  unsigned int nEvtsNoHigherPt = 0;
-  unsigned int nEvtsMcMatch    = 0;
-  unsigned int nEvtsVtxIso     = 0;
-  unsigned int nEvtsRelIso     = 0;
-  unsigned int nEvtsVtxIsoLoose= 0;
-  unsigned int nEvtsVtxIsoTight= 0;
-  unsigned int nEvtsRelIsoLoose= 0;
-  unsigned int nEvtsRelIsoTight= 0;
-  unsigned int nEvtsIso        = 0;
+  Long64_t nbytes               = 0;
+  Long64_t nb                   = 0;
+  int nEvtsWithMaxHTaus         = 0; 
+  unsigned int nEvts            = 0;
+  unsigned int nEvtsSeedPt      = 0;
+  unsigned int nEvtsSeedEta     = 0;
+  unsigned int nEvtsSeedChiSq   = 0;
+  unsigned int nEvtsSeedStubs   = 0;
+  unsigned int nEvtsNoHigherPt  = 0;
+  unsigned int nEvtsMcMatch     = 0;
+  unsigned int nEvtsVtxIso      = 0;
+  unsigned int nEvtsRelIso      = 0;
+  unsigned int nEvtsVtxIsoLoose = 0;
+  unsigned int nEvtsVtxIsoTight = 0;
+  unsigned int nEvtsRelIsoLoose = 0;
+  unsigned int nEvtsRelIsoTight = 0;
+  unsigned int nEvtsIso         = 0;
+
   unsigned int nAllEvts = fChain->GetEntries();
   bool isMinBias        = false;  
   
@@ -405,17 +406,17 @@ void TkEG::Loop()
 	}
 	
 	// Fill histo if it is the leading charged product
-	if (!notLeading) h_genTau_chargedDaugh_visPt_dRmax -> Fill( genTau->p4vis().Pt(), deltaRcharged_max);
-	if (!notLeading) h_genTau_chargedDaugh_PtLead_dRmax -> Fill( deltaRcharged_max, d.pt());
-	if (!notLeading) h_genTau_neutralDaugh_PtLead_dRmax -> Fill( deltaRneutral_max, d.pt());
+	if (!notLeading) h_genTausHad_chargedDaugh_visPt_dRmax -> Fill( genTau->p4vis().Pt(), deltaRcharged_max);
+	if (!notLeading) h_genTausHad_chargedDaugh_PtLead_dRmax -> Fill( deltaRcharged_max, d.pt());
+	if (!notLeading) h_genTausHad_neutralDaugh_PtLead_dRmax -> Fill( deltaRneutral_max, d.pt());
       }                
            
       if (DEBUG) genTau -> PrintFinalDaughtersCharged();
 
       // Fill the invariant mass and Pt of all charged products
       float chargedPt = p4sum.Pt();
-      h_genTau_chargedDaugh_totalMass -> Fill(p4sum.M());
-      h_genTau_chargedDaugh_Pt -> Fill (chargedPt);
+      h_genTausHad_chargedDaugh_totalMass -> Fill(p4sum.M());
+      h_genTausHad_chargedDaugh_Pt -> Fill (chargedPt);
 
 
       p4sum.SetPtEtaPhiM(0., 0., 0., 0.);
@@ -433,14 +434,14 @@ void TkEG::Loop()
       
       // Fill the invariant mass and ET of all neutral products (if exist)
       if (genTau->finalDaughtersNeutral().size()!=0){
-	h_genTau_neutralDaugh_totalMass -> Fill(p4sum.M());
-	h_genTau_neutralDaugh_Et -> Fill (neutralET);
+	h_genTausHad_neutralDaugh_totalMass -> Fill(p4sum.M());
+	h_genTausHad_neutralDaugh_Et -> Fill (neutralET);
 	
 	// Fill scatter plot of the chargedPt vs neutralET
 	h_genTauHad_chargedPtVsneutralET -> Fill (chargedPt, neutralET);
 	
-	h_genTau_CHF -> Fill(chargedPt/ genTau->p4vis().Pt());
-	h_genTau_NHF -> Fill(neutralET/ genTau->p4vis().Et());
+	h_genTausHad_CHF -> Fill(chargedPt/ genTau->p4vis().Pt());
+	h_genTausHad_NHF -> Fill(neutralET/ genTau->p4vis().Et());
       }
 
     } // For-loop: All hadronic gen-taus
@@ -714,13 +715,15 @@ void TkEG::Loop()
 	// Aply dR cuts
 	// Skip if EG is not within the signal cone 
 	if (deltaR > maxDeltaR) continue;
-	
+	/*
 	// Add the p4 of the EG to the total p4 of the clustered tracks
 	TLorentzVector p4sum = cand->GetTotalP4();
 	p4sum += eg->p4();
 	
 	if (p4sum.M() <  maxInvMass_EG) cand->AddEG(*eg);
-
+	*/	
+	cand->AddEG(*eg);
+	
       } // For-loop: All the EGs in the event
 
       // Apply mass cut to the track-candidate and the track+eg candidate
@@ -1995,25 +1998,110 @@ double TkEG::GetDonutRatio(L1TkEGParticle *L1TkEG,
 void TkEG::BookHistos_(void)
 //============================================================================
 {
-
   // Binning
   const unsigned int nEt = 300;
   const float minEt = 0.0;
   const float maxEt = +300.0;
 
+  const unsigned int nPt = 200;
+  const float minPt = 0.0;
+  const float maxPt = +200.0;
+
+  const unsigned int nPtR = 400;
+  const float minPtR = 0.0;
+  const float maxPtR = +20.0;
+
+  const unsigned int nIEta = 120;
+  const float minIEta = -60.0;
+  const float maxIEta = +60.0;
+
+  const unsigned int nIPhi = 150;
+  const float minIPhi =   0.0;
+  const float maxIPhi = 150.0;
+
   const unsigned int nEta = 60;
   const float minEta = -3.0;
   const float maxEta = +3.0;
+
+  const unsigned int nPhi = 64;
+  const float minPhi = -3.2;
+  const float maxPhi = +3.2;
+
+  const unsigned int nN = 20;
+  const float minN =   0.0;
+  const float maxN = +20.0;
+
+  const unsigned int nBool = 2;
+  const float minBool = -0.5;
+  const float maxBool = +1.5;
+
+  const unsigned int nM = 40;
+  const float minM =  0.0;
+  const float maxM = 4.0;
+
+  const unsigned int nR = 100;
+  const float minR = 0.0;
+  const float maxR = 1.0;
+
+  const unsigned int nDR = 200;
+  const float minDR = 0.0;
+  const float maxDR = 2.0;
+
+  const unsigned int nDEta = 120;
+  const float minDEta = -6.0;
+  const float maxDEta = +6.0;
+
+  const unsigned int nDPhi = 128;
+  const float minDPhi = -6.4;
+  const float maxDPhi = +6.4;
+
+  const unsigned int nChi = 500;
+  const float minChi =   0.0;
+  const float maxChi = 500.0;
 
   const unsigned int nG = 1000;
   const float minG      =    0.0;
   const float maxG      =   10.0;
 
+  const unsigned int nRChi = 200;
+  const float minRChi =   0.0;
+  const float maxRChi = 200.0;
 
+  const unsigned int nZ0 = 600;
+  const float minZ0 = -30.0;
+  const float maxZ0 = +30.0;
+
+  const unsigned int nRIso = 1000;
+  const float minRIso =   0.0;
+  const float maxRIso = +50.0;
+
+  const unsigned int nVIso = 500;
+  const float minVIso =   0.0;
+  const float maxVIso = +50.0;
+  
   const char* tEt   = ";E_{T} (GeV); Entries / %.0f GeV";
+  const char* tPt   = ";p_{T} (GeV/c);Entries / %.0f GeV/c";
+  const char* tPtR  = ";p_{T}^{rel} (GeV/c);Entries / %.1f GeV/c";
   const char* tEta  = ";#eta;Entries / %.2f";
+  const char* tPhi  = ";#phi (rads);Entries / %.2f (rads)";
+  const char* tM    = ";M (GeV/c^{2});Entries / %.2f (GeV/c^{2});";
+  const char* tN    = ";multiplicity;Entries / %.0f";
+  const char* tQ    = ";charge (e);Entries / %.0f e";
+  const char* tR    = ";R;Entries / %.2f";
+  const char* tDR   = ";#DeltaR;Entries / %.2f";
+  const char* tDEta = ";#Delta#eta;Entries / %.2f";
+  const char* tDPhi = ";#Delta#phi;Entries / %.2f";
+  const char* tZ0   = ";z_{0} (cm);Entries / %.2f cm";
+  const char* tDZ0  = ";#Deltaz_{0} (cm);Entries / %.2f cm";
+  const char* tRIso = ";relative isolation;Entries / %.2f";
+  const char* tVIso = ";min(z_{0}^{m} - z_{0}^{iso} (cm);Entries / %.2f cm";
+  const char* tIso  = ";vertex isolation;relative isolation";
+  const char* tChi  = ";#chi^{2};Entries / %.2f";
+  const char* tRChi = ";#chi^{2}_{#nu};Entries / %.2f";
+  const char* tW    = ";w_{#tau};Entries / %.2f";
   const char* tG    = ";#gamma;Entries / %.2f";
-
+  const char* tGW    = ";#gamma;w_{#tau}";
+  // const char* tRate = ";#E_{T} (GeV);Rate (kHz) / %.0f GeV";
 
   // Event-Type Histograms
   histoTools_.BookHisto_1D(h_Counters, "Counters",  "", 13, 0.0, +13.0);
@@ -2032,40 +2120,38 @@ void TkEG::BookHistos_(void)
   h_Counters->GetXaxis()->SetBinLabel(13, "RelIso (T)");
 
   // GenTaus Properties
-  histoTools_.BookHisto_1D(h_genTausAll_N, "genTausAll_N", ";Number of all genuine taus in event;Events / bin", 5, -0.5, +4.5);
-  histoTools_.BookHisto_1D(h_genTausAll_Pt, "genTausAll_Pt", ";p_{T} (GeV);Events / bin",20, +0.0, +100.0);
-  histoTools_.BookHisto_1D(h_genTausAll_Eta, "genTausAll_Eta", ";#eta ;Events / bin", 60, -3.0, +3.0);
-  histoTools_.BookHisto_1D(h_genTausAll_Phi, "genTausAll_Phi", ";#phi (rads) ;Events / bin", 21,  -3.15,  +3.15);
-  histoTools_.BookHisto_2D(h_genTausAll_Eta1VsEta2, "genTausAll_Eta1VsEta2", ";#eta_{1}; #eta_{2};Events / bin", 60, -3.0, +3.0, 60, -3.0, +3.0);
-  histoTools_.BookHisto_2D(h_genTausAll_Phi1VsPhi2, "genTausAll_Phi1VsPhi2", ";#phi_{1}; #phi_{2};Events / bin", 21,  -3.15,  +3.15, 21,  -3.15,  +3.15);
+  histoTools_.BookHisto_1D(h_genTausAll_N          , "genTausAll_N"  , tN   , nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(h_genTausAll_Pt         , "genTausAll_Pt" , tPt  , nPt  , minPt  , maxPt  );
+  histoTools_.BookHisto_1D(h_genTausAll_Eta        , "genTausAll_Eta", tEta , nEta , minEta , maxEta );
+  histoTools_.BookHisto_1D(h_genTausAll_Phi        , "genTausAll_Phi", tPhi , nPhi , minPhi , maxPhi );
+  histoTools_.BookHisto_2D(h_genTausAll_Eta1VsEta2 , "genTausAll_Eta1VsEta2", ";#eta_{1}; #eta_{2};Entries / bin", nEta , minEta , maxEta, nEta , minEta , maxEta );
+  histoTools_.BookHisto_2D(h_genTausAll_Phi1VsPhi2 , "genTausAll_Phi1VsPhi2", ";#phi_{1}; #phi_{2};Entries / bin", nPhi , minPhi , maxPhi, nPhi , minPhi , maxPhi );
 
   // GenTausHadronic Properties
-  histoTools_.BookHisto_1D(h_genTausHad_N, "genTausHadronic_N", ";Number of genuine hadronic taus in event;Events / bin", 5, -0.5, +4.5);
-  histoTools_.BookHisto_1D(h_genTausHad_Daughters_N, "genTausHad_Daughters_N", ";N_{daughters}; Events / bin", 11, -0.5, +10.5);
-  histoTools_.BookHisto_1D(h_genTausHad_chargedDaugh_N, "genTausHad_chargedDaugh_N", ";N_{charged}; Events / bin", 11, -0.5, +10.5);
-  histoTools_.BookHisto_1D(h_genTausHad_neutralDaugh_N, "genTausHad_neutralDaugh_N", ";N_{neutral}; Events / bin", 11, -0.5, +10.5);
+  histoTools_.BookHisto_1D(h_genTausHad_N                      , "genTausHadronic_N"        , tN   , nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(h_genTausHad_Daughters_N            , "genTausHad_Daughters_N"   , ";N_{daughters}; Entries / bin", nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(h_genTausHad_chargedDaugh_N         , "genTausHad_chargedDaugh_N", ";N_{charged}; Entries / bin"  , nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(h_genTausHad_neutralDaugh_N         , "genTausHad_neutralDaugh_N", ";N_{neutral}; Entries / bin"  , nN   , minN   , maxN   );
+  histoTools_.BookHisto_1D(h_genTausHad_chargedDaugh_Pt        , "genTausHad_chargedDaugh_Pt"        , ";p_{T}^{charged} (GeV);Entries / bin" , nPt  , minPt  , maxPt );
+  histoTools_.BookHisto_1D(h_genTausHad_chargedDaugh_totalMass , "genTausHad_chargedDaugh_totalMass" , ";M_{charged}; Entries / bin"          , nM   , minM   , maxM  );
+  histoTools_.BookHisto_1D(h_genTausHad_neutralDaugh_Et        , "genTausHad_neutralDaugh_Et"        , ";E_{T}^{neutral} (GeV);Entries / bin" , nEt  , minEt  , maxEt );
+  histoTools_.BookHisto_1D(h_genTausHad_neutralDaugh_totalMass , "genTausHad_neutralDaugh_totalMass" , ";M_{neutral}; Entries / bin"          , nM   , minM   , maxM   );
+  histoTools_.BookHisto_1D(h_genTausHad_CHF                    , "genTausHad_CHF"                    , ";CHF; Entries / bin"                  , 20, 0.0, 1.0);
+  histoTools_.BookHisto_1D(h_genTausHad_NHF                    , "genTausHad_NHF"                    , ";NHF; Entries / bin"                  , 20, 0.0, 1.0);
 
-
-  histoTools_.BookHisto_1D(h_genTau_chargedDaugh_Pt, "genTau_chargedDaugh_Pt", ";p_{T}^{charged} (GeV);Particles / bin", 300, +0.0, +300.0);
-  histoTools_.BookHisto_1D(h_genTau_chargedDaugh_totalMass, "genTau_chargedDaugh_totalMass", ";M_{charged}; GenTaus/ bin", 40, 0.0, +4.0);
-  histoTools_.BookHisto_1D(h_genTau_neutralDaugh_totalMass, "genTau_neutralDaugh_totalMass", ";M_{neutral}; GenTaus/ bin", 40, 0.0, +4.0);
-  histoTools_.BookHisto_1D(h_genTau_neutralDaugh_Et, "genTau_neutralDaugh_Et", ";E_{T}^{neutral} (GeV);Particles / bin", 300, +0.0, +300.0);
-
-  histoTools_.BookHisto_2D(h_genTauHad_chargedPtVsneutralET, "genTauHad_chargedPtVsneutralET", ";p_{T}^{charged} (GeV); E_{T}^{neutral} (GeV);Events / bin", 120, +0.0, +120.0, 20, +0.0, +120.0);
-  histoTools_.BookHisto_1D(h_genTau_CHF, "genTau_CHF", ";CHF; Entries /bin", 20, 0.0, 1.0);
-  histoTools_.BookHisto_1D(h_genTau_NHF, "genTau_NHF", ";NHF; Entries /bin", 20, 0.0, 1.0);
-  histoTools_.BookHisto_2D(h_genTau_chargedDaugh_visPt_dRmax, "genTau_chargedDaugh_visPt_dRmax", ";p_{T}^{vis} (#tau)  (GeV); #DeltaR_{max} (charged^{ldg}, charged)", 100, 0.0, 100.0, 50, 0.0, 0.5);
-  histoTools_.BookHisto_2D(h_genTau_chargedDaugh_PtLead_dRmax, "genTau_chargedDaugh_PtLead_dRmax", "; #DeltaR_{max} (#pi^{#pm}_{ldg}, #pi^{#pm}) ;p_{T} (#pi^{#pm}_{ldg}) (GeV)", 100, 0.0, 1.0, 100, 0.0, 100.0);
-  histoTools_.BookHisto_2D(h_genTau_neutralDaugh_PtLead_dRmax, "genTau_neutralDaugh_PtLead_dRmax", "; #DeltaR_{max} (#pi^{#pm}_{ldg}, #pi^{0});p_{T} (#pi^{#pm}_{ldg}) (GeV)",  100, 0.0, 1.0, 100, 0.0, 100.0);
+  histoTools_.BookHisto_2D(h_genTauHad_chargedPtVsneutralET      , "genTauHad_chargedPtVsneutralET"      , ";p_{T}^{charged} (GeV); E_{T}^{neutral} (GeV);Entries / bin", nPt  , minPt  , maxPt , nEt  , minEt  , maxEt );
+  histoTools_.BookHisto_2D(h_genTausHad_chargedDaugh_visPt_dRmax , "genTausHad_chargedDaugh_visPt_dRmax" , ";p_{T}^{vis} (#tau)  (GeV); #DeltaR_{max} (charged^{ldg}, charged)", 100, 0.0, 100.0, 50, 0.0, 0.5);
+  histoTools_.BookHisto_2D(h_genTausHad_chargedDaugh_PtLead_dRmax, "genTausHad_chargedDaugh_PtLead_dRmax", "; #DeltaR_{max} (#pi^{#pm}_{ldg}, #pi^{#pm}) ;p_{T} (#pi^{#pm}_{ldg}) (GeV)", 100, 0.0, 1.0, 100, 0.0, 100.0);
+  histoTools_.BookHisto_2D(h_genTausHad_neutralDaugh_PtLead_dRmax, "genTausHad_neutralDaugh_PtLead_dRmax", "; #DeltaR_{max} (#pi^{#pm}_{ldg}, #pi^{0});p_{T} (#pi^{#pm}_{ldg}) (GeV)",  100, 0.0, 1.0, 100, 0.0, 100.0);
 
   // EGs-Photons Matching (1 prong decay, 1 pi0 cases)
-  histoTools_.BookHisto_1D(h_Pion0_Et, "Pion0_Et", ";E_{T} (GeV); Particles / bin", 100, +0.0, +100.0);
-  histoTools_.BookHisto_1D(h_Photons_Et, "Photons_Et", ";E_{T} (GeV); Particles / bin", 100, +0.0, +100.0);
-  histoTools_.BookHisto_1D(h_Photons_dR  , "Photons_dR"  , ";#Delta R; Entries / bin",   200,  0.0,   +2.0);
-  histoTools_.BookHisto_1D(h_Photons_dPhi  , "Photons_dPhi"  , ";#Delta#phi; Entries / bin",  200,  -1.0,  1.0);
-  histoTools_.BookHisto_1D(h_Photons_dEta  , "Photons_dEta"  , ";#Delta#eta; Entries / bin",  400,  -2.0,  2.0);
-  histoTools_.BookHisto_2D(h_Photons_dEtaVsdPhi, "Photons_dEtaVsdPhi", ";#Delta#eta;#Delta#phi; Entries / bin", 400,  -2.0,  2.0, 200,  -1.0,  1.0);
-  histoTools_.BookHisto_2D(h_Pion0Et_Vs_PhotonsDR, "Pion0Et_Vs_PhotonsDR", ";E_{T} (#pi^{0})  (GeV); #DeltaR (photon_{1}, photon_{2})", 100, 0.0, 100.0, 200, 0.0, 2.0);
+  histoTools_.BookHisto_1D(h_Pion0_Et      , "Pion0_Et"     , tEt   , nEt   , minEt   , maxEt   );
+  histoTools_.BookHisto_1D(h_Photons_Et    , "Photons_Et"   , tEt   , nEt   , minEt   , maxEt   );
+  histoTools_.BookHisto_1D(h_Photons_dR    , "Photons_dR"   , tDR   , nDR   , minDR   , maxDR   );
+  histoTools_.BookHisto_1D(h_Photons_dPhi  , "Photons_dPhi" , tDPhi , nDPhi , minDPhi , maxDPhi ); 
+  histoTools_.BookHisto_1D(h_Photons_dEta  , "Photons_dEta" , tDEta , nDEta , minDEta , maxDEta );
+  histoTools_.BookHisto_2D(h_Photons_dEtaVsdPhi  , "Photons_dEtaVsdPhi", ";#Delta#eta;#Delta#phi; Entries / bin", nDEta , minDEta ,maxDEta , nDPhi , minDPhi ,maxDPhi );
+  histoTools_.BookHisto_2D(h_Pion0Et_Vs_PhotonsDR, "Pion0Et_Vs_PhotonsDR", ";E_{T} (#pi^{0})  (GeV); #DeltaR (photon_{1}, photon_{2})", nEt   , minEt   , maxEt , nDR   , minDR   , maxDR   );
   // --- Matching Counters
   histoTools_.BookHisto_1D(h_Photons_EGs_Matching, "Photons_EGs_Matching", "Entries / bin", 4, 0, 4);
   h_Photons_EGs_Matching->GetXaxis()->SetBinLabel(1, "No matching");
@@ -2075,73 +2161,19 @@ void TkEG::BookHistos_(void)
   h_Photons_EGs_Matching->GetXaxis()->SetLabelSize(15);
 
   // Tracks Properties
-  histoTools_.BookHisto_1D(h_trk_NStubs_all, "trk_NStubs_all", ";N_{stubs} (all tracks); Events / bin", 16, -0.5, 15.5);
-  histoTools_.BookHisto_1D(h_trk_Chi2_all, "trk_Chi2_all", ";#chi^{2} (all tracks); Events / bin", 100, 0.0, 100.0);
-  histoTools_.BookHisto_1D(h_trk_Chi2Red_all, "trk_Chi2Red_all", ";#chi^{2}/dof (all tracks); Events / bin", 50, 0.0, 50.0);
-  histoTools_.BookHisto_2D(h_trk_NStubsVsChi2_all, "trk_NStubsVsChi2_all", ";N_{stubs}; #chi^{2}; Events / bin",11, -0.5, 11.5, 100, 0.0, 100.0);
-
-  // Leading Tracks Counters 
-  histoTools_.BookHisto_1D(h_Counters_leadTrks, "Counters_leadTrks", ";;Events / bin", 6, 0, 6);
-  h_Counters_leadTrks->GetXaxis()->SetBinLabel(1, "All tracks");
-  h_Counters_leadTrks->GetXaxis()->SetBinLabel(2, "Pass #chi^{2}<100");
-  h_Counters_leadTrks->GetXaxis()->SetBinLabel(3, "Pass p_{T} cut");
-  h_Counters_leadTrks->GetXaxis()->SetBinLabel(4, "Pass #eta cut");
-  h_Counters_leadTrks->GetXaxis()->SetBinLabel(5, "Pass N_{stubs} & #chi^{2} cut");
-  h_Counters_leadTrks->GetXaxis()->SetBinLabel(6, "No higher p_{T} neighbour");
-
-  // All Leading Tracks in the event
-  histoTools_.BookHisto_1D(h_leadTrks_all_Multiplicity, "leadTrks_all_Multiplicity", ";Number of lead tracks in event;Events / bin", 16, -0.5, +15.5);
-
-  // DeltaZ0 of leading track with other tracks
-  histoTools_.BookHisto_1D(h_leadTrk_clustTrks_dZ0, "leadTrk_clustTrks_dZ0", ";#Deltaz_{0} (cm); entries / bin", 250, 0.0, 50.0); 
-
-  // Clustered tracks Pt
-  histoTools_.BookHisto_1D(h_clustTrks_Pt, "clustTrks_Pt", ";p_{T} (GeV);Tracks / bin", 300, +0.0, +300.0);
-
-  // Clustered tracks Eta
-  histoTools_.BookHisto_1D(h_clustTrks_Eta, "clustTrks_Eta", ";#eta;Tracks / bin", 60, -3.0, +3.0);
-
-  // Clustered tracks Phi
-  histoTools_.BookHisto_1D(h_clustTrks_Phi, "clustTrks_Phi", ";#phi (rads);Tracks / bin", 21,  -3.15,  +3.15);
-  
-  // Clustered tracks in Eta-Phi plane
-  histoTools_.BookHisto_2D(h_clustTrks_Phi_Eta, "clustTrks_Phi_Eta",  ";#phi (rads);#eta", 210,  -3.15,  +3.15, 300,  -3.0,  +3.0);  			      
-
-  // Number of clustered tracks (per cluster)
-  histoTools_.BookHisto_1D(h_trkClusters_MultiplicityPerCluster, "trkClusters_MultiplicityPerCluster", ";Number of tracks in cluster;Clusters / bin", 16, -0.5, +15.5);
-
-  histoTools_.BookHisto_1D(h_MCmatch_chargedDaugh_N, "MCmatch_chargedDaugh_N", ";Number of daughters^{+} of matched gen-#tau; entries / bin", 16, -0.5, +15.5);
-
-  histoTools_.BookHisto_1D(h_MCmatch_neutralDaugh_N, "MCmatch_neutralDaugh_N", ";Number of daughters^{0} of matched gen-#tau; entries / bin", 16, -0.5, +15.5);
-
-  // Opening of signal cone 
-  histoTools_.BookHisto_1D(h_SigCone_DeltaR, "SigCone_DeltaR", ";#DeltaR; Entries/ bin", 150, 0, 0.3 );
-
-  // Pt of track clusters
-  histoTools_.BookHisto_1D(h_trkClusters_Pt, "trkClusters_Pt", ";p_{T} (GeV);Clusters / bin", 150, +0.0, +300.0);
-
-  // Invariant mass of track clusters (before cut)
-  histoTools_.BookHisto_1D(h_trkClusters_M_beforeCut, "trkClusters_M_beforeCut", ";Invariant mass;Clusters / bin", 40, 0.0, +4.0);
-
-  // Invariant mass of track clusters
-  histoTools_.BookHisto_1D(h_trkClusters_M, "trkClusters_M", ";Invariant mass;Clusters / bin", 40, 0.0, +4.0);
-
-  // Number of EGs                                                                  
-  histoTools_.BookHisto_1D(h_EGs_N, "EGs_Multiplicity", ";Number of EGs in the event ; entries / bin", 201, -0.5, +200.5);
-
-  // MCmatched EGs Et 
-  histoTools_.BookHisto_1D(h_EGs_MCmatched_Et, "EGs_MCmatched_Et", ";E_{T} (GeV) ;EGs / bin", 50, 0.0, +100.0);
+  histoTools_.BookHisto_1D(h_trk_NStubs_all  , "trk_NStubs_all"  , ";N_{stubs}; Entries / bin", nN, minN, maxN );
+  histoTools_.BookHisto_1D(h_trk_Chi2_all    , "trk_Chi2_all"    , tChi ,  nChi , minChi , maxChi  );
+  histoTools_.BookHisto_1D(h_trk_Chi2Red_all , "trk_Chi2Red_all" , tRChi,  nRChi, minRChi, maxRChi );
+  histoTools_.BookHisto_2D(h_trk_NStubsVsChi2_all , "trk_NStubsVsChi2_all", ";N_{stubs}; #chi^{2}; Entries / bin", nChi , minChi , maxChi , nN, minN, maxN );
 
   // EGs Properties
-  histoTools_.BookHisto_1D(h_EGs_Et, "EGs_Et", ";E_{T} (GeV) ;EGs / bin", 200, 0.0, +100.0);
-  histoTools_.BookHisto_1D(h_EGs_Eta, "EGs_Eta", tEta  , nEta  , minEta  , maxEta  );
-  histoTools_.BookHisto_1D(h_EGs_Phi, "EGs_Phi", ";#phi (rads);EGs / bin", 36,  -3.15,  +3.15);
-  // histoTools_.BookHisto_1D(h_EGs_IEta, "EGs_IEta", ";i#eta;EGs / bin", 70, -35, +35); 
-  // histoTools_.BookHisto_1D(h_EGs_IPhi, "EGs_IPhi", ";i#phi;EGs / bin", 36,  0,  145);
-  histoTools_.BookHisto_1D(h_EGs_HwQual, "EGs_HwQual", ";Quality bit; EGs / bin", 32, 0.5, 32.5); 
-  histoTools_.BookHisto_2D(h_EGs_EtaVsEt, "EGs_EtaVsEt", ";#eta ;E_{T} (GeV); Entries/bin"  , nEta  , minEta  , maxEta, nEt  , minEt  , maxEt);
-
-  // MC Matched EGs 
+  histoTools_.BookHisto_1D(h_EGs_N       , "EGs_Multiplicity" , ";Number of EGs in the event ; entries / bin", 201, -0.5, +200.5);
+  histoTools_.BookHisto_1D(h_EGs_Et      , "EGs_Et"           , ";E_{T} (GeV) ;EGs / bin", 200, 0.0, +100.0);
+  histoTools_.BookHisto_1D(h_EGs_Eta     , "EGs_Eta"          , tEta  , nEta  , minEta  , maxEta  );
+  histoTools_.BookHisto_1D(h_EGs_Phi     , "EGs_Phi"          , ";#phi (rads);EGs / bin", 36,  -3.15,  +3.15);
+  histoTools_.BookHisto_1D(h_EGs_HwQual  , "EGs_HwQual"       , ";Quality bit; EGs / bin", 32, 0.5, 32.5); 
+  histoTools_.BookHisto_2D(h_EGs_EtaVsEt , "EGs_EtaVsEt"      , ";#eta ;E_{T} (GeV); Entries/bin"  , nEta  , minEta  , maxEta, nEt  , minEt  , maxEt);
+  // --- Matching
   histoTools_.BookHisto_1D(h_EGs_MCMatch,"EGs_MCMatch", ";;Entries / bin", 2, 0, 2);
   h_EGs_MCMatch->GetXaxis()->SetBinLabel(1,"not MC Matched EG");
   h_EGs_MCMatch->GetXaxis()->SetBinLabel(2,"MC Matched EG");
@@ -2149,56 +2181,31 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_EGs_Matched_dR_EG_matchPion0,"EGs_Matched_dR_EG_matchPion0", ";#DeltaR(EG, #pi^{0}); Entries / bin",30,  0.0,   +0.3);
   histoTools_.BookHisto_1D(h_EGs_Matched_ETResolution, "EGs_Matched_ETResolution", ";E_{T} resolution (GeV);Clusters / bin", 20000, -10.0, +10.0); 
 
-  // DR of lead trk and EGs
-  histoTools_.BookHisto_1D(h_leadTrk_EG_dR, "leadTrk_EG_dR", ";#DeltaR(trk_{ldg}, EG); entries / bin",   60,  0.0,   +6.0);
+  // Leading Tracks 
+  histoTools_.BookHisto_1D(h_Counters_leadTrks, "Counters_leadTrks", ";;Entries / bin", 6, 0, 6);
+  h_Counters_leadTrks->GetXaxis()->SetBinLabel(1, "All tracks");
+  h_Counters_leadTrks->GetXaxis()->SetBinLabel(2, "Pass #chi^{2}<100");
+  h_Counters_leadTrks->GetXaxis()->SetBinLabel(3, "Pass p_{T} cut");
+  h_Counters_leadTrks->GetXaxis()->SetBinLabel(4, "Pass #eta cut");
+  h_Counters_leadTrks->GetXaxis()->SetBinLabel(5, "Pass N_{stubs} & #chi^{2} cut");
+  h_Counters_leadTrks->GetXaxis()->SetBinLabel(6, "No higher p_{T} neighbour");
 
-  // DR of lead trk and EGs (before the correction of EG's eta
-  histoTools_.BookHisto_1D(h_leadTrk_EG_dR_beforecorrection, "leadTrk_EG_dR_beforecorrection", ";#DeltaR(trk_{ldg}, EG); entries / bin",   60,  0.0,   +6.0);
+  histoTools_.BookHisto_1D(h_leadTrks_all_Multiplicity, "leadTrks_all_Multiplicity", tN , nN , minN , maxN );
 
-  // DPhi of lead trk and EGs                                                       
-  histoTools_.BookHisto_1D(h_leadTrk_EG_dPhi, "leadTrk_EG_dPhi", ";#Delta#phi(trk_{ldg}, EG); entries / bin",  21,  -3.15,  +3.15);
+  // Signal Cone Opening
+  histoTools_.BookHisto_1D(h_SigCone_DeltaR, "SigCone_DeltaR", ";#DeltaR; Entries/ bin", 150, 0, 0.3 );
 
-  // DEta of lead trk and EGs
-  histoTools_.BookHisto_1D(h_leadTrk_EG_dEta, "leadTrk_EG_dEta", ";#Delta#eta(trk_{ldg}, EG); entries / bin",  100,  -10.0,  10.0);
+  // Track Clustering
+  histoTools_.BookHisto_1D(h_leadTrk_clustTrks_dZ0   , "leadTrk_clustTrks_dZ0"   , tDZ0 , nZ0  , 0    , maxZ0 );
+  histoTools_.BookHisto_1D(h_trkClusters_M_beforeCut , "trkClusters_M_beforeCut" , tM   , nM   , minM , maxM  );
 
-  // Clustered EGs counters
-  histoTools_.BookHisto_1D(h_clustEGs_allEGs, "clustEGs_allEGs", ";N_{EGs} (all) ; entries / bin", 16, -0.5, +15.5);
-  histoTools_.BookHisto_1D(h_clustEGs_passEt, "clustEGs_passEt", ";N_{EGs} (pass E_{T}) ; entries / bin", 16, -0.5, +15.5);
-  histoTools_.BookHisto_1D(h_clustEGs_passDRmax, "clustEGs_passDRmax", ";N_{EGs} (pass #DeltaR_{max}) ; entries / bin", 16, -0.5, +15.5);
-  histoTools_.BookHisto_1D(h_clustEGs_passDRmin, "clustEGs_passDRmin", ";N_{EGs} (pass #DeltaR_{min}) ; entries / bin", 16, -0.5, +15.5);
-  histoTools_.BookHisto_1D(h_clustEGs_passInvMass, "clustEGs_passInvMass", ";N_{EGs} (pass InvMass) ; entries / bin", 16, -0.5, +15.5);
-
-  // Clustered EGs Pt
-  histoTools_.BookHisto_1D(h_clustEGs_Et, "clustEGs_Et", ";E_{T} (GeV);Events / bin", 60, +0.0, +300.0);
-
-  // Clustered EGs Eta
-  histoTools_.BookHisto_1D(h_clustEGs_Eta, "clustEGs_Eta", ";#eta;EGs / bin", 60, -3.0, +3.0);
-
-  // Clustered EGs Phi
-  histoTools_.BookHisto_1D(h_clustEGs_Phi, "clustEGs_Phi", ";#phi (rads);EGs / bin", 21,  -3.15,  +3.15);
-
-  // Clustered EGs in Pt-Eta plane                                                           
-  histoTools_.BookHisto_2D(h_clustEGs_Et_Eta, "clustEGs_Et_Eta",  ";E_{T} (GeV);#eta", 60,  0.0,  +300.0, 60,  -3.0,  +3.0);
-  
-  // Clustered EGs in Eta-Phi plane
-  histoTools_.BookHisto_2D(h_clustEGs_Phi_Eta, "clustEGs_Phi_Eta",  ";#phi (rads);#eta", 230,  -3.15,  +3.15, 300,  -3.0,  +3.0);		      
-
-  // Mass of clustered EGs
-  histoTools_.BookHisto_1D(h_clustEGs_M, "clustEGs_M", ";Mass (GeV);clustered EGs / bin", 40, 0.0, +4.0);
-
-  // EG clustering counter
-  //histoTools_.BookHisto_2D(h_clustEGs_counter, "clustEGs_counter", ";Selection steps;clustered EGs / selection step", 5, 0.0, +5.0, 15, 0., 15.);
-  histoTools_.BookHisto_1D(h_clustEGs_counter, "clustEGs_counter", ";Selection steps;clustered EGs / selection step", 5, 0.0, +5.0);
-  h_clustEGs_counter->GetXaxis()->SetBinLabel(1,"allEGs");
-  h_clustEGs_counter->GetXaxis()->SetBinLabel(2,"passEt");
-  h_clustEGs_counter->GetXaxis()->SetBinLabel(3,"passDRmax");
-  h_clustEGs_counter->GetXaxis()->SetBinLabel(4,"passDRmin");
-  h_clustEGs_counter->GetXaxis()->SetBinLabel(5,"passInvMass");
-  h_clustEGs_counter->SetMarkerStyle(24);
+  // EGs Clustering
+  histoTools_.BookHisto_1D(h_leadTrk_EG_dR   , "leadTrk_EG_dR"  , tDR   , nDR   , minDR   , maxDR   );
+  histoTools_.BookHisto_1D(h_leadTrk_EG_dPhi , "leadTrk_EG_dPhi", tDPhi , nDPhi , minDPhi , maxDPhi );
+  histoTools_.BookHisto_1D(h_leadTrk_EG_dEta , "leadTrk_EG_dEta", tDEta , nDEta , minDEta , maxDEta );
 
   // Invariant mass of track+eg clusters (before cut)
   histoTools_.BookHisto_1D(h_TkEGClusters_M_beforeCut, "TkEGClusters_M_beforeCut", ";Invariant mass;Clusters / bin", 40, 0.0, +4.0);
-
 
   // Number of EGs (per cluster)
   histoTools_.BookHisto_1D(h_EGClusters_MultiplicityPerCluster, "EGClusters_MultiplicityPerCluster", ";Number of EGs in cluster;Clusters / bin", 16, -0.5, +15.5);
@@ -2220,16 +2227,16 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_ldgTkEG_ET, "TkEG_ldgET", ";E_{T} (GeV); TkEGs / bin", 300, 0.0,  +300.0); 
 
   // DeltaR in MC matching of the lead track of tau candidates
-  histoTools_.BookHisto_1D(hTkEG_DeltaRmatch  , "TkEG_DeltaRmatch"  , ";#Delta R;Particles / bin",   100,  0.0,   +1.0);
+  histoTools_.BookHisto_1D(hTkEG_DeltaRmatch  , "TkEG_DeltaRmatch"  , ";#Delta R;Entries / bin",   100,  0.0,   +1.0);
   
   // Visible Et of the matched generator taus
-  histoTools_.BookHisto_1D(hTkEG_genVisEt, "TkEG_genVisEt", ";E_{T}^{vis} (gen) (GeV);Particles / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTkEG_genVisEt, "TkEG_genVisEt", ";E_{T}^{vis} (gen) (GeV);Entries / bin", 40, 0.0,  +200.0);
 
   // Visible Et of the matched generator taus (when there is at least one EG clustered)
-  histoTools_.BookHisto_1D(hTkEG_genVisEt_clustEG, "TkEG_genVisEt_clustEG", ";E_{T}^{vis} (gen) (GeV);Particles / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTkEG_genVisEt_clustEG, "TkEG_genVisEt_clustEG", ";E_{T}^{vis} (gen) (GeV);Entries / bin", 40, 0.0,  +200.0);
   
   // Visible Pt of the matched generator taus (when there is at least one EG clustered)
-  histoTools_.BookHisto_1D(hTkEG_genVisPt_clustEG, "TkEG_genVisPt_clustEG", ";p_{T}^{vis} (gen) (GeV);Particles / bin", 40, 0.0,  +200.0);
+  histoTools_.BookHisto_1D(hTkEG_genVisPt_clustEG, "TkEG_genVisPt_clustEG", ";p_{T}^{vis} (gen) (GeV);Entries / bin", 40, 0.0,  +200.0);
 
   // Multiplicity of tau candidates 
   histoTools_.BookHisto_1D(h_TkEG_N, "TkEG_N", ";#tau-candidate multiplicity;Entries / bin", 16, -0.5, +15.5);
@@ -2269,6 +2276,10 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_leadTrks_Eta, "leadTrks_Eta", ";#eta;Tracks / bin", 60, -3.0, +3.0);
   histoTools_.BookHisto_1D(h_leadTrks_Phi, "leadTrks_Phi", ";#phi (rads);Tracks / bin", 21,  -3.15,  +3.15);
   histoTools_.BookHisto_2D(h_leadTrks_Phi_Eta, "leadTrks_Phi_Eta",  ";#phi (rads);#eta", 210,  -3.15,  +3.15, 600,  -3.0,  +3.0);  
+
+  // Track Clusters Properties
+  histoTools_.BookHisto_1D(h_trkClusters_Pt , "trkClusters_Pt", ";p_{T} (GeV);Clusters / bin", 150, +0.0, +300.0);
+  histoTools_.BookHisto_1D(h_trkClusters_M  , "trkClusters_M", ";Invariant mass;Clusters / bin", 40, 0.0, +4.0);
 
 
   histoTools_.BookHisto_1D(h_TkEG_isoTracks_InvMass, "TkEG_isoTracks_InvMass", ";Invariant mass (iso-cone); Entries / bin", 5000, +0.0, +5.0);
@@ -2548,17 +2559,17 @@ void TkEG::BookHistos_(void)
   histoTools_.BookHisto_1D(h_TkEG_NeutralsResolution_3pr, "TkEG_NeutralsResolution_3pr", ";#pi^{0} resolution (GeV);Clusters / bin", 21, -10.5, 10.5);
   
   // Decay Mode of non MCmatched Candidates 
-  histoTools_.BookHisto_1D(h_nonMCmatchedCandidates_decayMode, "nonMCmatchedCandidates_decayMode", ";;Events", 3, -0.5 , 2.5);
+  histoTools_.BookHisto_1D(h_nonMCmatchedCandidates_decayMode, "nonMCmatchedCandidates_decayMode", ";;Entries", 3, -0.5 , 2.5);
   h_nonMCmatchedCandidates_decayMode->GetXaxis()->SetBinLabel(1, "e");
   h_nonMCmatchedCandidates_decayMode->GetXaxis()->SetBinLabel(2, "#mu");
   h_nonMCmatchedCandidates_decayMode->GetXaxis()->SetBinLabel(3, "other");
 
   // MC matching 
-  histoTools_.BookHisto_1D(h_leadTrk_MCmatch, "leadTrk_MCmatch", ";;Events", 2, 0, 2);
+  histoTools_.BookHisto_1D(h_leadTrk_MCmatch, "leadTrk_MCmatch", ";;Entries", 2, 0, 2);
   h_leadTrk_MCmatch->GetXaxis()->SetBinLabel(1, "NOT MC Matched");
   h_leadTrk_MCmatch->GetXaxis()->SetBinLabel(2, "MC Matched");
 
-  histoTools_.BookHisto_1D(h_leadTrk4stubs_MCmatch, "leadTrk4stubs_MCmatch", ";;Events", 2, 0, 2);
+  histoTools_.BookHisto_1D(h_leadTrk4stubs_MCmatch, "leadTrk4stubs_MCmatch", ";;Entries", 2, 0, 2);
   h_leadTrk4stubs_MCmatch->GetXaxis()->SetBinLabel(1, "NOT MC Matched");
   h_leadTrk4stubs_MCmatch->GetXaxis()->SetBinLabel(2, "MC Matched");
 
@@ -2827,16 +2838,16 @@ void TkEG::WriteHistos_(void)
   h_genTausHad_Daughters_N->Write();
   h_genTausHad_chargedDaugh_N->Write();
   h_genTausHad_neutralDaugh_N->Write();
-  h_genTau_chargedDaugh_Pt->Write();
-  h_genTau_chargedDaugh_totalMass->Write();
-  h_genTau_neutralDaugh_totalMass->Write();
-  h_genTau_neutralDaugh_Et->Write();
+  h_genTausHad_chargedDaugh_Pt->Write();
+  h_genTausHad_chargedDaugh_totalMass->Write();
+  h_genTausHad_neutralDaugh_totalMass->Write();
+  h_genTausHad_neutralDaugh_Et->Write();
   h_genTauHad_chargedPtVsneutralET->Write();
-  h_genTau_CHF->Write();
-  h_genTau_NHF->Write();
-  h_genTau_chargedDaugh_visPt_dRmax->Write();
-  h_genTau_chargedDaugh_PtLead_dRmax->Write();
-  h_genTau_neutralDaugh_PtLead_dRmax->Write();
+  h_genTausHad_CHF->Write();
+  h_genTausHad_NHF->Write();
+  h_genTausHad_chargedDaugh_visPt_dRmax->Write();
+  h_genTausHad_chargedDaugh_PtLead_dRmax->Write();
+  h_genTausHad_neutralDaugh_PtLead_dRmax->Write();
 
   h_Pion0_Et->Write();
   h_Photons_Et->Write();
@@ -2861,43 +2872,23 @@ void TkEG::WriteHistos_(void)
 
   h_leadTrk_clustTrks_dZ0->Write();
 
-  h_clustTrks_Pt->Write();
-  h_clustTrks_Eta->Write();
-  h_clustTrks_Phi->Write();
-
   h_SigCone_DeltaR->Write();
 
-  h_trkClusters_MultiplicityPerCluster->Write();
-  h_MCmatch_chargedDaugh_N->Write();
-  h_MCmatch_neutralDaugh_N->Write();
   h_trkClusters_Pt->Write();
   h_trkClusters_M->Write();
   h_trkClusters_M_beforeCut->Write();
-
-  h_clustEGs_Et->Write();
-  h_clustEGs_Eta->Write();
-  h_clustEGs_Phi->Write();
-  h_clustEGs_M->Write();
 
   h_EGs_N -> Write();
   h_EGs_MCmatched_Et->Write();
   h_EGs_Et->Write();
   h_EGs_Eta->Write();
   h_EGs_Phi->Write();
-//  h_EGs_IEta->Write();
-//  h_EGs_IPhi->Write();
   h_EGs_HwQual->Write();
   h_EGs_EtaVsEt->Write();
 
   h_EGs_MCMatch->Write();
   h_EGs_Matched_dR_EG_matchPion0->Write();
   h_EGs_Matched_ETResolution->Write();
-
-  h_clustEGs_allEGs      -> Write();
-  h_clustEGs_passEt      -> Write();
-  h_clustEGs_passDRmax   -> Write();
-  h_clustEGs_passDRmin   -> Write();
-  h_clustEGs_passInvMass -> Write();
 
   h_leadTrk_EG_dR->Write();
   h_leadTrk_EG_dR_beforecorrection->Write();
@@ -3431,7 +3422,6 @@ void TkEG::WriteHistos_(void)
 
   // Write 2-D histograms
   h_leadTrks_Phi_Eta->Write();
-  h_clustTrks_Phi_Eta->Write();
   h_clustEGs_Et_Eta->Write();
   h_clustEGs_Phi_Eta->Write();
   h_clustEGs_counter->Write();
