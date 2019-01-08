@@ -13,10 +13,11 @@ EXAMPLES:
 ./plotResolution.py -m multicrab_CaloTkSkim_v92X_20180711T1118/ --gridX --gridY --formats .png,.pdf,.C
 ./plotResolution.py -m multicrab_CaloTkSkim_v92X_20180711T1118/
 ./plotResolution.py -i TT_TuneCUETP8M2T4_14TeV_L1TPU140 --url -m multicrab_Tracking_v92X_FitParams4Pt2Eta999Stubs0_14h58m32s_15Oct2018
+./plotResolution.py -i TT_TuneCUETP8M2T4_14TeV_L1TnoPU --gridX --url -m multicrab_Tracking_v92X_FitParams4Pt2Eta999Stubs0_14h58m32s_15Oct2018
 
 
 LAST USED:
-./plotResolution.py -i TT_TuneCUETP8M2T4_14TeV_L1TnoPU --gridX --url -m 
+./plotResolution.py -i TT_TuneCUETP8M2T4_14TeV_L1TPU140 --gridX --url -m multicrab_Tracking_v92X_FitParams4Pt2Eta999Stubs0_14h58m32s_15Oct2018
 
 '''
 
@@ -169,7 +170,7 @@ def main(opts):
     # Plot Histograms
     histoList  = datasetsMgr.getDataset(datasetsMgr.getAllDatasetNames()[0]).getDirectoryContent(opts.folder)
     histoPaths = [os.path.join(opts.folder, h) for h in histoList]
-    skipList   = ["eff_", "counter", "match_trk", "match_tp", "tp_pt", "tp_eta", "resVsEta_ptRel", "resVsPt_ptRel"]
+    skipList   = ["eff_", "counter", "match_trk", "match_tp", "tp_pt", "tp_eta"]#, "resVsEta_ptRel", "resVsPt_ptRel"]
     histoList  = []
     allowedReg = ["C", "I", "F", "L", "M", "H"]
 
@@ -269,7 +270,8 @@ def GetHistoKwargs(h, opts):
         ROOT.TGaxis.SetMaxDigits(5) #default
 
         if ("resVsPt_pt" in h):
-            kwargs["ylabel"] = "p_{T} resolution / " + format
+            # kwargs["ylabel"] = "p_{T} resolution / " + format
+             kwargs["ylabel"] = "#sigma_{p_{T}} / %.0f GeV/c"
             # kwargs["ylabel"] = "(p_{T}^{tk} - p_{T}^{tp})" + format
 
         if ("resVsPt_ptRel" in h):
@@ -279,20 +281,23 @@ def GetHistoKwargs(h, opts):
             
         if ("resVsPt_eta" in h):
             ROOT.TGaxis.SetMaxDigits(2) # force scientific scale
-            kwargs["ylabel"] = "#eta resolution / " + format
+            # kwargs["ylabel"] = "#eta resolution / " + format
+            kwargs["ylabel"] = "#sigma_{#eta} / %.0f GeV/c"
             #kwargs["ylabel"] = "(eta^{tk} - eta^{tp})" + format
 
         if ("resVsPt_phi" in h):
             ROOT.TGaxis.SetMaxDigits(2) # force scientific scale
-            kwargs["ylabel"] = "#phi resolution / " + format
+            kwargs["ylabel"] = "#sigma_{#phi} / " + format
 
         if ("resVsPt_z0" in h):
             #ROOT.TGaxis.SetMaxDigits(2) # force scientific scale
-            kwargs["ylabel"] = "z_{0} resolution / " + format
+            # kwargs["ylabel"] = "z_{0} resolution / " + format
+            kwargs["ylabel"] = "#sigma_{z_{0}} / %.0f GeV/c"
 
         if ("resVsPt_d0" in h):
             ROOT.TGaxis.SetMaxDigits(2) # force scientific scale
-            kwargs["ylabel"] = "d_{0} resolution / " + format
+            # kwargs["ylabel"] = "d_{0} resolution / " + format
+            kwargs["ylabel"] = "#sigma_{d_{0}} / %.0f GeV/c"
 
     if ("resVsEta_" in h):
         ROOT.gStyle.SetNdivisions(6, "X")
@@ -301,25 +306,30 @@ def GetHistoKwargs(h, opts):
         ROOT.TGaxis.SetMaxDigits(2) #default is 5
 
         if ("resVsEta_pt" in h):
-            kwargs["ylabel"] = "p_{T} resolution / " + format
+            # kwargs["ylabel"] = "p_{T} resolution / " + format
+            kwargs["ylabel"] = "#sigma_{p_{T}} / " + format
 
         if ("resVsEta_ptRel" in h):
             kwargs["ylabel"] = "relative p_{T} resolution / " + format
 
         if ("resVsEta_eta" in h):
-            kwargs["ylabel"] = "#eta resolution / " + format
+            #kwargs["ylabel"] = "#eta resolution / " + format
+            kwargs["ylabel"] = "#sigma_{#eta} / " + format
             kwargs["opts"]["ymaxfactor"] = 1.6
 
         if ("resVsEta_phi" in h):
-            kwargs["ylabel"] = "#phi resolution / " + format
+            #kwargs["ylabel"] = "#phi resolution / " + format
+            kwargs["ylabel"] = "#sigma_{#phi} / " + format
             kwargs["opts"]["ymaxfactor"] = 1.6
 
         if ("resVsEta_z0" in h):
-            kwargs["ylabel"] = "z_{0} resolution / " + format
+            #kwargs["ylabel"] = "z_{0} resolution / " + format
+            kwargs["ylabel"] = "#sigma_{z_{0}} / " + format
             kwargs["opts"]["ymaxfactor"] = 1.5
 
         if ("resVsEta_d0" in h):
-            kwargs["ylabel"] = "d_{0} resolution / " + format
+            # kwargs["ylabel"] = "d_{0} resolution / " + format
+            kwargs["ylabel"] = "#sigma_{d_{0}} / " + format
 
     if ("res_" in h):
         ROOT.gStyle.SetNdivisions(6, "X")
@@ -328,7 +338,8 @@ def GetHistoKwargs(h, opts):
 
         if ("res_pt" in h): # = (tk_Pt - tp_Pt)
             kwargs["ylabel"] = "Arbitrary units / %.2f GeV/c"
-            kwargs["opts"] = {"xmin": -3.0, "xmax": 3.0, "ymin": 1e-4, "ymaxfactor": 2.0}
+            # kwargs["xlabel"] = "e_{p_{T}} (GeV/c)"
+            kwargs["opts"] = {"xmin": -3.0, "xmax": 3.0, "ymin": 1e-5, "ymaxfactor": 2.0}
 
         if ("res_ptRel" in h): # = (tk_Pt - tp_Pt)/(tp_Pt)
             kwargs["ylabel"] = "Arbitrary units / %.3f"
@@ -485,7 +496,7 @@ if __name__ == "__main__":
     SAVEDIR      = None
     VERBOSE      = False
     RATIO        = False
-    SAVEFORMATS = [".png"]
+    SAVEFORMATS = [".png", ".pdf", ".C"]
     FOLDER      = ""
 
     # Define the available script options
