@@ -19,7 +19,11 @@ class L1TkEGParticle{
   // Constructors
   L1TkEGParticle();
   L1TkEGParticle(vector<TTTrack> tracks,
-		 vector<EG> EGs,
+		 vector<EG> EGs, 
+		 float sigCone_dRMin, 
+		 float sigCone_dRMax, 
+		 float isoCone_dRMin, 
+		 float isoCone_dRMax,
 		 GenParticle genTau,
 		 bool match);
 
@@ -45,22 +49,24 @@ class L1TkEGParticle{
   void PrintTTTracks();
   float CorrectedEta(float eta, float zTrack);
   void AddTrack(TTTrack trk) { theTracks.push_back(trk); }
+  void AddEG(EG eg) { theEGs.push_back(eg); }
   TTTrack GetLeadingTrack() const { return theTracks[0]; } 
   vector<TTTrack> GetTracks() const {return theTracks; }
   vector<EG> GetEGs() const{ return theEGs;}
   bool HasMatchingGenParticle(void) const{return theMatching;}
-  
   GenParticle GetMatchingGenParticle() const {return theGenTau;}
+  TLorentzVector GetTracksP4();
+  TLorentzVector GetEGsP4();
   TLorentzVector GetTotalP4();
   
   void SetShrinkingConeConst(double shrinkConeConst) {shrinkConeCons_ = shrinkConeConst;}
-  void SetSigConeMaxOpen(double sigConeMaxOpen) {sigConeMaxOpen_ = sigConeMaxOpen;}
+  void SetSigConeCutOffdR(double sigConeMaxOpen) {sigConeMaxOpen_ = sigConeMaxOpen;}
   double GetShrinkingConeConst() const {return shrinkConeCons_;}
   double GetSigConeMaxOpen() const {return sigConeMaxOpen_;}
-  double GetSigConeMin() const {return 0.0;}  // FIX ME: from code
-  double GetSigConeMax();
-  double GetIsoConeMin();
-  double GetIsoConeMax() const{return 0.3;}  // FIX ME: from code
+  double GetSigConeMin() const {return theSigCone_dRMin;}
+  double GetSigConeMax() const {return theSigCone_dRMax;}
+  double GetIsoConeMin() const {return theIsoCone_dRMin;}
+  double GetIsoConeMax() const {return theIsoCone_dRMax;}
   
   void FindIsoConeTracks(vector<TTTrack> TTTracks, bool useIsoCone=false);
   void SetIsoConeTracks(vector<TTTrack> isoTracks) {isoTracks_ = isoTracks;}
@@ -110,6 +116,10 @@ class L1TkEGParticle{
   AuxTools auxTools;
   vector<TTTrack> theTracks;
   vector<EG> theEGs;
+  float theSigCone_dRMin;
+  float theSigCone_dRMax;
+  float theIsoCone_dRMin;
+  float theIsoCone_dRMax;
   GenParticle theGenTau;
   bool theMatching;
 };
