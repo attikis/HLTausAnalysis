@@ -287,6 +287,7 @@ def readFromCrabDirs(taskdirs, emptyDatasetsAsNone=False, **kwargs):
             # crab3
             files = glob.glob(os.path.join(d, "results", inputFile))        
             name  = name.replace("crab_", "")
+
         if len(files) == 0:
             print >> sys.stderr, "Ignoring dataset %s: no files matched to '%s' in task directory %s" % (d, inputFile, os.path.join(d, "res"))
             noFiles = True
@@ -4380,6 +4381,7 @@ class DatasetPrecursor:
             # Get the data version (e.g. 80Xdata or 80Xmc)
             dv = aux.Get(rf, "configInfo/dataVersion")
             if dv == None:
+                dv = "93Xmc"
                 msg = "Unable to find 'configInfo/dataVersion' from ROOT file '%s'. Setting dataversion to \"%s\"" % (name, dv)
                 Print(msg, True)
                 continue                

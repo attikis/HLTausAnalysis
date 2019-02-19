@@ -146,7 +146,13 @@ _physicalMcAdd = {
 
     "GluGluHToTauTau_14TeV_L1TnoPU"  : "GluGluHToTauTau_14TeV_L1TnoPU", 
     "GluGluHToTauTau_14TeV_L1TPU140" : "GluGluHToTauTau_14TeV_L1TPU140", 
-    "GluGluHToTauTau_14TeV_L1TPU200" : "GluGluHToTauTau_14TeV_L1TPU200", 
+    "GluGluHToTauTau_14TeV_L1TPU200" : "GluGluHToTauTau_14TeV_L1TPU200",
+    # CMSSW Emulator validation needs
+    "GluGluHToTauTau_PU140" : "GluGluHToTauTau_14TeV_L1TPU200",
+    "GluGluHToTauTau_PU200" : "GluGluHToTauTau_14TeV_L1TPU200",
+    "SingleNeutrino_PU140"  : "SingleNeutrino_L1TPU140",
+    "SingleNeutrino_PU200"  : "SingleNeutrino_L1TPU200",
+    
 }
 
 '''

@@ -587,8 +587,8 @@ if __name__ == "__main__":
         Verbose("Single ROOT file mode", True)
 
         # Check & assign ROOT file 
-        CheckRootFile(f)
-        opts.rootFile = f
+        CheckRootFile(opts.rootFile)
+        # opts.rootFile = f
         
         # Create directory and subdirectories
         CreatePseudoDir(opts, args)
