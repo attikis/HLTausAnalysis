@@ -11,11 +11,11 @@ USAGE:
 
 
 EXAMPLES:
-./plotValidation.py -m <multicrab_dir>
+./plotValidation.py -m multicrab_L1TkEG_PhaseIIFall17D_MC
 
 
 LAST USED:
-./plotValidation.py -m multicrab_L1TkEG_PhaseIIFall17D_MC
+./plotValidation.py -m multicrab_L1TkEG_PhaseIIFall17D_MC_test/ --gridX --gridY --cutY
 
 '''
 
@@ -99,10 +99,11 @@ def ConverToRateHisto(hh):
         return
     
     rh = hh.getRootHisto()
-    crossingRate  = 30e+06 # 30MHz
-    convertTokHz  =  1e-03 # 1 Hz -> 1kHz
+    convertTokHz  =  1.0e-03 # 1 Hz -> 1kHz
+    crossingRate  = 30.0e+06 # 30MHz
+    normFactor    = (crossingRate * convertTokHz) / (rh.GetBinContent(1))
     # normFactor    = (crossingRate * convertTokHz) / (rh.Integral())
-    normFactor    = (crossingRate * convertTokHz) / (rh.GetEntries())
+    # normFactor    = (crossingRate * convertTokHz) / (rh.GetEntries())
     rh.Scale(normFactor)
     return
 
@@ -253,9 +254,6 @@ class Algorithm:
             Print(msg, False)
             return
         
-        style = tdrstyle.TDRStyle()
-        ROOT.gStyle.SetErrorX(0.5) #required for x-axis error bars! (must be called AFTER tdrstyle.TDRStyle())
-
         hList   = []
         myLabel  = self.labels[hPath]
         myHisto  = self.histograms[hPath]
@@ -299,7 +297,7 @@ class Algorithm:
         # Make the plot
         Verbose("Plotting all histograms for comparison", True)
         p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[])
-
+         
         # Apply Univeral style?
         if 0:
             p.histoMgr.setHistoDrawStyleAll("HIST")
@@ -339,7 +337,9 @@ def GetHistoKwargs(saveName, category):
     xmax    = 1.0
     xlabel_ = ""
     ymax    = None
-
+    cutBoxX = None
+    cutBoxY = None
+    
     if "numberof" in sName:
         xlabel_ = "multiplicity"
         units   = ""
@@ -381,17 +381,32 @@ def GetHistoKwargs(saveName, category):
         xmin   = 0 
         xmax   = 200
 
+    # Rate histogram (
     if "EtThreshold" in saveName:
-        ylabel = "Rate (kHz)"
+        ylabel  = "Rate (kHz)"
         units   = ""
-        xmin    =   0
-        xmax    = 100
+        ymin    = 1e0
         ymax    = 5e4
-
+        #ymin    = 1e-4
+        #ymax    = 2
+        xmin    =   0
+        xmax    = 100        
+        # 46 GeV threshold line (TkEG threshold for 100 Hz)
+        if "TkEG" in saveName:
+            cutBoxX = {"cutValue": 50.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        elif "TrkTau" in saveName:
+            cutBoxX = {"cutValue": 42.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        elif "CaloTk" in saveName:
+            cutBoxX = {"cutValue": 63.0, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+        else:
+            pass
+        # 50 Hz reference line
+        cutBoxY = {"cutValue": 50, "fillColor": 16, "box": False, "line": True, "greaterThan": True, "mainCanvas": True, "ratioCanvas": False}
+        
     if ymax == None:
-        opts = {"xmin": xmin, "xmax" : xmax, "ymin" : ymin, "ymaxfactor": ymaxf}
+        opts1 = {"xmin": xmin, "xmax" : xmax, "ymin" : ymin, "ymaxfactor": ymaxf}
     else:
-        opts = {"xmin": xmin, "xmax" : xmax, "ymin" : ymin, "ymax": ymax}
+        opts1 = {"xmin": xmin, "xmax" : xmax, "ymin" : ymin, "ymax": ymax}
 
     
     myParams = {}
@@ -409,12 +424,16 @@ def GetHistoKwargs(saveName, category):
     myParams["ylabelsize"]        = 25
     myParams["addMCUncertainty"]  = True
     myParams["addLuminosityText"] = False
-    myParams["opts"]              = opts
+    myParams["opts"]              = opts1
     myParams["opts2"]             = {"ymin": 0.3, "ymax": 1.7} # if ratio is enabled
     myParams["moveLegend"]        = {"dx": -0.02, "dy": +0.02, "dh": -0.15 }
     myParams["cmsExtraText"]      = "Phase-2 Simulation"
     myParams["cmsTextPosition"]   = "outframe"
     myParams["legend"]            = category.getLabel()
+    if opts.cutX:
+        myParams["cutBox"]  = cutBoxX
+    if opts.cutY:
+        myParams["cutBoxY"] = cutBoxY
     return myParams
                        
 def SavePlot(plot, plotName, saveDir, saveFormats = [".C", ".png", ".pdf"]):
@@ -507,6 +526,13 @@ def GetHistoPaths(rootFile):
     
 def main(opts):
 
+    # Apply TDR style
+    style = tdrstyle.TDRStyle()
+    style.setGridX(opts.gridX)
+    style.setGridY(opts.gridY)
+    style.setOptStat(False)
+    ROOT.gStyle.SetErrorX(0.5) #required for x-axis error bars! (must be called AFTER tdrstyle.TDRStyle())
+        
     # Open all ROOT file (Nested for-loops)
     myRootFiles = OpenRootFiles(opts)
 
@@ -566,6 +592,8 @@ if __name__=="__main__":
     #SAVEDIR         = "/afs/cern.ch/user/%s/%s/public/html/FitDiagnostics" % (getpass.getuser()[0], getpass.getuser())
     SAVEDIR         = "tmp" 
     URL             = False
+    CUTX            = False
+    CUTY            = False
     GRIDX           = False
     GRIDY           = False
     ROOTFILE        = "L1TausPerformance_full.root"
@@ -594,6 +622,12 @@ if __name__=="__main__":
 
     parser.add_option("--gridY", dest="gridY", default=GRIDY, action="store_true",
                       help="Enable the grid for the y-axis [default: %s]" % (GRIDY) )
+
+    parser.add_option("--cutX", dest="cutX", default=CUTX, action="store_true",
+                      help="Enable the cut-line for the x-axis [default: %s]" % (CUTX) )
+
+    parser.add_option("--cutY", dest="cutY", default=CUTY, action="store_true",
+                      help="Enable the cut-line for the y-axis [default: %s]" % (CUTY) )
 
     parser.add_option("-m", "--mcrab", dest="mcrab", default=MCRAB, 
                       help="Name of multicrab directory [default: %s]" % (MCRAB) )
