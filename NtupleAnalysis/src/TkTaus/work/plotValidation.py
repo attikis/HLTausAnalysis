@@ -15,7 +15,7 @@ EXAMPLES:
 
 
 LAST USED:
-./plotValidation.py -m <multicrab_dir>
+./plotValidation.py -m multicrab_L1TkEG_PhaseIIFall17D_MC
 
 '''
 
@@ -49,7 +49,8 @@ ROOT.gROOT.SetBatch(True)
 #================================================================================================
 ws = ShellStyles.WarningStyle()
 es = ShellStyles.ErrorStyle()
-hs = ShellStyles.HighlightStyle()
+ls = ShellStyles.HighlightStyle()
+hs = ShellStyles.HighlightAltStyle()
 cs = ShellStyles.CaptionStyle()
 ns = ShellStyles.NormalStyle()
 rs = ShellStyles.ResultStyle()
@@ -59,7 +60,6 @@ ss = ShellStyles.SuccessStyle()
 # s = ShellStyles.NoteLabel()
 # s = ShellStyles.WarningLabel()
 # s = ShellStyles.ErrorLabel()
-# s = ShellStyles.HighlightAltStyle()
 # s = ShellStyles.SuccessLabel()
 
 
@@ -92,50 +92,102 @@ def getDirectoryContent(rootFile, directory, predicate=None):
     Get the directory content of a given directory in the ROOT file.
     '''
     return aux.listDirectoryContent(rootFile.Get(directory))
-    
-class Category:
-    def __init__(self, name, opts):
-        xMin  = 0
-        yMin  = 0.0
-        yMaxF = 1.2
 
-        self.name       = name
-        self.gOpts      = opts
-        self.histonames = []
-        self.labels     = {}
-        self.colors     = {}
-        self.histograms = {}
-        #self.opts       = {"xmin": xMin, "xmax" : self.gOpts.xMax, "ymin" : yMin, "ymaxfactor": yMaxF}
-        #self.opts2      = {"ymin": 0.3, "ymax": 1.7}
-        self.moveLegend = {}
+
+def ConverToRateHisto(hh):
+    if "EtThreshold" not in hh.getName():
         return
+    
+    rh = hh.getRootHisto()
+    crossingRate  = 30e+06 # 30MHz
+    convertTokHz  =  1e-03 # 1 Hz -> 1kHz
+    # normFactor    = (crossingRate * convertTokHz) / (rh.Integral())
+    normFactor    = (crossingRate * convertTokHz) / (rh.GetEntries())
+    rh.Scale(normFactor)
+    return
+
+
+class Algorithm:
+    def __init__(self, name, opts):
+        self.name          = name
+        self.label         = self.GetAlgorithmLabel(name)
+        self.gOpts         = opts
+        self.histonames    = []
+        self.histoPaths    = []
+        self.labels        = {}
+        self.colors        = {}
+        self.histograms    = {}
+        self.histosSkipped = []
+        self.histosCreated = []
+        return
+
+    def GetAlgorithmLabel(self, algo):
+        if algo == "CaloTk":
+            return "#it{tracks+calo}"
+        elif algo == "TkTau":
+            return "#it{tracks-only}"
+        elif algo == "TrkTau":
+            return "#it{tracks-only}"
+        elif algo == "TkEG":
+            return "#it{tracks+e#gamma}"
+        else:
+            raise Exception("%sUnknown algorithm %s" % (es, algo + ns))
 
     def getName(self):
         return self.name
 
-    def addData(self,datarootfile):
-        self.datafile = datarootfile
-        return
+    def getHistosCreated(self):
+        return self.histosCreated
+
+    def getHistosSkipped(self):
+        return self.histosSkipped
+
+    def getNHistosCreated(self):
+        return len(self.histosCreated)
+
+    def getNHistosSkipped(self):
+        return len(self.histosSkipped)
+
+    def getNHistosTotal(self):
+        return self.getNHistosCreated() + self.getNHistosSkipped()
+
+    def getHistonames(self):
+        return self.histonames
+
+    def getHistoPaths(self):
+        # Ensure list has no duplicates
+        return list(set(self.histoPaths))
+    
+    def getLabel(self):
+        return self.label
+
+    def getIndex(self):
+        algo = self.name
+        if algo == "CaloTk":
+            return 0
+        elif algo == "TkTau":
+            return 1
+        elif algo == "TrkTau":
+            return 1
+        elif algo == "TkEG":
+            return 2
+        else:
+            raise Exception("%sUnknown algorithm %s" % (es, algo + ns))
 
     def addHisto(self, histo, legendlabel, color=0):
-        Print("Appending histogram \"%s\" with legend label \"%s\"." % (histo, legendlabel), False)
+        Verbose("Appending histogram \"%s\" with legend label \"%s\"." % (histo, legendlabel), False)
         self.histonames.append(histo)
         self.labels[histo] = legendlabel
         self.colors[histo] = color
         return
 
-    def setMoveLegend(self,move):
-        self.moveLegend = move
-        return
-
     def clone(self,name):
-        returnCat = Category(name, self.gOpts)
+        returnCat = Algorithm(name, self.gOpts)
         returnCat.histonames = self.histonames
         returnCat.labels     = self.labels
         returnCat.colors     = self.colors
         returnCat.opts       = self.opts
         returnCat.opts2      = self.opts2
-        returnCat.moveLegend = self.moveLegend
         return returnCat
 
     def fetchHistograms(self, rootFiles, opts):
@@ -144,73 +196,132 @@ class Category:
         
         # For-loop: All histogram names
         for i, hName in enumerate(hnamesList, 1):
+
             # For-loop: All ROOT files
             for j, f in enumerate(rootFiles, 1):
                 Verbose("Getting histogram \"%s\" from ROOT file \"%s\"" % (hName, f.GetName()), i==1)
-
+                
                 # Get the histograms
                 histo = f.Get(hName)
                 hType = str(type(histo))
-                
-                # Safety net for empty histos (if datasset integral is zero corresponding histo will not exist)
-#                if "TH1" in hType:
-#                    Verbose("Histogram is of type %s" % (hs + hType + ns), j==1)
-#                else: 
-#                    msg = "Skipping %s. Not a TH1 type histogram!" % (hName)
-#                    Print(es + msg + ns, False)
-#                    # Remove the first item from the list whose value is hName. It is an error if there is no such item.
-#                    if hName in self.histonames:
-#                        self.histonames.remove(hName)
-#                    continue
-
-                # Customise histogram
+                if "TH" not in hType:
+                    msg = "Skipping non-histogram object \"%s\" ( type = \"%s\")" % (hName, hType)
+                    Verbose(es + msg + ns, True)
+                    continue
+                else:
+                    Verbose("Histogram \"%s\" if of type \"%s\"" % (hName, hType), True)
+                    
+                # Customise histogram                
                 histo.SetFillColor(self.colors[hName])
                 histo.SetLineWidth(3)
-                Print("Mapping histogram name (key) %s to histogram with name %s (object)" % (hName, histo.GetName()), i==1 and j==1) #iro - fixme (dataset?)
+                Verbose("Mapping histogram name (key) %s to histogram with name %s (object)" % (hName, histo.GetName()), i==1 and j==1) #iro - fixme (dataset?)
+                print "self.histograms = ", self.histograms
                 self.histograms[hName] = histo # iro - fixme (dataset?)
+                self.histoPaths.append(hPath)
+        return
+
+    def fetchHistogram(self, hPath, rootFiles, opts):
+
+        # For-loop: All ROOT files
+        for j, f in enumerate(rootFiles, 1):
+            Verbose("Getting histogram \"%s\" from ROOT file \"%s\"" % (hPath, f.GetName()), i==1)
+            
+            # Get the histograms
+            histo = f.Get(hPath)
+            hType = str(type(histo))
+            if "TH" not in hType:
+                msg = "Skipping non-histogram object \"%s\" ( type = \"%s\")" % (hPath, hType)
+                Verbose(ls + msg + ns, True)
+                continue
+            else:
+                Verbose("Histogram \"%s\" if of type \"%s\"" % (hPath, hType), True)
+                
+            # Customise histogram
+            histo.SetFillColor(self.colors[hPath])
+            histo.SetLineWidth(3)
+            Verbose("Mapping histogram name (key) %s to histogram with name %s (object)" % (hPath, histo.GetName()), i==1 and j==1) #iro - fixme (dataset?)
+            self.histograms[hPath] = histo
+            self.histoPaths.append(hPath)
         return
 
 
-    def plot(self):
+    def plot(self, hPath, verbose):
+
+        # Sanity check
+        if hPath not in self.histograms:
+            msg = "Histogram %s was not stored for plotting. Skipping!" % (es + hPath + ns)
+            Print(msg, False)
+            return
+        
         style = tdrstyle.TDRStyle()
         ROOT.gStyle.SetErrorX(0.5) #required for x-axis error bars! (must be called AFTER tdrstyle.TDRStyle())
 
-        histolist = []        
-        # For-loop: All bkg histos
-        for i, hName in enumerate(self.histonames, 1):
-            myLabel = self.labels[hName]
-            myHisto = self.histograms[hName]
-            # myHisto = self.histograms[hName.split("/")[-1]] # iro - fixme
+        hList   = []
+        myLabel  = self.labels[hPath]
+        myHisto  = self.histograms[hPath]
+        integral = myHisto.Integral()
+        
+        # Sanity check (Histogram is not empty)
+        if integral == 0.0:
+            msg = "Skipping histogram %s (Integral = %.1f)" % (ls + hPath + ns, integral)
+            Print(msg, False)
+            self.histosSkipped.append(hPath)
+            return
+        else:
+            msg = "Creating histogram %s" % (hs + hPath + ns)
+            Print(msg, verbose)
+
+        # Create histogram histo
+        #hh = histograms.Histo(myHisto, hPath, legendStyle="F", drawStyle="HIST", legendLabel=myLabel)
+        hh = histograms.Histo(myHisto, hPath, legendStyle="L", drawStyle="HIST", legendLabel=myLabel)
+
+        # Convert to rate histogram (scale appropriately)
+        ConverToRateHisto(hh)
+
+        # Set histogram type (Data or MC)
+        hh.setIsDataMC(isData=False, isMC=True)
+        hList.append(hh)
+        if 0:
+            aux.PrintTH1Info(hh.getRootHisto())
             
-            Print("Creating histogram %s (Integral = %.1f)" % (hs + hName + ns, myHisto.Integral()), i==1) #iro - fixme
-            hh = histograms.Histo(myHisto, hName, legendStyle="F", drawStyle="HIST", legendLabel=myLabel)
-            if 0:
-                aux.PrintTH1Info(hh.getRootHisto())
-            hh.setIsDataMC(isData=False, isMC=True)
-            histolist.append(hh)
+        # Apply histogram style
+        styles.styles[self.getIndex()].apply(hh.getRootHisto())
+        self.histosCreated.append(hPath)            
             
         # Sanity check
-        for i, h in enumerate(histolist, 1):
-            hName = h.getRootHisto().GetName()
-            Verbose("Histogram name is %s" % (hs + hName + ns), i==1)
+        if len(hList) < 1:
+            return
 
-        # Do the plot
+        # Get the keyword arguments for this specific histogram
+        saveName = hPath.replace("/", "_") 
+        kwargs   = GetHistoKwargs(saveName, self)
+        
+        # Make the plot
         Verbose("Plotting all histograms for comparison", True)
-        p = plots.ComparisonManyPlot(histolist[0], histolist[1:], saveFormats=[])
-        p.setDefaultStyles()
-        if "Vs" in str(type(histolist[0])):
-            p.addMCUncertainty()
-        p.setLegendHeader(self.getName())
-                
-        # Draw the plot
-        saveName = histolist[0].getRootHisto().GetName()
-        if not os.path.exists(opts.saveDir):
-            os.makedirs(opts.saveDir)
-        plots.drawPlot(p, os.path.join(opts.saveDir, saveName), **GetHistoKwargs(saveName, self))
-        #plots.drawPlot(p, os.path.join(opts.saveDir, "alexandros"), **myParams)
+        p = plots.ComparisonManyPlot(hList[0], hList[1:], saveFormats=[])
 
-        # Save the plot (not needed - drawPlot saves the canvas already)
+        # Apply Univeral style?
+        if 0:
+            p.histoMgr.setHistoDrawStyleAll("HIST")
+            p.histoMgr.setHistoLegendStyleAll("FLP")
+
+        # Set legend labels
+        p.histoMgr.setHistoLegendLabelMany({hPath: kwargs["legend"]})
+
+        # Set Legend header?
+        if 0:
+            p.setLegendHeader(self.getLabel())
+
+        # Add MC uncertainty (if not a TH2)
+        if "Vs" in str(type(hList[0])):
+            p.addMCUncertainty() # appears to do nothing..
+            
+        # Draw the plot
+        plots.drawPlot(p, hPath, **kwargs)
+
+        # Save the plot
         SavePlot(p, saveName, opts.saveDir, saveFormats = opts.saveFormats)
+
         return
 
 
@@ -226,6 +337,9 @@ def GetHistoKwargs(saveName, category):
     ymaxf   = 1.2
     xmin    = 0.0
     xmax    = 1.0
+    xlabel_ = ""
+    ymax    = None
+
     if "numberof" in sName:
         xlabel_ = "multiplicity"
         units   = ""
@@ -241,30 +355,45 @@ def GetHistoKwargs(saveName, category):
         units   = "GeV"
         xmin    =   0
         xmax    = 200
+        ymin    = 1e0
+        logy    = True
     elif "phi" in sName:
         xlabel_ = "#phi"
         units   = "rads"
-        units   = ""
         xmin    = -3.15
         xmax    = +3.15       
     else:
         pass
 
-    ylabel = "Entries (%s)" % (units)
     if units !=  "":
+        ylabel = "Entries (%s)" % (units)
         xlabel = "%s (%s)" % (xlabel_, units)
     else:
+        ylabel = "Entries"
         xlabel = xlabel_
-
+        
     if "EtGenVsEt" in saveName:
         units  = "GeV"
-        xlabel = "aaE_{T} (%s)" % (units)
+        xlabel = "E_{T} (%s)" % (units)
         ylabel = "E_{T} (%s)" % (units)
         ymin   = 0 
         ymax   = 200
         xmin   = 0 
         xmax   = 200
 
+    if "EtThreshold" in saveName:
+        ylabel = "Rate (kHz)"
+        units   = ""
+        xmin    =   0
+        xmax    = 100
+        ymax    = 5e4
+
+    if ymax == None:
+        opts = {"xmin": xmin, "xmax" : xmax, "ymin" : ymin, "ymaxfactor": ymaxf}
+    else:
+        opts = {"xmin": xmin, "xmax" : xmax, "ymin" : ymin, "ymax": ymax}
+
+    
     myParams = {}
     myParams["xlabel"]            = xlabel
     myParams["ylabel"]            = ylabel
@@ -280,11 +409,12 @@ def GetHistoKwargs(saveName, category):
     myParams["ylabelsize"]        = 25
     myParams["addMCUncertainty"]  = True
     myParams["addLuminosityText"] = False
-    myParams["opts"]              = {"xmin": xmin, "xmax" : xmax, "ymin" : ymin, "ymaxfactor": ymaxf}
+    myParams["opts"]              = opts
     myParams["opts2"]             = {"ymin": 0.3, "ymax": 1.7} # if ratio is enabled
-    myParams["moveLegend"]        = category.moveLegend
+    myParams["moveLegend"]        = {"dx": -0.02, "dy": +0.02, "dh": -0.15 }
     myParams["cmsExtraText"]      = "Phase-2 Simulation"
     myParams["cmsTextPosition"]   = "outframe"
+    myParams["legend"]            = category.getLabel()
     return myParams
                        
 def SavePlot(plot, plotName, saveDir, saveFormats = [".C", ".png", ".pdf"]):
@@ -298,10 +428,10 @@ def SavePlot(plot, plotName, saveDir, saveFormats = [".C", ".png", ".pdf"]):
     saveName = os.path.join(saveDir, plotName.replace("/", "_"))
 
     # For-loop: All save formats
-    for i, ext in enumerate(saveFormats):
+    for i, ext in enumerate(saveFormats, 0):
         saveNameURL = saveName + ext
         saveNameURL = aux.convertToURL(saveNameURL, opts.url)
-        Print(saveNameURL, i==0)
+        Verbose(saveNameURL, i==0)
         plot.saveAs(saveName, formats=saveFormats)
     return
 
@@ -310,18 +440,24 @@ def OpenRootFiles(opts):
     Verbose("Opening all ROOT files from multicrab directory \"%s\"" % (opts.mcrab), True)
 
     myRootFiles = []
-    # For-loop: All datasets 
+    # For-loop: All datasets
+    Print("Found %d datasets:\n\t%s" % (len(opts.dsetDict), "\n\t".join(opts.dsetDict.keys())), True)
     for i, dset in enumerate(opts.dsetDict, 1):
-
+        
         # For-loop: All ROOT files (for given dataset)
         for j, f in enumerate(opts.dsetDict[dset], 1):
             if os.path.isfile(f):
-                Print("Opening file %s" % (f), i==1)
+                Verbose("Opening file %s" % (f), i==1)
                 myRootFiles.append(ROOT.TFile.Open(f, "R"))
             else:
-                raise Exception("File \"%s\" not found." % (f) )
+                msg = "File \"%s\" not found." % (f)
+                raise Exception(es + msg + ns)
 
-    Print("%sSuccessfully opened %d ROOT files from multicrab directory %s.%s" % (ss, len(myRootFiles), opts.mcrab, ns), True)
+    if len(myRootFiles) < 1:
+        msg = "Could not find any ROOT files under multicrab directory %s" % (opts.mcrab)
+        raise Exception(es + msg + ns)
+    
+    Verbose("%sSuccessfully opened %d ROOT files from multicrab directory %s" % (ss, len(myRootFiles), opts.mcrab + ns), True)
     return myRootFiles
 
 
@@ -332,7 +468,7 @@ def CloseRootFiles(myRootFiles):
     for i, f in enumerate(myRootFiles, 1):
         Verbose("Closing file \"%s\"" % (f.GetName()), i==1)
         f.Close()
-    Print("%sSuccessfully closed %d ROOT files.%s" % (ss, len(myRootFiles), ns), True)        
+    Verbose("%sSuccessfully closed %d ROOT files.%s" % (ss, len(myRootFiles), ns), True)        
     return
 
 def GetFoldersInRootFile(rootFile):
@@ -343,16 +479,6 @@ def GetFoldersInRootFile(rootFile):
         folders.append(k.GetName())
     return folders
     
-def GetAlgorithmLabel(algo):
-    if algo == "CaloTk":
-        return "#it{tracks+calo}"
-    elif algo == "TkTau":
-        return "#it{tracks-only}"
-    elif algo == "TkEG":
-        return "#it{tracks+e#gamma}"
-    else:
-        raise Exception("%sUnknown algorithm %s" % (es, algo + ns))
-
     
 def GetAlgorithmNames(rootFile):
     folders     = GetFoldersInRootFile(rootFile)
@@ -361,46 +487,75 @@ def GetAlgorithmNames(rootFile):
     return algos
 
 
+def GetHistoPaths(rootFile):
+    hPathList  = []
+    # For-loop: All folders in ROOT file
+    for folder in opts.folders:
+        hNameList  = []
+        hNameList.extend( getDirectoryContent(rootFile, folder, predicate=None) )
+        hPathList.extend( [os.path.join(folder, h) for h in hNameList] )
+
+    # Remove duplicates (safety)
+    hPathList = list(set(hPathList))
+    Print("Found %d histos:\n\t%s" % (len(hPathList), "\n\t".join(hPathList)), True)
+    
+    # Sort list alphabetically before returning
+    hPathList.sort() 
+
+    return hPathList
+    
+    
 def main(opts):
 
     # Open all ROOT file (Nested for-loops)
     myRootFiles = OpenRootFiles(opts)
-    hnameList   = getDirectoryContent(myRootFiles[0], opts.folder, predicate=None)
-    hpathList   = [os.path.join(opts.folder, h) for h in hnameList]
-    algos       = GetAlgorithmNames(myRootFiles[0])
-    cObjects    = []
 
+    # Declare a reference ROOT file
+    rootFile = myRootFiles[0]
+    
+    # Get all folders inside these files
+    opts.folders = GetFoldersInRootFile(rootFile)
+    Print("Found %d folders:\n\t%s" % (len(opts.folders), "\n\t".join(opts.folders)), True)    
 
-    for hpath in hpathList:
-        
-        # List categories and add the histogram names
-        for a in algos:
-            cObject = Category(GetAlgorithmLabel(a), opts)
+    # Get all the histogram names
+    algorithms = []
+    algoNames  = []
+    hPathList  = GetHistoPaths(rootFile)
+    
+    # Get algorithms present in ROOT files
+    algos = GetAlgorithmNames(myRootFiles[0])
+    Print("Found %d algorithms:\n\t%s" % (len(algos), "\n\t".join(algos)), True)
 
-        # FIXME - shouldn't these be inside the loop?
-        # Customise legend position and size
-        cObject.setMoveLegend( {"dx": -0.08, "dy": -0.02, "dh": -0.05 } )
+    # For-loop: All histograms inside ROOT files
+    #print "\n".join(hPathList)
+    #sys.exit()
+
+    for i, hPath in enumerate(hPathList, 1):
+        # print "hPath = ", hPath
+        algoName = hPath.split("/")[0].replace("Rate", "").replace("Eff", "")
+        # algoNames.append(algoName)
+        algo = Algorithm(algoName, opts)
 
         # Add histogram
-        cObject.addHisto(hpath, hpath, color=ROOT.kBlue-1) # iro - fixme
+        Verbose("Adding histogram \"%s\"" % (hPath), i==1)
+        algo.addHisto(hPath, os.path.basename(hPath), i+2) # iro - fixme
+                
+        Verbose("Fetching histograms for algorithm %s" % (hs + algo.getName() + ns), j==1)
+        #algo.fetchHistograms(myRootFiles, opts) # f.Get(histoPath)
+        algo.fetchHistogram(hPath, myRootFiles, opts) # f.Get(histoPath)
 
+        Verbose("Plotting histogram %s" % (hPath), True)
+        algo.plot(hPath, i==1)        
+        
         # Create list of algorithms
-        algorithms = [cObject] # iro - fixme
-
-        Verbose("Fetch histograms for %d algorithms" % (len(algorithms)), True)
-        # For-loop: All aglorithms
-        for i, algo in enumerate(algorithms, 1):
-            Verbose("Fetching histograms for algorithm %s" % (hs + algo.getName() + ns), i==1)
-            algo.fetchHistograms(myRootFiles, opts)
+        algorithms.append(algo)
     
-        Verbose("Plotting histograms for all algorithms", True)
-        # For-loop: All algorithms
-        for i, a in enumerate(algorithms, True):
-            Verbose("Plotting histograms for algorithm %s" % (a.getName()), i==1)
-            a.plot() 
-
     # Close all ROOT file (Nested for-loops)
     CloseRootFiles(myRootFiles)
+
+    # Inform user of location of files
+    Print("%sPlots saved under director \"%s\"%s" % (ss, opts.saveDir, ns), True)
+
     return
 
 
@@ -416,7 +571,6 @@ if __name__=="__main__":
     ROOTFILE        = "L1TausPerformance_full.root"
     MCRAB           = None
     FORMATS         = [".png"] #[".png", ".pdf", ".C"]
-    FOLDER          = "TkEGRate" #"TkEGEff"
     
     parser = OptionParser(usage="Usage: %prog [options]", add_help_option=True, conflict_handler="resolve")
 
@@ -444,9 +598,6 @@ if __name__=="__main__":
     parser.add_option("-m", "--mcrab", dest="mcrab", default=MCRAB, 
                       help="Name of multicrab directory [default: %s]" % (MCRAB) )
     
-    parser.add_option("--folder", dest="folder", default=FOLDER, 
-                      help="Folder inside the ROOT file containing the histograms to be plotted [default: %s]" % (FOLDER) )
-
     (opts, args) = parser.parse_args()
 
     opts.rootFiles = []
@@ -456,7 +607,6 @@ if __name__=="__main__":
     for crab in os.listdir(opts.mcrab):
         dset = crab.replace("crab_", "")
         if not os.path.isdir(os.path.join(os.getcwd(), opts.mcrab, crab)):
-            print crab
             continue
         else:
             opts.datasets.append(dset)
